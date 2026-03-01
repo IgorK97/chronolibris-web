@@ -51,3 +51,11 @@ export const useShelves = (userId: number) => {
     enabled: !!userId,
   });
 };
+
+export const useSelection = () => {
+  return useQuery({
+    queryKey: ['selections'],
+    queryFn: () => collectionsApi.getSelections(),
+    staleTime: 5 * 60 * 1000, // 5 минут
+  });
+};

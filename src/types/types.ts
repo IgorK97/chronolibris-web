@@ -1,3 +1,5 @@
+export const SELECTION_TYPE = { NEWEST: 1, POPULAR: 2, MANUAL: 3 } as const;
+
 export interface BookListItem {
   id: number;
   title: string;
@@ -200,6 +202,7 @@ export interface SelectionDetails {
   id: number;
   name: string;
   description: string;
+  selectionTypeId: number;
 }
 
 export interface PagedResult<T> {

@@ -1,12 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React from 'react';
+import React, { useMemo } from 'react';
 import { SectionHeader } from './SectionHeader'; // Наш переписанный заголовок
 import { BookCard } from '../../../components/books';
-import type { BookListItem } from '../../../types/types';
+import {
+  SELECTION_TYPE,
+  type BookListItem,
+  type SelectionDetails,
+} from '../../../types/types';
 import { useStore } from '../../../stores/globalStore';
 import { useSelectionBooks } from '../../../api/books';
 import styles from './Library.module.css';
 import ErrorBoundary from '@/components/ErrorBoundary/ErrorBoundary';
+import { useSelection } from '@/api/collections';
 
 interface LibraryProps {
   onNavigateToBook: (id: number) => void;
@@ -66,13 +71,37 @@ export const Library = ({
 }: LibraryProps) => {
   const { user, setCurrentBook } = useStore();
 
-  const sections = [
-    { id: 4, title: 'Новое' },
-    { id: 5, title: 'Часто читают' },
-    { id: 2, title: 'История культуры' },
-    { id: 1, title: 'Экономическая история' },
-    { id: 3, title: 'История мира' },
-  ];
+  const {
+    data: selections,
+    isLoading: selectionsIsLoading,
+    error,
+  } = useSelection();
+
+  // const sections = [
+  //   { id: 4, title: 'Новое' },
+  //   { id: 5, title: 'Часто читают' },
+  //   { id: 2, title: 'История культуры' },
+  //   { id: 1, title: 'Экономическая история' },
+  //   { id: 3, title: 'История мира' },
+  // ];
+
+  const sortedSections = useMemo<SelectionDetails[]>(() => {
+    if (!selections) return [];
+
+    const permanent = selections
+      .filter(
+        (s) =>
+          s.selectionTypeId === SELECTION_TYPE.NEWEST ||
+          s.selectionTypeId === SELECTION_TYPE.POPULAR
+      )
+      .sort((a, b) => a.selectionTypeId - b.selectionTypeId);
+
+    const manual = selections.filter(
+      (s) => s.selectionTypeId === SELECTION_TYPE.MANUAL
+    );
+
+    return [...permanent, ...manual];
+  }, [selections]);
 
   const navigateToBookHandler = (book: BookListItem) => {
     setCurrentBook(book);
@@ -86,14 +115,17 @@ export const Library = ({
       </div>
     );
 
+  if (selectionsIsLoading)
+    return <div className={styles['error-wrapper']}>Загрузка подборок...</div>;
+
   return (
     <main className={styles['library-container']}>
       <div className={styles['scroll-container']}>
-        {sections.map((section) => (
+        {sortedSections.map((section) => (
           <ErrorBoundary key={section.id}>
             <SelectionSection
               id={section.id}
-              title={section.title}
+              title={section.name}
               userId={user.userId}
               onNavigateToBook={navigateToBookHandler}
               onNavigateToList={onNavigateToList}
