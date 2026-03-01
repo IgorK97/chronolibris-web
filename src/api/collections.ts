@@ -22,8 +22,7 @@ export const collectionsApi = {
     ),
 
   // Shelves
-  getUserShelves: (userId: number) =>
-    apiClient.get<ShelfDetails[]>(`/Shelves/user/${userId}`),
+  getUserShelves: () => apiClient.get<ShelfDetails[]>(`/Shelves/user`),
 
   addBookToShelf: (shelfId: number, bookId: number) =>
     apiClient.post<boolean>(`/Shelves/${shelfId}/books/${bookId}`),
@@ -41,13 +40,29 @@ export const collectionsApi = {
 
   removeBookFromShelf: (shelfId: number, bookId: number) =>
     apiClient.delete<boolean>(`/Shelves/${shelfId}/books/${bookId}`),
+
+  createShelf: (name: string) => apiClient.post<number>(`/Shelves`, { name }),
+
+  deleteShelf: (shelfId: number) =>
+    apiClient.delete<boolean>(`/Shelves/${shelfId}`),
+
+  seekBookInShelf: (bookId: number) =>
+    apiClient.get<number[]>(`/Shelves/books/${bookId}`),
+};
+
+export const useSeekedShelves = (bookId: number) => {
+  return useQuery({
+    queryKey: ['seekedShelves', bookId],
+    queryFn: () => collectionsApi.seekBookInShelf(bookId),
+    enabled: !!bookId,
+  });
 };
 
 // hooks/useShelves.ts
 export const useShelves = (userId: number) => {
   return useQuery({
     queryKey: ['shelves', userId],
-    queryFn: () => collectionsApi.getUserShelves(userId),
+    queryFn: () => collectionsApi.getUserShelves(),
     enabled: !!userId,
   });
 };

@@ -8,6 +8,9 @@ import {
   Heart,
   Download,
   ListPlus,
+  SquareCheckBig,
+  Square,
+  WandSparkles,
   // XCircle,
   // ArrowUpCircle,
 } from 'lucide-react';
@@ -15,8 +18,12 @@ import styles from './BookDetails.module.css';
 import { useStore } from '../../../stores/globalStore';
 import { booksApi, useBookDetails } from '../../../api/books';
 import { useRoles } from '../../../api/references';
-import type { BookDetails } from '../../../types/types';
-import { collectionsApi, useShelves } from '../../../api/collections';
+import type { BookDetails, ShelfDetails } from '../../../types/types';
+import {
+  collectionsApi,
+  useSeekedShelves,
+  useShelves,
+} from '../../../api/collections';
 import {
   favColor,
   fillFavColor,
@@ -25,7 +32,7 @@ import {
 } from '../../../utils';
 import { t } from 'i18next';
 import { useEffect, useRef, useState } from 'react';
-import { CommentsSection } from './CommentSection/CommentsSection';
+// import { CommentsSection } from './CommentSection/CommentsSection';
 import { BookTabs } from './BookTabs/BookTabs';
 import { ParticipantsInfo } from './BookTabs/ParticipantsInfo';
 interface BookDetailsProps {
@@ -56,7 +63,11 @@ export const BookDetailsComponent = ({
 
   const { currentBook, setCurrentBook, user } = useStore();
   const { data: roles } = useRoles();
-  const { data: shelves } = useShelves(user?.userId || 0);
+  const { data: seekedShelves, refetch: refetchSeekedShelves } =
+    useSeekedShelves(currentBook?.id ?? 0);
+  const { data: shelves, refetch: refetchShelves } = useShelves(
+    user?.userId || 0
+  );
 
   const FAVORITES_SHELF_ID = shelves?.find((s) => s.shelfType === 1)?.id;
   const READ_SHELF_ID = shelves?.find((s) => s.shelfType === 2)?.id;
@@ -66,9 +77,25 @@ export const BookDetailsComponent = ({
   const ratingRef = useRef<HTMLDivElement>(null);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const [isShelfPanelOpen, setIsShelfPanelOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [newShelfName, setNewShelfName] = useState('');
+
   const handleMouseEnter = () => {
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
     setIsRatingPopupOpen(true);
+  };
+
+  const handleToggleShelf = async (shelf: ShelfDetails) => {
+    const isOnShelf = seekedShelves?.includes(shelf.id);
+    if (!bookId) return;
+    const success = !isOnShelf
+      ? await collectionsApi.addBookToShelf(shelf.id, bookId)
+      : await collectionsApi.removeBookFromShelf(shelf.id, bookId);
+
+    if (success) {
+      refetchSeekedShelves();
+    }
   };
 
   const handleMouseLeave = () => {
@@ -92,9 +119,21 @@ export const BookDetailsComponent = ({
     // if (success) refetch();
     // setIsRatingPopupOpen(false);
   };
+  const handleCreateShelf = async () => {
+    const trimmedName = newShelfName.trim();
+    if (!trimmedName || !user) return;
+    const newShelf = await collectionsApi.createShelf(trimmedName);
+    if (newShelf != 0) {
+      console.log('Created new shelf with ID:', newShelf);
+      // await refetchSeekedShelves();
+      await refetchShelves();
+      setNewShelfName('');
+      setIsCreating(false);
+    }
+  };
   const {
     data: fullBookDetails,
-    refetch,
+    refetch: refetchBook,
     isLoading,
     isError,
   } = useBookDetails(bookId ?? 0, user?.userId || 0, {
@@ -125,7 +164,7 @@ export const BookDetailsComponent = ({
       : await collectionsApi.removeBookFromShelf(shelfId, fullBookDetails.id);
     // console.log('Shelf toggle success:', success);
     // if (success) fetchBookDetails(user.userId, fullBookDetails.id);
-    if (success) refetch();
+    if (success) refetchBook();
   };
 
   const handleDownload = async () => {
@@ -194,12 +233,85 @@ export const BookDetailsComponent = ({
                 : t('book.to_favorites')}
             </span>
           </button>
-          <button className={styles['icon-button']} onClick={() => {}}>
+          <button
+            className={styles['icon-button']}
+            onClick={() => setIsShelfPanelOpen(true)}
+          >
             <ListPlus size={24} />
             <span className={styles['button-label']}>
               {t('book.add_to_collection')}
             </span>
           </button>
+          {isShelfPanelOpen && (
+            <div className={styles['shelf-panel']}>
+              <button
+                className={styles['shelf-panel-close']}
+                onClick={() => {
+                  setIsShelfPanelOpen(false);
+                  setIsCreating(false);
+                  setNewShelfName('');
+                }}
+              >
+                ✕
+              </button>
+
+              <ul className={styles['shelf-list']}>
+                {shelves?.map((shelf) => {
+                  const isOnShelf = seekedShelves?.includes(shelf.id);
+                  return (
+                    <li key={shelf.id} className={styles['shelf-item']}>
+                      <span className={styles['shelf-name']}>{shelf.name}</span>
+                      <button
+                        className={styles['shelf-toggle']}
+                        onClick={() => handleToggleShelf(shelf)}
+                      >
+                        {isOnShelf ? (
+                          <SquareCheckBig size={24} />
+                        ) : (
+                          <Square size={24} />
+                        )}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+
+              {isCreating ? (
+                <div className={styles['shelf-create-row']}>
+                  <input
+                    className={styles['shelf-create-row']}
+                    value={newShelfName}
+                    onChange={(e) => setNewShelfName(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleCreateShelf()}
+                    placeholder="Название новой полки"
+                    autoFocus
+                  />
+                  <button
+                    className={styles['shelf-confirm']}
+                    onClick={handleCreateShelf}
+                  >
+                    <WandSparkles size={20} />
+                  </button>
+                  <button
+                    className={styles['shelf-cancel']}
+                    onClick={() => {
+                      setIsCreating(false);
+                      setNewShelfName('');
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <button
+                  className={styles['shelf-create-btn']}
+                  onClick={() => setIsCreating(true)}
+                >
+                  + {t('book.create_new_collection')}
+                </button>
+              )}
+            </div>
+          )}
           <button className={styles['icon-button']} onClick={handleDownload}>
             <Download size={24} />
             <span className={styles['button-label']}>{t('book.download')}</span>
