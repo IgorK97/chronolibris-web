@@ -27,6 +27,7 @@ import { t } from 'i18next';
 import { useEffect, useRef, useState } from 'react';
 import { CommentsSection } from './CommentSection/CommentsSection';
 import { BookTabs } from './BookTabs/BookTabs';
+import { ParticipantsInfo } from './BookTabs/ParticipantsInfo';
 interface BookDetailsProps {
   onNavigateToReviews: (id: number) => void;
   onNavigateToRead: (id: number) => void;
@@ -338,7 +339,13 @@ export const BookDetailsComponent = ({
               canReview={true} // your actual condition
               discussionCount={fullBookDetails.commentsCount ?? 10}
               reviewsCount={fullBookDetails.reviewsCount}
-              infoContent={<p>Дополнительная информация о книге...</p>}
+              // infoContent={<p>Дополнительная информация о книге...</p>}
+              infoContent={
+                <ParticipantsInfo
+                  participants={fullBookDetails.participants}
+                  roles={roles ?? []}
+                />
+              }
             />
           </div>
           <button
