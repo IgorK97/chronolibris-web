@@ -1,0 +1,59 @@
+.safe-area {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--bg-color, #fff);
+  color: var(--text-color, #000);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #ddd;
+  position: sticky;
+  top: 0;
+  background: inherit;
+  z-index: 10;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  padding: 0 16px 0 0;
+  cursor: pointer;
+  color: inherit;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: bold;
+  margin: 0;
+  flex: 1;
+}
+
+/* Сетка книг */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 колонки как в RN */
+  gap: 16px;
+  padding: 16px;
+}
+
+.card-wrapper {
+  width: 100%;
+}
+
+.loader,
+.footer-loader {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  width: 100%;
+}
+
+/* Точка отслеживания для бесконечного скролла */
+.observer-sentinel {
+  height: 20px;
+}

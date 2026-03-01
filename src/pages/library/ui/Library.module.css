@@ -1,0 +1,41 @@
+.library-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 10px;
+  min-height: 100vh;
+  background-color: var(--bg-color, #fff);
+}
+
+.scroll-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-bottom: 40px;
+}
+
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 колонки как в оригинале */
+  gap: 16px;
+  padding: 0 16px;
+}
+
+@media (width >= 768px) {
+  .book-grid {
+    grid-template-columns: repeat(3, 1fr); /* На планшетах 3 */
+  }
+}
+
+.loading-wrapper,
+.error-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  gap: 10px;
+}
+
+.error-text {
+  color: #d32f2f;
+}

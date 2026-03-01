@@ -1,0 +1,44 @@
+.navigation-menu-root {
+  position: sticky;
+  top: 0;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  background-color: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  z-index: 1000;
+  padding: 0.5rem 1.5rem;
+}
+
+.navigation-menu-list {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-decoration: none;
+  color: #1a202c;
+  margin-right: 2rem;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.viewport-position {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}

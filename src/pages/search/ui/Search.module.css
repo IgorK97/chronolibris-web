@@ -1,0 +1,154 @@
+.container {
+  padding: 30px 20px 10px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.search-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 10px;
+  padding: 0 10px;
+  margin-top: 10px;
+  margin-bottom: 8px;
+  background-color: var(--container-background, #fff);
+  color: var(--text-color, #333);
+}
+
+.search-input {
+  flex: 1;
+  height: 40px;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 16px;
+}
+
+.button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--button-border, #ccc);
+  background-color: var(--button-background, #eee);
+  cursor: pointer;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.button:hover {
+  opacity: 0.8;
+}
+
+/* Grid layout replacing FlatList numColumns */
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 20px;
+}
+
+/* Modal Styling */
+.modal-overlay {
+  position: fixed;
+  margin: 0;
+  background-color: rgb(0 0 0 / 40%);
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #fff;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  padding-top: 20px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.scroll-area {
+  padding: 0 20px 10px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.section {
+  margin-bottom: 20px;
+}
+
+.selectable-item {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin: 4px 0;
+  cursor: pointer;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+
+.selectable-selected {
+  background-color: #fce4ec;
+  border-color: #d32f2f;
+  color: #d32f2f;
+}
+
+.year-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.year-input {
+  flex: 1;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px;
+  text-align: center;
+}
+
+.footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  border-top: 1px solid #eee;
+  padding: 10px 20px;
+  gap: 10px;
+}
+
+.footer-button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.reset-button {
+  background-color: #eee;
+  color: #333;
+}
+
+.apply-button {
+  background-color: #d32f2f;
+  color: white;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+}

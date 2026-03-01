@@ -1,0 +1,32 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 16px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 колонки */
+  gap: 16px;
+  width: 100%;
+}
+
+@media (width >= 1024px) {
+  .grid {
+    grid-template-columns: repeat(4, 1fr); /* 4 колонки на десктопе */
+  }
+}
+
+.center-loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  width: 100%;
+}
+
+.sentinel {
+  height: 40px;
+  width: 100%;
+}

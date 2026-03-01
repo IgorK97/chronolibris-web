@@ -1,0 +1,128 @@
+{
+  "profile": {
+    "reader": "Читатель",
+    "choose_avatar": "Выберите аватар",
+    "descr_avatar": "Вы можете выбрать изображение из галереи или сделать фото",
+    "from_gallery": "Из галереи",
+    "via_camera": "Сделать фото",
+    "button_text": "Отмена",
+    "label_settings": "Настройки",
+    "label_profile_settings": "Настройки профиля",
+    "label_security": "Безопасность",
+    "label_dark_theme": "Тёмная тема",
+    "label_help": "Помощь",
+    "tips": "Как пользоваться приложением",
+    "exit": "Выйти",
+    "enter": "Войти",
+    "title_prof_sett": "Настройки профиля",
+    "change_avatar": "Изменить аватар",
+    "label_name": "Имя пользователя",
+    "ph_name": "Введите имя пользователя",
+    "label_email": "Email",
+    "ph_email": "Введите ваш email",
+    "save": "Сохранить изменения",
+    "title_sec_sett": "Безопасность",
+    "label_pass": "Текущий пароль",
+    "ph_pass": "Введите текущий пароль",
+    "label_new_pass": "Новый пароль",
+    "ph_new_pass": "Введите новый пароль",
+    "label_conf_pass": "Подтвердите новый пароль",
+    "ph_conf_pass": "Повторите новый пароль"
+  },
+  "mybooks": {
+    "my_books": "Мои книги"
+  },
+  "search": {
+    "ph": "Поиск книг...",
+    "filters": "Фильтры",
+    "title_filters": "Фильтры",
+    "title_lang_sect": "Языки",
+    "title_genre_sect": "Темы и подтемы",
+    "title_mark": "Оценка",
+    "mark_label": "и выше",
+    "title_year_sect": "Год написания",
+    "ph_from": "От",
+    "ph_to": "До",
+    "reset": "Сбросить",
+    "apply": "Применить",
+    "hide": "Скрыть",
+    "show": "Показать все"
+  },
+  "auth": {
+    "error_name": "Введите имя пользователя",
+    "error_email": "Введите корректный email",
+    "incorr_email": "Некорректный email",
+    "error_fullname": "Введите имя",
+    "error_pass": "Введите пароль",
+    "short_pass": "Пароль должен быть не менее 6 символов",
+    "error_conf_pass": "Пароли не совпадают",
+    "error_phone": "Введите корректный номер телефона",
+    "alert_title_reg": "Регистрация",
+    "alert_text_reg": "Пользователь успешно зарегистрирован!",
+    "alert_title_auth": "Авторизация",
+    "alert_text_auth": "Успешный вход!",
+    "l_name": "Имя пользователя",
+    "l_fullname": "Имя",
+    "l_email": "Адрес электронной почты",
+    "l_phone": "Телефон",
+    "l_pass": "Пароль",
+    "l_conf_pass": "Подтвердите пароль",
+    "action_reg": "Зарегистрироваться",
+    "action_auth": "Войти",
+    "switch_to_reg": "Нет аккаунта? Зарегистрироваться",
+    "switch_to_auth": "Уже есть аккаунт? Войти"
+  },
+  "reviews": {
+    "title": "Отзывы",
+    "write": "Написать отзыв",
+    "filter_high": "Сначала с высокой оценкой",
+    "filter_low": "Сначала с низкой оценкой",
+    "new": "Новый отзыв",
+    "send": "Отправить",
+    "ph": "Напишите ваш отзыв..."
+  },
+  "book": {
+    "review_count": "отзывов",
+    "ratings_count": "оценок",
+    "p": "стр.",
+    "read": "Читать",
+    "about": "О книге",
+    "genres": "Жанры",
+    "themes": "Темы",
+    "view_all_reviews": "Cмотреть все отзывы",
+    "download": "Скачать",
+    "to_read": "В список прочитанного",
+    "read_done": "Прочитано",
+    "to_favorites": "В избранное",
+    "in_favorites": "В избранном",
+    "add_to_collection": "Добавить в список",
+    "year": "Год"
+  },
+  "not_found": {
+    "title": "404 - Страница не найдена",
+    "go_home": "На главную"
+  },
+  "bookmarks": {
+    "title": "Закладки",
+    "clear_all": "Очистить все",
+    "no_bookmarks": "Закладок нет...",
+    "chapter": "Глава"
+  },
+  "sect_header": {
+    "all": "Все"
+  },
+  "reader_footer": {
+    "progress": "Прогресс чтения"
+  },
+  "toc": {
+    "title": "Оглавление",
+    "close": "Закрыть",
+    "ph": "Искать в оглавлении..."
+  },
+  "tabs": {
+    "my_books": "Мои книги",
+    "search": "Поиск",
+    "profile": "Профиль",
+    "library": "Библиотека"
+  }
+}
