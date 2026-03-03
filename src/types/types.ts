@@ -180,13 +180,15 @@ export interface RateReviewCommand {
   score?: number;
 }
 
-export interface CreateReviewCommand {
-  bookId?: number;
-  userId?: number;
-  title?: string | undefined;
-  description?: string | undefined;
-  score?: number;
-  userName?: string | undefined;
+export interface CreateReviewRequest {
+  bookId: number;
+  reviewText?: string;
+  score: number;
+}
+
+export interface UpdateReviewRequest {
+  reviewText?: string;
+  score: number;
 }
 
 export interface RegisterUserCommand {

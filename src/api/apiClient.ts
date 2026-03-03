@@ -46,6 +46,9 @@ export const apiClient = {
   post: <T, D extends object = object>(url: string, body?: D) =>
     axiosInstance.post<T>(url, body).then((res) => res.data),
 
+  put: <T, D extends object = object>(url: string, body?: D) =>
+    axiosInstance.put<T>(url, body).then((res) => res.data),
+
   delete: <T>(url: string) =>
     axiosInstance.delete<T>(url).then((res) => res.data),
 

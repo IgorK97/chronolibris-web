@@ -35,6 +35,7 @@ import { useEffect, useRef, useState } from 'react';
 // import { CommentsSection } from './CommentSection/CommentsSection';
 import { BookTabs } from './BookTabs/BookTabs';
 import { ParticipantsInfo } from './BookTabs/ParticipantsInfo';
+import { reviewsApi } from '@/api/reviews';
 interface BookDetailsProps {
   onNavigateToReviews: (id: number) => void;
   onNavigateToRead: (id: number) => void;
@@ -110,14 +111,14 @@ export const BookDetailsComponent = ({
     };
   }, []);
   const handleRateBook = async (rating: number) => {
-    // if (!user) return;
-    // const success = await booksApi.rateBook(
-    //   fullBookDetails.id,
-    //   user.userId,
-    //   rating
-    // );
-    // if (success) refetch();
-    // setIsRatingPopupOpen(false);
+    if (!user) return;
+    const success = await reviewsApi.rateBook(
+      fullBookDetails.id,
+      user.userId,
+      rating
+    );
+    if (success) refetch();
+    setIsRatingPopupOpen(false);
   };
   const handleCreateShelf = async () => {
     const trimmedName = newShelfName.trim();
