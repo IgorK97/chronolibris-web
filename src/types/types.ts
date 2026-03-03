@@ -8,6 +8,7 @@ export interface BookListItem {
   ratingsCount: number;
   isFavorite: boolean;
   authors: string[];
+  isReviewable: boolean;
 }
 
 export interface PersonDetails {
@@ -60,11 +61,13 @@ export interface BookDetails {
   isAvailable: boolean;
   isFavorite: boolean;
   isRead: boolean;
+  isReviewable: boolean;
   publisher: PublisherDetails | null;
   country: string | null;
   language: string;
   participants: BookPersonGroupDetails[];
   themes: ThemeDeatils[];
+  userRating: number;
 }
 
 export interface DownloadedBook {

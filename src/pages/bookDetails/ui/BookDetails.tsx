@@ -338,79 +338,83 @@ export const BookDetailsComponent = ({
             <div className={styles['short-info-container']}>
               <h1 className={styles['title']}>{fullBookDetails.title}</h1>
               <p className={styles['author']}>{authors}</p>
-              <div className={styles['stats-row']}>
-                <div className={styles['stat-block']} ref={ratingRef}>
-                  <div
-                    className={styles['rating-trigger']}
-                    onMouseEnter={handleMouseEnter}
-                    onMouseLeave={handleMouseLeave}
-                  >
-                    <span className={styles['stat-icon']}>★</span>
+              {fullBookDetails.isReviewable && (
+                <div className={styles['stats-row']}>
+                  <div className={styles['stat-block']} ref={ratingRef}>
+                    <div
+                      className={styles['rating-trigger']}
+                      onMouseEnter={handleMouseEnter}
+                      onMouseLeave={handleMouseLeave}
+                    >
+                      <span className={styles['stat-icon']}>★</span>
+                      <div className={styles['stat-content']}>
+                        <span className={styles['stat-score']}>
+                          {fullBookDetails.averageRating?.toFixed(1)}
+                        </span>
+                        <span className={styles['stat-count']}>
+                          {fullBookDetails.ratingsCount}{' '}
+                          {t('book.ratings_count')}
+                        </span>
+                      </div>
+                      {fullBookDetails.userRating > 0 && (
+                        <span className={styles['user-rating-badge']}>
+                          {t('book.your_rating')}:{' '}
+                          {fullBookDetails.userRating.toFixed(1)}★
+                        </span>
+                      )}
+                      {isRatingPopupOpen && (
+                        <div
+                          className={styles['rating-popup']}
+                          onMouseEnter={handleMouseEnter}
+                          onMouseLeave={handleMouseLeave}
+                        >
+                          <span className={styles['rating-popup-title']}>
+                            {fullBookDetails.userRating
+                              ? t('book.change_rating')
+                              : t('book.rate_book')}
+                          </span>
+                          <div className={styles['stars-row']}>
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <button
+                                key={star}
+                                className={`${styles['star-btn']} ${
+                                  star <=
+                                  (hoverRating || fullBookDetails.userRating)
+                                    ? styles['star-btn-active']
+                                    : ''
+                                }`}
+                                onMouseEnter={() => setHoverRating(star)}
+                                onMouseLeave={() => setHoverRating(0)}
+                                onClick={() => handleRateBook(star)}
+                              >
+                                ★
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className={styles['stat-divider']} />
+
+                  <div className={styles['stat-block']}>
+                    <span
+                      className={`${styles['stat-icon']} ${styles['stat-icon--reviews']}`}
+                    >
+                      ✦
+                    </span>
                     <div className={styles['stat-content']}>
                       <span className={styles['stat-score']}>
-                        {fullBookDetails.averageRating?.toFixed(1)}
+                        {fullBookDetails.reviewsCount}
                       </span>
                       <span className={styles['stat-count']}>
-                        {fullBookDetails.ratingsCount} {t('book.ratings_count')}
+                        {t('book.review_count')}
                       </span>
                     </div>
-                    {fullBookDetails.userRating && (
-                      <span className={styles['user-rating-badge']}>
-                        {t('book.your_rating')}: {fullBookDetails.userRating}★
-                      </span>
-                    )}
-                    {isRatingPopupOpen && (
-                      <div
-                        className={styles['rating-popup']}
-                        onMouseEnter={handleMouseEnter}
-                        onMouseLeave={handleMouseLeave}
-                      >
-                        <span className={styles['rating-popup-title']}>
-                          {fullBookDetails.userRating
-                            ? t('book.change_rating')
-                            : t('book.rate_book')}
-                        </span>
-                        <div className={styles['stars-row']}>
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <button
-                              key={star}
-                              className={`${styles['star-btn']} ${
-                                star <=
-                                (hoverRating || fullBookDetails.userRating || 0)
-                                  ? styles['star-btn--active']
-                                  : ''
-                              }`}
-                              onMouseEnter={() => setHoverRating(star)}
-                              onMouseLeave={() => setHoverRating(0)}
-                              onClick={() => handleRateBook(star)}
-                            >
-                              ★
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
-
-                <div className={styles['stat-divider']} />
-
-                <div className={styles['stat-block']}>
-                  <span
-                    className={`${styles['stat-icon']} ${styles['stat-icon--reviews']}`}
-                  >
-                    ✦
-                  </span>
-                  <div className={styles['stat-content']}>
-                    <span className={styles['stat-score']}>
-                      {fullBookDetails.reviewsCount}
-                    </span>
-                    <span className={styles['stat-count']}>
-                      {t('book.review_count')}
-                    </span>
-                  </div>
-                </div>
-              </div>
+              )}
               {/* <span className={styles['review-text']}>
                 {fullBookDetails.reviewsCount} {t('book.review_count')}
               </span>
