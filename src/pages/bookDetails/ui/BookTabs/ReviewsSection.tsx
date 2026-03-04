@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 // import type { Review } from './bookTabsData';
-import { formatDate } from './bookTabsData';
+import { formatDate } from './BookTabsData';
 import {
   Avatar,
   VoteButton,
@@ -170,7 +170,7 @@ function ReviewItem({
   return (
     <div className={styles['review']}>
       <div className={styles['comment-inner']}>
-        <Avatar author={review.userName} />
+        <Avatar userName={review.userName} />
         <div className={styles['comment-body']}>
           <div className={styles['comment-header']}>
             <span className={styles['comment-author']}>{review.userName}</span>

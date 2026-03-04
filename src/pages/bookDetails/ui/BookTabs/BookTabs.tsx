@@ -14,6 +14,11 @@ interface BookTabsProps {
   canReview: boolean;
   discussionCount?: number;
   reviewsCount?: number;
+  bookId: number;
+  isAuth: boolean;
+  userReviewId: number | null; // If the user has already reviewed, their review ID (for edit/delete)
+  userCurrentScore: number; // If the user has already reviewed, their current rating score
+  onRatingChanged: () => void; // Callback when user changes their rating
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -23,13 +28,28 @@ export function BookTabs({
   canReview,
   discussionCount,
   reviewsCount,
+  bookId,
+  isAuth,
+  userReviewId,
+  userCurrentScore,
+  onRatingChanged,
 }: BookTabsProps) {
   const [activeTab, setActiveTab] = useState<TabId>('discussion');
 
-  const tabs: { id: TabId; label: string; count?: number; disabled?: boolean }[] = [
+  const tabs: {
+    id: TabId;
+    label: string;
+    count?: number;
+    disabled?: boolean;
+  }[] = [
     { id: 'info', label: 'Информация' },
     { id: 'discussion', label: 'Обсуждение', count: discussionCount },
-    { id: 'reviews', label: 'Отзывы', count: reviewsCount, disabled: !canReview },
+    {
+      id: 'reviews',
+      label: 'Отзывы',
+      count: reviewsCount,
+      disabled: !canReview,
+    },
   ];
 
   return (
@@ -56,11 +76,24 @@ export function BookTabs({
       {/* Tab panels */}
       {activeTab === 'info' && (
         <div className={styles['tab-content']}>
-          {infoContent ?? <p className={styles['tab-empty']}>Дополнительная информация недоступна.</p>}
+          {infoContent ?? (
+            <p className={styles['tab-empty']}>
+              Дополнительная информация недоступна.
+            </p>
+          )}
         </div>
       )}
       {activeTab === 'discussion' && <CommentsSection />}
-      {activeTab === 'reviews' && <ReviewsSection canReview={canReview} />}
+      {activeTab === 'reviews' && (
+        <ReviewsSection
+          canReview={canReview}
+          bookId={bookId}
+          isAuth={isAuth}
+          userReviewId={userReviewId}
+          userCurrentScore={userCurrentScore}
+          onRatingChanged={onRatingChanged}
+        />
+      )}
     </div>
   );
 }

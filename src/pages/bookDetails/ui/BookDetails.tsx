@@ -35,7 +35,12 @@ import { useEffect, useRef, useState } from 'react';
 // import { CommentsSection } from './CommentSection/CommentsSection';
 import { BookTabs } from './BookTabs/BookTabs';
 import { ParticipantsInfo } from './BookTabs/ParticipantsInfo';
-import { reviewsApi } from '@/api/reviews';
+import {
+  reviewsApi,
+  useCreateReview,
+  useInfiniteReviews,
+  useUpdateReview,
+} from '@/api/reviews';
 interface BookDetailsProps {
   onNavigateToReviews: (id: number) => void;
   onNavigateToRead: (id: number) => void;
@@ -69,6 +74,7 @@ export const BookDetailsComponent = ({
   const { data: shelves, refetch: refetchShelves } = useShelves(
     user?.userId || 0
   );
+  const [isAuth, setIsAuth] = useState(!!user);
 
   const FAVORITES_SHELF_ID = shelves?.find((s) => s.shelfType === 1)?.id;
   const READ_SHELF_ID = shelves?.find((s) => s.shelfType === 2)?.id;
@@ -99,6 +105,19 @@ export const BookDetailsComponent = ({
     }
   };
 
+  const { data: reviewsData, refetch: refetchReviews } = useInfiniteReviews(
+    bookId ?? 0,
+    isAuth
+  );
+
+  const allReviews = reviewsData?.pages.flatMap((p) => p.items) ?? [];
+  const userReview =
+    allReviews.find((r) => r.userName === user?.userName) ?? null;
+
+  // ── Mutations ───────────────────────────────────────────────────────────────
+  const createReview = useCreateReview(bookId ?? 0, isAuth);
+  const updateReview = useUpdateReview(bookId ?? 0, isAuth);
+
   const handleMouseLeave = () => {
     closeTimerRef.current = setTimeout(() => {
       setIsRatingPopupOpen(false);
@@ -111,14 +130,35 @@ export const BookDetailsComponent = ({
     };
   }, []);
   const handleRateBook = async (rating: number) => {
-    if (!user) return;
-    const success = await reviewsApi.rateBook(
-      fullBookDetails.id,
-      user.userId,
-      rating
-    );
-    if (success) refetch();
+    if (!user || !bookId) return;
+
+    if (userReview) {
+      // User already has a review — update score only, keep existing text
+      await updateReview.mutateAsync({
+        reviewId: userReview.id,
+        score: rating,
+        reviewText: userReview.text || undefined,
+      });
+    } else {
+      // No review yet — create a score-only one (server sets status = Published)
+      await createReview.mutateAsync({
+        bookId,
+        score: rating,
+      });
+    }
+
+    // Refetch book so averageRating / ratingsCount update in the header
+    refetchBook();
     setIsRatingPopupOpen(false);
+
+    //   if (!user) return;
+    //   const success = await reviewsApi.rateBook(
+    //     fullBookDetails.id,
+    //     // user.userId,
+    //     rating
+    //   );
+    //   if (success) refetch();
+    //   setIsRatingPopupOpen(false);
   };
   const handleCreateShelf = async () => {
     const trimmedName = newShelfName.trim();
@@ -453,9 +493,14 @@ export const BookDetailsComponent = ({
               onNavigateToReviews={onNavigateToReviews}
             /> */}
             <BookTabs
-              canReview={true} // your actual condition
+              canReview={fullBookDetails.isReviewable} // your actual condition
               discussionCount={fullBookDetails.commentsCount ?? 10}
               reviewsCount={fullBookDetails.reviewsCount}
+              bookId={fullBookDetails.id}
+              isAuth={isAuth}
+              userReviewId={userReview ? userReview.id : null}
+              userCurrentScore={userReview ? userReview.score : 0}
+              onRatingChanged={() => refetchBook()}
               // infoContent={<p>Дополнительная информация о книге...</p>}
               infoContent={
                 <ParticipantsInfo

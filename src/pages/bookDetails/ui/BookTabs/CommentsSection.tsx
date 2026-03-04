@@ -1,8 +1,14 @@
 import { useState, useRef } from 'react';
 import { ChevronDown, ChevronUp, CornerDownRight } from 'lucide-react';
-import type { Comment } from './bookTabsData';
-import { MOCK_COMMENTS, formatDate } from './bookTabsData';
-import { Avatar, VoteButton, ScoreDisplay, ThreeDotsMenu, ComposeBox } from './BookTabsAtoms';
+import type { Comment } from './BookTabsData';
+import { MOCK_COMMENTS, formatDate } from './BookTabsData';
+import {
+  Avatar,
+  VoteButton,
+  ScoreDisplay,
+  ThreeDotsMenu,
+  ComposeBox,
+} from './BookTabsAtoms';
 import styles from './BookTabs.module.css';
 
 // ─── Single comment ───────────────────────────────────────────────────────────
@@ -35,22 +41,38 @@ function CommentItem({
         };
       }
       return {
-        likes: type === 'like' ? prev.likes + 1 : prev.userVote === 'like' ? prev.likes - 1 : prev.likes,
-        dislikes: type === 'dislike' ? prev.dislikes + 1 : prev.userVote === 'dislike' ? prev.dislikes - 1 : prev.dislikes,
+        likes:
+          type === 'like'
+            ? prev.likes + 1
+            : prev.userVote === 'like'
+              ? prev.likes - 1
+              : prev.likes,
+        dislikes:
+          type === 'dislike'
+            ? prev.dislikes + 1
+            : prev.userVote === 'dislike'
+              ? prev.dislikes - 1
+              : prev.dislikes,
         userVote: type,
       };
     });
   };
 
   return (
-    <div className={`${styles['comment']} ${styles[`comment--depth-${indentLevel}`]}`}>
+    <div
+      className={`${styles['comment']} ${styles[`comment--depth-${indentLevel}`]}`}
+    >
       {depth > 0 && <div className={styles['thread-line']} />}
       <div className={styles['comment-inner']}>
         <Avatar author={comment.author} />
         <div className={styles['comment-body']}>
           <div className={styles['comment-header']}>
-            <span className={styles['comment-author']}>{comment.author.name}</span>
-            <span className={styles['comment-date']}>{formatDate(comment.createdAt)}</span>
+            <span className={styles['comment-author']}>
+              {comment.author.name}
+            </span>
+            <span className={styles['comment-date']}>
+              {formatDate(comment.createdAt)}
+            </span>
             <ThreeDotsMenu />
           </div>
 
@@ -58,20 +80,42 @@ function CommentItem({
 
           <div className={styles['comment-footer']}>
             <div className={styles['vote-group']}>
-              <VoteButton type="like" count={votes.likes} active={votes.userVote === 'like'} onClick={() => handleVote('like')} />
+              <VoteButton
+                type="like"
+                count={votes.likes}
+                active={votes.userVote === 'like'}
+                onClick={() => handleVote('like')}
+              />
               <ScoreDisplay likes={votes.likes} dislikes={votes.dislikes} />
-              <VoteButton type="dislike" count={votes.dislikes} active={votes.userVote === 'dislike'} onClick={() => handleVote('dislike')} />
+              <VoteButton
+                type="dislike"
+                count={votes.dislikes}
+                active={votes.userVote === 'dislike'}
+                onClick={() => handleVote('dislike')}
+              />
             </div>
 
-            <button className={styles['reply-btn']} onClick={() => onReply(comment.id, comment.author.name)}>
+            <button
+              className={styles['reply-btn']}
+              onClick={() => onReply(comment.id, comment.author.name)}
+            >
               <CornerDownRight size={13} />
               Ответить
             </button>
 
             {hasReplies && (
-              <button className={styles['expand-btn']} onClick={() => setRepliesOpen((v) => !v)}>
-                {repliesOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                {repliesOpen ? 'Скрыть ответы' : `Ответы (${comment.replies!.length})`}
+              <button
+                className={styles['expand-btn']}
+                onClick={() => setRepliesOpen((v) => !v)}
+              >
+                {repliesOpen ? (
+                  <ChevronUp size={14} />
+                ) : (
+                  <ChevronDown size={14} />
+                )}
+                {repliesOpen
+                  ? 'Скрыть ответы'
+                  : `Ответы (${comment.replies!.length})`}
               </button>
             )}
           </div>
@@ -81,7 +125,12 @@ function CommentItem({
       {repliesOpen && hasReplies && (
         <div className={styles['replies']}>
           {comment.replies!.map((reply) => (
-            <CommentItem key={reply.id} comment={reply} depth={depth + 1} onReply={onReply} />
+            <CommentItem
+              key={reply.id}
+              comment={reply}
+              depth={depth + 1}
+              onReply={onReply}
+            />
           ))}
         </div>
       )}
@@ -96,18 +145,28 @@ type SortMode = 'popular' | 'recent';
 export function CommentsSection() {
   const [comments, setComments] = useState<Comment[]>(MOCK_COMMENTS);
   const [sort, setSort] = useState<SortMode>('popular');
-  const [replyingTo, setReplyingTo] = useState<{ parentId: number; authorName: string } | null>(null);
+  const [replyingTo, setReplyingTo] = useState<{
+    parentId: number;
+    authorName: string;
+  } | null>(null);
   const composeRef = useRef<HTMLDivElement>(null);
 
   const sorted = [...comments].sort((a, b) =>
     sort === 'popular'
-      ? (b.likes - b.dislikes) - (a.likes - a.dislikes)
+      ? b.likes - b.dislikes - (a.likes - a.dislikes)
       : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 
   const handleReply = (parentId: number, authorName: string) => {
     setReplyingTo({ parentId, authorName });
-    setTimeout(() => composeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+    setTimeout(
+      () =>
+        composeRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        }),
+      50
+    );
   };
 
   const handleSubmit = (text: string) => {
@@ -116,7 +175,9 @@ export function CommentsSection() {
       author: { id: 0, name: 'Вы' },
       text,
       createdAt: new Date().toISOString(),
-      likes: 0, dislikes: 0, userVote: null,
+      likes: 0,
+      dislikes: 0,
+      userVote: null,
       replies: [],
     };
     if (!replyingTo) {
@@ -159,7 +220,9 @@ export function CommentsSection() {
             Новые
           </button>
         </div>
-        <span className={styles['sort-count']}>{comments.length} комментариев</span>
+        <span className={styles['sort-count']}>
+          {comments.length} комментариев
+        </span>
       </div>
 
       <div className={styles['comment-list']}>

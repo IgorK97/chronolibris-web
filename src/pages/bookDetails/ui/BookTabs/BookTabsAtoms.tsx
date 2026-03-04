@@ -1,21 +1,23 @@
 import { useState } from 'react';
-import { ThumbsUp, ThumbsDown, MoreHorizontal, CornerDownRight } from 'lucide-react';
-import type { ItemAuthor } from './bookTabsData';
+import {
+  ThumbsUp,
+  ThumbsDown,
+  MoreHorizontal,
+  CornerDownRight,
+} from 'lucide-react';
+// import type { ItemAuthor } from './bookTabsData';
 import styles from './BookTabs.module.css';
 
 // ─── Avatar ───────────────────────────────────────────────────────────────────
 
-import { getInitials, getAvatarColor } from './bookTabsData';
+import { getInitials, getAvatarColor } from './BookTabsData';
 
-export function Avatar({ author }: { author: ItemAuthor }) {
-  if (author.avatarUrl) {
-    return <img src={author.avatarUrl} alt={author.name} className={styles['avatar']} />;
-  }
+export function Avatar({ userName }: { userName: string }) {
   return (
     <div
       className={styles['avatar']}
       style={{
-        backgroundColor: getAvatarColor(author.name),
+        backgroundColor: getAvatarColor(userName),
         color: '#fff',
         display: 'flex',
         alignItems: 'center',
@@ -24,7 +26,7 @@ export function Avatar({ author }: { author: ItemAuthor }) {
         fontWeight: 700,
       }}
     >
-      {getInitials(author.name)}
+      {getInitials(userName)}
     </div>
   );
 }
@@ -32,7 +34,10 @@ export function Avatar({ author }: { author: ItemAuthor }) {
 // ─── VoteButton ───────────────────────────────────────────────────────────────
 
 export function VoteButton({
-  type, count, active, onClick,
+  type,
+  count,
+  active,
+  onClick,
 }: {
   type: 'like' | 'dislike';
   count: number;
@@ -60,12 +65,19 @@ export function VoteButton({
 
 // ─── Score display ────────────────────────────────────────────────────────────
 
-export function ScoreDisplay({ likes, dislikes }: { likes: number; dislikes: number }) {
+export function ScoreDisplay({
+  likes,
+  dislikes,
+}: {
+  likes: number;
+  dislikes: number;
+}) {
   const score = likes - dislikes;
   const color = score > 0 ? '#16a34a' : score < 0 ? '#dc2626' : '#6b7280';
   return (
     <span className={styles['score']} style={{ color }}>
-      {score > 0 ? '+' : ''}{score}
+      {score > 0 ? '+' : ''}
+      {score}
     </span>
   );
 }
@@ -88,13 +100,19 @@ export function ThreeDotsMenu() {
       {menuOpen && (
         <div className={styles['comment-menu']}>
           {reported ? (
-            <span className={styles['comment-menu-item']} style={{ color: '#6b7280', cursor: 'default' }}>
+            <span
+              className={styles['comment-menu-item']}
+              style={{ color: '#6b7280', cursor: 'default' }}
+            >
               Жалоба отправлена
             </span>
           ) : (
             <button
               className={styles['comment-menu-item']}
-              onClick={() => { setReported(true); setMenuOpen(false); }}
+              onClick={() => {
+                setReported(true);
+                setMenuOpen(false);
+              }}
             >
               Пожаловаться
             </button>
@@ -135,8 +153,15 @@ export function ComposeBox({
       {replyingTo && (
         <div className={styles['compose-reply-banner']}>
           <CornerDownRight size={13} />
-          <span>Ответ для <strong>{replyingTo.authorName}</strong></span>
-          <button className={styles['compose-reply-cancel']} onClick={onCancelReply}>✕</button>
+          <span>
+            Ответ для <strong>{replyingTo.authorName}</strong>
+          </span>
+          <button
+            className={styles['compose-reply-cancel']}
+            onClick={onCancelReply}
+          >
+            ✕
+          </button>
         </div>
       )}
       {children}
@@ -149,7 +174,9 @@ export function ComposeBox({
         rows={3}
       />
       <div className={styles['compose-footer']}>
-        <span className={styles['compose-counter']}>{text.length}/{MAX}</span>
+        <span className={styles['compose-counter']}>
+          {text.length}/{MAX}
+        </span>
         <button
           className={styles['compose-submit']}
           disabled={!text.trim()}
