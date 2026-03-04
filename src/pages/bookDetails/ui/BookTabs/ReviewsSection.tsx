@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 // import type { Review } from './bookTabsData';
 import { formatDate } from './BookTabsData';
@@ -258,6 +258,10 @@ export function ReviewsSection({
     null
   );
 
+  useEffect(() => {
+    setPickedRating(userCurrentScore);
+  }, [userCurrentScore]);
+
   const {
     data,
     isLoading,
@@ -269,8 +273,8 @@ export function ReviewsSection({
 
   const allReviews: ReviewDetails[] = data?.pages.flatMap((p) => p.items) ?? [];
 
-  const createReview = useCreateReview(bookId, isAuth);
-  const updateReview = useUpdateReview(bookId, isAuth);
+  const createReview = useCreateReview(bookId);
+  const updateReview = useUpdateReview(bookId);
   // const sorted = [...reviews].sort((a, b) =>
   //   sort === 'popular'
   //     ? b.likes - b.dislikes - (a.likes - a.dislikes)

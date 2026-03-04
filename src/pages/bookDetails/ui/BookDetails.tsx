@@ -39,6 +39,7 @@ import {
   reviewsApi,
   useCreateReview,
   useInfiniteReviews,
+  useMyReview,
   useUpdateReview,
 } from '@/api/reviews';
 interface BookDetailsProps {
@@ -110,24 +111,39 @@ export const BookDetailsComponent = ({
     isAuth
   );
 
+  const { data: userReview } = useMyReview(bookId ?? 0, isAuth);
+
   const allReviews = reviewsData?.pages.flatMap((p) => p.items) ?? [];
-  const userReview =
-    allReviews.find((r) => r.userName === user?.userName) ?? null;
+  // const userReview =
+  //   allReviews.find((r) => r.userName === user?.userName) ?? null;
 
   // ── Mutations ───────────────────────────────────────────────────────────────
-  const createReview = useCreateReview(bookId ?? 0, isAuth);
-  const updateReview = useUpdateReview(bookId ?? 0, isAuth);
+  const createReview = useCreateReview(bookId ?? 0);
+  const updateReview = useUpdateReview(bookId ?? 0);
 
   const handleMouseLeave = () => {
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+
     closeTimerRef.current = setTimeout(() => {
+      // Проверяем, существует ли еще компонент, можно через ref
       setIsRatingPopupOpen(false);
       setHoverRating(0);
-    }, 300); // enough time to move mouse into popup
+    }, 300);
+    // closeTimerRef.current = setTimeout(() => {
+    //   setIsRatingPopupOpen(false);
+    //   setHoverRating(0);
+    // }, 300); // enough time to move mouse into popup
   };
   useEffect(() => {
     return () => {
-      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+      if (closeTimerRef.current) {
+        clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = null;
+      }
     };
+    // return () => {
+    //   if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    // };
   }, []);
   const handleRateBook = async (rating: number) => {
     if (!user || !bookId) return;
@@ -148,7 +164,7 @@ export const BookDetailsComponent = ({
     }
 
     // Refetch book so averageRating / ratingsCount update in the header
-    refetchBook();
+    // refetchBook();
     setIsRatingPopupOpen(false);
 
     //   if (!user) return;
