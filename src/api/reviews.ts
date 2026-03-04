@@ -1,5 +1,7 @@
 import {
   useInfiniteQuery,
+  useMutation,
+  useQueryClient,
   // useMutation,
   // useQueryClient,
 } from '@tanstack/react-query';
@@ -13,14 +15,9 @@ import type {
 } from '../types/types';
 
 export const reviewsApi = {
-  getByBookId: (
-    bookId: number,
-    userId: number | null,
-    lastId?: number,
-    limit = 20
-  ) =>
+  getByBookId: (bookId: number, lastId?: number, limit = 20) =>
     apiClient.get<PagedResult<ReviewDetails>>(
-      `/Reviews/${bookId}?limit=${limit}&userId=${userId || ''}&lastId=${lastId || ''}`
+      `/Reviews/${bookId}?limit=${limit}&lastId=${lastId || ''}`
     ),
 
   create: (command: CreateReviewRequest) =>
@@ -35,16 +32,53 @@ export const reviewsApi = {
     apiClient.post('/Reviews/rate', command),
 };
 
-export const useInfiniteReviews = (bookId: number, userId: number | null) => {
+export const useInfiniteReviews = (bookId: number, isAuth: boolean) => {
   return useInfiniteQuery({
-    queryKey: ['reviews', bookId, userId],
-    queryFn: ({ pageParam }) =>
-      reviewsApi.getByBookId(bookId, userId, pageParam),
-    enabled: !!bookId && !!userId,
+    queryKey: ['reviews', bookId, isAuth],
+    queryFn: ({ pageParam }) => reviewsApi.getByBookId(bookId, pageParam),
+    enabled: !!bookId,
     initialPageParam: undefined as number | undefined,
     getNextPageParam: (lastPage) =>
-      lastPage.items.length > 0
-        ? lastPage.items[lastPage.items.length - 1].id
-        : undefined,
+      lastPage.hasNext ? (lastPage.lastId ?? undefined) : undefined,
+  });
+};
+
+export const reviewKeys = {
+  list: (bookId: number, isAuth: boolean) =>
+    ['reviews', bookId, isAuth] as const,
+};
+
+export const useCreateReview = (bookId: number, isAuth: boolean) => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (req: CreateReviewRequest) => reviewsApi.create(req),
+    onSuccess: () => {
+      // Invalidate so the list refetches and includes the new (pending) review
+      qc.invalidateQueries({ queryKey: reviewKeys.list(bookId, isAuth) });
+    },
+  });
+};
+
+export const useUpdateReview = (bookId: number, isAuth: boolean) => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      reviewId,
+      ...req
+    }: UpdateReviewRequest & { reviewId: number }) =>
+      reviewsApi.update(reviewId, req),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: reviewKeys.list(bookId, isAuth) });
+    },
+  });
+};
+
+export const useDeleteReview = (bookId: number, isAuth: boolean) => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (reviewId: number) => reviewsApi.delete(reviewId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: reviewKeys.list(bookId, isAuth) });
+    },
   });
 };

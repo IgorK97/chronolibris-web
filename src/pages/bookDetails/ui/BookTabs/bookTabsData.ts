@@ -25,7 +25,7 @@ export interface Review {
   createdAt: string;
   likes: number;
   dislikes: number;
-  userVote?: 'like' | 'dislike' | null;
+  userVote?: boolean;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -49,8 +49,14 @@ export function getInitials(name: string): string {
 
 export function getAvatarColor(name: string): string {
   const colors = [
-    '#ef4444', '#f97316', '#eab308', '#22c55e',
-    '#06b6d4', '#6366f1', '#ec4899', '#8b5cf6',
+    '#ef4444',
+    '#f97316',
+    '#eab308',
+    '#22c55e',
+    '#06b6d4',
+    '#6366f1',
+    '#ec4899',
+    '#8b5cf6',
   ];
   let hash = 0;
   for (let i = 0; i < name.length; i++)
@@ -66,21 +72,27 @@ export const MOCK_COMMENTS: Comment[] = [
     author: { id: 101, name: 'Анна Смирнова' },
     text: 'Кто-нибудь может объяснить смысл финальной сцены? Мне показалось, что это метафора, но я не уверена.',
     createdAt: '2025-11-14T18:30:00Z',
-    likes: 24, dislikes: 2, userVote: null,
+    likes: 24,
+    dislikes: 2,
+    userVote: null,
     replies: [
       {
         id: 11,
         author: { id: 102, name: 'Иван Петров' },
         text: 'Я тоже так думаю! Автор намекал на это ещё в третьей главе, когда герой смотрит на закат.',
         createdAt: '2025-11-15T09:12:00Z',
-        likes: 8, dislikes: 0, userVote: null,
+        likes: 8,
+        dislikes: 0,
+        userVote: null,
         replies: [
           {
             id: 111,
             author: { id: 103, name: 'Мария Козлова' },
             text: 'Да, я перечитала первую главу после финала — всё было прямо перед глазами!',
             createdAt: '2025-11-15T11:45:00Z',
-            likes: 3, dislikes: 0, userVote: null,
+            likes: 3,
+            dislikes: 0,
+            userVote: null,
             replies: [],
           },
         ],
@@ -90,7 +102,9 @@ export const MOCK_COMMENTS: Comment[] = [
         author: { id: 104, name: 'Дмитрий Волков' },
         text: 'Мне кажется, всё проще — это просто красивый образ без глубокого смысла.',
         createdAt: '2025-11-16T14:20:00Z',
-        likes: 1, dislikes: 4, userVote: null,
+        likes: 1,
+        dislikes: 4,
+        userVote: null,
         replies: [],
       },
     ],
@@ -100,7 +114,9 @@ export const MOCK_COMMENTS: Comment[] = [
     author: { id: 105, name: 'Елена Новикова' },
     text: 'В какой главе упоминается письмо от отца? Хочу найти цитату, никак не могу вспомнить.',
     createdAt: '2025-11-10T20:05:00Z',
-    likes: 15, dislikes: 1, userVote: null,
+    likes: 15,
+    dislikes: 1,
+    userVote: null,
     replies: [],
   },
   {
@@ -108,14 +124,18 @@ export const MOCK_COMMENTS: Comment[] = [
     author: { id: 106, name: 'Алексей Фёдоров' },
     text: 'Интересно, есть ли продолжение? В конце явно остались незакрытые линии.',
     createdAt: '2025-11-08T15:33:00Z',
-    likes: 9, dislikes: 3, userVote: null,
+    likes: 9,
+    dislikes: 3,
+    userVote: null,
     replies: [
       {
         id: 31,
         author: { id: 107, name: 'Светлана Орлова' },
         text: 'Автор говорил в интервью, что планирует вторую часть, но дата не объявлена.',
         createdAt: '2025-11-09T08:50:00Z',
-        likes: 5, dislikes: 0, userVote: null,
+        likes: 5,
+        dislikes: 0,
+        userVote: null,
         replies: [],
       },
     ],
@@ -129,7 +149,9 @@ export const MOCK_REVIEWS: Review[] = [
     text: 'Одна из лучших книг, что я читала за последний год. Автор умело выстраивает напряжение, персонажи живые и многогранные. Особенно впечатлила внутренняя эволюция главного героя — от замкнутого циника к человеку, способному на настоящую близость. Финал оставил двоякое ощущение, но именно это и делает книгу запоминающейся. Буду рекомендовать всем знакомым.',
     rating: 5,
     createdAt: '2025-11-20T10:00:00Z',
-    likes: 41, dislikes: 3, userVote: null,
+    likes: 41,
+    dislikes: 3,
+    userVote: null,
   },
   {
     id: 2,
@@ -137,7 +159,9 @@ export const MOCK_REVIEWS: Review[] = [
     text: 'Книга неплохая, но середина заметно провисает. Первые сто страниц — отличный темп, потом автор будто устал и начал тянуть резину. Диалоги местами звучат неестественно. Тем не менее концовка вытягивает впечатление.',
     rating: 3,
     createdAt: '2025-11-18T14:30:00Z',
-    likes: 18, dislikes: 5, userVote: null,
+    likes: 18,
+    dislikes: 5,
+    userVote: null,
   },
   {
     id: 3,
@@ -145,6 +169,8 @@ export const MOCK_REVIEWS: Review[] = [
     text: 'Прекрасный язык, богатые образы. Читается как поэзия в прозе. Немного сложновато для лёгкого чтения, но если вы любите вдумчивую литературу — это именно то, что нужно. Перечитаю обязательно.',
     rating: 4,
     createdAt: '2025-11-12T19:15:00Z',
-    likes: 29, dislikes: 1, userVote: null,
+    likes: 29,
+    dislikes: 1,
+    userVote: null,
   },
 ];
