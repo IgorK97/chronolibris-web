@@ -652,3 +652,24 @@
     gap: 8px;
   }
 }
+
+.show-more-btn {
+  background: none;
+  border: none;
+  color: #2563eb;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 8px 0;
+  margin-left: 24px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.show-more-btn:hover {
+  text-decoration: underline;
+}
+
+.replies-container {
+  margin-top: 8px;
+}

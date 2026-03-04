@@ -87,7 +87,7 @@ export function BookTabs({
           )}
         </div>
       )}
-      {activeTab === 'discussion' && <CommentsSection />}
+      {activeTab === 'discussion' && <CommentsSection bookId={bookId} />}
       {activeTab === 'reviews' && (
         <ReviewsSection
           canReview={canReview}
