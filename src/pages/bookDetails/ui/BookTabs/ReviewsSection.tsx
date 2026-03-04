@@ -15,6 +15,7 @@ import {
   useCreateReview,
   useUpdateReview,
   reviewsApi,
+  useDeleteReview,
 } from '@/api/reviews';
 import type { ReviewDetails } from '@/types/types';
 
@@ -241,6 +242,8 @@ interface ReviewsSectionProps {
   userCurrentScore: number;
   /** Callback so parent can refetch book stats after a rating change */
   onRatingChanged: () => void;
+  userReviewText?: string | null;
+  userReviewStatus?: string | null;
 }
 
 export function ReviewsSection({
@@ -249,6 +252,8 @@ export function ReviewsSection({
   isAuth,
   userReviewId,
   userCurrentScore,
+  userReviewText,
+  userReviewStatus,
   onRatingChanged,
 }: ReviewsSectionProps) {
   // const [reviews, setReviews] = useState<Review[]>(MOCK_REVIEWS);
@@ -258,9 +263,19 @@ export function ReviewsSection({
     null
   );
 
+  const isPending = userReviewStatus === 'На проверке';
+
   useEffect(() => {
     setPickedRating(userCurrentScore);
   }, [userCurrentScore]);
+
+  const handleDelete = async () => {
+    if (!userReviewId) return;
+    if (window.confirm('Вы уверены, что хотите удалить свой отзыв?')) {
+      await deleteReview.mutateAsync(userReviewId);
+      onRatingChanged();
+    }
+  };
 
   const {
     data,
@@ -275,6 +290,7 @@ export function ReviewsSection({
 
   const createReview = useCreateReview(bookId);
   const updateReview = useUpdateReview(bookId);
+  const deleteReview = useDeleteReview(bookId);
   // const sorted = [...reviews].sort((a, b) =>
   //   sort === 'popular'
   //     ? b.likes - b.dislikes - (a.likes - a.dislikes)
@@ -282,10 +298,15 @@ export function ReviewsSection({
   // );
 
   const handlePickRating = async (rating: number) => {
-    setPickedRating(rating);
     if (!isAuth) return;
 
+    setPickedRating(rating);
+
     if (userReviewId) {
+      // if (rating === userCurrentScore) {
+      //   await deleteReview.mutateAsync(userReviewId);
+      //   return;
+      // }
       await updateReview.mutateAsync({
         reviewId: userReviewId,
         score: rating,
@@ -344,6 +365,14 @@ export function ReviewsSection({
 
   return (
     <div className={styles['tab-content']}>
+      {/* Баннер модерации: показывается всегда, пока статус Pending */}
+      {isPending && (
+        <div
+          className={`${styles['submit-banner']} ${styles['submit-banner-pending']}`}
+        >
+          ✓ Ваш отзыв находится на модерации и будет опубликован после проверки.
+        </div>
+      )}
       <SubmitBanner
         status={submitStatus}
         onDismiss={() => setSubmitStatus(null)}
@@ -352,6 +381,10 @@ export function ReviewsSection({
         <ComposeBox
           placeholder="Поделитесь своим впечатлением о книге..."
           onSubmit={handleSubmit}
+          type="review"
+          onDelete={handleDelete}
+          initialText={userReviewText || ''}
+          isReadOnly={!!userReviewText}
         >
           <StarPicker
             value={pickedRating}

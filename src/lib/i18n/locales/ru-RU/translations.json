@@ -99,7 +99,11 @@
     "year": "Год",
     "create_new_collection": "новая полка",
     "your_rating": "Ваша оценка",
-    "change_rating": "Изменить оценку"
+    "rate_book": "Оценить книгу",
+    "change_rating": "Изменить оценку",
+    "confirm_delete_review": "Вы действительно хотите удалить оценку и отзыв?",
+    "deleting": "Удаление",
+    "delete_rating_and_review": "Удалить оценку и отзыв"
   },
   "not_found": {
     "title": "404 - Страница не найдена",

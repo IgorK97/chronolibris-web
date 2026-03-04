@@ -202,6 +202,7 @@ export function CommentsSection() {
           replyingTo={replyingTo}
           onCancelReply={() => setReplyingTo(null)}
           onSubmit={handleSubmit}
+          type="comment"
         />
       </div>
 

@@ -38,6 +38,7 @@ import { ParticipantsInfo } from './BookTabs/ParticipantsInfo';
 import {
   reviewsApi,
   useCreateReview,
+  useDeleteReview,
   useInfiniteReviews,
   useMyReview,
   useUpdateReview,
@@ -120,6 +121,7 @@ export const BookDetailsComponent = ({
   // ── Mutations ───────────────────────────────────────────────────────────────
   const createReview = useCreateReview(bookId ?? 0);
   const updateReview = useUpdateReview(bookId ?? 0);
+  const deleteReview = useDeleteReview(bookId ?? 0);
 
   const handleMouseLeave = () => {
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
@@ -150,6 +152,10 @@ export const BookDetailsComponent = ({
 
     if (userReview) {
       // User already has a review — update score only, keep existing text
+      // if (rating === userReview.score) {
+      //   await deleteReview.mutateAsync(userReview.id);
+      //   return;
+      // }
       await updateReview.mutateAsync({
         reviewId: userReview.id,
         score: rating,
@@ -157,6 +163,7 @@ export const BookDetailsComponent = ({
       });
     } else {
       // No review yet — create a score-only one (server sets status = Published)
+
       await createReview.mutateAsync({
         bookId,
         score: rating,
@@ -448,6 +455,33 @@ export const BookDetailsComponent = ({
                               </button>
                             ))}
                           </div>
+                          {/* Секция удаления оценки и отзыва */}
+                          {userReview && (
+                            <div className={styles['delete-section']}>
+                              <hr className={styles['separator']} />
+                              <button
+                                className={styles['delete-review-btn']}
+                                onClick={async () => {
+                                  if (
+                                    window.confirm(
+                                      t('book.confirm_delete_review')
+                                    )
+                                  ) {
+                                    await deleteReview.mutateAsync(
+                                      userReview.id
+                                    );
+                                    // Закрываем попап после удаления, если нужно
+                                    setIsRatingPopupOpen(false);
+                                  }
+                                }}
+                                disabled={deleteReview.isPending}
+                              >
+                                {deleteReview.isPending
+                                  ? t('common.deleting')
+                                  : t('book.delete_rating_and_review')}
+                              </button>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -516,7 +550,12 @@ export const BookDetailsComponent = ({
               isAuth={isAuth}
               userReviewId={userReview ? userReview.id : null}
               userCurrentScore={userReview ? userReview.score : 0}
-              onRatingChanged={() => refetchBook()}
+              userReviewText={userReview?.text}
+              userReviewStatus={userReview?.status}
+              onRatingChanged={() => {
+                refetchBook();
+                refetchReviews();
+              }}
               // infoContent={<p>Дополнительная информация о книге...</p>}
               infoContent={
                 <ParticipantsInfo

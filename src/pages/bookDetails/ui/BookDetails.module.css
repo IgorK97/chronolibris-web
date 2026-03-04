@@ -222,6 +222,41 @@
   }
 }
 
+.separator {
+  border: 0;
+  border-top: 1px solid #eee;
+  margin: 12px 0;
+  width: 100%;
+}
+
+.delete-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.delete-review-btn {
+  background: none;
+  border: none;
+  color: #ff4d4f; /* Красный цвет */
+  font-size: 13px;
+  cursor: pointer;
+  padding: 8px;
+  transition: opacity 0.2s;
+  text-decoration: underline; /* Чтобы было похоже на ссылку-кнопку */
+}
+
+.delete-review-btn:hover {
+  opacity: 0.8;
+  color: #cf1322;
+}
+
+.delete-review-btn:disabled {
+  color: #ccc;
+  cursor: not-allowed;
+}
+
 .shelf-panel {
   position: absolute; /* anchors to nearest positioned parent */
   top: 100%; /* appears directly below the header */

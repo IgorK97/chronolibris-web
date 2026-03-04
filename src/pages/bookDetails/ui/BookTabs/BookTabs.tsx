@@ -18,6 +18,8 @@ interface BookTabsProps {
   isAuth: boolean;
   userReviewId: number | null; // If the user has already reviewed, their review ID (for edit/delete)
   userCurrentScore: number; // If the user has already reviewed, their current rating score
+  userReviewText: string | undefined;
+  userReviewStatus: string | undefined;
   onRatingChanged: () => void; // Callback when user changes their rating
 }
 
@@ -32,6 +34,8 @@ export function BookTabs({
   isAuth,
   userReviewId,
   userCurrentScore,
+  userReviewStatus,
+  userReviewText,
   onRatingChanged,
 }: BookTabsProps) {
   const [activeTab, setActiveTab] = useState<TabId>('discussion');
@@ -92,6 +96,8 @@ export function BookTabs({
           userReviewId={userReviewId}
           userCurrentScore={userCurrentScore}
           onRatingChanged={onRatingChanged}
+          userReviewStatus={userReviewStatus}
+          userReviewText={userReviewText}
         />
       )}
     </div>

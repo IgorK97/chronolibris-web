@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ThumbsUp,
   ThumbsDown,
@@ -130,22 +130,35 @@ export function ComposeBox({
   replyingTo,
   onCancelReply,
   onSubmit,
+  onDelete,
+  initialText = '',
   children,
+  type,
+  isReadOnly = false,
 }: {
   placeholder: string;
   replyingTo?: { parentId: number; authorName: string } | null;
   onCancelReply?: () => void;
   onSubmit: (text: string) => void;
   children?: React.ReactNode; // slot for extra fields (e.g. star picker)
+  type: 'review' | 'comment';
+  onDelete?: () => void;
+  initialText?: string;
+  isReadOnly?: boolean;
 }) {
-  const [text, setText] = useState('');
-  const MAX = 2000;
+  const [text, setText] = useState(initialText);
+  const MAX = 5000;
+  const MIN = 120;
+
+  useEffect(() => {
+    setText(initialText);
+  }, [initialText]);
 
   const handleSubmit = () => {
     const trimmed = text.trim();
     if (!trimmed) return;
     onSubmit(trimmed);
-    setText('');
+    if (!initialText) setText('');
   };
 
   return (
@@ -172,18 +185,39 @@ export function ComposeBox({
         maxLength={MAX}
         onChange={(e) => setText(e.target.value)}
         rows={3}
+        minLength={type === 'review' ? MIN : 1}
+        disabled={isReadOnly}
       />
       <div className={styles['compose-footer']}>
         <span className={styles['compose-counter']}>
           {text.length}/{MAX}
         </span>
-        <button
+        {initialText ? (
+          <button
+            className={`${styles['compose-submit']} ${styles['compose-delete']}`}
+            onClick={onDelete}
+            style={{ backgroundColor: '#dc2626' }} // Красная кнопка
+          >
+            Удалить отзыв
+          </button>
+        ) : (
+          <button
+            className={styles['compose-submit']}
+            disabled={
+              !text.trim() || text.length < (type === 'review' ? MIN : 1)
+            }
+            onClick={handleSubmit}
+          >
+            Отправить
+          </button>
+        )}
+        {/* <button
           className={styles['compose-submit']}
           disabled={!text.trim()}
           onClick={handleSubmit}
         >
           Отправить
-        </button>
+        </button> */}
       </div>
     </div>
   );

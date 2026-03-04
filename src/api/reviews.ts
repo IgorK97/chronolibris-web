@@ -13,6 +13,7 @@ import type {
   CreateReviewRequest,
   RateReviewCommand,
   UpdateReviewRequest,
+  MyReviewDetails,
 } from '../types/types';
 
 export const reviewsApi = {
@@ -33,7 +34,7 @@ export const reviewsApi = {
     apiClient.post('/Reviews/rate', command),
 
   getMyReview: (bookId: number) =>
-    apiClient.get<ReviewDetails>(`/Reviews/my/${bookId}`),
+    apiClient.get<MyReviewDetails>(`/Reviews/my/${bookId}`),
 };
 
 export const useInfiniteReviews = (bookId: number, isAuth: boolean) => {

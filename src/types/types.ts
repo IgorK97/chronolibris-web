@@ -258,6 +258,20 @@ export interface ReviewDetails {
   userVote?: boolean;
 }
 
+export interface MyReviewDetails {
+  id: number;
+  title: string;
+  userName: string;
+  text: string;
+  score: number;
+  averageRating: number;
+  likesCount: number;
+  dislikesCount: number;
+  createdAt: Date;
+  userVote?: boolean;
+  status: string;
+}
+
 export interface UpdateProfileRequest {
   firstName: string;
   lastName: string;
