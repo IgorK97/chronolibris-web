@@ -116,9 +116,11 @@ function ReviewItem({
   review: ReviewDetails;
   isAuth: boolean;
 }) {
+  console.log(review.userVote, review.id);
   const [votes, setVotes] = useState({
     likes: review.likesCount,
     dislikes: review.dislikesCount,
+
     userVote:
       review.userVote === true
         ? 'like'
