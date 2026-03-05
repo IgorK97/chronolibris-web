@@ -1,18 +1,15 @@
 import { useState } from 'react';
-import {
-  // useMutation,
-  useQuery,
-  useQueryClient,
-} from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { commentsApi } from '@/api/comments';
 import {
   Avatar,
-  // VoteButton, ThreeDotsMenu,
+  // VoteButton,
   ComposeBox,
+  ThreeDotsMenu,
 } from './BookTabsAtoms';
 import { formatDate } from './BookTabsData';
 import type { CommentDto } from '@/types/types';
-// import { useStore } from '@/stores/globalStore';
+import { useStore } from '@/stores/globalStore';
 import styles from './BookTabs.module.css';
 
 const MAX_INDENT_DEPTH = 3; // После 3 уровня перестаем сдвигать вправо
@@ -26,7 +23,7 @@ export function CommentItem({
   depth?: number;
   bookId: number;
 }) {
-  //   const { user } = useStore();
+  const { user } = useStore();
   const qc = useQueryClient();
   const [isReplying, setIsReplying] = useState(false);
   const [showMore, setShowMore] = useState(false);
@@ -41,14 +38,14 @@ export function CommentItem({
     enabled: showMore,
   });
 
-  //   const deleteMutation = useMutation({
-  //     mutationFn: () => commentsApi.delete(comment.id),
-  //     onSuccess: () => qc.invalidateQueries({ queryKey: ['comments', bookId] }),
-  //   });
+  const deleteMutation = useMutation({
+    mutationFn: () => commentsApi.delete(comment.id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['comments', bookId] }),
+  });
 
   // Совмещаем превью-ответы с сервера и дозагруженные
-  const allReplies = fetchedReplies || comment.replies || [];
-  const hasReplies = allReplies.length > 0;
+  const allReplies = fetchedReplies || [];
+  const hasReplies = comment.repliesCount > 0;
 
   // Решение проблемы вложенности: сдвиг только до предела, линии всегда
   const indentStyle = {
@@ -57,25 +54,35 @@ export function CommentItem({
     paddingLeft: depth > 0 ? '16px' : '0px',
   };
 
+  const userName =
+    comment.userLogin == null || comment.userLogin == undefined
+      ? '[Недоступно]'
+      : comment.userLogin;
+
+  console.log(userName, 'Kukusiki');
+
   return (
     <div className={styles['comment-wrapper']} style={indentStyle}>
       <div className={styles['comment-item']}>
         <div className={styles['comment-header']}>
-          <Avatar userName={`User ${comment.userId}`} />
+          <Avatar userName={userName} />
           <div className={styles['comment-meta']}>
-            <span className={styles['author-name']}>
-              Пользователь {comment.userId}
-            </span>
+            <span className={styles['author-name']}>{userName}</span>
             <span className={styles['comment-date']}>
               {formatDate(comment.createdAt)}
             </span>
           </div>
-          {/* {user?.id === comment.userId && (
-            <ThreeDotsMenu onDelete={() => deleteMutation.mutate()} />
-          )} */}
+          {user?.userName === comment.userLogin && (
+            <ThreeDotsMenu
+              canDelete={true}
+              onDelete={async () => deleteMutation.mutate()}
+            />
+          )}
         </div>
 
-        <div className={styles['comment-text']}>{comment.text}</div>
+        <div className={styles['comment-text']}>
+          {comment.text == null ? '[Комментарий удалён]' : comment.text}
+        </div>
 
         <div className={styles['comment-footer']}>
           <button
@@ -109,12 +116,22 @@ export function CommentItem({
       </div>
 
       {/* Логика отображения дочерних элементов */}
-      {hasReplies && !showMore && depth === 0 && (
+      {hasReplies && !showMore && (
         <button
           className={styles['show-more-btn']}
           onClick={() => setShowMore(true)}
         >
-          <span>+ Показать ответы ({allReplies.length})</span>
+          <span>+ Показать ответы ({comment.repliesCount})</span>
+        </button>
+      )}
+
+      {/* Логика скрытия дочерних элементов */}
+      {hasReplies && showMore && (
+        <button
+          className={styles['show-more-btn']}
+          onClick={() => setShowMore(false)}
+        >
+          <span>- Скрыть ответы ({comment.repliesCount})</span>
         </button>
       )}
 

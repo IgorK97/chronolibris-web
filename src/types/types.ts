@@ -2,12 +2,12 @@ export const SELECTION_TYPE = { NEWEST: 1, POPULAR: 2, MANUAL: 3 } as const;
 
 export interface CommentDto {
   id: number;
-  text: string;
+  text?: string;
   createdAt: string;
-  userId: number;
+  userLogin?: string;
   parentCommentId: number | null;
   replies?: CommentDto[]; // Для первого уровня вложенности
-  repliesCount?: number; // Добавь это поле в DTO на сервере или считай на клиенте
+  repliesCount: number; // Добавь это поле в DTO на сервере или считай на клиенте
 }
 
 export interface CreateCommentRequest {

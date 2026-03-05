@@ -3,14 +3,9 @@ import type { CommentDto, CreateCommentRequest } from '../types/types';
 
 export const commentsApi = {
   // Получение корневых комментариев
-  getByBookId: (
-    bookId: number,
-    lastId?: number,
-    limit = 20,
-    includeReplies = true
-  ) =>
+  getByBookId: (bookId: number, lastId?: number, limit = 20) =>
     apiClient.get<CommentDto[]>(
-      `/Comments/book/${bookId}?limit=${limit}&lastId=${lastId || ''}&includeReplies=${includeReplies}`
+      `/Comments/book/${bookId}?limit=${limit}&lastId=${lastId || ''}`
     ),
 
   // Получение ответов на комментарий

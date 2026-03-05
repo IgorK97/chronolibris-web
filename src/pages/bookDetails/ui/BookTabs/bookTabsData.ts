@@ -39,7 +39,7 @@ export function formatDate(iso: string): string {
 }
 
 export function getInitials(name: string): string {
-  if (!name) return 'N';
+  if (!name || name == '[Недоступно]') return 'X';
   return name
     .split(' ')
     .slice(0, 2)

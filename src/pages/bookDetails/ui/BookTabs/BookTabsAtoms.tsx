@@ -84,7 +84,15 @@ export function ScoreDisplay({
 
 // ─── Three-dots menu ──────────────────────────────────────────────────────────
 
-export function ThreeDotsMenu() {
+export function ThreeDotsMenu({
+  // type,
+  canDelete,
+  onDelete,
+}: {
+  type?: 'comment' | 'review';
+  canDelete: boolean;
+  onDelete: () => Promise<void>;
+}) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [reported, setReported] = useState(false);
 
@@ -115,6 +123,17 @@ export function ThreeDotsMenu() {
               }}
             >
               Пожаловаться
+            </button>
+          )}
+          {canDelete && (
+            <button
+              className={styles['comment-menu-item']}
+              onClick={async () => {
+                await onDelete();
+                setMenuOpen(false);
+              }}
+            >
+              Удалить
             </button>
           )}
         </div>
