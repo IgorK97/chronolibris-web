@@ -18,6 +18,7 @@ import {
   useDeleteReview,
 } from '@/api/reviews';
 import type { ReviewDetails } from '@/types/types';
+import { useStore } from '@/stores/globalStore';
 
 // ─── Star row (display only) ──────────────────────────────────────────────────
 
@@ -30,7 +31,7 @@ function StarRating({ rating }: { rating: number }) {
       {[1, 2, 3, 4, 5].map((s) => (
         <span
           key={s}
-          className={`${styles['review-star']} ${s <= rating ? styles['review-star--filled'] : ''}`}
+          className={`${styles['review-star']} ${s <= rating ? styles['review-star-filled'] : ''}`}
         >
           ★
         </span>
@@ -112,11 +113,16 @@ const TRUNCATE_LINES = 5;
 function ReviewItem({
   review,
   isAuth,
+  canDelete,
+  onDelete,
 }: {
   review: ReviewDetails;
   isAuth: boolean;
+  canDelete: boolean; // Получаем снаружи
+  onDelete: () => Promise<void>; // Получаем снаружи
 }) {
-  console.log(review.userVote, review.id);
+  // const { user } = useStore();
+  console.log(canDelete, isAuth, review.userName, 'TRUTATA');
   const [votes, setVotes] = useState({
     likes: review.likesCount,
     dislikes: review.dislikesCount,
@@ -181,7 +187,7 @@ function ReviewItem({
             <span className={styles['comment-date']}>
               {formatDate(new Date(review.createdAt).toISOString())}
             </span>
-            <ThreeDotsMenu />
+            <ThreeDotsMenu canDelete={canDelete} onDelete={onDelete} />
           </div>
 
           {/* Truncated text block */}
@@ -265,19 +271,31 @@ export function ReviewsSection({
     null
   );
 
+  // Универсальная функция удаления
+  const handleDeleteReview = async (reviewId: number) => {
+    if (!window.confirm('Вы уверены, что хотите удалить этот отзыв?')) return;
+
+    try {
+      await deleteReview.mutateAsync(reviewId);
+      onRatingChanged(); // Обновляем общий рейтинг книги
+    } catch (error) {
+      console.error('Ошибка при удалении:', error);
+    }
+  };
+
   const isPending = userReviewStatus === 'На проверке';
 
   useEffect(() => {
     setPickedRating(userCurrentScore);
   }, [userCurrentScore]);
 
-  const handleDelete = async () => {
-    if (!userReviewId) return;
-    if (window.confirm('Вы уверены, что хотите удалить свой отзыв?')) {
-      await deleteReview.mutateAsync(userReviewId);
-      onRatingChanged();
-    }
-  };
+  // const handleDelete = async () => {
+  //   if (!userReviewId) return;
+  //   if (window.confirm('Вы уверены, что хотите удалить свой отзыв?')) {
+  //     await deleteReview.mutateAsync(userReviewId);
+  //     onRatingChanged();
+  //   }
+  // };
 
   const {
     data,
@@ -289,7 +307,7 @@ export function ReviewsSection({
   } = useInfiniteReviews(bookId, isAuth);
 
   const allReviews: ReviewDetails[] = data?.pages.flatMap((p) => p.items) ?? [];
-
+  const { user } = useStore(); // Достаем пользователя здесь
   const createReview = useCreateReview(bookId);
   const updateReview = useUpdateReview(bookId);
   const deleteReview = useDeleteReview(bookId);
@@ -384,7 +402,7 @@ export function ReviewsSection({
           placeholder="Поделитесь своим впечатлением о книге..."
           onSubmit={handleSubmit}
           type="review"
-          onDelete={handleDelete}
+          onDelete={() => userReviewId && handleDeleteReview(userReviewId)}
           initialText={userReviewText || ''}
           isReadOnly={!!userReviewText}
         >
@@ -429,7 +447,13 @@ export function ReviewsSection({
 
       <div className={styles['comment-list']}>
         {allReviews.map((r) => (
-          <ReviewItem key={r.id} review={r} isAuth={isAuth} />
+          <ReviewItem
+            key={r.id}
+            review={r}
+            isAuth={isAuth}
+            canDelete={isAuth && r.userName === user?.userName}
+            onDelete={() => handleDeleteReview(r.id)}
+          />
         ))}
       </div>
 

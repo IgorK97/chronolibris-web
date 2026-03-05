@@ -94,7 +94,7 @@ export function ThreeDotsMenu({
   onDelete: () => Promise<void>;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [reported, setReported] = useState(false);
+  // const [reported, setReported] = useState(false);
 
   return (
     <div className={styles['comment-menu-wrapper']}>
@@ -107,24 +107,18 @@ export function ThreeDotsMenu({
       </button>
       {menuOpen && (
         <div className={styles['comment-menu']}>
-          {reported ? (
-            <span
-              className={styles['comment-menu-item']}
-              style={{ color: '#6b7280', cursor: 'default' }}
-            >
-              Жалоба отправлена
-            </span>
-          ) : (
+          {!canDelete && (
             <button
               className={styles['comment-menu-item']}
               onClick={() => {
-                setReported(true);
+                // setReported(true);
                 setMenuOpen(false);
               }}
             >
               Пожаловаться
             </button>
           )}
+
           {canDelete && (
             <button
               className={styles['comment-menu-item']}
