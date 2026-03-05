@@ -50,7 +50,7 @@ export function VoteButton({
   return (
     <div className={styles['vote-wrapper']}>
       <button
-        className={`${styles['vote-btn']} ${active ? styles['vote-btn--active'] : ''} ${styles[`vote-btn--${type}`]}`}
+        className={`${styles['vote-btn']} ${active ? styles['vote-btn-active'] : ''} ${styles[`vote-btn-${type}`]}`}
         onClick={onClick}
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}

@@ -5,6 +5,9 @@ export interface CommentDto {
   text?: string;
   createdAt: string;
   userLogin?: string;
+  userVote?: boolean;
+  likesCount: number;
+  dislikesCount: number;
   parentCommentId: number | null;
   replies?: CommentDto[]; // Для первого уровня вложенности
   repliesCount: number; // Добавь это поле в DTO на сервере или считай на клиенте

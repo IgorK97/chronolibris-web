@@ -1,11 +1,16 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { commentsApi } from '@/api/comments';
+import {
+  commentsApi,
+  // useRateComment
+} from '@/api/comments';
 import {
   Avatar,
   // VoteButton,
   ComposeBox,
+  ScoreDisplay,
   ThreeDotsMenu,
+  VoteButton,
 } from './BookTabsAtoms';
 import { formatDate } from './BookTabsData';
 import type { CommentDto } from '@/types/types';
@@ -24,10 +29,14 @@ export function CommentItem({
   bookId: number;
 }) {
   const { user } = useStore();
+  const isAuth = !!user;
   const qc = useQueryClient();
   const [isReplying, setIsReplying] = useState(false);
   const [showMore, setShowMore] = useState(false);
-
+  // const rateMutation = useRateComment(
+  //   bookId,
+  //   comment.parentCommentId || undefined
+  // );
   // Загрузка дочерних комментариев по требованию
   const {
     data: fetchedReplies,
@@ -38,6 +47,17 @@ export function CommentItem({
     enabled: showMore,
     staleTime: 0,
   });
+
+  // const handleVote = (score: number) => {
+  //   if (!isAuth) {
+  //     alert('Нужно авторизоваться');
+  //     return;
+  //   }
+
+  //   // Если пользователь нажимает на ту же кнопку, мы обычно "снимаем" голос (score: 0)
+  //   // Но для простоты реализуем базовую логику:
+  //   rateMutation.mutate({ commentId: comment.id, score });
+  // };
 
   const repliesQueryKey = ['comments', 'replies', comment.id];
 
@@ -69,7 +89,56 @@ export function CommentItem({
       : comment.userLogin;
 
   console.log(userName, 'Kukusiki');
+  const [votes, setVotes] = useState({
+    likes: comment.likesCount,
+    dislikes: comment.dislikesCount,
 
+    userVote:
+      comment.userVote === true
+        ? 'like'
+        : comment.userVote === false
+          ? 'dislike'
+          : null,
+  } as {
+    likes: number;
+    dislikes: number;
+    userVote: 'like' | 'dislike' | null;
+  });
+  const handleVote = async (type: 'like' | 'dislike') => {
+    if (!isAuth) return; // guard: must be authenticated to vote
+    const score = type === 'like' ? 1 : -1;
+
+    // Optimistic UI update
+    setVotes((prev) => {
+      if (prev.userVote === type) {
+        return {
+          likes: type === 'like' ? prev.likes - 1 : prev.likes,
+          dislikes: type === 'dislike' ? prev.dislikes - 1 : prev.dislikes,
+          userVote: null,
+        };
+      }
+      return {
+        likes:
+          type === 'like'
+            ? prev.likes + 1
+            : prev.userVote === 'like'
+              ? prev.likes - 1
+              : prev.likes,
+        dislikes:
+          type === 'dislike'
+            ? prev.dislikes + 1
+            : prev.userVote === 'dislike'
+              ? prev.dislikes - 1
+              : prev.dislikes,
+        userVote: type,
+      };
+    });
+
+    await commentsApi.rateComment({
+      commentId: comment.id,
+      score,
+    });
+  };
   return (
     <div className={styles['comment-wrapper']} style={indentStyle}>
       <div className={styles['comment-item']}>
@@ -94,6 +163,22 @@ export function CommentItem({
         </div>
 
         <div className={styles['comment-footer']}>
+          {/* Группа кнопок голосования */}
+          <div className={styles['vote-group']}>
+            <VoteButton
+              type="like"
+              count={votes.likes}
+              active={votes.userVote === 'like'}
+              onClick={() => handleVote('like')}
+            />
+            <ScoreDisplay likes={votes.likes} dislikes={votes.dislikes} />
+            <VoteButton
+              type="dislike"
+              count={votes.dislikes}
+              active={votes.userVote === 'dislike'}
+              onClick={() => handleVote('dislike')}
+            />
+          </div>
           <button
             className={styles['reply-btn']}
             onClick={() => setIsReplying(!isReplying)}
