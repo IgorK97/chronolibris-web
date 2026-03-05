@@ -36,12 +36,21 @@ export function CommentItem({
     queryKey: ['comments', 'replies', comment.id],
     queryFn: () => commentsApi.getReplies(comment.id),
     enabled: showMore,
+    staleTime: 0,
   });
+
+  const repliesQueryKey = ['comments', 'replies', comment.id];
 
   const deleteMutation = useMutation({
     mutationFn: () => commentsApi.delete(comment.id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['comments', bookId] }),
   });
+
+  const handleHideReplies = () => {
+    setShowMore(false);
+    // Полностью удаляем данные об ответах этого комментария из кеша React Query
+    qc.removeQueries({ queryKey: repliesQueryKey });
+  };
 
   // Совмещаем превью-ответы с сервера и дозагруженные
   const allReplies = fetchedReplies || [];
@@ -115,8 +124,19 @@ export function CommentItem({
         )}
       </div>
 
-      {/* Логика отображения дочерних элементов */}
-      {hasReplies && !showMore && (
+      {hasReplies && (
+        <button
+          className={styles['show-more-btn']}
+          onClick={showMore ? handleHideReplies : () => setShowMore(true)}
+        >
+          <span>
+            {showMore ? '-' : '+'}{' '}
+            {showMore ? 'Скрыть ответы' : 'Показать ответы'} (
+            {comment.repliesCount})
+          </span>
+        </button>
+      )}
+      {/* {hasReplies && !showMore && (
         <button
           className={styles['show-more-btn']}
           onClick={() => setShowMore(true)}
@@ -125,7 +145,7 @@ export function CommentItem({
         </button>
       )}
 
-      {/* Логика скрытия дочерних элементов */}
+ 
       {hasReplies && showMore && (
         <button
           className={styles['show-more-btn']}
@@ -133,9 +153,9 @@ export function CommentItem({
         >
           <span>- Скрыть ответы ({comment.repliesCount})</span>
         </button>
-      )}
+      )} */}
 
-      {(showMore || depth > 0) && hasReplies && (
+      {showMore && hasReplies && (
         <div className={styles['replies-container']}>
           {allReplies.map((reply) => (
             <CommentItem
