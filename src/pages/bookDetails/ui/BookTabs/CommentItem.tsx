@@ -1,5 +1,10 @@
 import { useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  useInfiniteQuery,
+  useMutation,
+  // useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 import {
   commentsApi,
   // useRateComment
@@ -38,12 +43,28 @@ export function CommentItem({
   //   comment.parentCommentId || undefined
   // );
   // Загрузка дочерних комментариев по требованию
+  // const {
+  //   data: fetchedReplies,
+  //   // isLoading
+  // } = useQuery({
+  //   queryKey: ['comments', 'replies', comment.id],
+  //   queryFn: () => commentsApi.getReplies(comment.id),
+  //   enabled: showMore,
+  //   staleTime: 0,
+  // });
+
   const {
-    data: fetchedReplies,
-    // isLoading
-  } = useQuery({
+    data: infiniteReplies,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
     queryKey: ['comments', 'replies', comment.id],
-    queryFn: () => commentsApi.getReplies(comment.id),
+    // Используем pageParam как курсор (lastId)
+    queryFn: ({ pageParam }) => commentsApi.getReplies(comment.id, pageParam),
+    initialPageParam: undefined as number | undefined,
+    getNextPageParam: (lastPage) =>
+      lastPage.length > 0 ? lastPage[lastPage.length - 1].id : undefined,
     enabled: showMore,
     staleTime: 0,
   });
@@ -58,7 +79,7 @@ export function CommentItem({
   //   // Но для простоты реализуем базовую логику:
   //   rateMutation.mutate({ commentId: comment.id, score });
   // };
-
+  const allReplies = infiniteReplies?.pages.flat() || [];
   const repliesQueryKey = ['comments', 'replies', comment.id];
 
   const deleteMutation = useMutation({
@@ -73,7 +94,7 @@ export function CommentItem({
   };
 
   // Совмещаем превью-ответы с сервера и дозагруженные
-  const allReplies = fetchedReplies || [];
+  // const allReplies = fetchedReplies || [];
   const hasReplies = comment.repliesCount > 0;
 
   // Решение проблемы вложенности: сдвиг только до предела, линии всегда
@@ -250,6 +271,20 @@ export function CommentItem({
               bookId={bookId}
             />
           ))}
+          {hasNextPage && (
+            <button
+              className={styles['load-more-replies']} // Добавьте стиль в CSS по аналогии с load-more
+              onClick={() => fetchNextPage()}
+              disabled={isFetchingNextPage}
+              style={{
+                marginLeft: '24px',
+                fontSize: '0.85rem',
+                marginTop: '8px',
+              }}
+            >
+              {isFetchingNextPage ? 'Загрузка...' : 'Загрузить еще ответы'}
+            </button>
+          )}
         </div>
       )}
     </div>
