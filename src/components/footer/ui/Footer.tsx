@@ -10,7 +10,7 @@ export default function Footer() {
       <NavigationMenu.List className={styles['navigation-menu-list']}>
         <NavigationMenu.Item>
           <Text to="/" className={styles['logo']}>
-            📚 ELibrary 2026
+            Chronolibris 2026
           </Text>
         </NavigationMenu.Item>
       </NavigationMenu.List>

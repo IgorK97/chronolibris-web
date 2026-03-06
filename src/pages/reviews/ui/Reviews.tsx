@@ -39,7 +39,7 @@ export const Reviews = ({ onNavigate }: ReviewsProps) => {
     // fetchReviews,
     // loadMoreReviews,
     // refresh,
-  } = useInfiniteReviews(currentBook?.id ?? 0, user?.userId ?? 0);
+  } = useInfiniteReviews(currentBook?.id ?? 0, !!user?.userId);
   //  usePaginationReviews();
 
   // useEffect(() => {
@@ -75,11 +75,11 @@ export const Reviews = ({ onNavigate }: ReviewsProps) => {
     try {
       await reviewsApi.create({
         bookId: currentBook.id,
-        description: newReviewText,
+        reviewText: newReviewText,
         score: newRating,
-        title: 'Review',
-        userId: user.userId,
-        userName: user.firstName,
+        // title: 'Review',
+        // userId: user.userId,
+        // userName: user.firstName,
       });
 
       setNewReviewText('');

@@ -43,6 +43,8 @@ export const collectionsApi = {
 
   createShelf: (name: string) => apiClient.post<number>(`/Shelves`, { name }),
 
+  updateShelf: (shelfId: number, name: string) =>
+    apiClient.put<boolean>(`/Shelves/${shelfId}`, { name }),
   deleteShelf: (shelfId: number) =>
     apiClient.delete<boolean>(`/Shelves/${shelfId}`),
 

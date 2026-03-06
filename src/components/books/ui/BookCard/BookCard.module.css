@@ -79,3 +79,102 @@
   /* ensure words break if needed */
   word-break: break-all;
 }
+
+/* .menu-container {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: rgb(255 255 255 / 90%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.1s ease;
+}
+
+.menu-trigger {
+} */
+
+.menu-container {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+}
+
+/* Кнопка с тремя точками */
+.menu-trigger {
+  background: rgb(255 255 255 / 90%);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
+  transition: background-color 0.2s;
+  color: #333;
+}
+
+.menu-trigger:hover {
+  background: #fff;
+}
+
+/* Само выпадающее меню */
+.dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
+  padding: 4px;
+  min-width: 180px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #eaeaea;
+}
+
+.dropdown button {
+  background: transparent;
+  border: none;
+  padding: 10px 12px;
+  text-align: left;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  border-radius: 6px;
+  color: #333;
+  width: 100%;
+  transition: background-color 0.2s;
+}
+
+.dropdown button:hover {
+  background-color: #f5f5f5;
+}
+
+/* Стили для опции удаления */
+.delete-option {
+  color: #dc2626 !important; /* Красный цвет для удаления */
+}
+
+.delete-option:hover {
+  background-color: #fef2f2 !important;
+}
+
+/* Инфо часть */
+.info {
+  padding: 8px 0;
+  cursor: pointer;
+}
