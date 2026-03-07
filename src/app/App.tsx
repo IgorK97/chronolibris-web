@@ -21,7 +21,11 @@ import { ProtectedRoute } from './ProtectedRoute';
 import { SelectionListView } from '../pages/library/ui/SectionList';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { CountryManager, LanguageManager } from '@/pages/adminPanel';
+import {
+  CountryManager,
+  FormatManager,
+  LanguageManager,
+} from '@/pages/adminPanel';
 
 const queryClient = new QueryClient();
 
@@ -128,6 +132,7 @@ export default function App() {
             />
             <Route path="lang" element={<LanguageManager />} />
             <Route path="country" element={<CountryManager />} />
+            <Route path="format" element={<FormatManager />} />
           </Route>
           {/* </Route> */}
 

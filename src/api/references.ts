@@ -3,11 +3,14 @@ import { apiClient } from './apiClient';
 import type {
   CountryDto,
   CreateCountryRequest,
+  CreateFormatRequest,
   CreateLanguageRequest,
+  FormatDto,
   FtsConfigurationDto,
   LanguageDto,
   RoleDetails,
   UpdateCountryRequest,
+  UpdateFormatRequest,
   UpdateLanguageRequest,
 } from '../types/types';
 
@@ -89,6 +92,36 @@ export const referencesApi = {
    */
   deleteCountry: (id: number): Promise<void> =>
     apiClient.delete(`/References/countries/${id}`),
+
+  /**
+   * Получает список всех форматов книг
+   */
+  getFormats: (): Promise<FormatDto[]> =>
+    apiClient.get<FormatDto[]>('/References/formats'),
+
+  /**
+   * Получает формат по идентификатору
+   */
+  getFormatById: (id: number): Promise<FormatDto> =>
+    apiClient.get<FormatDto>(`/References/formats/${id}`),
+
+  /**
+   * Создает новую запись формата
+   */
+  createFormat: (data: CreateFormatRequest): Promise<number> =>
+    apiClient.post<number, CreateFormatRequest>('/References/formats', data),
+
+  /**
+   * Обновляет существующую запись формата
+   */
+  updateFormat: (id: number, data: UpdateFormatRequest): Promise<void> =>
+    apiClient.put<void, UpdateFormatRequest>(`/References/formats/${id}`, data),
+
+  /**
+   * Удаляет запись формата
+   */
+  deleteFormat: (id: number): Promise<void> =>
+    apiClient.delete(`/References/formats/${id}`),
 };
 
 // --- Hooks ---
@@ -255,6 +288,76 @@ export const useDeleteCountry = () => {
     mutationFn: referencesApi.deleteCountry,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['references', 'countries'] });
+    },
+  });
+};
+
+/**
+ * Хук для получения списка всех форматов книг
+ */
+export const useFormats = () => {
+  return useQuery({
+    queryKey: ['references', 'formats'],
+    queryFn: referencesApi.getFormats,
+    staleTime: 24 * 60 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+};
+
+/**
+ * Хук для получения формата по ID
+ */
+export const useFormatById = (id: number | null) => {
+  return useQuery({
+    queryKey: ['references', 'formats', id],
+    queryFn: () => {
+      if (id === null) throw new Error('ID формата не указан');
+      return referencesApi.getFormatById(id);
+    },
+    enabled: id !== null,
+    staleTime: 24 * 60 * 60 * 1000,
+  });
+};
+
+/**
+ * Хук для создания формата
+ */
+export const useCreateFormat = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: referencesApi.createFormat,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['references', 'formats'] });
+    },
+  });
+};
+
+/**
+ * Хук для обновления формата
+ */
+export const useUpdateFormat = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: UpdateFormatRequest }) =>
+      referencesApi.updateFormat(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['references', 'formats'] });
+    },
+  });
+};
+
+/**
+ * Хук для удаления формата
+ */
+export const useDeleteFormat = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: referencesApi.deleteFormat,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['references', 'formats'] });
     },
   });
 };

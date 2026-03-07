@@ -36,6 +36,20 @@ export interface UpdateCountryRequest {
   name: string;
 }
 
+export interface FormatDto {
+  id: number;
+  name: string;
+}
+
+export interface CreateFormatRequest {
+  name: string;
+}
+
+export interface UpdateFormatRequest {
+  id: number;
+  name: string;
+}
+
 export interface CommentDto {
   id: number;
   text?: string;
