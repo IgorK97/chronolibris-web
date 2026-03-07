@@ -1,5 +1,27 @@
 export const SELECTION_TYPE = { NEWEST: 1, POPULAR: 2, MANUAL: 3 } as const;
 
+export interface CreateLanguageRequest {
+  name: string;
+  ftsConfiguration: string;
+}
+
+export interface UpdateLanguageRequest {
+  id: number;
+  name: string;
+  ftsConfiguration: string;
+}
+
+export interface LanguageDto {
+  id: number;
+  name: string;
+  ftsConfiguration: string;
+}
+
+export interface FtsConfigurationDto {
+  configOid: number;
+  configName: string;
+}
+
 export interface CommentDto {
   id: number;
   text?: string;
