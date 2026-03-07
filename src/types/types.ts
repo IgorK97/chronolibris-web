@@ -22,6 +22,20 @@ export interface FtsConfigurationDto {
   configName: string;
 }
 
+export interface CountryDto {
+  id: number;
+  name: string;
+}
+
+export interface CreateCountryRequest {
+  name: string;
+}
+
+export interface UpdateCountryRequest {
+  id: number;
+  name: string;
+}
+
 export interface CommentDto {
   id: number;
   text?: string;

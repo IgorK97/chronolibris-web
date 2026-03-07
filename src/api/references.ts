@@ -1,10 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from './apiClient';
 import type {
+  CountryDto,
+  CreateCountryRequest,
   CreateLanguageRequest,
   FtsConfigurationDto,
   LanguageDto,
   RoleDetails,
+  UpdateCountryRequest,
   UpdateLanguageRequest,
 } from '../types/types';
 
@@ -53,6 +56,39 @@ export const referencesApi = {
 
   getFtsConfigurations: (): Promise<FtsConfigurationDto[]> =>
     apiClient.get<FtsConfigurationDto[]>('/References/fts-configurations'),
+
+  /**
+   * Получает список всех стран
+   */
+  getCountries: (): Promise<CountryDto[]> =>
+    apiClient.get<CountryDto[]>('/References/countries'),
+
+  /**
+   * Получает страну по идентификатору
+   */
+  getCountryById: (id: number): Promise<CountryDto> =>
+    apiClient.get<CountryDto>(`/References/countries/${id}`),
+
+  /**
+   * Создает новую запись страны
+   */
+  createCountry: (data: CreateCountryRequest): Promise<number> =>
+    apiClient.post<number, CreateCountryRequest>('/References/countries', data),
+
+  /**
+   * Обновляет существующую запись страны
+   */
+  updateCountry: (id: number, data: UpdateCountryRequest): Promise<void> =>
+    apiClient.put<void, UpdateCountryRequest>(
+      `/References/countries/${id}`,
+      data
+    ),
+
+  /**
+   * Удаляет запись страны
+   */
+  deleteCountry: (id: number): Promise<void> =>
+    apiClient.delete(`/References/countries/${id}`),
 };
 
 // --- Hooks ---
@@ -149,6 +185,76 @@ export const useDeleteLanguage = () => {
     onSuccess: () => {
       // Инвалидируем кэш языков после удаления
       queryClient.invalidateQueries({ queryKey: ['references', 'languages'] });
+    },
+  });
+};
+
+/**
+ * Хук для получения списка всех стран
+ */
+export const useCountries = () => {
+  return useQuery({
+    queryKey: ['references', 'countries'],
+    queryFn: referencesApi.getCountries,
+    staleTime: 24 * 60 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+};
+
+/**
+ * Хук для получения страны по ID
+ */
+export const useCountryById = (id: number | null) => {
+  return useQuery({
+    queryKey: ['references', 'countries', id],
+    queryFn: () => {
+      if (id === null) throw new Error('ID страны не указан');
+      return referencesApi.getCountryById(id);
+    },
+    enabled: id !== null,
+    staleTime: 24 * 60 * 60 * 1000,
+  });
+};
+
+/**
+ * Хук для создания страны
+ */
+export const useCreateCountry = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: referencesApi.createCountry,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['references', 'countries'] });
+    },
+  });
+};
+
+/**
+ * Хук для обновления страны
+ */
+export const useUpdateCountry = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: UpdateCountryRequest }) =>
+      referencesApi.updateCountry(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['references', 'countries'] });
+    },
+  });
+};
+
+/**
+ * Хук для удаления страны
+ */
+export const useDeleteCountry = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: referencesApi.deleteCountry,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['references', 'countries'] });
     },
   });
 };
