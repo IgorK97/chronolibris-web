@@ -40,6 +40,19 @@ export interface FormatDto {
   id: number;
   name: string;
 }
+// --- Типы запросов ---
+export interface CreatePublisherRequest {
+  name: string;
+  description: string;
+  countryId: number;
+}
+
+export interface UpdatePublisherRequest {
+  id: number;
+  name: string;
+  description: string;
+  countryId: number;
+}
 
 export interface CreateFormatRequest {
   name: string;
@@ -48,6 +61,16 @@ export interface CreateFormatRequest {
 export interface UpdateFormatRequest {
   id: number;
   name: string;
+}
+
+export interface PublisherDto {
+  id: number;
+  name: string;
+  description: string;
+  createdAt: string;
+  updatedAt?: string | null;
+  countryId: number;
+  countryName?: string | null;
 }
 
 export interface CommentDto {

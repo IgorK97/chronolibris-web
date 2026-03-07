@@ -25,6 +25,7 @@ import {
   CountryManager,
   FormatManager,
   LanguageManager,
+  PublisherManager,
 } from '@/pages/adminPanel';
 
 const queryClient = new QueryClient();
@@ -133,6 +134,7 @@ export default function App() {
             <Route path="lang" element={<LanguageManager />} />
             <Route path="country" element={<CountryManager />} />
             <Route path="format" element={<FormatManager />} />
+            <Route path="publisher" element={<PublisherManager />} />
           </Route>
           {/* </Route> */}
 
