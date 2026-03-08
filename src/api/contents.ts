@@ -1,0 +1,172 @@
+// File: src/api/contents.ts
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiClient } from './apiClient';
+import type {
+  ContentDto,
+  ContentListResponse,
+  ContentFilterRequest,
+} from '../types/types';
+import type { BookDto } from '../types/types';
+
+export interface CreateContentRequest {
+  title: string;
+  description: string;
+  countryId: number;
+  contentTypeId: number;
+  languageId: number;
+  year?: number | null;
+  parentContentId?: number | null;
+  position?: number | null;
+  personIds?: number[];
+  themeIds?: number[];
+}
+
+export interface UpdateContentRequest {
+  id: number;
+  title: string;
+  description: string;
+  countryId: number;
+  contentTypeId: number;
+  languageId: number;
+  year?: number | null;
+  parentContentId?: number | null;
+  position?: number | null;
+  personIds?: number[];
+  themeIds?: number[];
+}
+
+export interface BookContentLinkRequest {
+  contentId: number;
+  bookId: number;
+  order: number;
+}
+
+export const contentsApi = {
+  getContents: (filter: ContentFilterRequest): Promise<ContentListResponse> =>
+    apiClient.get<ContentListResponse>('/Contents', filter),
+
+  getContentById: (id: number): Promise<ContentDto> =>
+    apiClient.get<ContentDto>(`/Contents/${id}`),
+
+  getContentBooks: (contentId: number): Promise<BookDto[]> =>
+    apiClient.get<BookDto[]>(`/Contents/${contentId}/books`),
+
+  createContent: (data: CreateContentRequest): Promise<number> =>
+    apiClient.post<number, CreateContentRequest>('/Contents', data),
+
+  updateContent: (id: number, data: UpdateContentRequest): Promise<void> =>
+    apiClient.put<void, UpdateContentRequest>(`/Contents/${id}`, data),
+
+  deleteContent: (id: number): Promise<void> =>
+    apiClient.delete(`/Contents/${id}`),
+
+  linkBookToContent: (
+    contentId: number,
+    bookId: number,
+    data: BookContentLinkRequest
+  ): Promise<void> =>
+    apiClient.post<void, BookContentLinkRequest>(
+      `/Contents/${contentId}/books/${bookId}`,
+      data
+    ),
+
+  unlinkBookFromContent: (contentId: number, bookId: number): Promise<void> =>
+    apiClient.delete(`/Contents/${contentId}/books/${bookId}`),
+};
+
+export const useContents = (filter: ContentFilterRequest) => {
+  return useQuery({
+    queryKey: ['contents', filter],
+    queryFn: () => contentsApi.getContents(filter),
+    staleTime: 2 * 60 * 1000,
+  });
+};
+
+export const useContentById = (id: number | null) => {
+  return useQuery({
+    queryKey: ['contents', id],
+    queryFn: () => {
+      if (id === null) throw new Error('ID контента не указан');
+      return contentsApi.getContentById(id);
+    },
+    enabled: id !== null,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+export const useContentBooks = (contentId: number | null) => {
+  return useQuery({
+    queryKey: ['contents', contentId, 'books'],
+    queryFn: () => {
+      if (contentId === null) throw new Error('ID контента не указан');
+      return contentsApi.getContentBooks(contentId);
+    },
+    enabled: contentId !== null,
+    staleTime: 2 * 60 * 1000,
+  });
+};
+
+export const useCreateContent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: contentsApi.createContent,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contents'] });
+    },
+  });
+};
+
+export const useUpdateContent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: UpdateContentRequest }) =>
+      contentsApi.updateContent(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contents'] });
+    },
+  });
+};
+
+export const useDeleteContent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: contentsApi.deleteContent,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contents'] });
+    },
+  });
+};
+
+export const useLinkBookToContent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      contentId,
+      bookId,
+      data,
+    }: {
+      contentId: number;
+      bookId: number;
+      data: BookContentLinkRequest;
+    }) => contentsApi.linkBookToContent(contentId, bookId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contents'] });
+    },
+  });
+};
+
+export const useUnlinkBookFromContent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      contentId,
+      bookId,
+    }: {
+      contentId: number;
+      bookId: number;
+    }) => contentsApi.unlinkBookFromContent(contentId, bookId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contents'] });
+    },
+  });
+};

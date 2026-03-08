@@ -5,6 +5,7 @@ import { PublisherManager } from './ui/PublisherManager';
 import { SeriesManager } from './ui/SeriesManager';
 import { PersonManager } from './ui/PersonManager';
 import { ThemeManager } from './ui/ThemeManager';
+import { ContentManagement } from './ui/ContentManagement';
 
 export {
   LanguageManager,
@@ -14,4 +15,5 @@ export {
   SeriesManager,
   PersonManager,
   ThemeManager,
+  ContentManagement,
 };

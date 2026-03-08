@@ -110,6 +110,7 @@ export const ThemeManager: React.FC = () => {
     });
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSelectParent = (theme: ThemeDto) => {
     setSelectedParentId(selectedParentId === theme.id ? null : theme.id);
   };

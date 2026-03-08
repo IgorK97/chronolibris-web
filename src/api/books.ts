@@ -2,13 +2,18 @@ import {
   useQuery,
   useInfiniteQuery,
   type UseQueryOptions,
+  useQueryClient,
+  useMutation,
   // useMutation
 } from '@tanstack/react-query';
 import { apiClient } from './apiClient';
 import type {
   BookDetails,
+  BookDto,
+  BookFilterRequest,
   BookFilters,
   BookListItem,
+  BookListResponse,
   PagedResult,
   UpdateReadingProgressCommand,
 } from '../types/types';
@@ -24,6 +29,41 @@ interface SearchParams {
   rating?: number | null;
   yearFrom?: string;
   yearTo?: string;
+}
+
+export interface CreateBookRequest {
+  title: string;
+  description: string;
+  countryId: number;
+  languageId: number;
+  year?: number | null;
+  isbn?: string | null;
+  filePath?: string | null;
+  coverPath?: string | null;
+  isAvailable?: boolean;
+  isReviewable?: boolean;
+  publisherId?: number | null;
+  seriesId?: number | null;
+  personIds?: number[];
+  themeIds?: number[];
+}
+
+export interface UpdateBookRequest {
+  id: number;
+  title: string;
+  description: string;
+  countryId: number;
+  languageId: number;
+  year?: number | null;
+  isbn?: string | null;
+  filePath?: string | null;
+  coverPath?: string | null;
+  isAvailable?: boolean;
+  isReviewable?: boolean;
+  publisherId?: number | null;
+  seriesId?: number | null;
+  personIds?: number[];
+  themeIds?: number[];
 }
 export const booksApi = {
   getMetadata: (bookId: number, userId: number) =>
@@ -51,6 +91,20 @@ export const booksApi = {
 
   updateProgress: (command: UpdateReadingProgressCommand) =>
     apiClient.post(`/Books/${command.bookId}/progress`, command),
+
+  getBooks: (filter: BookFilterRequest): Promise<BookListResponse> =>
+    apiClient.get<BookListResponse>('/Books', filter),
+
+  getBookById: (id: number): Promise<BookDto> =>
+    apiClient.get<BookDto>(`/Books/${id}`),
+
+  createBook: (data: CreateBookRequest): Promise<number> =>
+    apiClient.post<number, CreateBookRequest>('/Books', data),
+
+  updateBook: (id: number, data: UpdateBookRequest): Promise<void> =>
+    apiClient.put<void, UpdateBookRequest>(`/Books/${id}`, data),
+
+  deleteBook: (id: number): Promise<void> => apiClient.delete(`/Books/${id}`),
 };
 
 // --- Hooks ---
@@ -201,5 +255,56 @@ export const useInfiniteSearchDebounced = (
     initialPageParam: undefined as number | undefined,
     getNextPageParam: (lastPage) =>
       lastPage.hasNext ? lastPage.lastId : undefined,
+  });
+};
+
+export const useBooks = (filter: BookFilterRequest) => {
+  return useQuery({
+    queryKey: ['books', filter],
+    queryFn: () => booksApi.getBooks(filter),
+    staleTime: 2 * 60 * 1000,
+  });
+};
+
+export const useBookById = (id: number | null) => {
+  return useQuery({
+    queryKey: ['books', id],
+    queryFn: () => {
+      if (id === null) throw new Error('ID книги не указан');
+      return booksApi.getBookById(id);
+    },
+    enabled: id !== null,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+export const useCreateBook = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: booksApi.createBook,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['books'] });
+    },
+  });
+};
+
+export const useUpdateBook = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: UpdateBookRequest }) =>
+      booksApi.updateBook(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['books'] });
+    },
+  });
+};
+
+export const useDeleteBook = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: booksApi.deleteBook,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['books'] });
+    },
   });
 };

@@ -102,6 +102,99 @@ export interface ThemeDto {
   updatedAt?: string;
 }
 
+// File: src/types/types.ts
+export interface ThemeDto {
+  id: number;
+  name: string;
+}
+
+export interface ContentDto {
+  id: number;
+  title: string;
+  description: string;
+  countryId: number;
+  countryName?: string | null;
+  contentTypeId: number;
+  contentType?: string | null;
+  languageId: number;
+  languageName?: string | null;
+  year?: number | null;
+  parentContentId?: number | null;
+  position?: number | null;
+  createdAt: string;
+  updatedAt?: string | null;
+  authors: string[];
+  themes: ThemeDto[];
+  booksCount: number;
+}
+
+export interface BookDto {
+  id: number;
+  title: string;
+  description: string;
+  countryId: number;
+  countryName?: string | null;
+  languageId: number;
+  languageName?: string | null;
+  year?: number | null;
+  isbn?: string | null;
+  coverPath?: string | null;
+  isAvailable: boolean;
+  isReviewable: boolean;
+  publisherId?: number | null;
+  publisherName?: string | null;
+  seriesId?: number | null;
+  seriesName?: string | null;
+  createdAt: string;
+  updatedAt?: string | null;
+  authors: string[];
+  themes: ThemeDto[];
+}
+
+export interface ContentListResponse {
+  items: ContentDto[];
+  nextCursor?: string | null;
+  prevCursor?: string | null;
+  totalCount: number;
+  hasMore: boolean;
+}
+
+export interface BookListResponse {
+  items: BookDto[];
+  nextCursor?: string | null;
+  prevCursor?: string | null;
+  totalCount: number;
+  hasMore: boolean;
+}
+
+export interface ContentFilterRequest {
+  searchQuery?: string | null;
+  authorName?: string | null;
+  includeThemeIds?: number[] | null;
+  excludeThemeIds?: number[] | null;
+  contentTypeId?: number | null;
+  languageId?: number | null;
+  yearFrom?: number | null;
+  yearTo?: number | null;
+  cursor?: string | null;
+  limit?: number;
+}
+
+export interface BookFilterRequest {
+  searchQuery?: string | null;
+  authorName?: string | null;
+  includeThemeIds?: number[] | null;
+  excludeThemeIds?: number[] | null;
+  publisherId?: number | null;
+  seriesId?: number | null;
+  languageId?: number | null;
+  yearFrom?: number | null;
+  yearTo?: number | null;
+  isAvailable?: boolean | null;
+  cursor?: string | null;
+  limit?: number;
+}
+
 export interface PublisherDto {
   id: number;
   name: string;

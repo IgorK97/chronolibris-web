@@ -22,6 +22,7 @@ import { SelectionListView } from '../pages/library/ui/SectionList';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
+  ContentManagement,
   CountryManager,
   FormatManager,
   LanguageManager,
@@ -30,6 +31,7 @@ import {
   SeriesManager,
   ThemeManager,
 } from '@/pages/adminPanel';
+import { ContentUnit } from '@/pages/adminPanel/ui/ContentUnit';
 
 const queryClient = new QueryClient();
 
@@ -141,6 +143,8 @@ export default function App() {
             <Route path="series" element={<SeriesManager />} />
             <Route path="person" element={<PersonManager />} />
             <Route path="themes" element={<ThemeManager />} />
+            <Route path="contents" element={<ContentManagement />} />
+            <Route path="contents/:contentId" element={<ContentUnit />} />
           </Route>
           {/* </Route> */}
 
