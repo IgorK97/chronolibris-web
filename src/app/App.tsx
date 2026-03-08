@@ -25,6 +25,7 @@ import {
   CountryManager,
   FormatManager,
   LanguageManager,
+  PersonManager,
   PublisherManager,
   SeriesManager,
 } from '@/pages/adminPanel';
@@ -137,6 +138,7 @@ export default function App() {
             <Route path="format" element={<FormatManager />} />
             <Route path="publisher" element={<PublisherManager />} />
             <Route path="series" element={<SeriesManager />} />
+            <Route path="person" element={<PersonManager />} />
           </Route>
           {/* </Route> */}
 

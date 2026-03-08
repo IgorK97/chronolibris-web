@@ -83,6 +83,15 @@ export interface UpdateFormatRequest {
   name: string;
 }
 
+export interface PersonDto {
+  id: number;
+  name: string;
+  description: string;
+  imageUrl?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface PublisherDto {
   id: number;
   name: string;
