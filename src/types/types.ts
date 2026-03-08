@@ -54,6 +54,26 @@ export interface UpdatePublisherRequest {
   countryId: number;
 }
 
+export interface SeriesDto {
+  id: number;
+  name: string;
+  publisherId: number;
+  publisherName?: string | null;
+  createdAt: string;
+  booksCount?: number;
+}
+
+export interface CreateSeriesRequest {
+  name: string;
+  publisherId: number;
+}
+
+export interface UpdateSeriesRequest {
+  id: number;
+  name: string;
+  publisherId: number;
+}
+
 export interface CreateFormatRequest {
   name: string;
 }
