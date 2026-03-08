@@ -28,6 +28,7 @@ import {
   PersonManager,
   PublisherManager,
   SeriesManager,
+  ThemeManager,
 } from '@/pages/adminPanel';
 
 const queryClient = new QueryClient();
@@ -139,6 +140,7 @@ export default function App() {
             <Route path="publisher" element={<PublisherManager />} />
             <Route path="series" element={<SeriesManager />} />
             <Route path="person" element={<PersonManager />} />
+            <Route path="themes" element={<ThemeManager />} />
           </Route>
           {/* </Route> */}
 

@@ -92,6 +92,16 @@ export interface PersonDto {
   updatedAt?: string;
 }
 
+export interface ThemeDto {
+  id: number;
+  name: string;
+  parentThemeId?: number | null;
+  parentThemeName?: string | null;
+  subThemesCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface PublisherDto {
   id: number;
   name: string;

@@ -4,6 +4,7 @@ import { FormatManager } from './ui/FormatManager';
 import { PublisherManager } from './ui/PublisherManager';
 import { SeriesManager } from './ui/SeriesManager';
 import { PersonManager } from './ui/PersonManager';
+import { ThemeManager } from './ui/ThemeManager';
 
 export {
   LanguageManager,
@@ -12,4 +13,5 @@ export {
   PublisherManager,
   SeriesManager,
   PersonManager,
+  ThemeManager,
 };
