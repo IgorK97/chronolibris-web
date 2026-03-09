@@ -19,6 +19,9 @@ export default defineConfig({
       '@lib': path.resolve(__dirname, './src/lib'),
     },
   },
+  optimizeDeps: {
+    include: ['.json', '.js'],
+  },
   server: {
     // https: true,
     proxy: {

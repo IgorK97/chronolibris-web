@@ -32,6 +32,7 @@ import {
   ThemeManager,
 } from '@/pages/adminPanel';
 import { ContentUnit } from '@/pages/adminPanel/ui/ContentUnit';
+import { Reader } from '@/components/Reader';
 
 const queryClient = new QueryClient();
 
@@ -145,6 +146,16 @@ export default function App() {
             <Route path="themes" element={<ThemeManager />} />
             <Route path="contents" element={<ContentManagement />} />
             <Route path="contents/:contentId" element={<ContentUnit />} />
+            <Route
+              path="reader"
+              element={
+                <Reader
+                  filePath="/data/002.js"
+                  cacheSize={10}
+                  preloadAhead={3}
+                />
+              }
+            />
           </Route>
           {/* </Route> */}
 
