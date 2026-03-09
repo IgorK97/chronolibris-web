@@ -150,7 +150,8 @@ export default function App() {
               path="reader"
               element={
                 <Reader
-                  filePath="/data/002.js"
+                  tocPath="/data/toc.json"
+                  filePath="/data/002.json"
                   cacheSize={10}
                   preloadAhead={3}
                 />

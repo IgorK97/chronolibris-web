@@ -70,8 +70,36 @@ export interface CachedPage {
   timestamp: number; // время кэширования (Date.now()), используется для вытеснения LRU
 }
 
+// ─── Интерфейсы оглавления (toc.js) ─────────────────────────
+
+// Одна запись Parts[]: описывает один фрагмент-файл книги
+export interface TocPart {
+  s: number; // глобальный индекс первого абзаца фрагмента
+  e: number; // глобальный индекс последнего абзаца фрагмента
+  xps: number[]; // xp первого сегмента фрагмента
+  xpe: number[]; // xp последнего сегмента фрагмента
+  url: string; // относительный URL файла фрагмента, например "002.js"
+}
+
+export interface TocMeta {
+  Title: string; // название книги
+  Authors: { Role: string; First: string; Last: string }[];
+  Annotation: string; // аннотация
+  Lang: string; // язык
+}
+
+// Полная структура toc.js
+export interface TocData {
+  Meta: TocMeta;
+  full_length: number; // общее число абзацев во всей книге
+  Body: unknown[]; // структура глав (не используется здесь напрямую)
+  Parts: TocPart[]; // массив фрагментов-файлов
+}
+
 // ─── Пропсы компонента ──────────────────────────────────────
 interface ReaderProps {
+  // Путь к toc.js. Если не передан — работаем без глобального прогресса.
+  tocPath?: string;
   filePath?: string; // путь к JSON-файлу книги (по умолчанию '/data/002.js')
   cacheSize?: number; // максимальное число страниц в кэше (по умолчанию 10)
   preloadAhead?: number; // сколько страниц вперёд предзагружать при навигации (по умолчанию 3)
@@ -84,9 +112,23 @@ const MAX_FONT_SIZE = 32; // максимально допустимый раз�
 const DEFAULT_CACHE_SIZE = 10; // размер LRU-кэша по умолчанию
 const DEFAULT_PRELOAD_AHEAD = 3; // количество страниц для предзагрузки
 
+// ─── Вспомогательная функция: найти ближайшую границу слова ──
+// Ищет последний пробел в строке str[0..maxLen-1].
+// Если пробел найден — возвращает его позицию + 1 (разрыв после пробела).
+// Если нет — возвращает maxLen (разрыв на точном лимите символов).
+// Это гарантирует, что страница никогда не обрывается посередине слова.
+function findWordBoundary(str: string, maxLen: number): number {
+  if (maxLen >= str.length) return str.length;
+  // Ищем последний пробел в пределах лимита
+  const lastSpace = str.lastIndexOf(' ', maxLen);
+  if (lastSpace > 0) return lastSpace + 1; // +1: пробел остаётся на текущей странице
+  return maxLen; // слово длиннее страницы — разрываем принудительно
+}
+
 // ─── Компонент ──────────────────────────────────────────────
 export const Reader: React.FC<ReaderProps> = ({
-  filePath = '/data/002.js', // путь к файлу книги
+  tocPath, // путь к toc.js (опционально)
+  filePath = '/data/002.js', // путь к файлу книги (fallback)
   cacheSize = DEFAULT_CACHE_SIZE, // максимум записей в кэше
   preloadAhead = DEFAULT_PRELOAD_AHEAD, // сколько страниц вперёд грузить заранее
 }) => {
@@ -103,16 +145,24 @@ export const Reader: React.FC<ReaderProps> = ({
   });
 
   // pageCache — Map<pageNumber, CachedPage>: хранит уже сгенерированные страницы.
-  const [pageCache, setPageCache] = useState<Map<number, CachedPage>>(
-    new Map()
-  );
+  //   const [pageCache, setPageCache] = useState<Map<number, CachedPage>>(
+  //     new Map()
+  //   );
+  const pageCacheRef = useRef<Map<number, CachedPage>>(new Map());
+
+  // ── Данные для глобального прогресса чтения ──────────────────
+  // tocData хранит весь toc.js; null если tocPath не задан или не загружен.
+  const [tocData, setTocData] = useState<TocData | null>(null);
+
+  // Индекс текущего фрагмента в массиве Parts[] (какой NNN.js открыт)
+  const [currentPartIndex, setCurrentPartIndex] = useState<number>(0);
 
   // pagePositions — Map<pageNumber, {segmentIndex, charOffset}>:
   // для каждой страницы запоминает, с какого сегмента и символа она начинается.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [pagePositions, setPagePositions] = useState<
-    Map<number, { segmentIndex: number; charOffset: number }>
-  >(new Map());
+  //   const [pagePositions, setPagePositions] = useState<
+  //     Map<number, { segmentIndex: number; charOffset: number }>
+  //   >(new Map());
 
   const containerRef = useRef<HTMLDivElement>(null); // ссылка на корневой <div> читалки
   const pageRef = useRef<HTMLDivElement>(null); // ссылка на активную страницу для замера размеров
@@ -122,6 +172,31 @@ export const Reader: React.FC<ReaderProps> = ({
   const pagePositionsRef = useRef<
     Map<number, { segmentIndex: number; charOffset: number }>
   >(new Map());
+
+  // ─── Эффект: загрузка toc.js ─────────────────────────────────
+  // Загружается один раз; даёт нам full_length и Parts[] для прогресса.
+  // Архитектурно: в будущем здесь же можно решать, какой фрагмент загрузить
+  // исходя из сохранённой позиции пользователя.
+  useEffect(() => {
+    if (!tocPath) return; // если tocPath не передан — работаем без toc
+
+    const loadToc = async () => {
+      try {
+        const response = await fetch(tocPath);
+        if (!response.ok) throw new Error(`Failed to load toc: ${tocPath}`);
+        const data: TocData = await response.json();
+        setTocData(data);
+
+        // Определяем, какой фрагмент соответствует filePath
+        const partIdx = data.Parts.findIndex((p) => filePath.endsWith(p.url));
+        if (partIdx !== -1) setCurrentPartIndex(partIdx);
+      } catch (err) {
+        console.error('Error loading toc:', err);
+      }
+    };
+
+    loadToc();
+  }, [tocPath, filePath]);
 
   // ─── Эффект 1: загрузка файла ───────────────────────────────
   // Запускается один раз при монтировании (и при изменении filePath).
@@ -147,8 +222,10 @@ export const Reader: React.FC<ReaderProps> = ({
   // (размер страницы изменился), поэтому всё сбрасывается до начала.
   useEffect(() => {
     if (originalSegments.length > 0) {
-      setPageCache(new Map());
-      setPagePositions(new Map());
+      //   setPageCache(new Map());
+      pageCacheRef.current = new Map();
+      pagePositionsRef.current = new Map(); // сбрасываем синхронно через ref
+      //   setPagePositions(new Map());
       setState((prev) => ({ ...prev, currentPage: 1 }));
     }
   }, [state.fontSize, originalSegments.length]);
@@ -179,9 +256,11 @@ export const Reader: React.FC<ReaderProps> = ({
       calculateTotalPages(); // обновляем state.totalPages
       isCalculatingRef.current = false; // снимаем блокировку
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.fontSize, originalSegments.length]);
   // Зависимости те же, что и в эффекте 2 — пересчитываем при изменении шрифта или данных
-  //Но здесь нет зависимости calculateTotalPages
+  // calculateTotalPages намеренно не в deps: вызывается только отсюда,
+  // добавление вызвало бы бесконечный цикл через setState → re-render.
 
   // ─── extractText: извлечение чистого текста из сегмента ─────
   // Рекурсивно обходит поле .c (строка | массив) и собирает строку.
@@ -240,6 +319,7 @@ export const Reader: React.FC<ReaderProps> = ({
       const segmentsList: PageSegment[] = []; // накапливаем сегменты текущей страницы
       let charCount = 0; // сколько символов уже собрали на эту страницу
       const startPos = pagePositionsRef.current.get(pageNumber);
+      console.log('StartPos', pageNumber, startPos);
       let currentIndex = startPos?.segmentIndex ?? 0;
       let currentCharOffset = startPos?.charOffset ?? 0;
       const maxChars = estimatedCharsPerPage.current;
@@ -274,41 +354,46 @@ export const Reader: React.FC<ReaderProps> = ({
           charCount += remaining;
           currentIndex = i + 1; // следующий сегмент
           currentCharOffset = 0; // сброс смещения — следующий сегмент читаем с начала
-        } else if (spaceLeft > 0) {
-          // Текст не влезает целиком — берём только сколько есть места
+          if (charCount >= maxChars) {
+            pagePositionsRef.current.set(pageNumber + 1, {
+              segmentIndex: i + 1,
+              charOffset: 0,
+            });
+            console.log(pageNumber + 1, {
+              segmentIndex: i + 1,
+              charOffset: 0,
+            });
+          }
+        } else {
+          const breakAt = findWordBoundary(textToUse, spaceLeft);
+          pagePositionsRef.current.set(pageNumber + 1, {
+            segmentIndex: i,
+            charOffset: currentCharOffset + breakAt,
+          });
+          console.log(pageNumber + 1, {
+            segmentIndex: i,
+            charOffset: currentCharOffset + breakAt,
+          });
           segmentsList.push({
             originalIndex: i,
-            text: textToUse.substring(0, spaceLeft), // обрезаем до конца страницы
-            isContinuation: currentCharOffset > 0 || charCount > 0,
-            continuationId: `seg-${i}`,
+            text: textToUse.substring(0, breakAt),
+            // isContinuation: currentCharOffset > 0 || charCount > 0,
+            isContinuation: currentCharOffset > 0,
+            continuationId: currentCharOffset > 0 ? `seg-${i}` : undefined,
             type: segment.t,
           });
 
-          // Сохраняем позицию для следующей страницы
-          setPagePositions((prev) => {
-            const newMap = new Map(prev);
-            newMap.set(pageNumber + 1, {
-              segmentIndex: i,
-              charOffset: currentCharOffset + spaceLeft,
-            });
-            return newMap;
-          });
-
-          charCount = maxChars; // страница заполнена — выходим из цикла
-          currentIndex = i;
-          currentCharOffset = currentCharOffset + spaceLeft;
-          pagePositionsRef.current.set(pageNumber + 1, {
-            segmentIndex: i,
-            charOffset: currentCharOffset,
-          });
-        } else {
-          break; // места нет и добавить нечего — выходим
+          charCount = maxChars;
         }
+        // else {
+        //   break;
+        // }
       }
 
       return { segments: segmentsList, pageNumber }; // возвращаем готовую страницу
     },
     [originalSegments, extractText, extractNotes]
+    // pagePositionsRef не нужен в deps — это ref, не state
   );
 
   // ─── getPage: получение страницы из кэша или генерация ──────
@@ -319,7 +404,8 @@ export const Reader: React.FC<ReaderProps> = ({
     (pageNumber: number): PageContent => {
       if (pageNumber < 1) return { segments: [], pageNumber }; // защита от отрицательных номеров
 
-      const cached = pageCache.get(pageNumber); // пробуем найти в кэше
+      //   const cached = pageCache.get(pageNumber); // пробуем найти в кэше
+      const cached = pageCacheRef.current.get(pageNumber);
       if (cached) {
         return cached.content; // кэш-хит: возвращаем готовое содержимое
       }
@@ -327,46 +413,79 @@ export const Reader: React.FC<ReaderProps> = ({
       const content = generatePage(pageNumber);
 
       // Обновляем кэш
-      setPageCache((prev) => {
-        const newCache = new Map(prev);
-        // Если кэш переполнен — удаляем самую старую запись (по timestamp)
-        if (newCache.size >= cacheSize) {
-          const oldestKey = Array.from(newCache.keys()).sort(
-            (a, b) =>
-              (newCache.get(a)?.timestamp || 0) -
-              (newCache.get(b)?.timestamp || 0)
-          )[0]; // ключ с наименьшим timestamp = самая старая запись
-          if (oldestKey !== undefined) newCache.delete(oldestKey);
-        }
-        // Сохраняем новую страницу с текущим временем
-        newCache.set(pageNumber, {
-          pageNumber,
-          content,
-          timestamp: Date.now(),
-        });
-        return newCache;
+      //   setPageCache((prev) => {
+      //     const newCache = new Map(prev);
+      //     // Если кэш переполнен — удаляем самую старую запись (по timestamp)
+      //     if (newCache.size >= cacheSize) {
+      //       const oldestKey = Array.from(newCache.keys()).sort(
+      //         (a, b) =>
+      //           (newCache.get(a)?.timestamp || 0) -
+      //           (newCache.get(b)?.timestamp || 0)
+      //       )[0]; // ключ с наименьшим timestamp = самая старая запись
+      //       if (oldestKey !== undefined) newCache.delete(oldestKey);
+      //     }
+      //     // Сохраняем новую страницу с текущим временем
+      //     newCache.set(pageNumber, {
+      //       pageNumber,
+      //       content,
+      //       timestamp: Date.now(),
+      //     });
+      //     return newCache;
+      //   });
+
+      if (pageCacheRef.current.size >= cacheSize) {
+        const oldestKey = Array.from(pageCacheRef.current.keys()).sort(
+          (a, b) =>
+            (pageCacheRef.current.get(a)?.timestamp || 0) -
+            (pageCacheRef.current.get(b)?.timestamp || 0)
+        )[0];
+        if (oldestKey !== undefined) pageCacheRef.current.delete(oldestKey);
+      }
+
+      pageCacheRef.current.set(pageNumber, {
+        pageNumber,
+        content,
+        timestamp: Date.now(),
       });
 
-      return content; // возвращаем сгенерированное содержимое
+      return content;
     },
-    [pageCache, generatePage, cacheSize]
+    [generatePage, cacheSize]
   );
 
   // ─── goToPage: переход на конкретную страницу ───────────────
   const goToPage = useCallback(
-    (page: number) => {
+    (newPage: number) => {
       if (isFlipping.current) return; // если идёт анимация — игнорируем
-      if (page < 1 || page > state.totalPages) return; // граничные проверки
+      if (newPage < 1 || newPage > state.totalPages) return; // граничные проверки
 
       isFlipping.current = true; // ставим флаг анимации
-      setState((prev) => ({ ...prev, currentPage: page })); // обновляем текущую страницу
 
-      // Предзагрузка следующих preloadAhead страниц (кладём в кэш заранее)
+      // ВАЖНО: сначала генерируем саму целевую страницу (если её нет в кэше).
+      // generatePage(N) как побочный эффект записывает в pagePositionsRef
+      // позицию начала страницы N+1. Без этого шага предзагрузка N+1
+      // вызовет generatePage(N+1) с пустым startPos — и получит страницу 1.
+      getPage(newPage);
+
+      // Предзагружаем следующие страницы СТРОГО ПОСЛЕДОВАТЕЛЬНО:
+      // getPage(N+1) должен идти только после getPage(N), иначе
+      // pagePositionsRef для N+1 ещё не заполнен.
       for (let i = 1; i <= preloadAhead; i++) {
-        if (page + i <= state.totalPages) {
-          getPage(page + i); // вызов создаёт запись в кэше как побочный эффект
+        if (newPage + i <= state.totalPages) {
+          getPage(newPage + i);
         }
       }
+
+      setState((prev) => ({ ...prev, currentPage: newPage }));
+
+      //   setState((prev) => ({ ...prev, currentPage: newPage })); // обновляем текущую страницу
+
+      //   // Предзагрузка следующих preloadAhead страниц (кладём в кэш заранее)
+      //   for (let i = 1; i <= preloadAhead; i++) {
+      //     if (newPage + i <= state.totalPages) {
+      //       getPage(newPage + i); // вызов создаёт запись в кэше как побочный эффект
+      //     }
+      //   }
       // Снимаем флаг анимации через 300 мс (длительность CSS-перехода)
       setTimeout(() => {
         isFlipping.current = false;
@@ -376,14 +495,39 @@ export const Reader: React.FC<ReaderProps> = ({
   );
 
   // Переход на следующую страницу
+  // двойной режим: листаем по 2 страницы сразу.
+  //
+  // Логика разворота:
+  //   currentPage всегда указывает на ЛЕВУЮ страницу разворота
+  //   (нечётная → currentPage-1, чётная → currentPage).
+  //
+  //   nextPage: переходим на leftPage + 2
+  //   prevPage: переходим на leftPage - 2
+  //
+  // В одиночном режиме поведение прежнее: ±1.
   const nextPage = useCallback(() => {
-    goToPage(state.currentPage + 1);
-  }, [state.currentPage, goToPage]);
+    // goToPage(state.currentPage + 1);
+    if (state.viewMode === 'double') {
+      // Определяем левую страницу текущего разворота
+      const leftPage =
+        state.currentPage % 2 === 0 ? state.currentPage : state.currentPage - 1;
+      goToPage(leftPage + 2);
+    } else {
+      goToPage(state.currentPage + 1);
+    }
+  }, [state.currentPage, state.viewMode, goToPage]);
 
   // Переход на предыдущую страницу
   const prevPage = useCallback(() => {
-    goToPage(state.currentPage - 1);
-  }, [state.currentPage, goToPage]);
+    // goToPage(state.currentPage - 1);
+    if (state.viewMode === 'double') {
+      const leftPage =
+        state.currentPage % 2 === 0 ? state.currentPage : state.currentPage - 1;
+      goToPage(leftPage - 2);
+    } else {
+      goToPage(state.currentPage - 1);
+    }
+  }, [state.currentPage, state.viewMode, goToPage]);
 
   // Изменение размера шрифта на delta пикселей (положительное или отрицательное)
   const changeFontSize = useCallback((delta: number) => {
@@ -403,8 +547,9 @@ export const Reader: React.FC<ReaderProps> = ({
       viewMode: prev.viewMode === 'single' ? 'double' : 'single',
       currentPage: 1, // сбрасываем на первую страницу при смене режима
     }));
-    setPageCache(new Map()); // инвалидируем кэш (шаг пагинации мог измениться)
-    setPagePositions(new Map()); // инвалидируем позиции страниц
+    pageCacheRef.current = new Map();
+    // setPageCache(new Map()); // инвалидируем кэш (шаг пагинации мог измениться)
+    pagePositionsRef.current = new Map();
   }, []);
 
   // ─── displayedPages: список страниц для рендера ─────────────
@@ -428,6 +573,48 @@ export const Reader: React.FC<ReaderProps> = ({
 
     return pages;
   }, [state.currentPage, state.viewMode, state.totalPages, getPage]);
+
+  // ─── FIX 3: readPercent — процент прочитанного по всей книге ─
+  //
+  // Алгоритм (без загрузки всех фрагментов):
+  //   toc.js содержит Parts[i].s и Parts[i].e — глобальные индексы абзацев
+  //   каждого фрагмента, и full_length — общее число абзацев в книге.
+  //
+  //   Мы знаем:
+  //     - currentPartIndex: какой фрагмент открыт
+  //     - currentPage, totalPages: прогресс внутри фрагмента
+  //
+  //   Вычисление:
+  //     globalStart = Parts[currentPartIndex].s  ← первый абзац фрагмента
+  //     globalEnd   = Parts[currentPartIndex].e  ← последний абзац фрагмента
+  //     partLength  = globalEnd - globalStart + 1 ← абзацев во фрагменте
+  //     progressInPart = currentPage / totalPages  ← прогресс внутри (0..1)
+  //     globalPos = globalStart + partLength * progressInPart
+  //     readPercent = (globalPos / full_length) * 100
+  //
+  //   Это линейная аппроксимация: считаем, что абзацы равномерно
+  //   распределены по страницам. Точности достаточно для прогресс-бара.
+  //   Реальный счётчик был бы точнее при накоплении pagePositions всего файла,
+  //   но требовал бы полной генерации всех страниц заранее.
+  const readPercent = useMemo<number>(() => {
+    // Если toc не загружен — используем прогресс внутри фрагмента
+    if (!tocData || tocData.Parts.length === 0) {
+      if (state.totalPages === 0) return 0;
+      return (state.currentPage / state.totalPages) * 100;
+    }
+
+    const part = tocData.Parts[currentPartIndex];
+    if (!part) return 0;
+
+    const partLength = part.e - part.s + 1; // абзацев во фрагменте
+    const progressInPart =
+      state.totalPages > 0 ? state.currentPage / state.totalPages : 0;
+
+    // Глобальная позиция (в абзацах) от начала книги
+    const globalPos = part.s + partLength * progressInPart;
+
+    return Math.min(100, (globalPos / tocData.full_length) * 100);
+  }, [tocData, currentPartIndex, state.currentPage, state.totalPages]);
 
   // ─── Обработка клавиатуры ────────────────────────────────────
   // ArrowRight / PageDown → следующая страница
@@ -505,19 +692,55 @@ export const Reader: React.FC<ReaderProps> = ({
         <div className={styles['controls']}>
           <button
             onClick={prevPage}
-            disabled={state.currentPage <= 1}
+            disabled={
+              state.viewMode === 'double'
+                ? // leftPage <= 2 означает некуда идти назад
+                  (state.currentPage % 2 === 0
+                    ? state.currentPage
+                    : state.currentPage - 1) <= 2
+                : state.currentPage <= 1
+            }
             className={styles['nav-button']}
           >
             ← Назад
           </button>
 
-          <span className={styles['page-info']}>
+          {/* <span className={styles['page-info']}>
             Страница {state.currentPage} из {state.totalPages}
+          </span> */}
+
+          <span className={styles['page-info']}>
+            {state.viewMode === 'double'
+              ? // В двойном режиме показываем диапазон страниц разворота
+                (() => {
+                  const left =
+                    state.currentPage % 2 === 0
+                      ? state.currentPage
+                      : state.currentPage - 1;
+                  const right = Math.min(left + 1, state.totalPages);
+                  return `${left}–${right} / ${state.totalPages}`;
+                })()
+              : `Стр. ${state.currentPage} / ${state.totalPages}`}
+            {/* Процент по всей книге — только если есть toc */}
+            {tocData && (
+              <span className={styles['read-percent']}>
+                {' '}
+                ({readPercent.toFixed(1)}%)
+              </span>
+            )}
           </span>
 
           <button
             onClick={nextPage}
-            disabled={state.currentPage >= state.totalPages}
+            disabled={
+              state.viewMode === 'double'
+                ? (state.currentPage % 2 === 0
+                    ? state.currentPage
+                    : state.currentPage - 1) +
+                    2 >
+                  state.totalPages
+                : state.currentPage >= state.totalPages
+            }
             className={styles['nav-button']}
           >
             Вперёд →
@@ -587,10 +810,16 @@ export const Reader: React.FC<ReaderProps> = ({
       </div>
 
       {/* Прогресс бар */}
-      <div className={styles['progress-bar']}>
+      {/* <div className={styles['progress-bar']}>
         <div
           className={styles['progress-fill']}
           style={{ width: `${(state.currentPage / state.totalPages) * 100}%` }}
+        />
+      </div> */}
+      <div className={styles['progress-bar']}>
+        <div
+          className={styles['progress-fill']}
+          style={{ width: `${readPercent}%` }}
         />
       </div>
     </div>
