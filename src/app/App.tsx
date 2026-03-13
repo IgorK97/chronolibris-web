@@ -33,6 +33,8 @@ import {
 } from '@/pages/adminPanel';
 import { ContentUnit } from '@/pages/adminPanel/ui/ContentUnit';
 import { Reader } from '@/components/Reader';
+import { BookManagement } from '@/pages/adminPanel/ui/BookManagement';
+import { BookUnit } from '@/pages/adminPanel/ui/BookUnit';
 
 const queryClient = new QueryClient();
 
@@ -146,6 +148,9 @@ export default function App() {
             <Route path="themes" element={<ThemeManager />} />
             <Route path="contents" element={<ContentManagement />} />
             <Route path="contents/:contentId" element={<ContentUnit />} />
+            {/*Add barrel export later */}
+            <Route path="books" element={<BookManagement />} />
+            <Route path="books/:bookId" element={<BookUnit />} />
             <Route
               path="reader"
               element={

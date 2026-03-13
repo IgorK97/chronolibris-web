@@ -551,3 +551,76 @@ export interface BookFilters {
   yearFrom: string;
   yearTo: string;
 }
+
+export interface ThemeDto {
+  id: number;
+  name: string;
+}
+
+export interface ContentDto {
+  id: number;
+  title: string;
+  description: string;
+  countryId: number;
+  countryName?: string | null;
+  contentTypeId: number;
+  contentType?: string | null;
+  languageId: number;
+  languageName?: string | null;
+  year?: number | null;
+  parentContentId?: number | null;
+  position?: number | null;
+  createdAt: string;
+  updatedAt?: string | null;
+  authors: string[];
+  themes: ThemeDto[];
+}
+
+export interface BookDto {
+  id: number;
+  title: string;
+  description: string;
+  countryId: number;
+  countryName?: string | null;
+  languageId: number;
+  languageName?: string | null;
+  year?: number | null;
+  isbn?: string | null;
+  coverPath?: string | null;
+  filePath?: string | null;
+  isAvailable: boolean;
+  isReviewable: boolean;
+  isFragment: boolean;
+  publisherId?: number | null;
+  publisherName?: string | null;
+  seriesId?: number | null;
+  seriesName?: string | null;
+  createdAt: string;
+  updatedAt?: string | null;
+  authors: string[];
+  themes: ThemeDto[];
+  contentsCount: number;
+}
+
+export interface BookListResponse {
+  items: BookDto[];
+  nextCursor?: string | null;
+  prevCursor?: string | null;
+  totalCount: number;
+  hasMore: boolean;
+}
+
+export interface BookFilterRequest {
+  searchQuery?: string | null;
+  authorName?: string | null;
+  includeThemeIds?: number[] | null;
+  excludeThemeIds?: number[] | null;
+  publisherId?: number | null;
+  seriesId?: number | null;
+  languageId?: number | null;
+  yearFrom?: number | null;
+  yearTo?: number | null;
+  isAvailable?: boolean | null;
+  cursor?: string | null;
+  limit?: number;
+}

@@ -14,6 +14,7 @@ import type {
   BookFilters,
   BookListItem,
   BookListResponse,
+  ContentDto,
   PagedResult,
   UpdateReadingProgressCommand,
 } from '../types/types';
@@ -65,6 +66,12 @@ export interface UpdateBookRequest {
   personIds?: number[];
   themeIds?: number[];
 }
+
+export interface BookContentLinkRequest {
+  bookId: number;
+  contentId: number;
+  order: number;
+}
 export const booksApi = {
   getMetadata: (bookId: number, userId: number) =>
     apiClient.get<BookDetails>(`/Books/${bookId}/info?userId=${userId}`),
@@ -98,6 +105,9 @@ export const booksApi = {
   getBookById: (id: number): Promise<BookDto> =>
     apiClient.get<BookDto>(`/Books/${id}`),
 
+  getBookContents: (bookId: number): Promise<ContentDto[]> =>
+    apiClient.get<ContentDto[]>(`/Books/${bookId}/contents`),
+
   createBook: (data: CreateBookRequest): Promise<number> =>
     apiClient.post<number, CreateBookRequest>('/Books', data),
 
@@ -105,6 +115,19 @@ export const booksApi = {
     apiClient.put<void, UpdateBookRequest>(`/Books/${id}`, data),
 
   deleteBook: (id: number): Promise<void> => apiClient.delete(`/Books/${id}`),
+
+  linkContentToBook: (
+    bookId: number,
+    contentId: number,
+    data: BookContentLinkRequest
+  ): Promise<void> =>
+    apiClient.post<void, BookContentLinkRequest>(
+      `/Books/${bookId}/contents/${contentId}`,
+      data
+    ),
+
+  unlinkContentFromBook: (bookId: number, contentId: number): Promise<void> =>
+    apiClient.delete(`/Books/${bookId}/contents/${contentId}`),
 };
 
 // --- Hooks ---
@@ -303,6 +326,52 @@ export const useDeleteBook = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: booksApi.deleteBook,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['books'] });
+    },
+  });
+};
+
+export const useBookContents = (bookId: number | null) => {
+  return useQuery({
+    queryKey: ['books', bookId, 'contents'],
+    queryFn: () => {
+      if (bookId === null) throw new Error('ID книги не указан');
+      return booksApi.getBookContents(bookId);
+    },
+    enabled: bookId !== null,
+    staleTime: 2 * 60 * 1000,
+  });
+};
+
+export const useLinkContentToBook = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      bookId,
+      contentId,
+      data,
+    }: {
+      bookId: number;
+      contentId: number;
+      data: BookContentLinkRequest;
+    }) => booksApi.linkContentToBook(bookId, contentId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['books'] });
+    },
+  });
+};
+
+export const useUnlinkContentFromBook = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      bookId,
+      contentId,
+    }: {
+      bookId: number;
+      contentId: number;
+    }) => booksApi.unlinkContentFromBook(bookId, contentId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['books'] });
     },
