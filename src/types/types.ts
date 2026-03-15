@@ -664,3 +664,15 @@ export interface BookFilterRequest {
   cursor?: string | null;
   limit?: number;
 }
+
+export interface TagType {
+  id: number;
+  name: string;
+}
+
+export interface TagDetails {
+  id: number;
+  name: string;
+  tagTypeId: number;
+  tagTypeName?: string;
+}
