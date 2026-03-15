@@ -5,11 +5,19 @@ import type {
   BookListItem,
   PagedResult,
 } from '../types/types';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export const collectionsApi = {
   // Selections
-  getSelections: () => apiClient.get<SelectionDetails[]>('/Selections'),
+  getAllSelections: () => apiClient.get<SelectionDetails[]>('/Selections'),
+
+  getSelections: (page = 1, pageSize = 20) =>
+    apiClient.get<PagedResult<SelectionDetails>>(
+      `/Selections/paged?page=${page}&pageSize=${pageSize}`
+    ),
+
+  getSelection: (selectionId: number) =>
+    apiClient.get<SelectionDetails>(`/Selections/${selectionId}`),
 
   getSelectionBooks: (
     selectionId: number,
@@ -20,6 +28,26 @@ export const collectionsApi = {
     apiClient.get<PagedResult<BookListItem>>(
       `/Selections/${selectionId}/books?lastId=${lastId || ''}&limit=${limit}`
     ),
+
+  createSelection: (data: {
+    name: string;
+    description: string;
+    selectionTypeId: number;
+  }) => apiClient.post<number>(`/Selections`, data),
+
+  updateSelection: (
+    selectionId: number,
+    data: { name?: string; description?: string; isActive?: boolean }
+  ) => apiClient.put(`/Selections/${selectionId}`, data),
+
+  deleteSelection: (selectionId: number) =>
+    apiClient.delete(`/Selections/${selectionId}`),
+
+  addBookToSelection: (selectionId: number, bookId: number) =>
+    apiClient.post(`/Selections/${selectionId}/books/${bookId}`),
+
+  removeBookFromSelection: (selectionId: number, bookId: number) =>
+    apiClient.delete(`/Selections/${selectionId}/books/${bookId}`),
 
   // Shelves
   getUserShelves: () => apiClient.get<ShelfDetails[]>(`/Shelves/user`),
@@ -69,10 +97,112 @@ export const useShelves = (userId: number) => {
   });
 };
 
-export const useSelection = () => {
+export const useAllSelection = () => {
   return useQuery({
     queryKey: ['selections'],
-    queryFn: () => collectionsApi.getSelections(),
+    queryFn: () => collectionsApi.getAllSelections(),
     staleTime: 5 * 60 * 1000, // 5 минут
+  });
+};
+
+export const useSelectionBooks = (
+  selectionId: number,
+  lastId: number | null,
+  limit: number = 10
+) => {
+  return useQuery({
+    queryKey: ['selectionBooks', selectionId, lastId, limit],
+    queryFn: () =>
+      collectionsApi.getSelectionBooks(selectionId, lastId ?? 0, limit),
+    enabled: !!selectionId,
+  });
+};
+
+export const useSelections = (page = 1, pageSize = 20) => {
+  return useQuery({
+    queryKey: ['selections', page, pageSize],
+    queryFn: () => collectionsApi.getSelections(page, pageSize),
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+export const useSelection = (selectionId: number) => {
+  return useQuery({
+    queryKey: ['selection', selectionId],
+    queryFn: () => collectionsApi.getSelection(selectionId),
+    enabled: !!selectionId,
+  });
+};
+
+export const useCreateSelection = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: collectionsApi.createSelection,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['selections'] });
+    },
+  });
+};
+
+export const useUpdateSelection = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      selectionId,
+      data,
+    }: {
+      selectionId: number;
+      data: { name?: string; description?: string; isActive?: boolean };
+    }) => collectionsApi.updateSelection(selectionId, data),
+    onSuccess: (_, { selectionId }) => {
+      queryClient.invalidateQueries({ queryKey: ['selection', selectionId] });
+      queryClient.invalidateQueries({ queryKey: ['selections'] });
+    },
+  });
+};
+
+export const useDeleteSelection = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: collectionsApi.deleteSelection,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['selections'] });
+    },
+  });
+};
+
+export const useAddBookToSelection = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      selectionId,
+      bookId,
+    }: {
+      selectionId: number;
+      bookId: number;
+    }) => collectionsApi.addBookToSelection(selectionId, bookId),
+    onSuccess: (_, { selectionId }) => {
+      queryClient.invalidateQueries({
+        queryKey: ['selectionBooks', selectionId],
+      });
+    },
+  });
+};
+
+export const useRemoveBookFromSelection = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      selectionId,
+      bookId,
+    }: {
+      selectionId: number;
+      bookId: number;
+    }) => collectionsApi.removeBookFromSelection(selectionId, bookId),
+    onSuccess: (_, { selectionId }) => {
+      queryClient.invalidateQueries({
+        queryKey: ['selectionBooks', selectionId],
+      });
+    },
   });
 };

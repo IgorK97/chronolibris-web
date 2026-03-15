@@ -460,10 +460,18 @@ export interface LoginUserCommand {
 }
 
 export interface SelectionDetails {
+  // id: number;
+  // name: string;
+  // description: string;
+  // selectionTypeId: number;
   id: number;
   name: string;
   description: string;
+  createdAt: string;
+  updatedAt?: string;
   selectionTypeId: number;
+  booksCount: number;
+  isActive?: boolean;
 }
 
 export interface PagedResult<T> {

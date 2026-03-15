@@ -11,7 +11,7 @@ import { useStore } from '../../../stores/globalStore';
 import { useSelectionBooks } from '../../../api/books';
 import styles from './Library.module.css';
 import ErrorBoundary from '@/components/ErrorBoundary/ErrorBoundary';
-import { useSelection } from '@/api/collections';
+import { useAllSelection } from '@/api/collections';
 
 interface LibraryProps {
   onNavigateToBook: (id: number) => void;
@@ -75,7 +75,7 @@ export const Library = ({
     data: selections,
     isLoading: selectionsIsLoading,
     error,
-  } = useSelection();
+  } = useAllSelection();
 
   // const sections = [
   //   { id: 4, title: 'Новое' },

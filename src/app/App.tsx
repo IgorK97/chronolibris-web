@@ -35,6 +35,7 @@ import { ContentUnit } from '@/pages/adminPanel/ui/ContentUnit';
 import { Reader } from '@/components/Reader';
 import { BookManagement } from '@/pages/adminPanel/ui/BookManagement';
 import { BookUnit } from '@/pages/adminPanel/ui/BookUnit';
+import { SelectionsPage } from '@/pages/adminPanel/Selection/SelectionsPage';
 
 const queryClient = new QueryClient();
 
@@ -140,6 +141,7 @@ export default function App() {
               element={<MyBooks onNavigateToBook={handleBookSelection} />}
             />
             <Route path="lang" element={<LanguageManager />} />
+            <Route path="selections" element={<SelectionsPage />} />
             <Route path="country" element={<CountryManager />} />
             <Route path="format" element={<FormatManager />} />
             <Route path="publisher" element={<PublisherManager />} />
