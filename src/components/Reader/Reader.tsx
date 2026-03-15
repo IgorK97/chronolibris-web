@@ -15,8 +15,6 @@ import React, {
 } from 'react';
 import styles from './Reader.module.css';
 
-// ─── Типы ────────────────────────────────────────────────────
-
 export interface Footnote {
   t: string;
   xp: number[];
@@ -66,21 +64,29 @@ export interface TocData {
   Parts: TocPart[];
 }
 
-// ─── Пропсы ──────────────────────────────────────────────────
-
 interface ReaderProps {
   tocPath?: string;
   filePath?: string;
   imagePath?: string;
 }
 
-// ─── Константы ───────────────────────────────────────────────
-
 const DEFAULT_FONT_SIZE = 18;
 const MIN_FONT_SIZE = 12;
 const MAX_FONT_SIZE = 32;
 
-// ─── Компонент ───────────────────────────────────────────────
+const FONT_OPTIONS: { label: string; value: string }[] = [
+  { label: 'Georgia', value: "Georgia, 'Times New Roman', serif" },
+  { label: 'Arial', value: 'Arial, Helvetica, sans-serif' },
+  { label: 'Verdana', value: 'Verdana, Geneva, sans-serif' },
+  { label: 'Times New Roman', value: "'Times New Roman', Times, serif" },
+  { label: 'Courier New', value: "'Courier New', Courier, monospace" },
+  { label: 'Palatino', value: "'Palatino Linotype', Palatino, serif" },
+  { label: 'Trebuchet MS', value: "'Trebuchet MS', sans-serif" },
+];
+
+const TEXT_COLORS = ['#1a1a1a', '#3b2a1a', '#1a2e1a', '#0d1b2a', '#4a4a4a'];
+const PAGE_COLORS = ['#ffffff', '#f5f1e8', '#f0ede0', '#e8f0e8', '#e8eef5'];
+const BG_COLORS = ['#f5f1e8', '#e8e0d0', '#d6cfc0', '#dde8dd', '#d0dce8'];
 
 export const Reader: React.FC<ReaderProps> = ({
   tocPath,
@@ -92,7 +98,11 @@ export const Reader: React.FC<ReaderProps> = ({
   const [fontSize, setFontSize] = useState(DEFAULT_FONT_SIZE);
   const [activeNote, setActiveNote] = useState<Note | null>(null);
   const [activeImage, setActiveImage] = useState<string | null>(null);
-
+  const [fontFamily, setFontFamily] = useState(FONT_OPTIONS[0].value);
+  const [textColor, setTextColor] = useState(TEXT_COLORS[0]);
+  const [pageColor, setPageColor] = useState(PAGE_COLORS[0]);
+  const [bgColor, setBgColor] = useState(BG_COLORS[0]);
+  const [colorModalOpen, setColorModalOpen] = useState(false);
   // Текущая «страница» = индекс колонки (0-based)
   const [currentCol, setCurrentCol] = useState(0);
   // Общее число колонок — вычисляется после рендера по scrollWidth
@@ -123,15 +133,18 @@ export const Reader: React.FC<ReaderProps> = ({
   // ─── Загрузка фрагмента ────────────────────────────────────
 
   useEffect(() => {
-    setIsLoading(true);
-    setCurrentCol(0);
-    fetch(filePath)
-      .then((r) => r.json())
-      .then((data: TextSegment[]) => {
-        setSegments(data);
-        setIsLoading(false);
-      })
-      .catch(() => setIsLoading(false));
+    const load = async () => {
+      setIsLoading(true);
+      setCurrentCol(0);
+      fetch(filePath)
+        .then((r) => r.json())
+        .then((data: TextSegment[]) => {
+          setSegments(data);
+          setIsLoading(false);
+        })
+        .catch(() => setIsLoading(false));
+    };
+    load();
   }, [filePath]);
 
   // ─── Подсчёт колонок ──────────────────────────────────────
@@ -152,7 +165,7 @@ export const Reader: React.FC<ReaderProps> = ({
       const id = setTimeout(recalcCols, 50);
       return () => clearTimeout(id);
     }
-  }, [isLoading, fontSize, recalcCols]);
+  }, [isLoading, fontSize, fontFamily, recalcCols]);
 
   useEffect(() => {
     window.addEventListener('resize', recalcCols);
@@ -168,7 +181,10 @@ export const Reader: React.FC<ReaderProps> = ({
       const clamped = Math.max(0, Math.min(col, totalCols - 1));
       setCurrentCol(clamped);
       // Программный скролл: каждая «страница» = clientWidth viewport
-      vp.scrollTo({ left: clamped * vp.clientWidth, behavior: 'smooth' });
+      vp.scrollTo({
+        left: clamped * (vp.clientWidth - 40),
+        behavior: 'smooth',
+      });
     },
     [totalCols]
   );
@@ -188,6 +204,12 @@ export const Reader: React.FC<ReaderProps> = ({
     setFontSize((prev) =>
       Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, prev + delta))
     );
+    setCurrentCol(0);
+    viewportRef.current?.scrollTo({ left: 0, behavior: 'auto' });
+  }, []);
+
+  const changeFontFamily = useCallback((value: string) => {
+    setFontFamily(value);
     setCurrentCol(0);
     viewportRef.current?.scrollTo({ left: 0, behavior: 'auto' });
   }, []);
@@ -264,128 +286,70 @@ export const Reader: React.FC<ReaderProps> = ({
   // Рендерит один TextSegment напрямую, без пагинации.
   // Браузер сам раскладывает контент по колонкам.
 
-  const renderSegment = useCallback(
-    (seg: TextSegment, index: number): React.ReactNode => {
-      if (seg.t === 'br') return <br key={index} />;
+  const renderSegment = (seg: TextSegment, index: number): React.ReactNode => {
+    if (seg.t === 'br') return <br key={index} />;
 
-      // Изображение
-      if (seg.t === 'img') {
-        const imgNodes = Array.isArray(seg.c) ? seg.c : [];
-        const firstImg = imgNodes.find(
-          (n) => typeof n !== 'string' && (n as ImgNode).t === 'img'
-        ) as ImgNode | undefined;
-        if (!firstImg) return null;
-        const fullUrl = imagePath
-          ? `${imagePath.replace(/\/$/, '')}/${firstImg.src}`
-          : firstImg.src;
-        return (
-          <div key={index} className={styles['img-block']}>
-            <img
-              src={fullUrl}
-              alt=""
-              className={styles['img-inline']}
-              onClick={() => setActiveImage(fullUrl)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && setActiveImage(fullUrl)}
-            />
-          </div>
-        );
-      }
-
-      // Вычисляем inline-содержимое
-      const getContent = (): React.ReactNode => {
-        if (typeof seg.c === 'string') return seg.c;
-        if (Array.isArray(seg.c)) {
-          return renderInlineContent(
-            seg.c.map((item) =>
-              typeof item === 'string' ? item : (item as InlineNode)
-            )
-          );
-        }
-        return null;
-      };
-
-      if (seg.t === 'title') {
-        return (
-          <h2 key={index} className={styles['title']}>
-            {getContent()}
-          </h2>
-        );
-      }
-
+    // Изображение
+    if (seg.t === 'img') {
+      const imgNodes = Array.isArray(seg.c) ? seg.c : [];
+      const firstImg = imgNodes.find(
+        (n) => typeof n !== 'string' && (n as ImgNode).t === 'img'
+      ) as ImgNode | undefined;
+      if (!firstImg) return null;
+      const fullUrl = imagePath
+        ? `${imagePath.replace(/\/$/, '')}/${firstImg.src}`
+        : firstImg.src;
       return (
-        <p key={index} className={styles['paragraph']}>
-          {getContent()}
-        </p>
-      );
-    },
-    [imagePath, renderInlineContent]
-  );
-
-  // ─── FootnoteModal ────────────────────────────────────────
-
-  const FootnoteModal = useCallback(() => {
-    if (!activeNote) return null;
-    const footnoteText = activeNote.f
-      ? Array.isArray(activeNote.f.c)
-        ? activeNote.f.c.join('\n\n')
-        : activeNote.f.c
-      : '';
-    return createPortal(
-      <div
-        className={styles['footnote-overlay']}
-        onClick={() => setActiveNote(null)}
-      >
-        <div
-          className={styles['footnote-modal']}
-          onClick={(e) => e.stopPropagation()}
-          role="dialog"
-          aria-modal="true"
-        >
-          <button
-            className={styles['footnote-close']}
-            onClick={() => setActiveNote(null)}
-            aria-label="Закрыть"
-          >
-            ✕
-          </button>
-          <div className={styles['footnote-content']}>
-            <span className={styles['footnote-label']}>{activeNote.c}</span>
-            <p>{footnoteText}</p>
-          </div>
+        <div key={index} className={styles['img-block']}>
+          <img
+            src={fullUrl}
+            alt=""
+            className={styles['img-inline']}
+            onClick={() => setActiveImage(fullUrl)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && setActiveImage(fullUrl)}
+          />
         </div>
-      </div>,
-      document.body
-    );
-  }, [activeNote]);
+      );
+    }
 
-  // ─── ImageLightbox ────────────────────────────────────────
+    // Вычисляем inline-содержимое
+    const getContent = (): React.ReactNode => {
+      if (typeof seg.c === 'string') return seg.c;
+      if (Array.isArray(seg.c)) {
+        return renderInlineContent(
+          seg.c.map((item) =>
+            typeof item === 'string' ? item : (item as InlineNode)
+          )
+        );
+      }
+      return null;
+    };
 
-  const ImageLightbox = useCallback(() => {
-    if (!activeImage) return null;
-    return createPortal(
-      <div
-        className={styles['lightbox-overlay']}
-        onClick={() => setActiveImage(null)}
-        role="button"
-        aria-label="Закрыть изображение"
-        tabIndex={0}
-        onKeyDown={(e) => e.key === 'Escape' && setActiveImage(null)}
+    if (seg.t === 'title') {
+      return (
+        <h2
+          key={index}
+          className={styles['title']}
+          style={{ fontSize: `${fontSize}px`, fontFamily, color: textColor }}
+        >
+          {getContent()}
+        </h2>
+      );
+    }
+
+    return (
+      <p
+        key={index}
+        className={styles['paragraph']}
+        style={{ fontSize: `${fontSize}px`, fontFamily, color: textColor }}
       >
-        <img
-          src={activeImage}
-          alt=""
-          className={styles['lightbox-img']}
-          onClick={(e) => e.stopPropagation()}
-        />
-      </div>,
-      document.body
+        {getContent()}
+      </p>
     );
-  }, [activeImage]);
-
-  // ─── Рендер ───────────────────────────────────────────────
-
+  };
+  // [imagePath, renderInlineContent]
   if (isLoading) {
     return (
       <div className={styles['loading']}>
@@ -396,7 +360,7 @@ export const Reader: React.FC<ReaderProps> = ({
   }
 
   return (
-    <div className={styles['reader']}>
+    <div className={styles['reader']} style={{ background: bgColor }}>
       {/* Тулбар */}
       <div className={styles['toolbar']}>
         <div className={styles['controls']}>
@@ -429,6 +393,26 @@ export const Reader: React.FC<ReaderProps> = ({
 
         <div className={styles['settings']}>
           <button
+            onClick={() => setColorModalOpen(true)}
+            className={styles['color-button']}
+            aria-label="Настройка цветов"
+            title="Цвета"
+          >
+            🎨
+          </button>
+          <select
+            className={styles['font-select']}
+            value={fontFamily}
+            onChange={(e) => changeFontFamily(e.target.value)}
+            aria-label="Выбор шрифта"
+          >
+            {FONT_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+          <button
             onClick={() => changeFontSize(-2)}
             className={styles['font-button']}
           >
@@ -450,7 +434,11 @@ export const Reader: React.FC<ReaderProps> = ({
           book-viewport — контейнер с overflow-x: hidden.
           Пользователь не может скроллить руками — только кнопки/клавиши.
         */}
-        <div className={styles['book-viewport']} ref={viewportRef}>
+        <div
+          className={styles['book-viewport']}
+          ref={viewportRef}
+          style={{ background: pageColor }}
+        >
           {/*
             book-content — колоночный контейнер.
             CSS: columns: 1; column-fill: auto; height: 100%
@@ -487,936 +475,211 @@ export const Reader: React.FC<ReaderProps> = ({
         />
       </div>
 
-      <FootnoteModal />
-      <ImageLightbox />
+      <FootnoteModal note={activeNote} onClose={() => setActiveNote(null)} />
+      <ImageLightbox src={activeImage} onClose={() => setActiveImage(null)} />
+      <ColorModal
+        open={colorModalOpen}
+        onClose={() => setColorModalOpen(false)}
+        textColor={textColor}
+        pageColor={pageColor}
+        bgColor={bgColor}
+        onTextColor={setTextColor}
+        onPageColor={setPageColor}
+        onBgColor={setBgColor}
+      />
     </div>
   );
 };
 
 export default Reader;
 
-// import { createPortal } from 'react-dom';
-// import React, {
-//   useState,
-//   useEffect,
-//   useCallback,
-//   useRef,
-//   useMemo,
-// } from 'react';
-// import styles from './Reader.module.css';
-
-// export interface Footnote {
-//   t: string;
-//   xp: number[];
-//   c: string | string[];
-// }
-
-// export interface Note {
-//   t: string;
-//   role: string;
-//   xp: number[];
-//   c: string;
-//   f?: Footnote;
-// }
-
-// export type InlineNode = Note | { t: 'em' | 'st'; c: string };
-
-// export interface ImgNode {
-//   t: 'img';
-//   src: string;
-// }
-
-// export interface TextSegment {
-//   t: string;
-//   xp?: number[];
-//   c: string | TextSegment[] | (string | InlineNode)[] | ImgNode[];
-// }
-
-// export interface PageSegment {
-//   originalIndex: number;
-//   text: string;
-//   isContinuation: boolean;
-//   continuationId?: string;
-//   type: string;
-//   notes?: Note[];
-//   inlineContent?: (string | InlineNode)[];
-//   imgSrc?: string;
-// }
-
-// export interface PageContent {
-//   segments: PageSegment[];
-//   pageNumber: number;
-// }
-
-// export interface ReaderState {
-//   currentPage: number;
-//   totalPages: number;
-//   fontSize: number;
-//   isLoading: boolean;
-// }
-
-// export interface CachedPage {
-//   pageNumber: number;
-//   content: PageContent;
-//   timestamp: number;
-// }
-
-// export interface TocPart {
-//   s: number;
-//   e: number;
-//   xps: number[];
-//   xpe: number[];
-//   url: string;
-// }
-
-// export interface TocMeta {
-//   Title: string;
-//   Authors: { Role: string; First: string; Last: string }[];
-//   Annotation: string;
-//   Lang: string;
-// }
-
-// export interface TocData {
-//   Meta: TocMeta;
-//   full_length: number;
-//   Body: unknown[];
-//   Parts: TocPart[];
-// }
-
-// interface ReaderProps {
-//   tocPath?: string;
-//   filePath?: string;
-//   imagePath?: string;
-//   cacheSize?: number;
-//   preloadAhead?: number;
-// }
-
-// const DEFAULT_FONT_SIZE = 18;
-// const MIN_FONT_SIZE = 12;
-// const MAX_FONT_SIZE = 32;
-// const DEFAULT_CACHE_SIZE = 10;
-// const DEFAULT_PRELOAD_AHEAD = 3;
-
-// // ─── Вспомогательная функция: найти ближайшую границу слова ──
-// // Ищет последний пробел в строке str[0..maxLen-1].
-// // Если пробел найден — возвращает его позицию + 1 (разрыв после пробела).
-// // Если нет — возвращает maxLen (разрыв на точном лимите символов).
-// // Это гарантирует, что страница никогда не обрывается посередине слова.
-// function findWordBoundary(str: string, maxLen: number): number {
-//   if (maxLen >= str.length) return str.length;
-//   // Ищем последний пробел в пределах лимита
-//   const lastSpace = str.lastIndexOf(' ', maxLen);
-//   if (lastSpace > 0) return lastSpace + 1; // +1: пробел остаётся на текущей странице
-//   return maxLen; // слово длиннее страницы — разрываем принудительно
-// }
-
-// // ─── Компонент ──────────────────────────────────────────────
-// export const Reader: React.FC<ReaderProps> = ({
-//   tocPath, // путь к toc.js (опционально)
-//   filePath = '/data/002.js', // путь к файлу книги (fallback)
-//   imagePath, // базовый URL папки с картинками книги
-//   cacheSize = DEFAULT_CACHE_SIZE, // максимум записей в кэше
-//   preloadAhead = DEFAULT_PRELOAD_AHEAD, // сколько страниц вперёд грузить заранее
-// }) => {
-//   // originalSegments — «чистый» исходный массив сегментов из файла.
-//   // ВАЖНО: он никогда не должен мутироваться; generatePage читает его только на чтение.
-//   const [originalSegments, setOriginalSegments] = useState<TextSegment[]>([]);
-//   // state — основное состояние читалки: номер страницы, шрифт, режим, флаг загрузки
-//   const [state, setState] = useState<ReaderState>({
-//     currentPage: 1,
-//     totalPages: 0,
-//     fontSize: DEFAULT_FONT_SIZE,
-//     isLoading: true,
-//   });
-
-//   const pageCacheRef = useRef<Map<number, CachedPage>>(new Map());
-
-//   // ── Данные для глобального прогресса чтения ──────────────────
-//   // tocData хранит весь toc.js; null если tocPath не задан или не загружен.
-//   const [tocData, setTocData] = useState<TocData | null>(null);
-
-//   // Индекс текущего фрагмента в массиве Parts[] (какой NNN.js открыт)
-//   const [currentPartIndex, setCurrentPartIndex] = useState<number>(0);
-
-//   const [activeImage, setActiveImage] = useState<string | null>(null);
-
-//   const containerRef = useRef<HTMLDivElement>(null); // ссылка на корневой <div> читалки
-//   const pageRef = useRef<HTMLDivElement>(null); // ссылка на активную страницу для замера размеров
-//   const isFlipping = useRef(false); // флаг анимации листания (ref, не state — нет ре-рендера)
-//   const estimatedCharsPerPage = useRef(800); // расчётное число символов на одну страницу
-//   const isCalculatingRef = useRef(false); // защита от повторного запуска расчёта страниц
-//   const pagePositionsRef = useRef<
-//     Map<number, { segmentIndex: number; charOffset: number }>
-//   >(new Map());
-
-//   // ─── Состояние модального окна сноски ───────────────────────
-//   const [activeNote, setActiveNote] = useState<Note | null>(null);
-
-//   // ─── Эффект: загрузка toc.js ─────────────────────────────────
-//   // Загружается один раз; даёт нам full_length и Parts[] для прогресса.
-//   // Архитектурно: в будущем здесь же можно решать, какой фрагмент загрузить
-//   // исходя из сохранённой позиции пользователя.
-//   useEffect(() => {
-//     if (!tocPath) return; // если tocPath не передан — работаем без toc
-
-//     const loadToc = async () => {
-//       try {
-//         const response = await fetch(tocPath);
-//         if (!response.ok) throw new Error(`Failed to load toc: ${tocPath}`);
-//         const data: TocData = await response.json();
-//         setTocData(data);
-
-//         // Определяем, какой фрагмент соответствует filePath
-//         const partIdx = data.Parts.findIndex((p) => filePath.endsWith(p.url));
-//         if (partIdx !== -1) setCurrentPartIndex(partIdx);
-//       } catch (err) {
-//         console.error('Error loading toc:', err);
-//       }
-//     };
-
-//     loadToc();
-//   }, [tocPath, filePath]);
-
-//   // ─── Эффект 1: загрузка файла ───────────────────────────────
-//   // Запускается один раз при монтировании (и при изменении filePath).
-//   useEffect(() => {
-//     const loadFile = async () => {
-//       try {
-//         const response = await fetch(filePath);
-//         if (!response.ok) throw new Error(`Failed to load ${filePath}`);
-//         const data = await response.json();
-//         setOriginalSegments(data);
-//         setState((prev) => ({ ...prev, isLoading: false }));
-//       } catch (error) {
-//         console.error('Error loading file:', error);
-//         setState((prev) => ({ ...prev, isLoading: false }));
-//       }
-//     };
-
-//     loadFile();
-//   }, [filePath]); // зависимость: только filePath — повторный запуск при смене файла
-
-//   // ─── Эффект 2: сброс кэша при смене шрифта ──────────────────
-//   // При изменении fontSize старый кэш и позиции страниц становятся невалидными
-//   // (размер страницы изменился), поэтому всё сбрасывается до начала.
-//   useEffect(() => {
-//     if (originalSegments.length > 0) {
-//       pageCacheRef.current = new Map();
-//       pagePositionsRef.current = new Map();
-//       setState((prev) => ({ ...prev, currentPage: 1 }));
-//     }
-//   }, [state.fontSize, originalSegments.length]);
-//   // Зависимости: fontSize (изменился шрифт) и originalSegments.length (загружены новые данные)
-
-//   // ─── Эффект 3: замер контейнера и пересчёт числа страниц ────
-//   // Когда pageRef.current доступен и данные загружены, рассчитываем
-//   // сколько символов помещается на экране, затем вычисляем totalPages.
-//   useEffect(() => {
-//     if (
-//       pageRef.current && // DOM-элемент страницы уже отрисован
-//       originalSegments.length > 0 && // данные загружены
-//       !isCalculatingRef.current // не идёт параллельный расчёт
-//     ) {
-//       isCalculatingRef.current = true; // ставим блокировку
-//       const container = pageRef.current;
-//       // Приблизительная ширина одного символа = 60% от fontSize
-//       const charWidth = state.fontSize * 0.6;
-//       const lineHeight = state.fontSize * 1.6;
-
-//       const paddingH = 80; // 40px слева + 40px справа
-//       const paddingV = 80; // 40px сверху + 40px снизу
-//       const charsPerLine = Math.floor(
-//         (container.clientWidth - paddingH) / charWidth
-//       );
-//       const linesPerPage = Math.floor(
-//         (container.clientHeight - paddingV) / lineHeight
-//       );
-
-//       // Итоговое число символов на страницу с коэффициентом 0.85 (поправка на отступы/пробелы)
-//       estimatedCharsPerPage.current = charsPerLine * linesPerPage * 0.7;
-
-//       calculateTotalPages(); // обновляем state.totalPages
-//       isCalculatingRef.current = false; // снимаем блокировку
-//     }
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
-//   }, [state.fontSize, originalSegments.length]);
-//   // Зависимости те же, что и в эффекте 2 — пересчитываем при изменении шрифта или данных
-//   // calculateTotalPages намеренно не в deps: вызывается только отсюда,
-//   // добавление вызвало бы бесконечный цикл через setState → re-render.
-
-//   // ─── extractText: извлечение чистого текста из сегмента ─────
-//   // Рекурсивно обходит поле .c (строка | массив) и собирает строку.
-//   // Note-объекты пропускаются (возвращают ''), т.к. их текст — метка сноски, а не основной текст.
-//   // em/st — включаются как обычный текст (для подсчёта символов при пагинации).
-//   const IMG_PLACEHOLDER_LEN = 100; // условная «стоимость» картинки в символах
-//   const extractText = useCallback((segment: TextSegment): string => {
-//     if (segment.t === 'img') return ' '.repeat(IMG_PLACEHOLDER_LEN);
-//     if (typeof segment.c === 'string') {
-//       return segment.c;
-//     } else if (Array.isArray(segment.c)) {
-//       return segment.c
-//         .map((item) => {
-//           if (typeof item === 'string') return item;
-//           if (item.t === 'note') return (item as Note).c; // метка "[N]" входит в счёт символов
-//           if (item.t === 'em' || item.t === 'st')
-//             return (item as { t: string; c: string }).c;
-//           if (item.t === 'img') return ' '.repeat(IMG_PLACEHOLDER_LEN);
-//           return extractText(item as TextSegment);
-//         })
-//         .join('');
-//     }
-//     return ''; // fallback для неизвестных форматов
-//   }, []); // нет зависимостей — чистая функция
-
-//   // ─── extractNotes: извлечение сносок из сегмента ────────────
-//   // Проходит по массиву .c и собирает все Note-объекты (t === 'note').
-//   const extractNotes = useCallback((segment: TextSegment): Note[] => {
-//     const notes: Note[] = [];
-//     if (Array.isArray(segment.c)) {
-//       segment.c.forEach((item) => {
-//         if (typeof item !== 'string' && item.t === 'note') {
-//           notes.push(item as Note);
-//         }
-//       });
-//     }
-//     return notes;
-//   }, []);
-
-//   // ─── extractInlineContent: «богатое» содержимое сегмента ─────
-//   // Возвращает массив (string | InlineNode) для рендера с форматированием.
-//   // Для простых строк — оборачивает в массив с одним элементом.
-//   const extractInlineContent = useCallback(
-//     (segment: TextSegment): (string | InlineNode)[] => {
-//       if (typeof segment.c === 'string') return [segment.c];
-//       if (Array.isArray(segment.c)) {
-//         return segment.c.map((item) => {
-//           if (typeof item === 'string') return item;
-//           return item as InlineNode;
-//         });
-//       }
-//       return [];
-//     },
-//     []
-//   );
-
-//   // ─── calculateTotalPages: расчёт общего числа страниц ───────
-//   // Суммирует длину всех текстов и делит на размер одной страницы.
-//   const calculateTotalPages = useCallback(() => {
-//     if (originalSegments.length === 0 || estimatedCharsPerPage.current <= 0)
-//       return;
-
-//     let totalChars = 0;
-//     // Суммируем длину текста каждого сегмента
-//     originalSegments.forEach((seg) => {
-//       totalChars += extractText(seg).length;
-//     });
-
-//     // ceil — округляем вверх; || 1 — минимум 1 страница
-//     const total = Math.ceil(totalChars / estimatedCharsPerPage.current) || 1;
-//     setState((prev) => ({ ...prev, totalPages: total }));
-//   }, [originalSegments, extractText]);
-
-//   // Генерация страницы
-//   const generatePage = useCallback(
-//     (pageNumber: number): PageContent => {
-//       if (originalSegments.length === 0) return { segments: [], pageNumber };
-
-//       const segmentsList: PageSegment[] = []; // накапливаем сегменты текущей страницы
-//       let charCount = 0; // сколько символов уже собрали на эту страницу
-//       const startPos = pagePositionsRef.current.get(pageNumber);
-//       console.log('StartPos', pageNumber, startPos);
-//       let currentIndex = startPos?.segmentIndex ?? 0;
-//       let currentCharOffset = startPos?.charOffset ?? 0;
-//       const maxChars = estimatedCharsPerPage.current;
-
-//       // Основной цикл: проходим по originalSegments пока не заполним страницу
-//       for (
-//         let i = currentIndex;
-//         i < originalSegments.length && charCount < maxChars;
-//         i++
-//       ) {
-//         const segment = originalSegments[i]; // текущий исходный сегмент
-
-//         if (segment.t === 'img') {
-//           const imgNodes = Array.isArray(segment.c) ? segment.c : [];
-//           const firstImg = imgNodes.find(
-//             (n) => typeof n !== 'string' && (n as ImgNode).t === 'img'
-//           ) as ImgNode | undefined;
-//           const src = firstImg?.src ?? '';
-//           segmentsList.push({
-//             originalIndex: i,
-//             text: '',
-//             isContinuation: false,
-//             type: 'img',
-//             imgSrc: src,
-//           });
-//           // Картинка «занимает» IMG_PLACEHOLDER_LEN символов
-//           charCount += IMG_PLACEHOLDER_LEN;
-//           currentCharOffset = 0;
-//           if (charCount >= maxChars) {
-//             pagePositionsRef.current.set(pageNumber + 1, {
-//               segmentIndex: i + 1,
-//               charOffset: 0,
-//             });
-//           }
-//           continue;
-//         }
-
-//         const fullText = extractText(segment); // полный текст сегмента
-//         // Если сегмент уже частично попал на предыдущую страницу — берём остаток
-//         const textToUse =
-//           currentCharOffset > 0
-//             ? fullText.substring(currentCharOffset)
-//             : fullText;
-//         const remaining = textToUse.length; // сколько символов осталось в сегменте
-//         const spaceLeft = maxChars - charCount; // сколько символов ещё вмещает страница
-
-//         if (remaining <= spaceLeft) {
-//           // Весь текст сегмента помещается на страницу — добавляем целиком
-//           segmentsList.push({
-//             originalIndex: i,
-//             text: textToUse,
-//             isContinuation: currentCharOffset > 0,
-//             continuationId: currentCharOffset > 0 ? `seg-${i}` : undefined,
-//             type: segment.t,
-//             // Сноски и rich-content добавляем только для целого (не разорванного) начала сегмента
-//             notes: currentCharOffset === 0 ? extractNotes(segment) : undefined,
-//             inlineContent: extractInlineContent(segment),
-//             // currentCharOffset === 0
-//             //   ? extractInlineContent(segment)
-//             //   : undefined,
-//           });
-//           charCount += remaining;
-//           currentIndex = i + 1; // следующий сегмент
-//           currentCharOffset = 0; // сброс смещения — следующий сегмент читаем с начала
-//           if (charCount >= maxChars) {
-//             pagePositionsRef.current.set(pageNumber + 1, {
-//               segmentIndex: i + 1,
-//               charOffset: 0,
-//             });
-//             console.log(pageNumber + 1, {
-//               segmentIndex: i + 1,
-//               charOffset: 0,
-//             });
-//           }
-//         } else {
-//           const breakAt = findWordBoundary(textToUse, spaceLeft);
-//           pagePositionsRef.current.set(pageNumber + 1, {
-//             segmentIndex: i,
-//             charOffset: currentCharOffset + breakAt,
-//           });
-//           console.log(pageNumber + 1, {
-//             segmentIndex: i,
-//             charOffset: currentCharOffset + breakAt,
-//           });
-//           segmentsList.push({
-//             originalIndex: i,
-//             text: textToUse.substring(0, breakAt),
-//             // isContinuation: currentCharOffset > 0 || charCount > 0,
-//             isContinuation: currentCharOffset > 0,
-//             continuationId: currentCharOffset > 0 ? `seg-${i}` : undefined,
-//             type: segment.t,
-//             inlineContent: extractInlineContent(segment),
-//           });
-
-//           charCount = maxChars;
-//         }
-//       }
-
-//       return { segments: segmentsList, pageNumber }; // возвращаем готовую страницу
-//     },
-//     [originalSegments, extractText, extractNotes, extractInlineContent]
-//     // pagePositionsRef не нужен в deps — это ref, не state
-//   );
-
-//   // ─── getPage: получение страницы из кэша или генерация ──────
-//   // Сначала ищет страницу в pageCache. Если нашёл — возвращает сразу.
-//   // Иначе вызывает generatePage, сохраняет результат в кэш и возвращает.
-//   // При переполнении кэша вытесняет самую старую запись (LRU по timestamp).
-//   const getPage = useCallback(
-//     (pageNumber: number): PageContent => {
-//       if (pageNumber < 1) return { segments: [], pageNumber }; // защита от отрицательных номеров
-
-//       //   const cached = pageCache.get(pageNumber); // пробуем найти в кэше
-//       const cached = pageCacheRef.current.get(pageNumber);
-//       if (cached) {
-//         return cached.content; // кэш-хит: возвращаем готовое содержимое
-//       }
-//       // Кэш-промах: генерируем страницу
-//       const content = generatePage(pageNumber);
-
-//       if (pageCacheRef.current.size >= cacheSize) {
-//         const oldestKey = Array.from(pageCacheRef.current.keys()).sort(
-//           (a, b) =>
-//             (pageCacheRef.current.get(a)?.timestamp || 0) -
-//             (pageCacheRef.current.get(b)?.timestamp || 0)
-//         )[0];
-//         if (oldestKey !== undefined) pageCacheRef.current.delete(oldestKey);
-//       }
-
-//       pageCacheRef.current.set(pageNumber, {
-//         pageNumber,
-//         content,
-//         timestamp: Date.now(),
-//       });
-
-//       return content;
-//     },
-//     [generatePage, cacheSize]
-//   );
-
-//   // ─── goToPage: переход на конкретную страницу ───────────────
-//   const goToPage = useCallback(
-//     (newPage: number) => {
-//       if (isFlipping.current) return; // если идёт анимация — игнорируем
-//       if (newPage < 1 || newPage > state.totalPages) return; // граничные проверки
-
-//       isFlipping.current = true; // ставим флаг анимации
-
-//       // ВАЖНО: сначала генерируем саму целевую страницу (если её нет в кэше).
-//       // generatePage(N) как побочный эффект записывает в pagePositionsRef
-//       // позицию начала страницы N+1. Без этого шага предзагрузка N+1
-//       // вызовет generatePage(N+1) с пустым startPos — и получит страницу 1.
-//       getPage(newPage);
-
-//       // Предзагружаем следующие страницы СТРОГО ПОСЛЕДОВАТЕЛЬНО:
-//       // getPage(N+1) должен идти только после getPage(N), иначе
-//       // pagePositionsRef для N+1 ещё не заполнен.
-//       for (let i = 1; i <= preloadAhead; i++) {
-//         if (newPage + i <= state.totalPages) {
-//           getPage(newPage + i);
-//         }
-//       }
-
-//       setState((prev) => ({ ...prev, currentPage: newPage }));
-
-//       // Снимаем флаг анимации через 300 мс (длительность CSS-перехода)
-//       setTimeout(() => {
-//         isFlipping.current = false;
-//       }, 300);
-//     },
-//     [state.totalPages, preloadAhead, getPage]
-//   );
-
-//   const nextPage = useCallback(() => {
-//     goToPage(state.currentPage + 1);
-//   }, [state.currentPage, goToPage]);
-
-//   // Переход на предыдущую страницу
-//   const prevPage = useCallback(() => {
-//     goToPage(state.currentPage - 1);
-//   }, [state.currentPage, goToPage]);
-
-//   // Изменение размера шрифта на delta пикселей (положительное или отрицательное)
-//   const changeFontSize = useCallback((delta: number) => {
-//     setState((prev) => {
-//       const newSize = Math.min(
-//         MAX_FONT_SIZE,
-//         Math.max(MIN_FONT_SIZE, prev.fontSize + delta) // зажимаем в диапазон [MIN, MAX]
-//       );
-//       return { ...prev, fontSize: newSize };
-//     });
-//   }, []);
-
-//   // ─── displayedPages: список страниц для рендера ─────────────
-//   // В режиме 'single' — одна страница (currentPage).
-//   // В режиме 'double' — разворот: чётная (левая) + нечётная (правая).
-//   const displayedPages = useMemo(() => {
-//     const pages: PageContent[] = [];
-//     pages.push(getPage(state.currentPage));
-
-//     return pages;
-//   }, [state.currentPage, state.totalPages, getPage]);
-
-//   // ─── FIX 3: readPercent — процент прочитанного по всей книге ─
-//   //
-//   // Алгоритм (без загрузки всех фрагментов):
-//   //   toc.js содержит Parts[i].s и Parts[i].e — глобальные индексы абзацев
-//   //   каждого фрагмента, и full_length — общее число абзацев в книге.
-//   //
-//   //   Мы знаем:
-//   //     - currentPartIndex: какой фрагмент открыт
-//   //     - currentPage, totalPages: прогресс внутри фрагмента
-//   //
-//   //   Вычисление:
-//   //     globalStart = Parts[currentPartIndex].s  ← первый абзац фрагмента
-//   //     globalEnd   = Parts[currentPartIndex].e  ← последний абзац фрагмента
-//   //     partLength  = globalEnd - globalStart + 1 ← абзацев во фрагменте
-//   //     progressInPart = currentPage / totalPages  ← прогресс внутри (0..1)
-//   //     globalPos = globalStart + partLength * progressInPart
-//   //     readPercent = (globalPos / full_length) * 100
-//   //
-//   //   Это линейная аппроксимация: считаем, что абзацы равномерно
-//   //   распределены по страницам. Точности достаточно для прогресс-бара.
-//   //   Реальный счётчик был бы точнее при накоплении pagePositions всего файла,
-//   //   но требовал бы полной генерации всех страниц заранее.
-//   const readPercent = useMemo<number>(() => {
-//     // Если toc не загружен — используем прогресс внутри фрагмента
-//     if (!tocData || tocData.Parts.length === 0) {
-//       if (state.totalPages === 0) return 0;
-//       return (state.currentPage / state.totalPages) * 100;
-//     }
-
-//     const part = tocData.Parts[currentPartIndex];
-//     if (!part) return 0;
-
-//     const partLength = part.e - part.s + 1; // абзацев во фрагменте
-//     const progressInPart =
-//       state.totalPages > 0 ? state.currentPage / state.totalPages : 0;
-
-//     // Глобальная позиция (в абзацах) от начала книги
-//     const globalPos = part.s + partLength * progressInPart;
-
-//     return Math.min(100, (globalPos / tocData.full_length) * 100);
-//   }, [tocData, currentPartIndex, state.currentPage, state.totalPages]);
-
-//   // ─── Обработка клавиатуры ────────────────────────────────────
-//   // ArrowRight / PageDown → следующая страница
-//   // ArrowLeft / PageUp → предыдущая страница
-//   useEffect(() => {
-//     const handleKeyDown = (e: KeyboardEvent) => {
-//       if (e.key === 'Escape') {
-//         setActiveNote(null);
-//         return;
-//       }
-//       if (e.key === 'ArrowRight' || e.key === 'PageDown') {
-//         nextPage();
-//       } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
-//         prevPage();
-//       }
-//     };
-
-//     window.addEventListener('keydown', handleKeyDown);
-//     return () => window.removeEventListener('keydown', handleKeyDown);
-//   }, [nextPage, prevPage]);
-
-//   // ─── renderInlineContent: рендер богатого содержимого параграфа ──
-//   // Обходит массив (string | InlineNode) и преобразует в JSX-узлы:
-//   //   строка → текстовый узел
-//   //   em     → <em>
-//   //   st     → <strong>
-//   //   note   → кликабельный [N] с обработчиком открытия сноски
-//   const renderInlineContent = useCallback(
-//     (content: (string | InlineNode)[], segKey: string): React.ReactNode => {
-//       return content.map((item, idx) => {
-//         if (typeof item === 'string') {
-//           return <React.Fragment key={idx}>{item}</React.Fragment>;
-//         }
-//         if (item.t === 'em') {
-//           return <em key={idx}>{(item as { t: string; c: string }).c}</em>;
-//         }
-//         if (item.t === 'st') {
-//           return (
-//             <strong key={idx}>{(item as { t: string; c: string }).c}</strong>
-//           );
-//         }
-//         if (item.t === 'note') {
-//           const note = item as Note;
-//           return (
-//             <span
-//               key={idx}
-//               className={styles['note-ref']}
-//               onClick={(e) => {
-//                 e.stopPropagation();
-//                 setActiveNote(note);
-//               }}
-//               role="button"
-//               tabIndex={0}
-//               onKeyDown={(e) => e.key === 'Enter' && setActiveNote(note)}
-//             >
-//               {note.c}
-//             </span>
-//           );
-//         }
-//         return null;
-//       });
-//     },
-//     [setActiveNote]
-//   );
-
-//   // ─── ImageLightbox: увеличенная картинка поверх всего ────────
-//   // Рендерится через portal в document.body — чтобы position:fixed
-//   // не ломался из-за transform у родителей.
-//   const ImageLightbox = useCallback(() => {
-//     if (!activeImage) return null;
-//     return createPortal(
-//       <div
-//         className={styles['lightbox-overlay']}
-//         onClick={() => setActiveImage(null)}
-//         role="button"
-//         aria-label="Закрыть изображение"
-//         tabIndex={0}
-//         onKeyDown={(e) => e.key === 'Escape' && setActiveImage(null)}
-//       >
-//         <img
-//           src={activeImage}
-//           alt=""
-//           className={styles['lightbox-img']}
-//           onClick={(e) => e.stopPropagation()} // клик по картинке закрывает (см. ниже)
-//         />
-//       </div>,
-//       document.body
-//     );
-//   }, [activeImage]);
-
-//   // ─── renderSegment: рендер одного PageSegment в JSX ─────────
-//   const renderSegment = useCallback(
-//     (seg: PageSegment, index: number, pageNum: number) => {
-//       if (seg.type === 'br') {
-//         return <br key={`${pageNum}-${index}`} />;
-//       }
-
-//       // ── Изображение ──────────────────────────────────────────
-//       if (seg.type === 'img' && seg.imgSrc) {
-//         const fullUrl = imagePath
-//           ? `${imagePath.replace(/\/$/, '')}/${seg.imgSrc}`
-//           : seg.imgSrc;
-//         return (
-//           <div key={`${pageNum}-${index}`} className={styles['img-block']}>
-//             <img
-//               src={fullUrl}
-//               alt=""
-//               className={styles['img-inline']}
-//               onClick={() => setActiveImage(fullUrl)}
-//               role="button"
-//               tabIndex={0}
-//               onKeyDown={(e) => e.key === 'Enter' && setActiveImage(fullUrl)}
-//             />
-//           </div>
-//         );
-//       }
-
-//       // Определяем содержимое: rich если есть inlineContent, иначе plain text
-//       const content = seg.inlineContent
-//         ? renderInlineContent(seg.inlineContent, `${pageNum}-${index}`)
-//         : seg.text;
-
-//       if (seg.type === 'title') {
-//         return (
-//           <h2
-//             key={`${pageNum}-${index}`}
-//             className={styles['title']}
-//             style={{ fontSize: `${state.fontSize * 1.3}px` }}
-//           >
-//             {content}
-//           </h2>
-//         );
-//       }
-//       // Обычный параграф
-//       return (
-//         <p
-//           key={`${pageNum}-${index}`}
-//           className={`${styles['paragraph']} ${seg.isContinuation ? styles['continuation'] : ''}`}
-//           style={{ fontSize: `${state.fontSize}px` }}
-//         >
-//           {content}
-//         </p>
-//       );
-//     },
-//     [state.fontSize, renderInlineContent, imagePath]
-//   );
-
-//   // ─── FootnoteModal: модальное окно с текстом сноски ──────────
-//   const FootnoteModal = useCallback(() => {
-//     if (!activeNote) return null;
-
-//     const footnoteText = activeNote.f
-//       ? Array.isArray(activeNote.f.c)
-//         ? activeNote.f.c.join('\n\n')
-//         : activeNote.f.c
-//       : '';
-
-//     return (
-//       <div
-//         className={styles['footnote-overlay']}
-//         onClick={() => setActiveNote(null)}
-//       >
-//         <div
-//           className={styles['footnote-modal']}
-//           onClick={(e) => e.stopPropagation()}
-//           role="dialog"
-//           aria-modal="true"
-//         >
-//           <button
-//             className={styles['footnote-close']}
-//             onClick={() => setActiveNote(null)}
-//             aria-label="Закрыть"
-//           >
-//             ✕
-//           </button>
-//           <div className={styles['footnote-content']}>
-//             <span className={styles['footnote-label']}>{activeNote.c}</span>
-//             <p>{footnoteText}</p>
-//           </div>
-//         </div>
-//       </div>
-//     );
-//   }, [activeNote]);
-//   // position: fixed работает относительно viewport только если
-//   // ни один из предков не имеет transform, filter, perspective
-//   // или will-change: transform. У reader-контейнера, скорее всего,
-//   // есть один из этих CSS-свойств (например, для анимации листания),
-//   // что «пробивает» контекст позиционирования и fixed прикрепляется к нему,
-//   // а не к окну. Решение — createPortal(…, document.body): модалка монтируется
-//   // напрямую в <body>, полностью вне дерева reader, и position: fixed работает как ожидается.
-
-//   // const FootnoteModal = useCallback(() => {
-//   //   if (!activeNote) return null;
-
-//   //   const footnoteText = activeNote.f
-//   //     ? Array.isArray(activeNote.f.c)
-//   //       ? activeNote.f.c.join('\n\n')
-//   //       : activeNote.f.c
-//   //     : '';
-
-//   //   return createPortal(
-//   //     <div
-//   //       className={styles['footnote-overlay']}
-//   //       onClick={() => setActiveNote(null)}
-//   //     >
-//   //       <div
-//   //         className={styles['footnote-modal']}
-//   //         onClick={(e) => e.stopPropagation()}
-//   //         role="dialog"
-//   //         aria-modal="true"
-//   //       >
-//   //         <button
-//   //           className={styles['footnote-close']}
-//   //           onClick={() => setActiveNote(null)}
-//   //           aria-label="Закрыть"
-//   //         >
-//   //           ✕
-//   //         </button>
-//   //         <div className={styles['footnote-content']}>
-//   //           <span className={styles['footnote-label']}>{activeNote.c}</span>
-//   //           <p>{footnoteText}</p>
-//   //         </div>
-//   //       </div>
-//   //     </div>,
-//   //     document.body
-//   //   );
-//   // }, [activeNote]);
-
-//   if (state.isLoading) {
-//     return (
-//       <div className={styles['loading']}>
-//         <div className={styles['spinner']}></div>
-//         <p>Загрузка книги...</p>
-//       </div>
-//     );
-//   }
-
-//   // ─── Основной рендер ─────────────────────────────────────────
-//   return (
-//     <div className={styles['reader']} ref={containerRef}>
-//       {/* Панель управления */}
-//       <div className={styles['toolbar']}>
-//         <div className={styles['controls']}>
-//           <button
-//             onClick={prevPage}
-//             disabled={state.currentPage <= 1}
-//             className={styles['nav-button']}
-//           >
-//             ← Назад
-//           </button>
-
-//           <span className={styles['page-info']}>
-//             {`Стр. ${state.currentPage} / ${state.totalPages}`}
-//             {/* Процент по всей книге — только если есть toc */}
-//             {tocData && (
-//               <span className={styles['read-percent']}>
-//                 {' '}
-//                 ({readPercent.toFixed(1)}%)
-//               </span>
-//             )}
-//           </span>
-
-//           <button
-//             onClick={nextPage}
-//             disabled={state.currentPage >= state.totalPages}
-//             className={styles['nav-button']}
-//           >
-//             Вперёд →
-//           </button>
-//         </div>
-
-//         <div className={styles['settings']}>
-//           <button
-//             onClick={() => changeFontSize(-2)}
-//             className={styles['font-button']}
-//           >
-//             A-
-//           </button>
-//           <span className={styles['font-size']}>{state.fontSize}px</span>
-//           <button
-//             onClick={() => changeFontSize(2)}
-//             className={styles['font-button']}
-//           >
-//             A+
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* Область чтения */}
-//       <div className={styles['reading-area']}>
-//         {displayedPages.map((page, pageIndex) => (
-//           <div
-//             key={page.pageNumber}
-//             className={`${styles.page} ${
-//               pageIndex === displayedPages.length - 1
-//                 ? styles['active-page']
-//                 : ''
-//             } ${isFlipping.current ? styles['flipping'] : ''}`}
-//             // pageRef вешается на последнюю (или единственную) страницу разворота
-//             // для замера размеров в эффекте 3
-//             ref={pageIndex === displayedPages.length - 1 ? pageRef : null}
-//           >
-//             {/* Рендерим все сегменты страницы */}
-//             {page.segments.map((seg, idx) =>
-//               renderSegment(seg, idx, page.pageNumber)
-//             )}
-//             <div className={styles['page-number']}>{page.pageNumber}</div>
-//           </div>
-//         ))}
-//       </div>
-
-//       {/* Навигация кликом - почему-то не отображается */}
-//       <div className={styles['click-zones']}>
-//         <div
-//           className={styles['prev-zone']}
-//           onClick={prevPage}
-//           role="button"
-//           tabIndex={0}
-//           aria-label="Предыдущая страница"
-//         />
-//         <div
-//           className={styles['next-zone']}
-//           onClick={nextPage}
-//           role="button"
-//           tabIndex={0}
-//           aria-label="Следующая страница"
-//         />
-//       </div>
-
-//       {/* Прогресс бар */}
-//       {/* <div className={styles['progress-bar']}>
-//         <div
-//           className={styles['progress-fill']}
-//           style={{ width: `${(state.currentPage / state.totalPages) * 100}%` }}
-//         />
-//       </div> */}
-//       <div className={styles['progress-bar']}>
-//         <div
-//           className={styles['progress-fill']}
-//           style={{ width: `${readPercent}%` }}
-//         />
-//       </div>
-
-//       {/* Модальное окно сноски */}
-//       <FootnoteModal />
-//       <ImageLightbox />
-//     </div>
-//   );
-// };
-
-// export default Reader;
+interface ColorModalProps {
+  open: boolean;
+  onClose: () => void;
+  textColor: string;
+  pageColor: string;
+  bgColor: string;
+  onTextColor: (c: string) => void;
+  onPageColor: (c: string) => void;
+  onBgColor: (c: string) => void;
+}
+
+const ColorSwatch: React.FC<{
+  color: string;
+  selected: boolean;
+  onSelect: () => void;
+  dark?: boolean;
+}> = ({ color, selected, onSelect, dark }) => (
+  <button
+    onClick={onSelect}
+    aria-label={color}
+    style={{
+      width: 28,
+      height: 28,
+      borderRadius: '50%',
+      background: color,
+      border: selected
+        ? `3px solid ${dark ? '#fff' : '#1a1a1a'}`
+        : '2px solid #ccc',
+      outline: selected ? `2px solid ${color}` : 'none',
+      outlineOffset: 2,
+      cursor: 'pointer',
+      padding: 0,
+      flexShrink: 0,
+      transition: 'transform 0.1s',
+      transform: selected ? 'scale(1.18)' : 'scale(1)',
+      boxShadow: selected
+        ? '0 0 0 2px rgba(0,0,0,0.18)'
+        : '0 1px 3px rgba(0,0,0,0.12)',
+    }}
+  />
+);
+
+const ColorModal: React.FC<ColorModalProps> = ({
+  open,
+  onClose,
+  textColor,
+  pageColor,
+  bgColor,
+  onTextColor,
+  onPageColor,
+  onBgColor,
+}) => {
+  if (!open) return null;
+
+  const rows: {
+    label: string;
+    colors: string[];
+    value: string;
+    onChange: (c: string) => void;
+  }[] = [
+    {
+      label: 'Цвет текста',
+      colors: TEXT_COLORS,
+      value: textColor,
+      onChange: onTextColor,
+    },
+    {
+      label: 'Цвет страницы',
+      colors: PAGE_COLORS,
+      value: pageColor,
+      onChange: onPageColor,
+    },
+    {
+      label: 'Цвет фона',
+      colors: BG_COLORS,
+      value: bgColor,
+      onChange: onBgColor,
+    },
+  ];
+
+  return createPortal(
+    <div className={styles['color-overlay']} onClick={onClose}>
+      <div
+        className={styles['color-modal']}
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Настройка цветов"
+      >
+        <div className={styles['color-modal-header']}>
+          <span className={styles['color-modal-title']}>Цвета оформления</span>
+          <button
+            className={styles['footnote-close']}
+            onClick={onClose}
+            aria-label="Закрыть"
+          >
+            ✕
+          </button>
+        </div>
+        <div className={styles['color-modal-body']}>
+          {rows.map((row) => (
+            <div key={row.label} className={styles['color-row']}>
+              <span className={styles['color-row-label']}>{row.label}</span>
+              <div className={styles['color-swatches']}>
+                {row.colors.map((c) => (
+                  <ColorSwatch
+                    key={c}
+                    color={c}
+                    selected={row.value === c}
+                    onSelect={() => row.onChange(c)}
+                    dark={row.label === 'Цвет текста'}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+};
+
+// ─── FootnoteModal ────────────────────────────────────────
+
+interface FootnoteModalProps {
+  note: Note | null;
+  onClose: () => void;
+}
+
+const FootnoteModal: React.FC<FootnoteModalProps> = ({ note, onClose }) => {
+  if (!note) return null;
+  const footnoteText = note.f
+    ? Array.isArray(note.f.c)
+      ? note.f.c.join('\n\n')
+      : note.f.c
+    : '';
+  return createPortal(
+    <div className={styles['footnote-overlay']} onClick={onClose}>
+      <div
+        className={styles['footnote-modal']}
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+      >
+        <button
+          className={styles['footnote-close']}
+          onClick={onClose}
+          aria-label="Закрыть"
+        >
+          ✕
+        </button>
+        <div className={styles['footnote-content']}>
+          <span className={styles['footnote-label']}>{note.c}</span>
+          <p>{footnoteText}</p>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+};
+
+// ─── ImageLightbox ────────────────────────────────────────
+
+interface ImageLightboxProps {
+  src: string | null;
+  onClose: () => void;
+}
+
+const ImageLightbox: React.FC<ImageLightboxProps> = ({ src, onClose }) => {
+  if (!src) return null;
+  return createPortal(
+    <div
+      className={styles['lightbox-overlay']}
+      onClick={onClose}
+      role="button"
+      aria-label="Закрыть изображение"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === 'Escape' && onClose()}
+    >
+      <img
+        src={src}
+        alt=""
+        className={styles['lightbox-img']}
+        onClick={(e) => e.stopPropagation()}
+      />
+    </div>,
+    document.body
+  );
+};

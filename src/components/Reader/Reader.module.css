@@ -134,7 +134,7 @@
   */
   columns: 1;
   column-fill: auto;
-  column-gap: 0; /* gap между страницами не нужен — viewport их скрывает */
+  column-gap: 40px; /* gap между страницами не нужен — viewport их скрывает */
   height: 100%; /* высота = высота viewport, колонки не выходят за неё */
   padding: 40px;
   box-sizing: border-box;
@@ -147,6 +147,18 @@
     Горизонтальный overflow обрезает viewport, а не этот блок.
   */
   overflow: visible;
+}
+
+.font-select {
+  padding: 7px 10px;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  min-width: 140px;
+  padding-right: 28px;
 }
 
 /* ── Абзацы ──────────────────────────────────────────────── */
@@ -269,10 +281,10 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
-  animation: fadeIn 0.15s ease;
+  animation: fade-in 0.15s ease;
 }
 
-@keyframes fadeIn {
+@keyframes fade-in {
   from {
     opacity: 0;
   }
@@ -292,10 +304,10 @@
   max-height: 70vh;
   display: flex;
   flex-direction: column;
-  animation: slideUp 0.15s ease;
+  animation: slide-up 0.15s ease;
 }
 
-@keyframes slideUp {
+@keyframes slide-up {
   from {
     transform: translateY(12px);
     opacity: 0;
@@ -411,4 +423,84 @@
   .next-zone {
     width: 20%;
   }
+}
+
+/* ── Кнопка цвета ────────────────────────────────────────── */
+.color-button {
+  padding: 7px 10px;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  transition: all 0.2s;
+}
+
+.color-button:hover {
+  background: #8b4513;
+  border-color: #8b4513;
+}
+
+/* ── Модальное окно цветов ───────────────────────────────── */
+.color-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 45%);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fade-in 0.15s ease;
+}
+
+.color-modal {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgb(0 0 0 / 22%);
+  width: 340px;
+  max-width: 95vw;
+  animation: slide-up 0.15s ease;
+  overflow: hidden;
+}
+
+.color-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.color-modal-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+}
+
+.color-modal-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.color-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.color-row-label {
+  font-size: 13px;
+  color: #555;
+  width: 105px;
+  flex-shrink: 0;
+}
+
+.color-swatches {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
