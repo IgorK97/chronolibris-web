@@ -162,10 +162,11 @@ export default function App() {
                 <Reader
                   tocPath="/data/toc.json"
                   filePath="/data/000.json"
+                  basePath="/data"
                   // imagePath={`${import.meta.env.VITE_STORAGE_URL}/books/v1/4/images`}
                   imagePath={`${import.meta.env.VITE_STORAGE_URL}/covers/4`}
-                  cacheSize={10}
-                  preloadAhead={3}
+                  // cacheSize={10}
+                  // preloadAhead={3}
                 />
               }
             />
