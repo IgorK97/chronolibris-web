@@ -13,6 +13,7 @@ import type { ContentDto, BookDto, BookFilterRequest } from '@/types/types';
 import { BookSearchPopup } from './BookSearchPopup';
 import styles from './ContentUnit.module.css';
 import { useNavigate, useParams } from 'react-router-dom';
+import { ContentTagsManager } from './ContentTagsManagement';
 
 interface ContentUnitProps {
   contentId: number;
@@ -122,6 +123,9 @@ export const ContentUnit = () => {
           </div>
         </div>
       </div>
+
+      {/* Управление тегами */}
+      {id && <ContentTagsManager contentId={id} />}
 
       {/* Список книг */}
       <div className={styles['books-section']}>

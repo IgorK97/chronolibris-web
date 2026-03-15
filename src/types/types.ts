@@ -158,6 +158,7 @@ export interface ContentDto {
   authors: string[];
   themes: ThemeDto[];
   booksCount: number;
+  tags: TagDetails[];
 }
 
 export interface BookDto {

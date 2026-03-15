@@ -5,6 +5,7 @@ import type {
   ContentDto,
   ContentListResponse,
   ContentFilterRequest,
+  TagDetails,
 } from '../types/types';
 import type { BookDto } from '../types/types';
 
@@ -72,6 +73,29 @@ export const contentsApi = {
 
   unlinkBookFromContent: (contentId: number, bookId: number): Promise<void> =>
     apiClient.delete(`/Contents/${contentId}/books/${bookId}`),
+
+  getContentTags: (contentId: number): Promise<TagDetails[]> =>
+    apiClient.get<TagDetails[]>(`/Contents/${contentId}/tags`),
+
+  searchTags: (
+    searchTerm: string,
+    tagTypeId?: number | null,
+    limit: number = 5
+  ): Promise<TagDetails[]> => {
+    const params = new URLSearchParams();
+    params.append('searchTerm', searchTerm);
+    if (tagTypeId) params.append('tagTypeId', tagTypeId.toString());
+    params.append('limit', limit.toString());
+    return apiClient.get<TagDetails[]>(
+      `/Contents/tags/search?${params.toString()}`
+    );
+  },
+
+  addTagToContent: (contentId: number, tagId: number): Promise<void> =>
+    apiClient.post<void>(`/Contents/${contentId}/tags/${tagId}`),
+
+  removeTagFromContent: (contentId: number, tagId: number): Promise<void> =>
+    apiClient.delete(`/Contents/${contentId}/tags/${tagId}`),
 };
 
 export const useContents = (filter: ContentFilterRequest) => {
@@ -167,6 +191,54 @@ export const useUnlinkBookFromContent = () => {
     }) => contentsApi.unlinkBookFromContent(contentId, bookId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contents'] });
+    },
+  });
+};
+
+export const useContentTags = (contentId: number | null) => {
+  return useQuery({
+    queryKey: ['contentTags', contentId],
+    queryFn: () => {
+      if (contentId === null) throw new Error('ID контента не указан');
+      return contentsApi.getContentTags(contentId);
+    },
+    enabled: contentId !== null,
+    staleTime: 2 * 60 * 1000,
+  });
+};
+
+export const useSearchTags = (
+  searchTerm: string,
+  tagTypeId?: number | null
+) => {
+  return useQuery({
+    queryKey: ['searchTags', searchTerm, tagTypeId],
+    queryFn: () => contentsApi.searchTags(searchTerm, tagTypeId, 5),
+    enabled: searchTerm.length >= 2,
+    staleTime: 1 * 60 * 1000,
+  });
+};
+
+export const useAddTagToContent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ contentId, tagId }: { contentId: number; tagId: number }) =>
+      contentsApi.addTagToContent(contentId, tagId),
+    onSuccess: (_, { contentId }) => {
+      queryClient.invalidateQueries({ queryKey: ['contentTags', contentId] });
+      queryClient.invalidateQueries({ queryKey: ['contents', contentId] });
+    },
+  });
+};
+
+export const useRemoveTagFromContent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ contentId, tagId }: { contentId: number; tagId: number }) =>
+      contentsApi.removeTagFromContent(contentId, tagId),
+    onSuccess: (_, { contentId }) => {
+      queryClient.invalidateQueries({ queryKey: ['contentTags', contentId] });
+      queryClient.invalidateQueries({ queryKey: ['contents', contentId] });
     },
   });
 };
