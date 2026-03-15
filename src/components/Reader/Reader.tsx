@@ -278,6 +278,7 @@ export const Reader: React.FC<ReaderProps> = ({
   // em/st — включаются как обычный текст (для подсчёта символов при пагинации).
   const IMG_PLACEHOLDER_LEN = 100; // условная «стоимость» картинки в символах
   const extractText = useCallback((segment: TextSegment): string => {
+    if (segment.t === 'img') return ' '.repeat(IMG_PLACEHOLDER_LEN);
     if (typeof segment.c === 'string') {
       return segment.c;
     } else if (Array.isArray(segment.c)) {
@@ -287,11 +288,26 @@ export const Reader: React.FC<ReaderProps> = ({
           if (item.t === 'note') return (item as Note).c; // метка "[N]" входит в счёт символов
           if (item.t === 'em' || item.t === 'st')
             return (item as { t: string; c: string }).c;
+          if (item.t === 'img') return ' '.repeat(IMG_PLACEHOLDER_LEN);
           return extractText(item as TextSegment);
         })
         .join('');
     }
     return ''; // fallback для неизвестных форматов
+    // if (typeof segment.c === 'string') {
+    //   return segment.c;
+    // } else if (Array.isArray(segment.c)) {
+    //   return segment.c
+    //     .map((item) => {
+    //       if (typeof item === 'string') return item;
+    //       if (item.t === 'note') return (item as Note).c; // метка "[N]" входит в счёт символов
+    //       if (item.t === 'em' || item.t === 'st')
+    //         return (item as { t: string; c: string }).c;
+    //       return extractText(item as TextSegment);
+    //     })
+    //     .join('');
+    // }
+    // return ''; // fallback для неизвестных форматов
   }, []); // нет зависимостей — чистая функция
 
   // ─── extractNotes: извлечение сносок из сегмента ────────────
@@ -362,6 +378,32 @@ export const Reader: React.FC<ReaderProps> = ({
         i++
       ) {
         const segment = originalSegments[i]; // текущий исходный сегмент
+
+        if (segment.t === 'img') {
+          const imgNodes = Array.isArray(segment.c) ? segment.c : [];
+          const firstImg = imgNodes.find(
+            (n) => typeof n !== 'string' && (n as ImgNode).t === 'img'
+          ) as ImgNode | undefined;
+          const src = firstImg?.src ?? '';
+          segmentsList.push({
+            originalIndex: i,
+            text: '',
+            isContinuation: false,
+            type: 'img',
+            imgSrc: src,
+          });
+          // Картинка «занимает» IMG_PLACEHOLDER_LEN символов
+          charCount += IMG_PLACEHOLDER_LEN;
+          currentCharOffset = 0;
+          if (charCount >= maxChars) {
+            pagePositionsRef.current.set(pageNumber + 1, {
+              segmentIndex: i + 1,
+              charOffset: 0,
+            });
+          }
+          continue;
+        }
+
         const fullText = extractText(segment); // полный текст сегмента
         // Если сегмент уже частично попал на предыдущую страницу — берём остаток
         const textToUse =
@@ -678,10 +720,92 @@ export const Reader: React.FC<ReaderProps> = ({
   );
 
   // ─── renderSegment: рендер одного PageSegment в JSX ─────────
+  // const renderSegment = useCallback(
+  //   (seg: PageSegment, index: number, pageNum: number) => {
+  //     if (seg.type === 'br') {
+  //       return <br key={`${pageNum}-${index}`} />;
+  //     }
+
+  //     // Определяем содержимое: rich если есть inlineContent, иначе plain text
+  //     const content = seg.inlineContent
+  //       ? renderInlineContent(seg.inlineContent, `${pageNum}-${index}`)
+  //       : seg.text;
+
+  //     if (seg.type === 'title') {
+  //       return (
+  //         <h2
+  //           key={`${pageNum}-${index}`}
+  //           className={styles['title']}
+  //           style={{ fontSize: `${state.fontSize * 1.3}px` }}
+  //         >
+  //           {content}
+  //         </h2>
+  //       );
+  //     }
+  //     // Обычный параграф
+  //     return (
+  //       <p
+  //         key={`${pageNum}-${index}`}
+  //         className={`${styles['paragraph']} ${seg.isContinuation ? styles['continuation'] : ''}`}
+  //         style={{ fontSize: `${state.fontSize}px` }}
+  //       >
+  //         {content}
+  //       </p>
+  //     );
+  //   },
+  //   [state.fontSize, renderInlineContent]
+  // );
+
+  // ─── ImageLightbox: увеличенная картинка поверх всего ────────
+  // Рендерится через portal в document.body — чтобы position:fixed
+  // не ломался из-за transform у родителей.
+  const ImageLightbox = useCallback(() => {
+    if (!activeImage) return null;
+    return createPortal(
+      <div
+        className={styles['lightbox-overlay']}
+        onClick={() => setActiveImage(null)}
+        role="button"
+        aria-label="Закрыть изображение"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === 'Escape' && setActiveImage(null)}
+      >
+        <img
+          src={activeImage}
+          alt=""
+          className={styles['lightbox-img']}
+          onClick={(e) => e.stopPropagation()} // клик по картинке закрывает (см. ниже)
+        />
+      </div>,
+      document.body
+    );
+  }, [activeImage]);
+
+  // ─── renderSegment: рендер одного PageSegment в JSX ─────────
   const renderSegment = useCallback(
     (seg: PageSegment, index: number, pageNum: number) => {
       if (seg.type === 'br') {
         return <br key={`${pageNum}-${index}`} />;
+      }
+
+      // ── Изображение ──────────────────────────────────────────
+      if (seg.type === 'img' && seg.imgSrc) {
+        const fullUrl = imagePath
+          ? `${imagePath.replace(/\/$/, '')}/${seg.imgSrc}`
+          : seg.imgSrc;
+        return (
+          <div key={`${pageNum}-${index}`} className={styles['img-block']}>
+            <img
+              src={fullUrl}
+              alt=""
+              className={styles['img-inline']}
+              onClick={() => setActiveImage(fullUrl)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && setActiveImage(fullUrl)}
+            />
+          </div>
+        );
       }
 
       // Определяем содержимое: rich если есть inlineContent, иначе plain text
@@ -711,7 +835,7 @@ export const Reader: React.FC<ReaderProps> = ({
         </p>
       );
     },
-    [state.fontSize, renderInlineContent]
+    [state.fontSize, renderInlineContent, imagePath]
   );
 
   // ─── FootnoteModal: модальное окно с текстом сноски ──────────
@@ -945,6 +1069,7 @@ export const Reader: React.FC<ReaderProps> = ({
 
       {/* Модальное окно сноски */}
       <FootnoteModal />
+      <ImageLightbox />
     </div>
   );
 };
