@@ -56,7 +56,7 @@
   max-height: 70vh;
   display: flex;
   flex-direction: column;
-  animation: slideUp 0.15s ease;
+  animation: slide-up 0.15s ease;
 }
 
 @keyframes slide-up {
@@ -116,4 +116,69 @@
   font-size: 0.92em;
   line-height: 1.6;
   color: #222;
+}
+
+/* Блок-обёртка картинки: занимает всю ширину, текст не обтекает */
+.img-block {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin: 1em 0;
+  clear: both; /* на случай если где-то есть float */
+}
+
+/* Сама картинка: небольшая, кликабельная */
+.img-inline {
+  max-width: 40%; /* небольшой размер — не на всю ширину */
+  max-height: 180px;
+  object-fit: contain;
+  cursor: zoom-in;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
+  transition:
+    box-shadow 0.15s,
+    transform 0.15s;
+}
+
+.img-inline:hover {
+  box-shadow: 0 4px 16px rgb(0 0 0 / 25%);
+  transform: scale(1.03);
+}
+
+/* ── Лайтбокс ─────────────────────────────────────────────── */
+
+/* Затемнённый оверлей на весь экран */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 85%);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+  animation: fade-in 0.15s ease;
+}
+
+/* Увеличенная картинка */
+.lightbox-img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 8px 40px rgb(0 0 0 / 60%);
+  cursor: zoom-out;
+  animation: scale-in 0.15s ease;
+}
+
+@keyframes scale-in {
+  from {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }

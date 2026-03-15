@@ -255,13 +255,19 @@ export const Reader: React.FC<ReaderProps> = ({
       // Приблизительная ширина одного символа = 60% от fontSize
       const charWidth = state.fontSize * 0.6;
       // Высота одной строки = 150% от fontSize (line-height: 1.5)
-      const lineHeight = state.fontSize * 1.5;
-      // Количество символов в одной строке = ширина контейнера / ширина символа
-      const charsPerLine = Math.floor(container.clientWidth / charWidth);
-      // Количество строк на странице = высота контейнера / высота строки
-      const linesPerPage = Math.floor(container.clientHeight / lineHeight);
+      const lineHeight = state.fontSize * 1.6;
+
+      const paddingH = 80; // 40px слева + 40px справа
+      const paddingV = 80; // 40px сверху + 40px снизу
+      const charsPerLine = Math.floor(
+        (container.clientWidth - paddingH) / charWidth
+      );
+      const linesPerPage = Math.floor(
+        (container.clientHeight - paddingV) / lineHeight
+      );
+
       // Итоговое число символов на страницу с коэффициентом 0.85 (поправка на отступы/пробелы)
-      estimatedCharsPerPage.current = charsPerLine * linesPerPage * 0.85;
+      estimatedCharsPerPage.current = charsPerLine * linesPerPage * 0.7;
 
       calculateTotalPages(); // обновляем state.totalPages
       isCalculatingRef.current = false; // снимаем блокировку
