@@ -1,5 +1,37 @@
 export const SELECTION_TYPE = { NEWEST: 1, POPULAR: 2, MANUAL: 3 } as const;
 
+// File: src/types/types.ts
+export interface BookFileDto {
+  id: number;
+  bookId: number;
+  formatId: number;
+  formatName?: string | null;
+  storageUrl: string;
+  fileSizeBytes: number;
+  fileSizeDisplay: string;
+  isReadable: boolean;
+  createdAt: string;
+  completedAt?: string | null;
+  createdBy: number;
+  createdByName?: string | null;
+  version: number;
+  bookFileStatusId: number;
+  bookFileStatusName?: string | null;
+}
+
+export interface FormatDto {
+  id: number;
+  name: string;
+}
+
+export const BookFileStatuses = {
+  PENDING: 1,
+  UPLOADED: 2,
+  PROCESSING: 3,
+  COMPLETED: 4,
+  FAILED: 5,
+} as const;
+
 export interface CreateLanguageRequest {
   name: string;
   ftsConfiguration: string;

@@ -11,6 +11,7 @@ import {
 import type { ContentDto } from '@/types/types';
 import { ContentSearchPopup } from './ContentSearchPopup';
 import styles from './BookUnit.module.css';
+import { BookFileManagement } from './BookFileManagement';
 
 export const BookUnit: React.FC = () => {
   const { bookId } = useParams<{ bookId: string }>();
@@ -184,8 +185,9 @@ export const BookUnit: React.FC = () => {
       <div className={styles['files-section']}>
         <h3>Файлы книги</h3>
         <div className={styles['files-placeholder']}>
-          <p>Список файлов книги будет отображаться здесь</p>
-          <p className={styles['hint']}>(Функционал в разработке)</p>
+          <BookFileManagement bookId={id!} />
+          {/* <p>Список файлов книги будет отображаться здесь</p>
+          <p className={styles['hint']}>(Функционал в разработке)</p> */}
         </div>
       </div>
 
