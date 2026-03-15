@@ -60,7 +60,7 @@ export default function MainLayout() {
       <main className={styles['main-content']}>
         <Outlet />
       </main>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }
