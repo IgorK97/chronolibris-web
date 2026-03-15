@@ -1,261 +1,414 @@
-/* Корневой контейнер читалки */
+/* ============================================================
+   Reader.module.css — стили для читалки на CSS columns
+   ============================================================ */
+
+/* ── Корневой контейнер ──────────────────────────────────── */
 .reader {
-  display: flex; /* флекс-контейнер: дочерние элементы (тулбар, область чтения, прогресс) */
-  flex-direction: column; /* ...расположены вертикально */
-  min-height: 100vh;
-  background: #f5f1e8; /* тёплый бежевый фон — «бумажный» оттенок */
-  font-family:
-    Georgia, 'Times New Roman', serif; /* книжный шрифт с засечками */
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* фиксированная высота экрана */
+  overflow: hidden; /* ничего не выходит за пределы */
+  background: #f5f1e8;
+  font-family: Georgia, 'Times New Roman', serif;
 }
 
 /* ── Экран загрузки ──────────────────────────────────────── */
 .loading {
-  display: flex; /* флекс-контейнер для центрирования */
-  flex-direction: column; /* спиннер над текстом */
-  align-items: center; /* горизонтальное центрирование */
-  justify-content: center; /* вертикальное центрирование */
-  height: 100vh; /* занимает весь экран */
-  background: #f5f1e8; /* такой же бежевый фон, как у .reader */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #f5f1e8;
 }
 
-/* ── Анимированный спиннер ───────────────────────────────── */
+/* ── Спиннер ─────────────────────────────────────────────── */
 .spinner {
-  width: 50px; /* ширина спиннера */
-  height: 50px; /* высота спиннера */
-  border: 4px solid #ddd; /* серая граница по всему кругу */
-  border-top: 4px solid #8b4513; /* верхняя часть — коричневая (saddle brown), создаёт «дугу» */
-  border-radius: 50%; /* делаем квадрат кругом */
-  animation: spin 1s linear infinite; /* бесконечное вращение за 1 секунду */
-  margin-bottom: 20px; /* отступ под спиннером перед текстом "Загрузка..." */
+  width: 50px;
+  height: 50px;
+  border: 4px solid #ddd;
+  border-top: 4px solid #8b4513;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
 }
 
-/* Ключевые кадры анимации вращения */
 @keyframes spin {
   0% {
     transform: rotate(0deg);
-  } /* начало — без поворота */
+  }
+
   100% {
     transform: rotate(360deg);
-  } /* конец — полный оборот */
+  }
 }
 
-/* ── Панель управления (тулбар) ──────────────────────────── */
+/* ── Тулбар ──────────────────────────────────────────────── */
 .toolbar {
-  position: sticky;
-  top: 0;
-  display: flex; /* горизонтальный флекс */
-  justify-content: space-between; /* элементы по краям: навигация слева, настройки справа */
-  align-items: center; /* вертикальное выравнивание по центру */
-  padding: 10px 20px; /* внутренние отступы */
-  background: #fff; /* белый фон тулбара */
-  border-bottom: 1px solid #ddd; /* разделительная линия снизу */
-  box-shadow: 0 2px 4px rgb(0 0 0/10%); /* лёгкая тень для визуального отделения */
-  z-index: 100; /* тулбар поверх остального контента */
+  flex-shrink: 0; /* не сжимается — всегда занимает свою высоту */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+  box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+  z-index: 100;
 }
 
-/* ── Контейнеры групп кнопок ─────────────────────────────── */
-.controls,   /* группа навигации: ← кнопка, «Страница X из Y», → кнопка */
+.controls,
 .settings {
-  /* группа настроек: A-, размер, A+, режим */
-  display: flex; /* горизонтальный флекс внутри группы */
-  align-items: center; /* выравнивание по центру вертикально */
-  gap: 15px; /* отступы между дочерними элементами */
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
-/* ── Базовые стили кнопок навигации и настроек ───────────── */
-.nav-button,  /* кнопки ← Назад и Вперёд → */
-.font-button, /* кнопки A- и A+ изменения шрифта */
-.mode-button {
-  /* кнопка переключения режима 1/2 страницы */
-  padding: 8px 16px; /* внутренние отступы */
-  border: 1px solid #ccc; /* светло-серая граница */
-  background: #fff; /* белый фон */
-  border-radius: 4px; /* скруглённые углы */
-  cursor: pointer; /* курсор «рука» при наведении */
-  font-size: 14px; /* размер текста кнопки */
-  transition: all 0.2s; /* плавный переход всех свойств за 0.2с */
+.nav-button,
+.font-button {
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
 }
 
-/* Состояние hover для активных кнопок */
-.nav-button:hover:not(:disabled), /* наведение на не-задизейбленную nav-button */
-.font-button:hover,               /* наведение на font-button */
-.mode-button:hover {
-  /* наведение на mode-button */
-  background: #8b4513; /* коричневый фон при наведении */
-  color: #fff; /* белый текст при наведении */
-  border-color: #8b4513; /* граница того же цвета */
+.nav-button:hover:not(:disabled),
+.font-button:hover {
+  background: #8b4513;
+  color: #fff;
+  border-color: #8b4513;
 }
 
-/* Состояние disabled для кнопок навигации */
 .nav-button:disabled {
-  opacity: 0.5; /* полупрозрачность — визуальный сигнал недоступности */
-  cursor: not-allowed; /* курсор «запрет» */
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-/* ── Информационные метки в тулбаре ──────────────────────── */
 .page-info {
-  font-size: 14px; /* размер текста "Страница X из Y" */
-  color: #666; /* серый цвет */
-  min-width: 150px; /* фиксированная минимальная ширина — не скачет при смене номера */
-  text-align: center; /* центрирование текста */
+  font-size: 14px;
+  color: #666;
+  min-width: 160px;
+  text-align: center;
+}
+
+.read-percent {
+  color: #8b4513;
 }
 
 .font-size {
-  font-size: 14px; /* размер текста "18px" */
-  color: #666; /* серый цвет */
-  min-width: 50px; /* фиксированная ширина */
-  text-align: center; /* центрирование */
+  font-size: 14px;
+  color: #666;
+  min-width: 50px;
+  text-align: center;
 }
 
-/* ── Область чтения (содержит одну или две страницы) ─────── */
+/* ── Область чтения ──────────────────────────────────────── */
 .reading-area {
-  flex: 1; /* занимает всё доступное вертикальное пространство между тулбаром и прогресс-баром */
-  display: flex; /* горизонтальный флекс для режима двух страниц */
-  justify-content: center; /* центрирование страниц горизонтально */
-  align-items: stretch; /* страницы растягиваются на полную высоту области */
-  padding: 20px; /* отступ вокруг страниц */
-  gap: 20px; /* зазор между двумя страницами в режиме разворота */
-  position: relative; /* контекст позиционирования для .click-zones */
+  flex: 1; /* занимает всё место между тулбаром и прогресс-баром */
+  position: relative; /* контекст для зон клика */
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
 }
 
-/* ── Страница книги ──────────────────────────────────────── */
-.page {
-  flex: 1; /* страница занимает доступную ширину (делится поровну при развороте) */
-  max-width: 600px; /* максимальная ширина в обычном режиме */
-  background: #fff; /* белый «лист бумаги» */
-  padding: 40px; /* внутренние поля страницы */
-  box-shadow: 0 4px 8px rgb(0 0 0/15%); /* тень для эффекта «лежащего листа» */
-  overflow-y: auto; /* прокрутка длинных страниц вертикально */
-  position: relative; /* для абсолютного позиционирования .page-number */
-
-  /* transition:           
-    transform 0.3s ease,
-    opacity 0.3s ease; */
-  line-height: 1.6; /* межстрочный интервал — чуть больше стандартного для читаемости */
-  text-align: justify; /* выравнивание текста по ширине (книжный стиль) */
+/* ── Viewport — «окно» в одну страницу ───────────────────── */
+.book-viewport {
+  width: 100%;
+  max-width: 700px; /* максимальная ширина страницы */
+  height: 100%;
+  overflow: hidden; /* скролл только программный, через scrollTo */
+  background: #fff;
+  box-shadow: 0 4px 8px rgb(0 0 0 / 15%);
 }
 
-/* Активная (крайняя правая или единственная) страница — чуть шире */
-.page.active-page {
-  max-width: 700px; /* дополнительные 100px ширины для основной страницы */
+/* ── Колоночный контейнер ────────────────────────────────── */
+.book-content {
+  /*
+    Одна колонка = 100% ширины viewport.
+    column-fill: auto — колонки заполняются сверху вниз последовательно,
+    а не балансируются. Это ключевое: текст идёт в следующую колонку
+    только когда текущая заполнена до высоты контейнера.
+  */
+  columns: 1;
+  column-fill: auto;
+  column-gap: 0; /* gap между страницами не нужен — viewport их скрывает */
+  height: 100%; /* высота = высота viewport, колонки не выходят за неё */
+  padding: 40px;
+  box-sizing: border-box;
+  line-height: 1.6;
+  text-align: justify;
+
+  /*
+    Важно: overflow должен быть visible, иначе браузер
+    не создаст лишние колонки за пределами высоты.
+    Горизонтальный overflow обрезает viewport, а не этот блок.
+  */
+  overflow: visible;
 }
 
-/* Анимация листания: страница смещается влево и становится полупрозрачной */
-
-/* .page.flipping {
-  opacity: 0.5;
-  transform: translateX(-20px); 
-} */
-
-/* ── Абзацы текста ───────────────────────────────────────── */
+/* ── Абзацы ──────────────────────────────────────────────── */
 .paragraph {
-  margin-bottom: 1em; /* отступ снизу = одна строка */
-  text-indent: 2em; /* красная строка (книжный отступ) */
+  margin-bottom: 1em;
+  text-indent: 2em;
+
+  /*
+    break-inside: avoid — браузер старается не разрывать абзац
+    между колонками. Для коротких абзацев работает хорошо.
+    Для очень длинных — браузер всё равно разорвёт, это нормально.
+  */
+  break-inside: avoid;
 }
 
-/* Первый абзац страницы не имеет красной строки */
 .paragraph:first-child {
-  text-indent: 0; /* убираем отступ у первого абзаца */
+  text-indent: 0;
 }
 
-/* Продолжение разорванного абзаца — не имеет красной строки 
-** Применяется когда isContinuation === true в PageSegment */
-.continuation {
-  text-indent: 0; /* нет отступа для продолжений */
-}
-
-/* ── Заголовок главы ─────────────────────────────────────── */
+/* ── Заголовок ───────────────────────────────────────────── */
 .title {
-  text-align: center; /* заголовок по центру */
-  margin: 2em 0; /* вертикальные отступы сверху и снизу */
-  text-indent: 0; /* без красной строки */
-  font-weight: bold; /* жирное начертание */
+  text-align: center;
+  margin: 1.5em 0 1em;
+  font-weight: bold;
+  text-indent: 0;
+  break-after: avoid; /* заголовок не отрывается от следующего абзаца */
+  break-inside: avoid;
 }
 
-/* ── Маркер сноски в тексте ──────────────────────────────── */
-.footnote-marker {
-  color: #8b4513; /* коричневый — тот же акцентный цвет, что и у спиннера/ховера */
-  cursor: pointer; /* курсор «рука» — намёк на кликабельность (обработчик не реализован) */
+/* ── Сноска в тексте ─────────────────────────────────────── */
+.note-ref {
+  color: #5a7fa8;
+  cursor: pointer;
+  font-size: 0.82em;
+  vertical-align: super;
+  line-height: 0;
+  padding: 0 1px;
+  border-bottom: 1px dotted #5a7fa8;
+  transition: color 0.15s;
+  white-space: nowrap;
 }
 
-.footnote-marker sup {
-  margin-left: 2px; /* отступ слева от знака сноски от предыдущего символа */
+.note-ref:hover,
+.note-ref:focus {
+  color: #2d5986;
+  outline: none;
 }
 
-/* ── Номер страницы внизу ────────────────────────────────── */
-.page-number {
-  position: absolute; /* абсолютное позиционирование внутри .page */
-  bottom: 20px; /* 20px от нижнего края страницы */
-  left: 50%; /* начало от середины */
-  transform: translateX(
-    -50%
-  ); /* сдвиг влево на половину собственной ширины — точное центрирование */
-
-  font-size: 12px; /* небольшой шрифт */
-  color: #999; /* светло-серый — ненавязчивый */
+/* ── Изображение в тексте ────────────────────────────────── */
+.img-block {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin: 1em 0;
+  break-inside: avoid;
 }
 
-/* ── Зоны клика для листания ───────────────────────────────
-** Прозрачные кликабельные области поверх текста (левая / правая) */
-.click-zones {
-  position: absolute; /* позиционируется относительно .reading-area (у него position: relative) */
-  margin: 120px 0 60px; /* отступы сверху (под тулбар) и снизу (прогресс-бар) */
-  display: flex; /* горизонтальный флекс: левая и правая зоны рядом */
-  pointer-events: none; /* сам контейнер не перехватывает клики */
+.img-inline {
+  max-width: 40%;
+  max-height: 160px;
+  object-fit: contain;
+  cursor: zoom-in;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
+  transition:
+    box-shadow 0.15s,
+    transform 0.15s;
 }
 
-/* Зона предыдущей страницы (левая половина) */
+.img-inline:hover {
+  box-shadow: 0 4px 16px rgb(0 0 0 / 25%);
+  transform: scale(1.03);
+}
+
+/* ── Зоны клика ──────────────────────────────────────────── */
 .prev-zone,
-/* Зона следующей страницы (правая половина) */
 .next-zone {
-  flex: 1; /* равная ширина: каждая занимает 50% .click-zones */
-  pointer-events: auto; /* перехватывает клики (в отличие от родителя) */
-  cursor: pointer; /* курсор «рука» */
-  transition: background 0.2s; /* плавное появление затемнения при наведении */
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 15%; /* 15% от краёв — зоны клика для листания */
+  cursor: pointer;
+  z-index: 10;
+  transition: background 0.2s;
 }
 
-/* Лёгкое затемнение при наведении — визуальная обратная связь */
+.prev-zone {
+  left: 0;
+}
+
+.next-zone {
+  right: 0;
+}
+
 .prev-zone:hover,
 .next-zone:hover {
-  background: rgb(0 0 0/5%); /* чёрный с 5% прозрачностью */
+  background: rgb(0 0 0 / 4%);
 }
 
-/* ── Прогресс-бар чтения (в самом низу) ─────────────────── */
+/* ── Прогресс-бар ────────────────────────────────────────── */
 .progress-bar {
-  height: 4px; /* тонкая горизонтальная полоска */
-  background: #ddd; /* серый фон — «пустая» часть */
-  position: relative; /* контекст для .progress-fill */
+  flex-shrink: 0;
+  height: 4px;
+  background: #ddd;
 }
 
-/* Заполненная часть прогресс-бара */
 .progress-fill {
-  height: 100%; /* на всю высоту родителя */
-  background: #8b4513; /* коричневый — акцентный цвет */
-  transition: width 0.3s ease; /* плавное изменение ширины при смене страницы */
-
-  /* Ширина задаётся инлайн-стилем: width: `${(currentPage / totalPages) * 100}%` */
+  height: 100%;
+  background: #8b4513;
+  transition: width 0.3s ease;
 }
 
-/* ── Адаптивные стили для мобильных устройств ────────────── */
-@media (width <= 768px) {
-  /* срабатывает на экранах ≤ 768px */
-  .reading-area {
-    padding: 10px; /* уменьшаем отступ */
+/* ── Модальное окно сноски ───────────────────────────────── */
+.footnote-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 45%);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
 
-  .page {
-    padding: 20px; /* уменьшаем поля страницы */
-    max-width: 100% !important; /* страница на всю ширину (перекрывает .active-page) */
+  to {
+    opacity: 1;
+  }
+}
+
+.footnote-modal {
+  position: relative;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgb(0 0 0 / 22%);
+  max-width: 560px;
+  width: 100%;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.15s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.footnote-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  line-height: 1;
+  color: #888;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition:
+    color 0.15s,
+    background 0.15s;
+  z-index: 1;
+}
+
+.footnote-close:hover {
+  color: #333;
+  background: #f0f0f0;
+}
+
+.footnote-content {
+  padding: 20px 44px 20px 20px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.footnote-label {
+  display: inline-block;
+  font-weight: 600;
+  font-size: 0.85em;
+  color: #5a7fa8;
+  margin-bottom: 8px;
+}
+
+.footnote-content p {
+  margin: 0;
+  font-size: 0.92em;
+  line-height: 1.6;
+  color: #222;
+}
+
+/* ── Лайтбокс ────────────────────────────────────────────── */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 85%);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+  animation: fadeIn 0.15s ease;
+}
+
+.lightbox-img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 8px 40px rgb(0 0 0 / 60%);
+  animation: scale-in 0.15s ease;
+}
+
+@keyframes scale-in {
+  from {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ── Адаптив ─────────────────────────────────────────────── */
+@media (width <= 768px) {
+  .reading-area {
+    padding: 10px;
+  }
+
+  .book-content {
+    padding: 20px;
   }
 
   .toolbar {
-    flex-direction: column; /* тулбар становится вертикальным */
-    gap: 10px; /* отступ между строками тулбара */
+    flex-direction: column;
+    gap: 10px;
+    padding: 8px 12px;
   }
 
   .controls,
   .settings {
-    flex-wrap: wrap; /* кнопки переносятся на следующую строку если не помещаются */
-    justify-content: center; /* центрирование по горизонтали */
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .prev-zone,
+  .next-zone {
+    width: 20%;
   }
 }
