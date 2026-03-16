@@ -149,6 +149,8 @@ export const Reader: React.FC<ReaderProps> = ({
 
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [bookmarkPanelOpen, setBookmarkPanelOpen] = useState<boolean>(false);
+  const [toolbarCollapsed, setToolbarCollapsed] = useState(false);
+  const pageGap = 0;
 
   const [editingBookmark, setEditingBookmark] = useState<Bookmark | null>(null);
   const [contextMenu, setContextMenu] = useState<{
@@ -166,6 +168,8 @@ export const Reader: React.FC<ReaderProps> = ({
 
   const viewportRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+
+  const [twoPageMode, setTwoPageMode] = useState(false);
 
   // Загрузка toc
 
@@ -205,11 +209,16 @@ export const Reader: React.FC<ReaderProps> = ({
       .catch(() => setIsLoading(false));
   }, [currentUrl]);
 
-  const recalcCols = useCallback(() => {
+  const recalcCols = () => {
     const vp = viewportRef.current;
     const ct = contentRef.current;
     if (!vp || !ct) return;
-    const cols = Math.round(ct.scrollWidth / vp.clientWidth);
+
+    const pageWidth = twoPageMode
+      ? vp.clientWidth / 2
+      : vp.clientWidth - pageGap;
+
+    const cols = Math.round(ct.scrollWidth / pageWidth);
     const newTotal = Math.max(1, cols);
     setTotalCols(newTotal);
 
@@ -224,23 +233,27 @@ export const Reader: React.FC<ReaderProps> = ({
       } else {
         target = Math.min(pending, newTotal - 1);
       }
+      if (twoPageMode && target > 0) target = target - (target % 2);
       pendingColRef.current = null;
       setCurrentCol(target);
-      vp.scrollTo({ left: target * (vp.clientWidth - 40), behavior: 'auto' });
+      vp.scrollTo({
+        // left: target * ct.clientWidth,
+        left: target * pageWidth,
+        behavior: 'auto',
+      });
     }
-  }, []);
-
+  };
   useEffect(() => {
     if (!isLoading) {
       const id = setTimeout(recalcCols, 50);
       return () => clearTimeout(id);
     }
-  }, [isLoading, fontSize, fontFamily, segments, recalcCols]);
+  }, [isLoading, fontSize, fontFamily, segments]);
 
   useEffect(() => {
     window.addEventListener('resize', recalcCols);
     return () => window.removeEventListener('resize', recalcCols);
-  }, [recalcCols]);
+  }, []);
 
   useEffect(() => {
     if (!tocData || isLoading || isPrefetching || nextSegments !== null) return;
@@ -273,58 +286,107 @@ export const Reader: React.FC<ReaderProps> = ({
 
   // Навигация
 
-  const goToCol = useCallback(
-    (col: number) => {
-      const vp = viewportRef.current;
-      if (!vp) return;
+  // const goToCol = useCallback(
+  //   (col: number) => {
+  //     const vp = viewportRef.current;
+  //     if (!vp) return;
 
-      // Вперёд за пределы фрагмента
-      if (col >= totalCols && tocData) {
-        const nextIdx = currentPartIndex + 1;
-        if (nextIdx < tocData.Parts.length) {
-          if (nextSegments !== null) {
-            // Мгновенное переключение на предзагруженный фрагмент
-            setSegments(nextSegments);
-            setNextSegments(null);
-            setCurrentCol(0);
-            pendingColRef.current = 0;
-          } else {
-            pendingColRef.current = 0;
-          }
-          setCurrentPartIndex(nextIdx);
-          return;
-        }
-      }
+  //     // Вперёд за пределы фрагмента
+  //     if (col >= totalCols && tocData) {
+  //       const nextIdx = currentPartIndex + 1;
+  //       if (nextIdx < tocData.Parts.length) {
+  //         if (nextSegments !== null) {
+  //           // Мгновенное переключение на предзагруженный фрагмент
+  //           setSegments(nextSegments);
+  //           setNextSegments(null);
+  //           setCurrentCol(0);
+  //           pendingColRef.current = 0;
+  //         } else {
+  //           pendingColRef.current = 0;
+  //         }
+  //         setCurrentPartIndex(nextIdx);
+  //         return;
+  //       }
+  //     }
 
-      // Назад за пределы фрагмента
-      if (col < 0 && tocData) {
-        const prevIdx = currentPartIndex - 1;
-        if (prevIdx >= 0) {
-          pendingColRef.current = 9999;
-          setCurrentPartIndex(prevIdx);
-          return;
+  //     // Назад за пределы фрагмента
+  //     if (col < 0 && tocData) {
+  //       const prevIdx = currentPartIndex - 1;
+  //       if (prevIdx >= 0) {
+  //         pendingColRef.current = 9999;
+  //         setCurrentPartIndex(prevIdx);
+  //         return;
+  //       }
+  //       return;
+  //     }
+
+  //     const clamped = Math.max(0, Math.min(col, totalCols - 1));
+  //     console.log(col, totalCols - 1);
+  //     const gap = clamped === totalCols - 1 ? 2 * pageGap : 0;
+  //     console.log(gap);
+  //     setCurrentCol(clamped);
+  //     vp.scrollTo({
+  //       left: clamped * (vp.clientWidth - pageGap),
+  //       behavior: 'smooth',
+  //     });
+  //   },
+  //   [totalCols, tocData, currentPartIndex, nextSegments, pageGap]
+  // );
+
+  const goToCol = (col: number) => {
+    const vp = viewportRef.current;
+    if (!vp) return;
+
+    const pageWidth = twoPageMode ? vp.clientWidth / 2 : vp.clientWidth;
+    console.log(pageWidth);
+    if (col >= totalCols && tocData) {
+      const nextIdx = currentPartIndex + 1;
+      if (nextIdx < tocData.Parts.length) {
+        if (nextSegments !== null) {
+          setSegments(nextSegments);
+          setNextSegments(null);
+          setCurrentCol(0);
+          pendingColRef.current = 0;
+        } else {
+          pendingColRef.current = 0;
         }
+        setCurrentPartIndex(nextIdx);
         return;
       }
+    }
 
-      const clamped = Math.max(0, Math.min(col, totalCols - 1));
-      setCurrentCol(clamped);
-      vp.scrollTo({
-        left: clamped * (vp.clientWidth - 40),
-        behavior: 'smooth',
-      });
-    },
-    [totalCols, tocData, currentPartIndex, nextSegments]
-  );
+    if (col < 0 && tocData) {
+      const prevIdx = currentPartIndex - 1;
+      if (prevIdx >= 0) {
+        pendingColRef.current = 9999;
+        setCurrentPartIndex(prevIdx);
+        return;
+      }
+      return;
+    }
 
-  const nextCol = useCallback(
-    () => goToCol(currentCol + 1),
-    [currentCol, goToCol]
-  );
-  const prevCol = useCallback(
-    () => goToCol(currentCol - 1),
-    [currentCol, goToCol]
-  );
+    let clamped = Math.max(0, Math.min(col, totalCols - 1));
+    // В режиме двух страниц всегда показываем левую страницу разворота
+    if (twoPageMode && clamped > 0) clamped = clamped - (clamped % 2);
+    const leftPos = clamped * pageWidth;
+
+    // if (col + 1 === totalCols) leftPos += pageGap;
+    console.log(col, totalCols, leftPos);
+    setCurrentCol(clamped);
+    vp.scrollTo({ left: leftPos, behavior: 'smooth' });
+  };
+
+  // const nextCol = useCallback(
+  //   () => goToCol(currentCol + 1),
+  //   [currentCol, goToCol]
+  // );
+  // const prevCol = useCallback(
+  //   () => goToCol(currentCol - 1),
+  //   [currentCol, goToCol]
+  // );
+
+  const nextCol = () => goToCol(currentCol + (twoPageMode ? 2 : 1));
+  const prevCol = () => goToCol(currentCol - (twoPageMode ? 2 : 1));
 
   const changeFontSize = useCallback((delta: number) => {
     setFontSize((p) =>
@@ -354,37 +416,36 @@ export const Reader: React.FC<ReaderProps> = ({
 
   // Клик по прогресс-бару
 
-  const handleProgressClick = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      if (!tocData) return;
-      const rect = e.currentTarget.getBoundingClientRect();
-      const ratio = Math.max(
-        0,
-        Math.min(1, (e.clientX - rect.left) / rect.width)
-      );
-      const targetGlobal = Math.round(ratio * tocData.Body[0].e); // 0-based
+  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!tocData) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const ratio = Math.max(
+      0,
+      Math.min(1, (e.clientX - rect.left) / rect.width)
+    );
+    const targetGlobal = Math.round(ratio * tocData.Body[0].e); // 0-based
 
-      const partIdx = tocData.Parts.findIndex(
-        (p) => targetGlobal >= p.s && targetGlobal <= p.e
-      );
-      if (partIdx === -1) return;
+    const partIdx = tocData.Parts.findIndex(
+      (p) => targetGlobal >= p.s && targetGlobal <= p.e
+    );
+    if (partIdx === -1) return;
 
-      const part = tocData.Parts[partIdx];
-      const withinRatio =
-        (targetGlobal - part.s) / Math.max(1, part.e - part.s);
+    const part = tocData.Parts[partIdx];
+    const withinRatio = (targetGlobal - part.s) / Math.max(1, part.e - part.s);
 
-      if (partIdx === currentPartIndex) {
-        // Тот же фрагмент
-        const targetCol = Math.round(withinRatio * (totalCols - 1));
-        goToCol(targetCol);
-      } else {
-        // Другой фрагмент: сохраняем ratio, меняем фрагмент
-        pendingColRef.current = -withinRatio; // отрицательное = ratio mode
-        setCurrentPartIndex(partIdx);
-      }
-    },
-    [tocData, currentPartIndex, totalCols, goToCol]
-  );
+    if (partIdx === currentPartIndex) {
+      // Тот же фрагмент
+      // const targetCol = Math.round(withinRatio * (totalCols - 1));
+      // goToCol(targetCol);
+      let targetCol = Math.round(withinRatio * (totalCols - 1));
+      if (twoPageMode && targetCol > 0) targetCol = targetCol - (targetCol % 2);
+      goToCol(targetCol);
+    } else {
+      // Другой фрагмент: сохраняем ratio, меняем фрагмент
+      pendingColRef.current = -withinRatio; // отрицательное = ratio mode
+      setCurrentPartIndex(partIdx);
+    }
+  };
 
   useEffect(() => {
     if (!contextMenu) return;
@@ -443,13 +504,16 @@ export const Reader: React.FC<ReaderProps> = ({
         const elRect = el.getBoundingClientRect();
         const elLeft =
           elRect.left - vpRect.left + viewportRef.current.scrollLeft;
-        const colWidth = viewportRef.current.clientWidth - 40;
+        // const colWidth = viewportRef.current.clientWidth - pageGap;
+        const colWidth = twoPageMode
+          ? viewportRef.current.clientWidth / 2
+          : viewportRef.current.clientWidth - pageGap;
         const targetCol = Math.max(0, Math.floor(elLeft / colWidth));
 
         if (targetCol !== currentCol) {
           setCurrentCol(targetCol);
           viewportRef.current.scrollTo({
-            left: targetCol * (viewportRef.current.clientWidth - 40),
+            left: targetCol * (viewportRef.current.clientWidth - pageGap),
             behavior: 'smooth',
           });
         }
@@ -462,7 +526,7 @@ export const Reader: React.FC<ReaderProps> = ({
         setCurrentPartIndex(partIdx);
       }
     },
-    [tocData, currentPartIndex, currentCol]
+    [tocData, currentPartIndex, currentCol, twoPageMode]
   );
 
   useEffect(() => {
@@ -479,15 +543,18 @@ export const Reader: React.FC<ReaderProps> = ({
       const vpRect = viewportRef.current.getBoundingClientRect();
       const elRect = el.getBoundingClientRect();
       const elLeft = elRect.left - vpRect.left + viewportRef.current.scrollLeft;
-      const colWidth = viewportRef.current.clientWidth - 40;
+      // const colWidth = viewportRef.current.clientWidth - pageGap;
+      const colWidth = twoPageMode
+        ? viewportRef.current.clientWidth / 2
+        : viewportRef.current.clientWidth - pageGap;
       const targetCol = Math.max(0, Math.floor(elLeft / colWidth));
       setCurrentCol(targetCol);
       viewportRef.current.scrollTo({
-        left: targetCol * (viewportRef.current.clientWidth - 40),
+        left: targetCol * (viewportRef.current.clientWidth - pageGap),
         behavior: 'smooth',
       });
     }, 80);
-  }, [isLoading, totalCols, segments]);
+  }, [isLoading, totalCols, segments, twoPageMode]);
 
   const renderInlineContent = useCallback(
     (content: (string | InlineNode)[]): React.ReactNode => {
@@ -649,99 +716,132 @@ export const Reader: React.FC<ReaderProps> = ({
         }}
       />
 
-      {/* Тулбар */}
-      <div className={styles['toolbar']}>
-        <div className={styles['controls']}>
-          {tocData && (
-            <button
-              onClick={() => setTocOpen((v) => !v)}
-              className={`${styles['nav-button']} ${tocOpen ? styles['nav-button-active'] : ''}`}
-              aria-label="Содержание"
-            >
-              ☰ Содержание
-            </button>
-          )}
-          <button
-            onClick={prevCol}
-            disabled={!hasPrev}
-            className={styles['nav-button']}
-          >
-            ← Назад
-          </button>
-          <span className={styles['page-info']}>
-            {`Стр. ${currentCol + 1} / ${totalCols}`}
+      <div
+        className={`${styles['toolbar']} ${toolbarCollapsed ? styles['toolbar-collapsed'] : ''}`}
+      >
+        <button
+          className={styles['toolbar-toggle']}
+          onClick={() => setToolbarCollapsed((v) => !v)}
+          aria-label={
+            toolbarCollapsed ? 'Развернуть панель' : 'Свернуть панель'
+          }
+          title={toolbarCollapsed ? 'Развернуть панель' : 'Свернуть панель'}
+        >
+          {toolbarCollapsed ? '▾' : '▴'}
+        </button>
+        <div className={styles['toolbar-inner']}>
+          <div className={styles['controls']}>
             {tocData && (
-              <span className={styles['read-percent']}>
-                {' '}
-                ({readPercent.toFixed(0)}%)
-              </span>
+              <button
+                onClick={() => setTocOpen((v) => !v)}
+                className={`${styles['nav-button']} ${tocOpen ? styles['nav-button-active'] : ''}`}
+                aria-label="Содержание"
+              >
+                ☰ Содержание
+              </button>
             )}
-          </span>
-          <button
-            onClick={nextCol}
-            disabled={!hasNext}
-            className={styles['nav-button']}
-          >
-            Вперёд →
-          </button>
-        </div>
+            <button
+              onClick={prevCol}
+              disabled={!hasPrev}
+              className={styles['nav-button']}
+            >
+              ← Назад
+            </button>
+            <span className={styles['page-info']}>
+              {/* {`Стр. ${currentCol + 1} / ${totalCols}`} */}
+              {twoPageMode
+                ? `Стр. ${Math.min(currentCol + 2, totalCols)} / ${totalCols}`
+                : `Стр. ${currentCol + 1} / ${totalCols}`}
+              {tocData && (
+                <span className={styles['read-percent']}>
+                  {' '}
+                  ({readPercent.toFixed(0)}%)
+                </span>
+              )}
+            </span>
+            <button
+              onClick={nextCol}
+              disabled={!hasNext}
+              className={styles['nav-button']}
+            >
+              Вперёд →
+            </button>
+            <button
+              onClick={() => {
+                setTwoPageMode((v) => !v);
+                setCurrentCol(0);
+                viewportRef.current?.scrollTo({ left: 0, behavior: 'auto' });
+                setTimeout(recalcCols, 50);
+              }}
+              className={`${styles['nav-button']} ${twoPageMode ? styles['nav-button-active'] : ''}`}
+              title={twoPageMode ? 'Одна страница' : 'Две страницы'}
+              aria-label={twoPageMode ? 'Одна страница' : 'Две страницы'}
+            >
+              {twoPageMode ? '□' : '▯▯'}
+            </button>
+          </div>
 
-        <div className={styles['settings']}>
-          <select
-            className={styles['font-select']}
-            value={fontFamily}
-            onChange={(e) => changeFontFamily(e.target.value)}
-            aria-label="Выбор шрифта"
-          >
-            {FONT_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-          <button
-            onClick={() => setColorModalOpen(true)}
-            className={styles['color-button']}
-            aria-label="Настройка цветов"
-            title="Цвета"
-          >
-            🎨
-          </button>
-          <button
-            onClick={() => setBookmarkPanelOpen((v) => !v)}
-            className={`${styles['color-button']} ${bookmarkPanelOpen ? styles['nav-button-active'] : ''}`}
-            aria-label="Закладки"
-            title={`Закладки (${bookmarks.filter((b) => b.bookFileId === bookFileId).length})`}
-          >
-            🔖{' '}
-            {bookmarks.filter((b) => b.bookFileId === bookFileId).length > 0
-              ? bookmarks.filter((b) => b.bookFileId === bookFileId).length
-              : ''}
-          </button>
-          <button
-            onClick={() => changeFontSize(-2)}
-            className={styles['font-button']}
-          >
-            A-
-          </button>
-          <span className={styles['font-size']}>{fontSize}px</span>
-          <button
-            onClick={() => changeFontSize(2)}
-            className={styles['font-button']}
-          >
-            A+
-          </button>
+          <div className={styles['settings']}>
+            <select
+              className={styles['font-select']}
+              value={fontFamily}
+              onChange={(e) => changeFontFamily(e.target.value)}
+              aria-label="Выбор шрифта"
+            >
+              {FONT_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={() => setColorModalOpen(true)}
+              className={styles['color-button']}
+              aria-label="Настройка цветов"
+              title="Цвета"
+            >
+              🎨
+            </button>
+            <button
+              onClick={() => setBookmarkPanelOpen((v) => !v)}
+              className={`${styles['color-button']} ${bookmarkPanelOpen ? styles['nav-button-active'] : ''}`}
+              aria-label="Закладки"
+              title={`Закладки (${bookmarks.filter((b) => b.bookFileId === bookFileId).length})`}
+            >
+              🔖{' '}
+              {bookmarks.filter((b) => b.bookFileId === bookFileId).length > 0
+                ? bookmarks.filter((b) => b.bookFileId === bookFileId).length
+                : ''}
+            </button>
+            <button
+              onClick={() => changeFontSize(-2)}
+              className={styles['font-button']}
+            >
+              A-
+            </button>
+            <span className={styles['font-size']}>{fontSize}px</span>
+            <button
+              onClick={() => changeFontSize(2)}
+              className={styles['font-button']}
+            >
+              A+
+            </button>
+          </div>
         </div>
       </div>
-
       {/* Область чтения */}
-      <div className={styles['reading-area']}>
+      {/* <div className={styles['reading-area']}>
         <div
-          className={styles['book-viewport']}
+          // className={styles['book-viewport']}
+          className={`${styles['book-viewport']} ${twoPageMode ? styles['book-viewport-two'] : ''}`}
           ref={viewportRef}
           style={{ background: pageColor }}
         >
-          <div className={styles['book-content']} ref={contentRef}>
+          <div
+            // className={styles['book-content']}
+            className={`${styles['book-content']} ${twoPageMode ? styles['book-content-two'] : ''}`}
+            ref={contentRef}
+          >
             {segments.map((seg, idx) => renderSegment(seg, idx))}
           </div>
         </div>
@@ -759,8 +859,46 @@ export const Reader: React.FC<ReaderProps> = ({
           tabIndex={0}
           aria-label="Следующая страница"
         />
-      </div>
+      </div> */}
 
+      <div className={styles['reading-area']}>
+        {/* Строка 1 */}
+        <div className={styles['pad-top']} />
+
+        {/* Строка 2 */}
+        <div className={styles['pad-left']} />
+        <div
+          className={`${styles['book-viewport']} ${twoPageMode ? styles['book-viewport-two'] : ''}`}
+          ref={viewportRef}
+          style={{ background: pageColor }}
+        >
+          <div
+            className={`${styles['book-content']} ${twoPageMode ? styles['book-content-two'] : ''}`}
+            ref={contentRef}
+          >
+            {segments.map((seg, idx) => renderSegment(seg, idx))}
+          </div>
+        </div>
+        <div className={styles['pad-right']} />
+
+        {/* Строка 3 */}
+        <div className={styles['pad-bottom']} />
+
+        <div
+          className={styles['prev-zone']}
+          onClick={prevCol}
+          role="button"
+          tabIndex={0}
+          aria-label="Предыдущая страница"
+        />
+        <div
+          className={styles['next-zone']}
+          onClick={nextCol}
+          role="button"
+          tabIndex={0}
+          aria-label="Следующая страница"
+        />
+      </div>
       {/* Кликабельный прогресс-бар */}
       <div
         className={styles['progress-bar']}
@@ -776,19 +914,6 @@ export const Reader: React.FC<ReaderProps> = ({
           className={styles['progress-fill']}
           style={{ width: `${readPercent}%` }}
         />
-        {/* Маркеры границ фрагментов */}
-        {tocData &&
-          tocData.Parts.map((part, i) => {
-            if (i === 0) return null;
-            const pct = (part.s / tocData.Body[0].e) * 100;
-            return (
-              <div
-                key={i}
-                className={styles['progress-marker']}
-                style={{ left: `${pct}%` }}
-              />
-            );
-          })}
       </div>
 
       {isPrefetching && (
