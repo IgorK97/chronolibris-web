@@ -80,12 +80,28 @@ interface ReaderProps {
   imagePath?: string;
 }
 
-// ─── Константы ───────────────────────────────────────────────
+// export interface BookmarkAnchor {
+//   paraIndex: number;
+//   charOffset: number;
+// }
+
+export type HighlightColor = 'yellow' | 'green' | 'blue' | 'pink' | 'none';
+
+export interface Bookmark {
+  id: number;
+  paraIndex: number;
+  bookFileId: number;
+  note: string;
+  createdAt: number;
+  // start: BookmarkAnchor;
+  // end: BookmarkAnchor;
+  // selectedText: string;
+  // highlightColor: HighlightColor;
+}
 
 const DEFAULT_FONT_SIZE = 18;
 const MIN_FONT_SIZE = 12;
 const MAX_FONT_SIZE = 32;
-/** За сколько страниц до конца начинаем подгружать следующий фрагмент */
 const PREFETCH_THRESHOLD = 3;
 
 const FONT_OPTIONS: { label: string; value: string }[] = [
@@ -134,10 +150,22 @@ export const Reader: React.FC<ReaderProps> = ({
   const [activeNote, setActiveNote] = useState<Note | null>(null);
   const [activeImage, setActiveImage] = useState<string | null>(null);
 
-  const [currentCol, setCurrentCol] = useState(0);
-  const [totalCols, setTotalCols] = useState(0);
+  const [currentCol, setCurrentCol] = useState(0); //Индекс текущей колонки-страницы
+  const [totalCols, setTotalCols] = useState(0); //Общее количество колонок-страниц
 
-  // pendingCol: число ≥ 0 — конкретная колонка,
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
+  const [bookmarkPanelOpen, setBookmarkPanelOpen] = useState<boolean>(false);
+
+  const [editingBookmark, setEditingBookmark] = useState<Bookmark | null>(null);
+  const [contextMenu, setContextMenu] = useState<{
+    paraIndex: number;
+    x: number;
+    y: number;
+  } | null>(null);
+
+  const pendingBookmarkParaRef = useRef<number | null>(null);
+
+  // pendingCol: число >= 0 — конкретная колонка,
   //             число < 0 — ratio внутри фрагмента (умножить на totalCols),
   //             9999 — последняя страница
   const pendingColRef = useRef<number | null>(null);
@@ -145,7 +173,7 @@ export const Reader: React.FC<ReaderProps> = ({
   const viewportRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  // ─── Загрузка toc ─────────────────────────────────────────
+  // Загрузка toc
 
   useEffect(() => {
     if (!tocPath) return;
@@ -161,8 +189,6 @@ export const Reader: React.FC<ReaderProps> = ({
       .catch(console.error);
   }, [tocPath]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ─── URL текущего фрагмента ───────────────────────────────
-
   const currentUrl = useMemo(() => {
     if (tocData) {
       const part = tocData.Parts[currentPartIndex];
@@ -170,8 +196,6 @@ export const Reader: React.FC<ReaderProps> = ({
     }
     return filePath ?? '';
   }, [tocData, currentPartIndex, basePath, filePath]);
-
-  // ─── Загрузка фрагмента при смене currentUrl ──────────────
 
   useEffect(() => {
     if (!currentUrl) return;
@@ -186,8 +210,6 @@ export const Reader: React.FC<ReaderProps> = ({
       })
       .catch(() => setIsLoading(false));
   }, [currentUrl]);
-
-  // ─── Подсчёт колонок + обработка pending ──────────────────
 
   const recalcCols = useCallback(() => {
     const vp = viewportRef.current;
@@ -226,8 +248,6 @@ export const Reader: React.FC<ReaderProps> = ({
     return () => window.removeEventListener('resize', recalcCols);
   }, [recalcCols]);
 
-  // ─── Предзагрузка следующего фрагмента ───────────────────
-
   useEffect(() => {
     if (!tocData || isLoading || isPrefetching || nextSegments !== null) return;
     if (totalCols === 0) return;
@@ -257,7 +277,7 @@ export const Reader: React.FC<ReaderProps> = ({
     basePath,
   ]);
 
-  // ─── Навигация ────────────────────────────────────────────
+  // Навигация
 
   const goToCol = useCallback(
     (col: number) => {
@@ -312,8 +332,6 @@ export const Reader: React.FC<ReaderProps> = ({
     [currentCol, goToCol]
   );
 
-  // ─── Размер и гарнитура ───────────────────────────────────
-
   const changeFontSize = useCallback((delta: number) => {
     setFontSize((p) =>
       Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, p + delta))
@@ -328,24 +346,24 @@ export const Reader: React.FC<ReaderProps> = ({
     viewportRef.current?.scrollTo({ left: 0, behavior: 'auto' });
   }, []);
 
-  // ─── Клавиатура ───────────────────────────────────────────
+  // Клавиатура
 
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setActiveNote(null);
-        setActiveImage(null);
-        setTocOpen(false);
-        return;
-      }
-      if (e.key === 'ArrowRight' || e.key === 'PageDown') nextCol();
-      else if (e.key === 'ArrowLeft' || e.key === 'PageUp') prevCol();
-    };
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  }, [nextCol, prevCol]);
+  // useEffect(() => {
+  //   const handleKey = (e: KeyboardEvent) => {
+  //     if (e.key === 'Escape') {
+  //       setActiveNote(null);
+  //       setActiveImage(null);
+  //       setTocOpen(false);
+  //       return;
+  //     }
+  //     if (e.key === 'ArrowRight' || e.key === 'PageDown') nextCol();
+  //     else if (e.key === 'ArrowLeft' || e.key === 'PageUp') prevCol();
+  //   };
+  //   window.addEventListener('keydown', handleKey);
+  //   return () => window.removeEventListener('keydown', handleKey);
+  // }, [nextCol, prevCol]);
 
-  // ─── Прогресс чтения (сквозная нумерация) ────────────────
+  // Прогресс чтения (сквозная нумерация)
   //
   // toc хранит: full_length — общее число абзацев (1-based, т.е. абзацы 0..full_length-1).
   // Каждый Part: s и e — 0-based глобальные индексы первого и последнего абзаца.
@@ -362,7 +380,7 @@ export const Reader: React.FC<ReaderProps> = ({
     return Math.min(100, (globalPos / (tocData.full_length - 1)) * 100);
   }, [tocData, currentPartIndex, currentCol, totalCols]);
 
-  // ─── Клик по прогресс-бару ────────────────────────────────
+  // Клик по прогресс-бару
 
   const handleProgressClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
@@ -396,7 +414,108 @@ export const Reader: React.FC<ReaderProps> = ({
     [tocData, currentPartIndex, totalCols, goToCol]
   );
 
-  // ─── renderInlineContent ─────────────────────────────────
+  useEffect(() => {
+    if (!contextMenu) return;
+    const handler = (e: MouseEvent) => {
+      if (!(e.target as HTMLElement).closest('[data-ctx-menu'))
+        setContextMenu(null);
+    };
+
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [contextMenu]);
+  const bookFileId = 1;
+
+  const createBookmark = useCallback(
+    (paraIndex: number, note: string) => {
+      const bm: Bookmark = {
+        id: Math.random(),
+        paraIndex,
+        bookFileId,
+        note,
+        createdAt: Date.now(),
+      };
+      setBookmarks((prev) => [...prev, bm]);
+      setContextMenu(null);
+    },
+    [bookFileId]
+  );
+
+  const updateBookmark = useCallback((id: number, note: string) => {
+    setBookmarks((prev) => prev.map((b) => (b.id === id ? { ...b, note } : b)));
+    setEditingBookmark(null);
+  }, []);
+
+  const deleteBookmark = useCallback((id: number) => {
+    setBookmarks((prev) => prev.filter((b) => b.id !== id));
+    setEditingBookmark(null);
+  }, []);
+
+  const navigateToBookmark = useCallback(
+    (bm: Bookmark) => {
+      if (!tocData) return;
+      const globalIdx = bm.paraIndex - 1;
+      const partIdx = tocData.Parts.findIndex(
+        (p) => globalIdx >= p.s && globalIdx <= p.e
+      );
+      if (partIdx === -1) return;
+      setBookmarkPanelOpen(false);
+
+      const scrollToParaInDOM = (paraIdx: number) => {
+        const el = contentRef.current?.querySelector(
+          `[data-para-index="${paraIdx}"]`
+        ) as HTMLElement | null;
+        if (!el || !viewportRef.current) return false;
+
+        const vpRect = viewportRef.current.getBoundingClientRect();
+        const elRect = el.getBoundingClientRect();
+        const elLeft =
+          elRect.left - vpRect.left + viewportRef.current.scrollLeft;
+        const colWidth = viewportRef.current.clientWidth - 40;
+        const targetCol = Math.max(0, Math.floor(elLeft / colWidth));
+
+        if (targetCol !== currentCol) {
+          setCurrentCol(targetCol);
+          viewportRef.current.scrollTo({
+            left: targetCol * (viewportRef.current.clientWidth - 40),
+            behavior: 'smooth',
+          });
+        }
+        return true;
+      };
+      if (partIdx === currentPartIndex) {
+        setTimeout(() => scrollToParaInDOM(bm.paraIndex), 50);
+      } else {
+        pendingBookmarkParaRef.current = bm.paraIndex;
+        setCurrentPartIndex(partIdx);
+      }
+    },
+    [tocData, currentPartIndex, currentCol]
+  );
+
+  useEffect(() => {
+    if (pendingBookmarkParaRef.current === null) return;
+    if (isLoading || totalCols === 0) return;
+    const paraIdx = pendingBookmarkParaRef.current;
+    pendingBookmarkParaRef.current = null;
+    // Небольшая задержка — DOM должен окончательно отрендериться
+    setTimeout(() => {
+      const el = contentRef.current?.querySelector(
+        `[data-para-index="${paraIdx}"]`
+      ) as HTMLElement | null;
+      if (!el || !viewportRef.current) return;
+      const vpRect = viewportRef.current.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      const elLeft = elRect.left - vpRect.left + viewportRef.current.scrollLeft;
+      const colWidth = viewportRef.current.clientWidth - 40;
+      const targetCol = Math.max(0, Math.floor(elLeft / colWidth));
+      setCurrentCol(targetCol);
+      viewportRef.current.scrollTo({
+        left: targetCol * (viewportRef.current.clientWidth - 40),
+        behavior: 'smooth',
+      });
+    }, 80);
+  }, [isLoading, totalCols, segments]);
 
   const renderInlineContent = useCallback(
     (content: (string | InlineNode)[]): React.ReactNode => {
@@ -433,8 +552,6 @@ export const Reader: React.FC<ReaderProps> = ({
     []
   );
 
-  // ─── renderSegment ────────────────────────────────────────
-
   const renderSegment = (seg: TextSegment, index: number): React.ReactNode => {
     if (seg.t === 'br') return <br key={index} />;
 
@@ -462,6 +579,12 @@ export const Reader: React.FC<ReaderProps> = ({
       );
     }
 
+    const paraIndex = seg.xp?.[2] ?? 0;
+    const paraBookmark =
+      bookmarks.find(
+        (bm) => bm.paraIndex === paraIndex && bm.bookFileId === bookFileId
+      ) ?? null;
+
     const getContent = (): React.ReactNode => {
       if (typeof seg.c === 'string') return seg.c;
       if (Array.isArray(seg.c)) {
@@ -480,21 +603,51 @@ export const Reader: React.FC<ReaderProps> = ({
       color: textColor,
     };
 
+    const handleContextMenu = (e: React.MouseEvent) => {
+      e.preventDefault();
+      setContextMenu({ paraIndex, x: e.clientX, y: e.clientY });
+    };
+
+    const bookmarkIcon = paraBookmark ? (
+      <span
+        className={styles['bookmark-icon']}
+        title={paraBookmark.note || 'Закладка'}
+        onClick={(e) => {
+          e.stopPropagation();
+          setEditingBookmark(paraBookmark);
+        }}
+      >
+        🔖
+      </span>
+    ) : null;
+
     if (seg.t === 'title') {
       return (
-        <h2 key={index} className={styles['title']} style={textStyle}>
+        <h2
+          key={index}
+          className={styles['title']}
+          style={textStyle}
+          data-para-index={String(paraIndex)}
+          onContextMenu={handleContextMenu}
+        >
+          {bookmarkIcon}
           {getContent()}
         </h2>
       );
     }
     return (
-      <p key={index} className={styles['paragraph']} style={textStyle}>
+      <p
+        key={index}
+        className={`${styles['paragraph']} ${paraBookmark ? styles['paragraph-bookmarked'] : ''}`}
+        style={textStyle}
+        data-para-index={String(paraIndex)}
+        onContextMenu={handleContextMenu}
+      >
+        {bookmarkIcon}
         {getContent()}
       </p>
     );
   };
-
-  // ─── Рендер ───────────────────────────────────────────────
 
   if (isLoading && segments.length === 0) {
     return (
@@ -581,6 +734,17 @@ export const Reader: React.FC<ReaderProps> = ({
             title="Цвета"
           >
             🎨
+          </button>
+          <button
+            onClick={() => setBookmarkPanelOpen((v) => !v)}
+            className={`${styles['color-button']} ${bookmarkPanelOpen ? styles['nav-button-active'] : ''}`}
+            aria-label="Закладки"
+            title={`Закладки (${bookmarks.filter((b) => b.bookFileId === bookFileId).length})`}
+          >
+            🔖{' '}
+            {bookmarks.filter((b) => b.bookFileId === bookFileId).length > 0
+              ? bookmarks.filter((b) => b.bookFileId === bookFileId).length
+              : ''}
           </button>
           <button
             onClick={() => changeFontSize(-2)}
@@ -674,13 +838,47 @@ export const Reader: React.FC<ReaderProps> = ({
         onPageColor={setPageColor}
         onBgColor={setBgColor}
       />
+      <BookmarkPanel
+        open={bookmarkPanelOpen}
+        onClose={() => setBookmarkPanelOpen(false)}
+        bookmarks={bookmarks.filter((b) => b.bookFileId === bookFileId)}
+        onEdit={setEditingBookmark}
+        onDelete={deleteBookmark}
+        onNavigate={navigateToBookmark}
+      />
+      {contextMenu && (
+        <ContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          paraIndex={contextMenu.paraIndex}
+          existingBookmark={
+            bookmarks.find(
+              (b) =>
+                b.paraIndex === contextMenu.paraIndex &&
+                b.bookFileId === bookFileId
+            ) ?? null
+          }
+          onAddBookmark={(note) => createBookmark(contextMenu.paraIndex, note)}
+          onEditBookmark={(bm) => {
+            setEditingBookmark(bm);
+            setContextMenu(null);
+          }}
+          onClose={() => setContextMenu(null)}
+        />
+      )}
+      {editingBookmark && (
+        <BookmarkEditModal
+          bookmark={editingBookmark}
+          onSave={(note) => updateBookmark(editingBookmark.id, note)}
+          onDelete={() => deleteBookmark(editingBookmark.id)}
+          onClose={() => setEditingBookmark(null)}
+        />
+      )}
     </div>
   );
 };
 
 export default Reader;
-
-// ─── TocSidebar ───────────────────────────────────────────
 
 interface TocSidebarProps {
   open: boolean;
@@ -763,8 +961,6 @@ const TocSidebar: React.FC<TocSidebarProps> = ({
   );
 };
 
-// ─── FootnoteModal ────────────────────────────────────────
-
 interface FootnoteModalProps {
   note: Note | null;
   onClose: () => void;
@@ -801,8 +997,6 @@ const FootnoteModal: React.FC<FootnoteModalProps> = ({ note, onClose }) => {
     document.body
   );
 };
-
-// ─── ColorModal ───────────────────────────────────────────
 
 interface ColorModalProps {
   open: boolean;
@@ -920,6 +1114,280 @@ const ColorModal: React.FC<ColorModalProps> = ({
   );
 };
 
+interface ContextMenuProps {
+  x: number;
+  y: number;
+  paraIndex: number;
+  existingBookmark: Bookmark | null;
+  onAddBookmark: (note: string) => void;
+  onEditBookmark: (bm: Bookmark) => void;
+  onClose: () => void;
+}
+
+const ContextMenu: React.FC<ContextMenuProps> = ({
+  x,
+  y,
+  existingBookmark,
+  onAddBookmark,
+  onEditBookmark,
+  onClose,
+}) => {
+  const [phase, setPhase] = useState<'menu' | 'add'>('menu');
+  const [note, setNote] = useState('');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (phase === 'add') setTimeout(() => textareaRef.current?.focus(), 30);
+  }, [phase]);
+
+  // Позиционирование — не вылезать за правый/нижний край
+  const style: React.CSSProperties = {
+    position: 'fixed',
+    left: Math.min(x, window.innerWidth - 260),
+    top: Math.min(y, window.innerHeight - 200),
+    zIndex: 4000,
+  };
+
+  return createPortal(
+    <div data-ctx-menu="true" className={styles['ctx-menu']} style={style}>
+      {phase === 'menu' ? (
+        <>
+          {existingBookmark ? (
+            <button
+              className={styles['ctx-item']}
+              onClick={() => {
+                onEditBookmark(existingBookmark);
+                onClose();
+              }}
+            >
+              🔖 Редактировать закладку
+            </button>
+          ) : (
+            <button
+              className={styles['ctx-item']}
+              onClick={() => setPhase('add')}
+            >
+              🔖 Добавить закладку
+            </button>
+          )}
+          <button
+            className={`${styles['ctx-item']} ${styles['ctx-item-cancel']}`}
+            onClick={onClose}
+          >
+            Отмена
+          </button>
+        </>
+      ) : (
+        <div className={styles['ctx-add-form']}>
+          <div className={styles['ctx-add-label']}>Заметка к закладке</div>
+          <textarea
+            ref={textareaRef}
+            className={styles['ctx-add-textarea']}
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="Необязательно…"
+            rows={3}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                onAddBookmark(note.trim());
+              }
+              if (e.key === 'Escape') onClose();
+            }}
+          />
+          <div className={styles['ctx-add-actions']}>
+            <button className={styles['ctx-cancel-btn']} onClick={onClose}>
+              Отмена
+            </button>
+            <button
+              className={styles['ctx-confirm-btn']}
+              onClick={() => onAddBookmark(note.trim())}
+            >
+              Добавить
+            </button>
+          </div>
+        </div>
+      )}
+    </div>,
+    document.body
+  );
+};
+
+// ─── BookmarkEditModal ────────────────────────────────────
+// Модалка редактирования/удаления закладки
+
+interface BookmarkEditModalProps {
+  bookmark: Bookmark;
+  onSave: (note: string) => void;
+  onDelete: () => void;
+  onClose: () => void;
+}
+
+const BookmarkEditModal: React.FC<BookmarkEditModalProps> = ({
+  bookmark,
+  onSave,
+  onDelete,
+  onClose,
+}) => {
+  const [note, setNote] = useState(bookmark.note);
+  useEffect(() => setNote(bookmark.note), [bookmark.id]); // eslint-disable-line
+
+  return createPortal(
+    <div className={styles['footnote-overlay']} onClick={onClose}>
+      <div
+        className={styles['bm-edit-modal']}
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+      >
+        <div className={styles['bm-edit-header']}>
+          <span className={styles['bm-edit-title']}>🔖 Закладка</span>
+          <button className={styles['footnote-close']} onClick={onClose}>
+            ✕
+          </button>
+        </div>
+
+        <div className={styles['bm-edit-section']}>
+          <span className={styles['bm-edit-label']}>Заметка</span>
+          <textarea
+            className={styles['bm-edit-textarea']}
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="Добавьте заметку…"
+            rows={4}
+            autoFocus
+          />
+        </div>
+
+        <div className={styles['bm-edit-position']}>
+          Абзац №{bookmark.paraIndex} ·{' '}
+          {new Date(bookmark.createdAt).toLocaleString('ru', {
+            day: 'numeric',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit',
+          })}
+        </div>
+
+        <div className={styles['bm-edit-actions']}>
+          <button className={styles['bm-delete-btn']} onClick={onDelete}>
+            Удалить
+          </button>
+          <button
+            className={styles['bm-save-btn']}
+            onClick={() => {
+              onSave(note.trim());
+              onClose();
+            }}
+          >
+            Сохранить
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+};
+
+// ─── BookmarkPanel ────────────────────────────────────────
+// Правая боковая панель со списком закладок
+
+interface BookmarkPanelProps {
+  open: boolean;
+  onClose: () => void;
+  bookmarks: Bookmark[];
+  onEdit: (bm: Bookmark) => void;
+  onDelete: (id: number) => void;
+  onNavigate: (bm: Bookmark) => void;
+}
+
+const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
+  open,
+  onClose,
+  bookmarks,
+  onEdit,
+  onDelete,
+  onNavigate,
+}) =>
+  createPortal(
+    <>
+      <div
+        className={`${styles['toc-overlay']} ${open ? styles['toc-overlay-open'] : ''}`}
+        onClick={onClose}
+      />
+      <aside
+        className={`${styles['toc-sidebar']} ${styles['bm-sidebar']} ${open ? styles['toc-sidebar-open'] : ''}`}
+        aria-label="Закладки"
+        role="complementary"
+      >
+        <div className={styles['toc-header']}>
+          <span className={styles['toc-title']}>
+            Закладки ({bookmarks.length})
+          </span>
+          <button
+            className={styles['footnote-close']}
+            onClick={onClose}
+            aria-label="Закрыть"
+          >
+            ✕
+          </button>
+        </div>
+
+        {bookmarks.length === 0 ? (
+          <div className={styles['bm-empty']}>
+            Правый клик на абзаце,
+            <br />
+            чтобы поставить закладку
+          </div>
+        ) : (
+          <div className={styles['toc-list']}>
+            {[...bookmarks]
+              .sort((a, b) => a.paraIndex - b.paraIndex)
+              .map((bm) => (
+                <div key={bm.id} className={styles['bm-item']}>
+                  <div className={styles['bm-item-icon']}>🔖</div>
+                  <div className={styles['bm-item-body']}>
+                    <div
+                      className={styles['bm-item-title']}
+                      onClick={() => onNavigate(bm)}
+                      title="Перейти к закладке"
+                    >
+                      Абзац №{bm.paraIndex}
+                    </div>
+                    {bm.note && (
+                      <div className={styles['bm-item-note']}>{bm.note}</div>
+                    )}
+                    <div className={styles['bm-item-meta']}>
+                      {new Date(bm.createdAt).toLocaleString('ru', {
+                        day: 'numeric',
+                        month: 'short',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </div>
+                    <div className={styles['bm-item-actions']}>
+                      <button
+                        className={styles['bm-item-btn']}
+                        onClick={() => onEdit(bm)}
+                      >
+                        ✏️ Изменить
+                      </button>
+                      <button
+                        className={styles['bm-item-btn']}
+                        onClick={() => onDelete(bm.id)}
+                      >
+                        🗑 Удалить
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        )}
+      </aside>
+    </>,
+    document.body
+  );
+
 // ─── ImageLightbox ────────────────────────────────────────
 
 interface ImageLightboxProps {
@@ -948,752 +1416,3 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({ src, onClose }) => {
     document.body
   );
 };
-
-// // ============================================================
-// // Reader.tsx — компонент чтения книги на CSS columns
-// // Весь текст фрагмента рендерится в один контейнер с
-// // column-count: 1 и фиксированной высотой. Браузер сам
-// // раскладывает контент по «страницам»-колонкам.
-// // Навигация — scrollTo на ширину viewport программно.
-// // ============================================================
-// import { createPortal } from 'react-dom';
-// import React, {
-//   useState,
-//   useEffect,
-//   useCallback,
-//   useRef,
-//   useMemo,
-// } from 'react';
-// import styles from './Reader.module.css';
-
-// export interface Footnote {
-//   t: string;
-//   xp: number[];
-//   c: string | string[];
-// }
-
-// export interface Note {
-//   t: string;
-//   role: string;
-//   xp: number[];
-//   c: string;
-//   f?: Footnote;
-// }
-
-// export type InlineNode = Note | { t: 'em' | 'st'; c: string };
-
-// export interface ImgNode {
-//   t: 'img';
-//   src: string;
-// }
-
-// export interface TextSegment {
-//   t: string;
-//   xp?: number[];
-//   c: string | TextSegment[] | (string | InlineNode)[] | ImgNode[];
-// }
-
-// export interface TocPart {
-//   s: number; // глобальный 0-based индекс первого абзаца фрагмента
-//   e: number; // глобальный 0-based индекс последнего абзаца фрагмента
-//   xps: number[];
-//   xpe: number[];
-//   url: string;
-// }
-
-// export interface TocBodyItem {
-//   s: number;
-//   e: number;
-//   t: string;
-//   c?: TocBodyItem[];
-// }
-
-// export interface TocMeta {
-//   Title: string;
-//   Authors: { Role: string; First?: string; Last?: string }[];
-//   Annotation: string;
-//   Lang: string;
-// }
-
-// export interface TocData {
-//   Meta: TocMeta;
-//   full_length: number; // общее число абзацев в книге (1-based, т.е. абзацы 1..full_length)
-//   Body: TocBodyItem[];
-//   Parts: TocPart[];
-// }
-
-// // export interface TocPart {
-// //   s: number;
-// //   e: number;
-// //   xps: number[];
-// //   xpe: number[];
-// //   url: string;
-// // }
-
-// // export interface TocMeta {
-// //   Title: string;
-// //   Authors: { Role: string; First: string; Last: string }[];
-// //   Annotation: string;
-// //   Lang: string;
-// // }
-
-// // export interface TocData {
-// //   Meta: TocMeta;
-// //   full_length: number;
-// //   Body: unknown[];
-// //   Parts: TocPart[];
-// // }
-
-// interface ReaderProps {
-//   /** базовый путь для URL фрагментов, напр. '/data/' */
-//   basePath?: string;
-//   tocPath?: string;
-//   filePath?: string;
-//   imagePath?: string;
-// }
-
-// const DEFAULT_FONT_SIZE = 18;
-// const MIN_FONT_SIZE = 12;
-// const MAX_FONT_SIZE = 32;
-
-// const FONT_OPTIONS: { label: string; value: string }[] = [
-//   { label: 'Georgia', value: "Georgia, 'Times New Roman', serif" },
-//   { label: 'Arial', value: 'Arial, Helvetica, sans-serif' },
-//   { label: 'Verdana', value: 'Verdana, Geneva, sans-serif' },
-//   { label: 'Times New Roman', value: "'Times New Roman', Times, serif" },
-//   { label: 'Courier New', value: "'Courier New', Courier, monospace" },
-//   { label: 'Palatino', value: "'Palatino Linotype', Palatino, serif" },
-//   { label: 'Trebuchet MS', value: "'Trebuchet MS', sans-serif" },
-// ];
-
-// const TEXT_COLORS = ['#1a1a1a', '#3b2a1a', '#1a2e1a', '#0d1b2a', '#4a4a4a'];
-// const PAGE_COLORS = ['#ffffff', '#f5f1e8', '#f0ede0', '#e8f0e8', '#e8eef5'];
-// const BG_COLORS = ['#f5f1e8', '#e8e0d0', '#d6cfc0', '#dde8dd', '#d0dce8'];
-
-// function buildUrl(base: string | undefined, url: string): string {
-//   if (!base) return url;
-//   return base.replace(/\/$/, '') + '/' + url.replace(/^\//, '');
-// }
-
-// export const Reader: React.FC<ReaderProps> = ({
-//   basePath,
-//   tocPath,
-//   filePath = '/data/002.js',
-//   imagePath,
-// }) => {
-//   const [segments, setSegments] = useState<TextSegment[]>([]);
-//   const [isLoading, setIsLoading] = useState(true);
-//   const [fontSize, setFontSize] = useState(DEFAULT_FONT_SIZE);
-//   const [activeNote, setActiveNote] = useState<Note | null>(null);
-//   const [activeImage, setActiveImage] = useState<string | null>(null);
-//   const [fontFamily, setFontFamily] = useState(FONT_OPTIONS[0].value);
-//   const [textColor, setTextColor] = useState(TEXT_COLORS[0]);
-//   const [pageColor, setPageColor] = useState(PAGE_COLORS[0]);
-//   const [bgColor, setBgColor] = useState(BG_COLORS[0]);
-//   const [colorModalOpen, setColorModalOpen] = useState(false);
-//   // Текущая «страница» = индекс колонки (0-based)
-//   const [currentCol, setCurrentCol] = useState(0);
-//   // Общее число колонок — вычисляется после рендера по scrollWidth
-//   const [totalCols, setTotalCols] = useState(0);
-
-//   const [tocData, setTocData] = useState<TocData | null>(null);
-//   const [currentPartIndex, setCurrentPartIndex] = useState(0);
-//   const [nextSegments, setNextSegments] = useState<TextSegment[] | null>(null);
-//   const [isPrefetching, setIsPrefetching] = useState(false);
-//   // viewport — внешний контейнер с overflow-x: hidden (скролл только программный)
-//   const viewportRef = useRef<HTMLDivElement>(null);
-//   // content — колоночный контейнер
-//   const contentRef = useRef<HTMLDivElement>(null);
-
-//   // ─── Загрузка toc ─────────────────────────────────────────
-
-//   useEffect(() => {
-//     if (!tocPath) return;
-//     fetch(tocPath)
-//       .then((r) => r.json())
-//       .then((data: TocData) => {
-//         setTocData(data);
-//         const idx = data.Parts.findIndex((p) => filePath.endsWith(p.url));
-//         if (idx !== -1) setCurrentPartIndex(idx);
-//       })
-//       .catch(console.error);
-//   }, [tocPath, filePath]);
-
-//   const currentUrl = useMemo(() => {
-//     if (tocData) {
-//       const part = tocData.Parts[currentPartIndex];
-//       if (part) return buildUrl(basePath, part.url);
-//     }
-//     return filePath ?? '';
-//   }, [tocData, currentPartIndex, basePath, filePath]);
-
-//   // ─── Загрузка фрагмента ────────────────────────────────────
-
-//   // useEffect(() => {
-//   //   const load = async () => {
-//   //     setIsLoading(true);
-//   //     setCurrentCol(0);
-//   //     fetch(filePath)
-//   //       .then((r) => r.json())
-//   //       .then((data: TextSegment[]) => {
-//   //         setSegments(data);
-//   //         setIsLoading(false);
-//   //       })
-//   //       .catch(() => setIsLoading(false));
-//   //   };
-//   //   load();
-//   // }, [filePath]);
-
-//   useEffect(() => {
-//     if (!currentUrl) return;
-//     const load = async () => {
-//       setIsLoading(true);
-//       setNextSegments(null);
-//       setCurrentCol(0);
-//       fetch(currentUrl)
-//         .then((r) => r.json())
-//         .then((data: TextSegment[]) => {
-//           setSegments(data);
-//           setIsLoading(false);
-//         })
-//         .catch(() => setIsLoading(false));
-//     };
-//     load();
-//   }, [currentUrl]);
-
-//   // ─── Подсчёт колонок ──────────────────────────────────────
-//   // scrollWidth всего book-content / clientWidth одного viewport = число колонок.
-//   // Вызывается после рендера и при ресайзе.
-
-//   const recalcCols = useCallback(() => {
-//     const vp = viewportRef.current;
-//     const ct = contentRef.current;
-//     if (!vp || !ct) return;
-//     const cols = Math.round(ct.scrollWidth / vp.clientWidth);
-//     setTotalCols(Math.max(1, cols));
-//   }, []);
-
-//   useEffect(() => {
-//     if (!isLoading) {
-//       // Задержка 50ms — браузер должен завершить layout колонок
-//       const id = setTimeout(recalcCols, 50);
-//       return () => clearTimeout(id);
-//     }
-//   }, [isLoading, fontSize, fontFamily, recalcCols]);
-
-//   useEffect(() => {
-//     window.addEventListener('resize', recalcCols);
-//     return () => window.removeEventListener('resize', recalcCols);
-//   }, [recalcCols]);
-
-//   // ─── Навигация по колонкам ────────────────────────────────
-
-//   const goToCol = useCallback(
-//     (col: number) => {
-//       const vp = viewportRef.current;
-//       if (!vp) return;
-//       const clamped = Math.max(0, Math.min(col, totalCols - 1));
-//       setCurrentCol(clamped);
-//       // Программный скролл: каждая «страница» = clientWidth viewport
-//       vp.scrollTo({
-//         left: clamped * (vp.clientWidth - 40),
-//         behavior: 'smooth',
-//       });
-//     },
-//     [totalCols]
-//   );
-
-//   const nextCol = useCallback(
-//     () => goToCol(currentCol + 1),
-//     [currentCol, goToCol]
-//   );
-//   const prevCol = useCallback(
-//     () => goToCol(currentCol - 1),
-//     [currentCol, goToCol]
-//   );
-
-//   // ─── Смена шрифта — сброс на первую колонку ───────────────
-
-//   const changeFontSize = useCallback((delta: number) => {
-//     setFontSize((prev) =>
-//       Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, prev + delta))
-//     );
-//     setCurrentCol(0);
-//     viewportRef.current?.scrollTo({ left: 0, behavior: 'auto' });
-//   }, []);
-
-//   const changeFontFamily = useCallback((value: string) => {
-//     setFontFamily(value);
-//     setCurrentCol(0);
-//     viewportRef.current?.scrollTo({ left: 0, behavior: 'auto' });
-//   }, []);
-
-//   // ─── Клавиатура ───────────────────────────────────────────
-
-//   useEffect(() => {
-//     const handleKey = (e: KeyboardEvent) => {
-//       if (e.key === 'Escape') {
-//         setActiveNote(null);
-//         setActiveImage(null);
-//         return;
-//       }
-//       if (e.key === 'ArrowRight' || e.key === 'PageDown') nextCol();
-//       else if (e.key === 'ArrowLeft' || e.key === 'PageUp') prevCol();
-//     };
-//     window.addEventListener('keydown', handleKey);
-//     return () => window.removeEventListener('keydown', handleKey);
-//   }, [nextCol, prevCol]);
-
-//   // ─── Прогресс чтения ─────────────────────────────────────
-
-//   const readPercent = useMemo<number>(() => {
-//     if (totalCols === 0) return 0;
-//     if (!tocData || tocData.Parts.length === 0) {
-//       return ((currentCol + 1) / totalCols) * 100;
-//     }
-//     const part = tocData.Parts[currentPartIndex];
-//     if (!part) return 0;
-//     const partLength = part.e - part.s + 1;
-//     const progressInPart = (currentCol + 1) / totalCols;
-//     const globalPos = part.s + partLength * progressInPart;
-//     return Math.min(100, (globalPos / tocData.full_length) * 100);
-//   }, [tocData, currentPartIndex, currentCol, totalCols]);
-
-//   // ─── renderInlineContent ─────────────────────────────────
-
-//   const renderInlineContent = useCallback(
-//     (content: (string | InlineNode)[]): React.ReactNode => {
-//       return content.map((item, idx) => {
-//         if (typeof item === 'string')
-//           return <React.Fragment key={idx}>{item}</React.Fragment>;
-//         if (item.t === 'em')
-//           return <em key={idx}>{(item as { t: string; c: string }).c}</em>;
-//         if (item.t === 'st')
-//           return (
-//             <strong key={idx}>{(item as { t: string; c: string }).c}</strong>
-//           );
-//         if (item.t === 'note') {
-//           const note = item as Note;
-//           return (
-//             <span
-//               key={idx}
-//               className={styles['note-ref']}
-//               onClick={(e) => {
-//                 e.stopPropagation();
-//                 setActiveNote(note);
-//               }}
-//               role="button"
-//               tabIndex={0}
-//               onKeyDown={(e) => e.key === 'Enter' && setActiveNote(note)}
-//             >
-//               {note.c}
-//             </span>
-//           );
-//         }
-//         return null;
-//       });
-//     },
-//     []
-//   );
-
-//   // ─── renderSegment ────────────────────────────────────────
-//   // Рендерит один TextSegment напрямую, без пагинации.
-//   // Браузер сам раскладывает контент по колонкам.
-
-//   const renderSegment = (seg: TextSegment, index: number): React.ReactNode => {
-//     if (seg.t === 'br') return <br key={index} />;
-
-//     // Изображение
-//     if (seg.t === 'img') {
-//       const imgNodes = Array.isArray(seg.c) ? seg.c : [];
-//       const firstImg = imgNodes.find(
-//         (n) => typeof n !== 'string' && (n as ImgNode).t === 'img'
-//       ) as ImgNode | undefined;
-//       if (!firstImg) return null;
-//       const fullUrl = imagePath
-//         ? `${imagePath.replace(/\/$/, '')}/${firstImg.src}`
-//         : firstImg.src;
-//       return (
-//         <div key={index} className={styles['img-block']}>
-//           <img
-//             src={fullUrl}
-//             alt=""
-//             className={styles['img-inline']}
-//             onClick={() => setActiveImage(fullUrl)}
-//             role="button"
-//             tabIndex={0}
-//             onKeyDown={(e) => e.key === 'Enter' && setActiveImage(fullUrl)}
-//           />
-//         </div>
-//       );
-//     }
-
-//     // Вычисляем inline-содержимое
-//     const getContent = (): React.ReactNode => {
-//       if (typeof seg.c === 'string') return seg.c;
-//       if (Array.isArray(seg.c)) {
-//         return renderInlineContent(
-//           seg.c.map((item) =>
-//             typeof item === 'string' ? item : (item as InlineNode)
-//           )
-//         );
-//       }
-//       return null;
-//     };
-
-//     if (seg.t === 'title') {
-//       return (
-//         <h2
-//           key={index}
-//           className={styles['title']}
-//           style={{ fontSize: `${fontSize}px`, fontFamily, color: textColor }}
-//         >
-//           {getContent()}
-//         </h2>
-//       );
-//     }
-
-//     return (
-//       <p
-//         key={index}
-//         className={styles['paragraph']}
-//         style={{ fontSize: `${fontSize}px`, fontFamily, color: textColor }}
-//       >
-//         {getContent()}
-//       </p>
-//     );
-//   };
-//   // [imagePath, renderInlineContent]
-//   if (isLoading) {
-//     return (
-//       <div className={styles['loading']}>
-//         <div className={styles['spinner']} />
-//         <p>Загрузка книги...</p>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className={styles['reader']} style={{ background: bgColor }}>
-//       {/* Тулбар */}
-//       <div className={styles['toolbar']}>
-//         <div className={styles['controls']}>
-//           <button
-//             onClick={prevCol}
-//             disabled={currentCol <= 0}
-//             className={styles['nav-button']}
-//           >
-//             ← Назад
-//           </button>
-
-//           <span className={styles['page-info']}>
-//             {`Стр. ${currentCol + 1} / ${totalCols}`}
-//             {tocData && (
-//               <span className={styles['read-percent']}>
-//                 {' '}
-//                 ({readPercent.toFixed(1)}%)
-//               </span>
-//             )}
-//           </span>
-
-//           <button
-//             onClick={nextCol}
-//             disabled={currentCol >= totalCols - 1}
-//             className={styles['nav-button']}
-//           >
-//             Вперёд →
-//           </button>
-//         </div>
-
-//         <div className={styles['settings']}>
-//           <button
-//             onClick={() => setColorModalOpen(true)}
-//             className={styles['color-button']}
-//             aria-label="Настройка цветов"
-//             title="Цвета"
-//           >
-//             🎨
-//           </button>
-//           <select
-//             className={styles['font-select']}
-//             value={fontFamily}
-//             onChange={(e) => changeFontFamily(e.target.value)}
-//             aria-label="Выбор шрифта"
-//           >
-//             {FONT_OPTIONS.map((opt) => (
-//               <option key={opt.value} value={opt.value}>
-//                 {opt.label}
-//               </option>
-//             ))}
-//           </select>
-//           <button
-//             onClick={() => changeFontSize(-2)}
-//             className={styles['font-button']}
-//           >
-//             A-
-//           </button>
-//           <span className={styles['font-size']}>{fontSize}px</span>
-//           <button
-//             onClick={() => changeFontSize(2)}
-//             className={styles['font-button']}
-//           >
-//             A+
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* Область чтения */}
-//       <div className={styles['reading-area']}>
-//         {/*
-//           book-viewport — контейнер с overflow-x: hidden.
-//           Пользователь не может скроллить руками — только кнопки/клавиши.
-//         */}
-//         <div
-//           className={styles['book-viewport']}
-//           ref={viewportRef}
-//           style={{ background: pageColor }}
-//         >
-//           {/*
-//             book-content — колоночный контейнер.
-//             CSS: columns: 1; column-fill: auto; height: 100%
-//             Ширина колонки = 100% viewport, т.е. одна колонка = одна страница.
-//             column-gap создаёт отступ между «страницами» в горизонтальном потоке.
-//           */}
-//           <div className={styles['book-content']} ref={contentRef}>
-//             {segments.map((seg, idx) => renderSegment(seg, idx))}
-//           </div>
-//         </div>
-
-//         {/* Зоны клика поверх текста */}
-//         <div
-//           className={styles['prev-zone']}
-//           onClick={prevCol}
-//           role="button"
-//           tabIndex={0}
-//           aria-label="Предыдущая страница"
-//         />
-//         <div
-//           className={styles['next-zone']}
-//           onClick={nextCol}
-//           role="button"
-//           tabIndex={0}
-//           aria-label="Следующая страница"
-//         />
-//       </div>
-
-//       {/* Прогресс-бар */}
-//       <div className={styles['progress-bar']}>
-//         <div
-//           className={styles['progress-fill']}
-//           style={{ width: `${readPercent}%` }}
-//         />
-//       </div>
-
-//       <FootnoteModal note={activeNote} onClose={() => setActiveNote(null)} />
-//       <ImageLightbox src={activeImage} onClose={() => setActiveImage(null)} />
-//       <ColorModal
-//         open={colorModalOpen}
-//         onClose={() => setColorModalOpen(false)}
-//         textColor={textColor}
-//         pageColor={pageColor}
-//         bgColor={bgColor}
-//         onTextColor={setTextColor}
-//         onPageColor={setPageColor}
-//         onBgColor={setBgColor}
-//       />
-//     </div>
-//   );
-// };
-
-// export default Reader;
-
-// interface ColorModalProps {
-//   open: boolean;
-//   onClose: () => void;
-//   textColor: string;
-//   pageColor: string;
-//   bgColor: string;
-//   onTextColor: (c: string) => void;
-//   onPageColor: (c: string) => void;
-//   onBgColor: (c: string) => void;
-// }
-
-// const ColorSwatch: React.FC<{
-//   color: string;
-//   selected: boolean;
-//   onSelect: () => void;
-//   dark?: boolean;
-// }> = ({ color, selected, onSelect, dark }) => (
-//   <button
-//     onClick={onSelect}
-//     aria-label={color}
-//     style={{
-//       width: 28,
-//       height: 28,
-//       borderRadius: '50%',
-//       background: color,
-//       border: selected
-//         ? `3px solid ${dark ? '#fff' : '#1a1a1a'}`
-//         : '2px solid #ccc',
-//       outline: selected ? `2px solid ${color}` : 'none',
-//       outlineOffset: 2,
-//       cursor: 'pointer',
-//       padding: 0,
-//       flexShrink: 0,
-//       transition: 'transform 0.1s',
-//       transform: selected ? 'scale(1.18)' : 'scale(1)',
-//       boxShadow: selected
-//         ? '0 0 0 2px rgba(0,0,0,0.18)'
-//         : '0 1px 3px rgba(0,0,0,0.12)',
-//     }}
-//   />
-// );
-
-// const ColorModal: React.FC<ColorModalProps> = ({
-//   open,
-//   onClose,
-//   textColor,
-//   pageColor,
-//   bgColor,
-//   onTextColor,
-//   onPageColor,
-//   onBgColor,
-// }) => {
-//   if (!open) return null;
-
-//   const rows: {
-//     label: string;
-//     colors: string[];
-//     value: string;
-//     onChange: (c: string) => void;
-//   }[] = [
-//     {
-//       label: 'Цвет текста',
-//       colors: TEXT_COLORS,
-//       value: textColor,
-//       onChange: onTextColor,
-//     },
-//     {
-//       label: 'Цвет страницы',
-//       colors: PAGE_COLORS,
-//       value: pageColor,
-//       onChange: onPageColor,
-//     },
-//     {
-//       label: 'Цвет фона',
-//       colors: BG_COLORS,
-//       value: bgColor,
-//       onChange: onBgColor,
-//     },
-//   ];
-
-//   return createPortal(
-//     <div className={styles['color-overlay']} onClick={onClose}>
-//       <div
-//         className={styles['color-modal']}
-//         onClick={(e) => e.stopPropagation()}
-//         role="dialog"
-//         aria-modal="true"
-//         aria-label="Настройка цветов"
-//       >
-//         <div className={styles['color-modal-header']}>
-//           <span className={styles['color-modal-title']}>Цвета оформления</span>
-//           <button
-//             className={styles['footnote-close']}
-//             onClick={onClose}
-//             aria-label="Закрыть"
-//           >
-//             ✕
-//           </button>
-//         </div>
-//         <div className={styles['color-modal-body']}>
-//           {rows.map((row) => (
-//             <div key={row.label} className={styles['color-row']}>
-//               <span className={styles['color-row-label']}>{row.label}</span>
-//               <div className={styles['color-swatches']}>
-//                 {row.colors.map((c) => (
-//                   <ColorSwatch
-//                     key={c}
-//                     color={c}
-//                     selected={row.value === c}
-//                     onSelect={() => row.onChange(c)}
-//                     dark={row.label === 'Цвет текста'}
-//                   />
-//                 ))}
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-//     </div>,
-//     document.body
-//   );
-// };
-
-// // ─── FootnoteModal ────────────────────────────────────────
-
-// interface FootnoteModalProps {
-//   note: Note | null;
-//   onClose: () => void;
-// }
-
-// const FootnoteModal: React.FC<FootnoteModalProps> = ({ note, onClose }) => {
-//   if (!note) return null;
-//   const footnoteText = note.f
-//     ? Array.isArray(note.f.c)
-//       ? note.f.c.join('\n\n')
-//       : note.f.c
-//     : '';
-//   return createPortal(
-//     <div className={styles['footnote-overlay']} onClick={onClose}>
-//       <div
-//         className={styles['footnote-modal']}
-//         onClick={(e) => e.stopPropagation()}
-//         role="dialog"
-//         aria-modal="true"
-//       >
-//         <button
-//           className={styles['footnote-close']}
-//           onClick={onClose}
-//           aria-label="Закрыть"
-//         >
-//           ✕
-//         </button>
-//         <div className={styles['footnote-content']}>
-//           <span className={styles['footnote-label']}>{note.c}</span>
-//           <p>{footnoteText}</p>
-//         </div>
-//       </div>
-//     </div>,
-//     document.body
-//   );
-// };
-
-// // ─── ImageLightbox ────────────────────────────────────────
-
-// interface ImageLightboxProps {
-//   src: string | null;
-//   onClose: () => void;
-// }
-
-// const ImageLightbox: React.FC<ImageLightboxProps> = ({ src, onClose }) => {
-//   if (!src) return null;
-//   return createPortal(
-//     <div
-//       className={styles['lightbox-overlay']}
-//       onClick={onClose}
-//       role="button"
-//       aria-label="Закрыть изображение"
-//       tabIndex={0}
-//       onKeyDown={(e) => e.key === 'Escape' && onClose()}
-//     >
-//       <img
-//         src={src}
-//         alt=""
-//         className={styles['lightbox-img']}
-//         onClick={(e) => e.stopPropagation()}
-//       />
-//     </div>,
-//     document.body
-//   );
-// };
