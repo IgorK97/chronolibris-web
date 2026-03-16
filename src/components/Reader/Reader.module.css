@@ -106,12 +106,13 @@
 
 /* Область чтения */
 .reading-area {
-  flex: 1; /* занимает всё место между тулбаром и прогресс-баром */
+  /* flex: 1; */
   position: relative; /* контекст для зон клика */
   overflow: hidden;
   display: flex;
   justify-content: center;
-  padding: 20px;
+  padding: 5px;
+  height: 90%;
 }
 
 /* окно для колонки-страницы */

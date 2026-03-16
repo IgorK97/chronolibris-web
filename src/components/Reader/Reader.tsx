@@ -11,8 +11,6 @@ import React, {
 } from 'react';
 import styles from './Reader.module.css';
 
-// ─── Типы ────────────────────────────────────────────────────
-
 export interface Footnote {
   t: string;
   xp: number[];
@@ -69,8 +67,6 @@ export interface TocData {
   Parts: TocPart[];
 }
 
-// ─── Пропсы ──────────────────────────────────────────────────
-
 interface ReaderProps {
   tocPath?: string;
   /** базовый путь для URL фрагментов, напр. '/data/' */
@@ -122,8 +118,6 @@ function buildUrl(base: string | undefined, url: string): string {
   if (!base) return url;
   return base.replace(/\/$/, '') + '/' + url.replace(/^\//, '');
 }
-
-// ─── Компонент ───────────────────────────────────────────────
 
 export const Reader: React.FC<ReaderProps> = ({
   tocPath,
@@ -346,38 +340,16 @@ export const Reader: React.FC<ReaderProps> = ({
     viewportRef.current?.scrollTo({ left: 0, behavior: 'auto' });
   }, []);
 
-  // Клавиатура
-
-  // useEffect(() => {
-  //   const handleKey = (e: KeyboardEvent) => {
-  //     if (e.key === 'Escape') {
-  //       setActiveNote(null);
-  //       setActiveImage(null);
-  //       setTocOpen(false);
-  //       return;
-  //     }
-  //     if (e.key === 'ArrowRight' || e.key === 'PageDown') nextCol();
-  //     else if (e.key === 'ArrowLeft' || e.key === 'PageUp') prevCol();
-  //   };
-  //   window.addEventListener('keydown', handleKey);
-  //   return () => window.removeEventListener('keydown', handleKey);
-  // }, [nextCol, prevCol]);
-
-  // Прогресс чтения (сквозная нумерация)
-  //
-  // toc хранит: full_length — общее число абзацев (1-based, т.е. абзацы 0..full_length-1).
-  // Каждый Part: s и e — 0-based глобальные индексы первого и последнего абзаца.
-  // xp[2] в сегментах — 1-based сквозной номер абзаца.
-  // Текущая позиция: интерполируем между s и e по прогрессу колонок.
-
   const readPercent = useMemo<number>(() => {
-    if (!tocData || tocData.full_length === 0 || totalCols === 0) return 0;
+    // console.log('TOC-START');
+    if (!tocData || tocData.Body[0].e === 0 || totalCols === 0) return 0;
+    // console.log('TOC-MEDIUM', tocData.full_length);
     const part = tocData.Parts[currentPartIndex];
     if (!part) return 0;
-
+    console.log('TOC_END');
     const colRatio = totalCols > 1 ? currentCol / (totalCols - 1) : 1;
     const globalPos = part.s + (part.e - part.s) * colRatio; // 0-based
-    return Math.min(100, (globalPos / (tocData.full_length - 1)) * 100);
+    return Math.min(100, (globalPos / tocData.Body[0].e) * 100);
   }, [tocData, currentPartIndex, currentCol, totalCols]);
 
   // Клик по прогресс-бару
@@ -390,7 +362,7 @@ export const Reader: React.FC<ReaderProps> = ({
         0,
         Math.min(1, (e.clientX - rect.left) / rect.width)
       );
-      const targetGlobal = Math.round(ratio * (tocData.full_length - 1)); // 0-based
+      const targetGlobal = Math.round(ratio * tocData.Body[0].e); // 0-based
 
       const partIdx = tocData.Parts.findIndex(
         (p) => targetGlobal >= p.s && targetGlobal <= p.e
@@ -808,7 +780,7 @@ export const Reader: React.FC<ReaderProps> = ({
         {tocData &&
           tocData.Parts.map((part, i) => {
             if (i === 0) return null;
-            const pct = (part.s / (tocData.full_length - 1)) * 100;
+            const pct = (part.s / tocData.Body[0].e) * 100;
             return (
               <div
                 key={i}
