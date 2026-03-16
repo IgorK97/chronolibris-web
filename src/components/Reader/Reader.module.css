@@ -6,7 +6,7 @@
 .reader {
   display: flex;
   flex-direction: column;
-  height: 95vh;
+  height: 100vh;
   overflow: hidden;
   background: #f5f1e8;
   font-family: Georgia, 'Times New Roman', serif;
@@ -51,6 +51,7 @@
   box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
   z-index: 100;
   transition: box-shadow 0.2s;
+  margin-bottom: 10px;
 }
 
 .toolbar-inner {
@@ -168,36 +169,50 @@
   --page-padding: 40px;
 }
 
+.reading-container {
+  width: 100%;
+  height: 80%;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
 .reading-area {
   display: grid;
-  grid-template-columns: var(--page-padding) 1fr var(--page-padding);
+  grid-template-columns: 1fr 700px 1fr;
   grid-template-rows: var(--page-padding) 1fr var(--page-padding);
-  width: 100%;
-  height: 90%;
+  width: 55%;
+  height: 100%;
+  justify-self: center;
 }
 
 .pad-top {
   grid-column: 1 / -1;
   grid-row: 1;
   background: #fff;
+  box-shadow: 10px 0 8px rgb(0 0 0 / 15%);
 }
 
 .pad-bottom {
   grid-column: 1 / -1;
   grid-row: 3;
   background: #fff;
+  box-shadow: 10px 10px 8px rgb(0 0 0 / 15%);
+  margin-bottom: 10px;
 }
 
 .pad-left {
   grid-column: 1;
   grid-row: 2;
   background: #fff;
+  box-shadow: 0 10px 8px rgb(0 0 0 / 15%);
 }
 
 .pad-right {
   grid-column: 3;
   grid-row: 2;
   background: #fff;
+  box-shadow: 10px 4px 8px rgb(0 0 0 / 15%);
 }
 
 .book-viewport {
@@ -207,7 +222,6 @@
   justify-self: center;
   height: 100%;
   overflow: hidden;
-  box-shadow: 0 4px 8px rgb(0 0 0 / 15%);
 }
 
 .book-content {

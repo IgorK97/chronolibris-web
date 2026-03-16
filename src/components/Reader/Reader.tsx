@@ -860,45 +860,47 @@ export const Reader: React.FC<ReaderProps> = ({
           aria-label="Следующая страница"
         />
       </div> */}
+      <div className={styles['reading-container']}>
+        <div className={styles['reading-area']}>
+          {/* Строка 1 */}
+          <div className={styles['pad-top']} />
 
-      <div className={styles['reading-area']}>
-        {/* Строка 1 */}
-        <div className={styles['pad-top']} />
-
-        {/* Строка 2 */}
-        <div className={styles['pad-left']} />
-        <div
-          className={`${styles['book-viewport']} ${twoPageMode ? styles['book-viewport-two'] : ''}`}
-          ref={viewportRef}
-          style={{ background: pageColor }}
-        >
+          {/* Строка 2 */}
+          <div className={styles['pad-left']} />
           <div
-            className={`${styles['book-content']} ${twoPageMode ? styles['book-content-two'] : ''}`}
-            ref={contentRef}
+            className={`${styles['book-viewport']} ${twoPageMode ? styles['book-viewport-two'] : ''}`}
+            ref={viewportRef}
+            style={{ background: pageColor }}
           >
-            {segments.map((seg, idx) => renderSegment(seg, idx))}
+            <div
+              className={`${styles['book-content']} ${twoPageMode ? styles['book-content-two'] : ''}`}
+              ref={contentRef}
+            >
+              {segments.map((seg, idx) => renderSegment(seg, idx))}
+            </div>
           </div>
+          <div className={styles['pad-right']} />
+
+          {/* Строка 3 */}
+          <div className={styles['pad-bottom']} />
+
+          <div
+            className={styles['prev-zone']}
+            onClick={prevCol}
+            role="button"
+            tabIndex={0}
+            aria-label="Предыдущая страница"
+          />
+          <div
+            className={styles['next-zone']}
+            onClick={nextCol}
+            role="button"
+            tabIndex={0}
+            aria-label="Следующая страница"
+          />
         </div>
-        <div className={styles['pad-right']} />
-
-        {/* Строка 3 */}
-        <div className={styles['pad-bottom']} />
-
-        <div
-          className={styles['prev-zone']}
-          onClick={prevCol}
-          role="button"
-          tabIndex={0}
-          aria-label="Предыдущая страница"
-        />
-        <div
-          className={styles['next-zone']}
-          onClick={nextCol}
-          role="button"
-          tabIndex={0}
-          aria-label="Следующая страница"
-        />
       </div>
+
       {/* Кликабельный прогресс-бар */}
       <div
         className={styles['progress-bar']}
