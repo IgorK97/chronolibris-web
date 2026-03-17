@@ -11,6 +11,16 @@ import React, {
 } from 'react';
 import styles from './Reader.module.css';
 import { Bookmark, Palette } from 'lucide-react';
+import type { Bookmark as BookmarkDetails } from '@/types/types';
+import {
+  bookmarksApi,
+  CreateBookmarkRequest,
+  useBookmarks,
+  useCreateBookmark,
+  useUpdateBookmark,
+  useDeleteBookmark,
+} from '@/api/bookmarks';
+import { useStore } from '@/stores/globalStore';
 
 export interface Footnote {
   t: string;
@@ -70,22 +80,13 @@ export interface TocData {
 
 interface ReaderProps {
   tocPath?: string;
-
   basePath?: string;
-
+  bookFileId: number;
   filePath?: string;
   imagePath?: string;
 }
 
 export type HighlightColor = 'yellow' | 'green' | 'blue' | 'pink' | 'none';
-
-export interface Bookmark {
-  id: number;
-  paraIndex: number;
-  bookFileId: number;
-  note: string;
-  createdAt: number;
-}
 
 const DEFAULT_FONT_SIZE = 18;
 const MIN_FONT_SIZE = 12;
@@ -116,6 +117,7 @@ export const Reader: React.FC<ReaderProps> = ({
   basePath,
   filePath,
   imagePath,
+  bookFileId,
 }) => {
   const [tocData, setTocData] = useState<TocData | null>(null);
   const [currentPartIndex, setCurrentPartIndex] = useState(0);
@@ -139,7 +141,20 @@ export const Reader: React.FC<ReaderProps> = ({
   const [currentCol, setCurrentCol] = useState(0);
   const [totalCols, setTotalCols] = useState(0);
 
-  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
+  const { user } = useStore();
+
+  const { data: bookmarks = [], isLoading: bookmarksLoading } = useBookmarks(
+    bookFileId ?? null,
+    user ?? null
+  );
+
+  console.log(bookmarks);
+
+  const createBookmarkMutation = useCreateBookmark();
+  const updateBookmarkMutation = useUpdateBookmark();
+  const deleteBookmarkMutation = useDeleteBookmark();
+
+  // const [bookmarks, setBookmarks] = useState<BookmarkDetails[]>([]);
   const [bookmarkPanelOpen, setBookmarkPanelOpen] = useState<boolean>(false);
   const [toolbarCollapsed, setToolbarCollapsed] = useState(false);
   const pageGap = 40;
@@ -149,7 +164,8 @@ export const Reader: React.FC<ReaderProps> = ({
   // ✅ Флаг, что нужно восстановить позицию по элементу, а не по колонке
   const restoreByElementRef = useRef<boolean>(false);
 
-  const [editingBookmark, setEditingBookmark] = useState<Bookmark | null>(null);
+  const [editingBookmark, setEditingBookmark] =
+    useState<BookmarkDetails | null>(null);
   const [contextMenu, setContextMenu] = useState<{
     paraIndex: number;
     x: number;
@@ -202,19 +218,45 @@ export const Reader: React.FC<ReaderProps> = ({
       .then((r) => r.json())
       .then((data: TocData) => {
         setTocData(data);
-        if (filePath) {
+
+        // Если filePath не передан, берём первый Part из TOC
+        if (!filePath && data.Parts.length > 0) {
+          const firstPartUrl = buildUrl(basePath, data.Parts[0].url);
+          // Триггерим загрузку первого фрагмента через обновление currentUrl
+          // (currentUrl вычисляется через useMemo, поэтому достаточно установить currentPartIndex)
+          setCurrentPartIndex(0);
+        } else if (filePath) {
           const idx = data.Parts.findIndex((p) => filePath.endsWith(p.url));
           if (idx !== -1) setCurrentPartIndex(idx);
         }
+
+        // if (filePath) {
+        //   const idx = data.Parts.findIndex((p) => filePath.endsWith(p.url));
+        //   if (idx !== -1) setCurrentPartIndex(idx);
+        // }
       })
       .catch(console.error);
   }, [tocPath]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // const currentUrl = useMemo(() => {
+  //   if (tocData) {
+  //     const part = tocData.Parts[currentPartIndex];
+  //     if (part) return buildUrl(basePath, part.url);
+  //   }
+  //   return filePath ?? '';
+  // }, [tocData, currentPartIndex, basePath, filePath]);
+
   const currentUrl = useMemo(() => {
-    if (tocData) {
-      const part = tocData.Parts[currentPartIndex];
-      if (part) return buildUrl(basePath, part.url);
-    }
+    if (!tocData) return filePath ?? '';
+
+    // Если currentPartIndex выходит за границы, корректируем
+    const safeIndex = Math.max(
+      0,
+      Math.min(currentPartIndex, tocData.Parts.length - 1)
+    );
+    const part = tocData.Parts[safeIndex];
+
+    if (part) return buildUrl(basePath, part.url);
     return filePath ?? '';
   }, [tocData, currentPartIndex, basePath, filePath]);
 
@@ -395,7 +437,7 @@ export const Reader: React.FC<ReaderProps> = ({
 
   useEffect(() => {
     setCurrentCol(0);
-    viewportRef.current?.scrollTo({ left: 0, behavior: 'auto' });
+    contentRef.current?.scrollTo({ left: 0, behavior: 'auto' });
   }, [twoPageMode]);
 
   const nextCol = () => goToCol(currentCol + (twoPageMode ? 2 : 1));
@@ -481,35 +523,71 @@ export const Reader: React.FC<ReaderProps> = ({
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [contextMenu]);
-  const bookFileId = 1;
+  // const bookFileId = 1;
+
+  // const createBookmark = useCallback(
+  //   (paraIndex: number, note: string) => {
+  //     const bm: BookmarkDetails = {
+  //       id: Math.random(),
+  //       paraIndex,
+  //       bookFileId,
+  //       note,
+  //       createdAt: Date.now(),
+  //     };
+  //     setBookmarks((prev) => [...prev, bm]);
+  //     setContextMenu(null);
+  //   },
+  //   [bookFileId]
+  // );
 
   const createBookmark = useCallback(
     (paraIndex: number, note: string) => {
-      const bm: Bookmark = {
-        id: Math.random(),
+      if (!bookFileId || !user) return;
+
+      const request: CreateBookmarkRequest = {
+        bookFileId: bookFileId,
         paraIndex,
-        bookFileId,
-        note,
-        createdAt: Date.now(),
+        note: note.trim() || undefined,
       };
-      setBookmarks((prev) => [...prev, bm]);
+
+      createBookmarkMutation.mutate(request);
       setContextMenu(null);
     },
-    [bookFileId]
+    [bookFileId, user, createBookmarkMutation]
   );
 
-  const updateBookmark = useCallback((id: number, note: string) => {
-    setBookmarks((prev) => prev.map((b) => (b.id === id ? { ...b, note } : b)));
-    setEditingBookmark(null);
-  }, []);
+  const updateBookmark = useCallback(
+    (id: number, note: string, bookFileId: number) => {
+      updateBookmarkMutation.mutate({
+        id,
+        data: { note: note.trim() || undefined },
+        bookFileId,
+      });
+      setEditingBookmark(null);
+    },
+    [updateBookmarkMutation]
+  );
 
-  const deleteBookmark = useCallback((id: number) => {
-    setBookmarks((prev) => prev.filter((b) => b.id !== id));
-    setEditingBookmark(null);
-  }, []);
+  const deleteBookmark = useCallback(
+    (id: number, bookFileId: number) => {
+      deleteBookmarkMutation.mutate({ id, bookFileId });
+      setEditingBookmark(null);
+    },
+    [deleteBookmarkMutation]
+  );
+
+  // const updateBookmark = useCallback((id: number, note: string) => {
+  //   setBookmarks((prev) => prev.map((b) => (b.id === id ? { ...b, note } : b)));
+  //   setEditingBookmark(null);
+  // }, []);
+
+  // const deleteBookmark = useCallback((id: number) => {
+  //   setBookmarks((prev) => prev.filter((b) => b.id !== id));
+  //   setEditingBookmark(null);
+  // }, []);
 
   const navigateToBookmark = useCallback(
-    (bm: Bookmark) => {
+    (bm: BookmarkDetails) => {
       if (!tocData) return;
       const globalIdx = bm.paraIndex - 1;
       const partIdx = tocData.Parts.findIndex(
@@ -971,7 +1049,8 @@ export const Reader: React.FC<ReaderProps> = ({
         onClose={() => setBookmarkPanelOpen(false)}
         bookmarks={bookmarks.filter((b) => b.bookFileId === bookFileId)}
         onEdit={setEditingBookmark}
-        onDelete={deleteBookmark}
+        isLoading={bookmarksLoading}
+        onDelete={() => deleteBookmark}
         onNavigate={navigateToBookmark}
       />
       {contextMenu && (
@@ -997,8 +1076,10 @@ export const Reader: React.FC<ReaderProps> = ({
       {editingBookmark && (
         <BookmarkEditModal
           bookmark={editingBookmark}
-          onSave={(note) => updateBookmark(editingBookmark.id, note)}
-          onDelete={() => deleteBookmark(editingBookmark.id)}
+          onSave={(note) =>
+            updateBookmark(editingBookmark.id, note, bookFileId)
+          }
+          onDelete={() => deleteBookmark(editingBookmark.id, bookFileId)}
           onClose={() => setEditingBookmark(null)}
         />
       )}
@@ -1246,9 +1327,9 @@ interface ContextMenuProps {
   x: number;
   y: number;
   paraIndex: number;
-  existingBookmark: Bookmark | null;
+  existingBookmark: BookmarkDetails | null;
   onAddBookmark: (note: string) => void;
-  onEditBookmark: (bm: Bookmark) => void;
+  onEditBookmark: (bm: BookmarkDetails) => void;
   onClose: () => void;
 }
 
@@ -1344,7 +1425,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
 // Модалка редактирования/удаления закладки
 
 interface BookmarkEditModalProps {
-  bookmark: Bookmark;
+  bookmark: BookmarkDetails;
   onSave: (note: string) => void;
   onDelete: () => void;
   onClose: () => void;
@@ -1424,16 +1505,18 @@ const BookmarkEditModal: React.FC<BookmarkEditModalProps> = ({
 interface BookmarkPanelProps {
   open: boolean;
   onClose: () => void;
-  bookmarks: Bookmark[];
-  onEdit: (bm: Bookmark) => void;
-  onDelete: (id: number) => void;
-  onNavigate: (bm: Bookmark) => void;
+  bookmarks: BookmarkDetails[];
+  isLoading?: boolean;
+  onEdit: (bm: BookmarkDetails) => void;
+  onDelete: () => void;
+  onNavigate: (bm: BookmarkDetails) => void;
 }
 
 const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
   open,
   onClose,
   bookmarks,
+  isLoading,
   onEdit,
   onDelete,
   onNavigate,
@@ -1463,11 +1546,15 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
         </div>
 
         {bookmarks.length === 0 ? (
-          <div className={styles['bm-empty']}>
-            Правый клик на абзаце,
-            <br />
-            чтобы поставить закладку
-          </div>
+          isLoading ? (
+            <div className={styles['bm-empty']}>Загрузка закладок...</div>
+          ) : (
+            <div className={styles['bm-empty']}>
+              Правый клик на абзаце,
+              <br />
+              чтобы поставить закладку
+            </div>
+          )
         ) : (
           <div className={styles['toc-list']}>
             {[...bookmarks]
@@ -1505,7 +1592,7 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
                       </button>
                       <button
                         className={styles['bm-item-btn']}
-                        onClick={() => onDelete(bm.id)}
+                        onClick={() => onDelete()}
                       >
                         🗑 Удалить
                       </button>

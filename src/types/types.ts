@@ -161,6 +161,14 @@ export interface ContentDto {
   tags: TagDetails[];
 }
 
+export interface Bookmark {
+  id: number;
+  paraIndex: number;
+  bookFileId: number;
+  note: string;
+  createdAt: number;
+}
+
 export interface BookDto {
   id: number;
   title: string;

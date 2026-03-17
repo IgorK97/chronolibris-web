@@ -47,6 +47,7 @@ interface BookDetailsProps {
   onNavigateToReviews: (id: number) => void;
   onNavigateToRead: (id: number) => void;
   onNavigateToBack: () => void;
+  onReadClick: (bookId: number, bookFileId?: number) => void | Promise<void>;
 }
 
 function getAuthorsString(
@@ -65,6 +66,7 @@ export const BookDetailsComponent = ({
   onNavigateToReviews,
   onNavigateToRead,
   onNavigateToBack,
+  onReadClick,
 }: BookDetailsProps) => {
   // const [isDownloaded, setIsDownloaded] = useState<boolean>(false);
   // const [isNewVersionAvailable] = useState<boolean>(false);
@@ -567,7 +569,7 @@ export const BookDetailsComponent = ({
           </div>
           <button
             className={styles['read-button']}
-            onClick={() => onNavigateToRead(fullBookDetails.id)}
+            onClick={() => onReadClick(fullBookDetails.id, 3)}
           >
             {t('book.read')}
           </button>

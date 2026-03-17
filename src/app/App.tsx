@@ -43,6 +43,23 @@ const queryClient = new QueryClient();
 export default function App() {
   const { setUser, isInitialized, setInitialized, setCurrentBook } = useStore();
   const navigate = useNavigate(); // Добавляем хук навигации
+  const handleReadClick = async (bookId: number, bookFileId?: number) => {
+    // Можно добавить логику: проверка прав, загрузка метаданных и т.д.
+
+    // Переход с параметрами для Reader
+    navigate('/reader', {
+      state: {
+        bookId,
+        bookFileId,
+        // Опционально: базовые пути для API
+        // basePath: `/api/books/${bookId}/fragments`,
+        // tocPath: `/api/books/${bookId}/toc`,
+        tocPath: '/data/toc.json',
+        filePath: '/data/000.json',
+        basePath: '/data',
+      },
+    });
+  };
   useEffect(() => {
     const initApp = async () => {
       // Если в localStorage нашли старого юзера, можно обновить его данные с сервера
@@ -121,6 +138,7 @@ export default function App() {
               <BookDetailsComponent
                 onNavigateToBack={() => navigate(-1)}
                 onNavigateToRead={() => {}}
+                onReadClick={handleReadClick}
                 onNavigateToReviews={handleNavigateToReviews}
               />
             }
@@ -176,6 +194,7 @@ export default function App() {
                   tocPath="/data/toc.json"
                   filePath="/data/000.json"
                   basePath="/data"
+                  bookFileId={3}
                   // imagePath={`${import.meta.env.VITE_STORAGE_URL}/books/v1/4/images`}
                   imagePath={`${import.meta.env.VITE_STORAGE_URL}/covers/4`}
                   // cacheSize={10}
