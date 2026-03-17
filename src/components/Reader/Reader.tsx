@@ -236,7 +236,7 @@ export const Reader: React.FC<ReaderProps> = ({
       if (twoPageMode && target > 0) target = target - (target % 2);
       pendingColRef.current = null;
       setCurrentCol(target);
-      vp.scrollTo({
+      ct.scrollTo({
         // left: target * ct.clientWidth,
         left: target * pageWidth,
         behavior: 'auto',
@@ -335,6 +335,7 @@ export const Reader: React.FC<ReaderProps> = ({
 
   const goToCol = (col: number) => {
     const vp = viewportRef.current;
+    const ct = contentRef.current;
     if (!vp) return;
 
     const pageWidth = twoPageMode ? vp.clientWidth / 2 : vp.clientWidth;
@@ -373,7 +374,7 @@ export const Reader: React.FC<ReaderProps> = ({
     // if (col + 1 === totalCols) leftPos += pageGap;
     console.log(col, totalCols, leftPos);
     setCurrentCol(clamped);
-    vp.scrollTo({ left: leftPos, behavior: 'smooth' });
+    ct!.scrollTo({ left: leftPos, behavior: 'smooth' });
   };
 
   // const nextCol = useCallback(
@@ -500,10 +501,10 @@ export const Reader: React.FC<ReaderProps> = ({
         ) as HTMLElement | null;
         if (!el || !viewportRef.current) return false;
 
-        const vpRect = viewportRef.current.getBoundingClientRect();
+        const ctRect = contentRef.current!.getBoundingClientRect();
         const elRect = el.getBoundingClientRect();
         const elLeft =
-          elRect.left - vpRect.left + viewportRef.current.scrollLeft;
+          elRect.left - ctRect.left + contentRef.current!.scrollLeft;
         // const colWidth = viewportRef.current.clientWidth - pageGap;
         const colWidth = twoPageMode
           ? viewportRef.current.clientWidth / 2
@@ -512,8 +513,8 @@ export const Reader: React.FC<ReaderProps> = ({
 
         if (targetCol !== currentCol) {
           setCurrentCol(targetCol);
-          viewportRef.current.scrollTo({
-            left: targetCol * (viewportRef.current.clientWidth - pageGap),
+          contentRef.current!.scrollTo({
+            left: targetCol * (contentRef.current!.clientWidth - pageGap),
             behavior: 'smooth',
           });
         }
@@ -549,7 +550,7 @@ export const Reader: React.FC<ReaderProps> = ({
         : viewportRef.current.clientWidth - pageGap;
       const targetCol = Math.max(0, Math.floor(elLeft / colWidth));
       setCurrentCol(targetCol);
-      viewportRef.current.scrollTo({
+      contentRef.current!.scrollTo({
         left: targetCol * (viewportRef.current.clientWidth - pageGap),
         behavior: 'smooth',
       });
