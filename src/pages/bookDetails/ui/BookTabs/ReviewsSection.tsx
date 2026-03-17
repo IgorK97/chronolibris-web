@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 // import type { Review } from './bookTabsData';
-import { formatDate } from './BookTabsData';
+import { formatDate } from '@/utils';
 import {
   Avatar,
   VoteButton,

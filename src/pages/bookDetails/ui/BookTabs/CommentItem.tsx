@@ -17,7 +17,7 @@ import {
   ThreeDotsMenu,
   VoteButton,
 } from './BookTabsAtoms';
-import { formatDate } from './BookTabsData';
+import { formatDate } from '@/utils';
 import type { CommentDto } from '@/types/types';
 import { useStore } from '@/stores/globalStore';
 import styles from './BookTabs.module.css';

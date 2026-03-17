@@ -12,3 +12,17 @@ export const getImageUrl = (path: string | null | undefined) => {
 
   return `${baseUrl}${cleanPath}`;
 };
+
+export function formatDate(iso: string): string {
+  console.log('DATE: ', iso);
+  if (iso === undefined) {
+    console.log('UNDEFINED');
+    return '';
+  }
+
+  return new Date(iso).toLocaleDateString('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}

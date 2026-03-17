@@ -43,9 +43,10 @@ import {
   useMyReview,
   useUpdateReview,
 } from '@/api/reviews';
+import { useBookFiles } from '@/api/bookFiles';
 interface BookDetailsProps {
   onNavigateToReviews: (id: number) => void;
-  onNavigateToRead: (id: number) => void;
+  onNavigateToRead: (id: number, bookFileId?: number) => void;
   onNavigateToBack: () => void;
   onReadClick: (bookId: number, bookFileId?: number) => void | Promise<void>;
 }
@@ -96,6 +97,13 @@ export const BookDetailsComponent = ({
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
     setIsRatingPopupOpen(true);
   };
+
+  const { data: bookFiles, isLoading: filesLoading } = useBookFiles(
+    bookId ?? 0
+  );
+
+  const defaultBookFileId =
+    bookFiles?.find((f) => f.isReadable)?.id ?? bookFiles?.[0]?.id;
 
   const handleToggleShelf = async (shelf: ShelfDetails) => {
     const isOnShelf = seekedShelves?.includes(shelf.id);
@@ -233,17 +241,10 @@ export const BookDetailsComponent = ({
     if (success) refetchBook();
   };
 
-  const handleDownload = async () => {
-    // if (!isDownloaded) {
-    //   await downloadAndSaveBook(
-    //     fullBookDetails.id,
-    //     `${process.env.REACT_APP_BASE_URL}/api/Books/${fullBookDetails.id}/read`,
-    //   );
-    //   await downloadAndSaveMetadata(fullBookDetails);
-    // } else {
-    //   deleteLocalBook(fullBookDetails.id);
-    // }
-    // setIsDownloaded(!isDownloaded);
+  const handleDownload = async (bookFileId?: number) => {
+    // Сервер сам резолвит путь для скачивания
+    if (!bookFileId) return;
+    window.open(`/api/books/files/${bookFileId}/download`, '_blank');
   };
 
   return (
@@ -263,9 +264,6 @@ export const BookDetailsComponent = ({
           <button
             className={styles['icon-button']}
             onClick={() => {
-              // console.log(
-              //   `Toggling read status for book ${fullBookDetails.id}, current status: ${fullBookDetails.isRead}`
-              // );
               toggleShelfAction(READ_SHELF_ID, !!fullBookDetails.isRead);
             }}
           >
@@ -378,10 +376,31 @@ export const BookDetailsComponent = ({
               )}
             </div>
           )}
-          <button className={styles['icon-button']} onClick={handleDownload}>
+          <div className={styles['download-dropdown']}>
+            <button className={styles['icon-button']}>
+              <Download size={24} />
+              <span className={styles['button-label']}>
+                {t('book.download')}
+              </span>
+            </button>
+            {bookFiles && bookFiles.length > 0 && (
+              <div className={styles['download-options']}>
+                {bookFiles.map((file) => (
+                  <button
+                    key={file.id}
+                    className={styles['download-option']}
+                    onClick={() => handleDownload(file.id)}
+                  >
+                    {file.formatId} ({file.fileSizeBytes} {file.fileSizeBytes})
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          {/* <button className={styles['icon-button']} onClick={handleDownload}>
             <Download size={24} />
             <span className={styles['button-label']}>{t('book.download')}</span>
-          </button>
+          </button> */}
         </div>
       </header>
 
@@ -569,9 +588,10 @@ export const BookDetailsComponent = ({
           </div>
           <button
             className={styles['read-button']}
+            disabled={!defaultBookFileId}
             onClick={() => onReadClick(fullBookDetails.id, 3)}
           >
-            {t('book.read')}
+            {defaultBookFileId ? t('book.read') : t('book.no_files_available')}
           </button>
         </div>
       </div>

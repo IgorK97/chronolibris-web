@@ -10,17 +10,30 @@ import React, {
   useMemo,
 } from 'react';
 import styles from './Reader.module.css';
-import { Bookmark, Palette } from 'lucide-react';
-import type { Bookmark as BookmarkDetails } from '@/types/types';
 import {
-  bookmarksApi,
-  CreateBookmarkRequest,
+  Bookmark,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  Palette,
+  PencilLine,
+  TableOfContents,
+  Trash2,
+} from 'lucide-react';
+import type { Bookmark as BookmarkDetails } from '@/types/types';
+
+import type { CreateBookmarkRequest } from '@/api/bookmarks';
+import {
+  // bookmarksApi,
   useBookmarks,
   useCreateBookmark,
   useUpdateBookmark,
   useDeleteBookmark,
 } from '@/api/bookmarks';
 import { useStore } from '@/stores/globalStore';
+import { formatDate } from '@/utils';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export interface Footnote {
   t: string;
@@ -79,11 +92,12 @@ export interface TocData {
 }
 
 interface ReaderProps {
-  tocPath?: string;
-  basePath?: string;
+  // tocPath?: string;
+  // basePath?: string;
   bookFileId: number;
-  filePath?: string;
-  imagePath?: string;
+  initialChunkIndex?: number;
+  // filePath?: string;
+  // imagePath?: string;
 }
 
 export type HighlightColor = 'yellow' | 'green' | 'blue' | 'pink' | 'none';
@@ -106,26 +120,41 @@ const FONT_OPTIONS: { label: string; value: string }[] = [
 const TEXT_COLORS = ['#1a1a1a', '#3b2a1a', '#1a2e1a', '#0d1b2a', '#4a4a4a'];
 const PAGE_COLORS = ['#ffffff', '#f5f1e8', '#f0ede0', '#e8f0e8', '#e8eef5'];
 const BG_COLORS = ['#f5f1e8', '#e8e0d0', '#d6cfc0', '#dde8dd', '#d0dce8'];
-
-function buildUrl(base: string | undefined, url: string): string {
-  if (!base) return url;
-  return base.replace(/\/$/, '') + '/' + url.replace(/^\//, '');
-}
+const fetchToc = async (bookFileId: number): Promise<TocData> => {
+  const res = await fetch(`/api/books/files/${bookFileId}/toc`);
+  if (!res.ok) throw new Error('Failed to fetch TOC');
+  return res.json();
+};
+const fetchChunk = async (
+  bookFileId: number,
+  chunkIndex: number
+): Promise<TextSegment[]> => {
+  const res = await fetch(
+    `/api/books/files/${bookFileId}/chunks/${chunkIndex}`
+  );
+  if (!res.ok) throw new Error('Failed to fetch chunk');
+  return res.json();
+};
+// function buildUrl(base: string | undefined, url: string): string {
+//   if (!base) return url;
+//   return base.replace(/\/$/, '') + '/' + url.replace(/^\//, '');
+// }
 
 export const Reader: React.FC<ReaderProps> = ({
-  tocPath,
-  basePath,
-  filePath,
-  imagePath,
+  // tocPath,
+  // basePath,
+  // filePath,
+  // imagePath,
   bookFileId,
+  initialChunkIndex = 0,
 }) => {
-  const [tocData, setTocData] = useState<TocData | null>(null);
-  const [currentPartIndex, setCurrentPartIndex] = useState(0);
+  // const [tocData, setTocData] = useState<TocData | null>(null);
+  const [currentPartIndex, setCurrentPartIndex] = useState(initialChunkIndex);
 
-  const [segments, setSegments] = useState<TextSegment[]>([]);
-  const [nextSegments, setNextSegments] = useState<TextSegment[] | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isPrefetching, setIsPrefetching] = useState(false);
+  // const [segments, setSegments] = useState<TextSegment[]>([]);
+  // const [nextSegments, setNextSegments] = useState<TextSegment[] | null>(null);
+  // const [isLoading, setIsLoading] = useState(true);
+  // const [isPrefetching, setIsPrefetching] = useState(false);
 
   const [fontSize, setFontSize] = useState(DEFAULT_FONT_SIZE);
   const [fontFamily, setFontFamily] = useState(FONT_OPTIONS[0].value);
@@ -159,9 +188,9 @@ export const Reader: React.FC<ReaderProps> = ({
   const [toolbarCollapsed, setToolbarCollapsed] = useState(false);
   const pageGap = 40;
 
-  // ✅ Хранит индекс параграфа, который был первым видимым до изменений
+  //Индекс первого видимого на странице параграфа до изменений
   const visibleParaIndexRef = useRef<number | null>(null);
-  // ✅ Флаг, что нужно восстановить позицию по элементу, а не по колонке
+  //Флаг того, что после изменения нужно восстановить позицию по элементу
   const restoreByElementRef = useRef<boolean>(false);
 
   const [editingBookmark, setEditingBookmark] =
@@ -171,6 +200,18 @@ export const Reader: React.FC<ReaderProps> = ({
     x: number;
     y: number;
   } | null>(null);
+
+  const {
+    data: fetchedTocData,
+    // isLoading: tocLoading,
+    // error: tocError,
+  } = useQuery<TocData, Error>({
+    queryKey: ['toc', bookFileId],
+    queryFn: () => fetchToc(bookFileId),
+    staleTime: Infinity,
+    gcTime: 20 * 60 * 1000,
+    retry: 2,
+  });
 
   // Находит индекс первого параграфа, который полностью виден в текущей вьюпорте
   const captureVisibleParaIndex = useCallback(() => {
@@ -211,32 +252,44 @@ export const Reader: React.FC<ReaderProps> = ({
   const contentRef = useRef<HTMLDivElement>(null);
 
   const [twoPageMode, setTwoPageMode] = useState(false);
-
   useEffect(() => {
-    if (!tocPath) return;
-    fetch(tocPath)
-      .then((r) => r.json())
-      .then((data: TocData) => {
-        setTocData(data);
+    // setNextSegments(null);
+    setCurrentCol(0);
+  }, [currentPartIndex]);
 
-        // Если filePath не передан, берём первый Part из TOC
-        if (!filePath && data.Parts.length > 0) {
-          const firstPartUrl = buildUrl(basePath, data.Parts[0].url);
-          // Триггерим загрузку первого фрагмента через обновление currentUrl
-          // (currentUrl вычисляется через useMemo, поэтому достаточно установить currentPartIndex)
-          setCurrentPartIndex(0);
-        } else if (filePath) {
-          const idx = data.Parts.findIndex((p) => filePath.endsWith(p.url));
-          if (idx !== -1) setCurrentPartIndex(idx);
-        }
+  // useEffect(() => {
+  //   if (fetchedTocData) {
+  //     setTocData(fetchedTocData);
+  //     if (fetchedTocData.Parts.length > 0) {
+  //       setCurrentPartIndex(initialChunkIndex);
+  //     }
+  //   }
+  // }, [fetchedTocData, initialChunkIndex]);
+  // useEffect(() => {
+  //   if (!tocPath) return;
+  //   fetch(tocPath)
+  //     .then((r) => r.json())
+  //     .then((data: TocData) => {
+  //       setTocData(data);
 
-        // if (filePath) {
-        //   const idx = data.Parts.findIndex((p) => filePath.endsWith(p.url));
-        //   if (idx !== -1) setCurrentPartIndex(idx);
-        // }
-      })
-      .catch(console.error);
-  }, [tocPath]); // eslint-disable-line react-hooks/exhaustive-deps
+  //       // Если filePath не передан, берём первый Part из TOC
+  //       if (!filePath && data.Parts.length > 0) {
+  //         const firstPartUrl = buildUrl(basePath, data.Parts[0].url);
+  //         // Триггерим загрузку первого фрагмента через обновление currentUrl
+  //         // (currentUrl вычисляется через useMemo, поэтому достаточно установить currentPartIndex)
+  //         setCurrentPartIndex(0);
+  //       } else if (filePath) {
+  //         const idx = data.Parts.findIndex((p) => filePath.endsWith(p.url));
+  //         if (idx !== -1) setCurrentPartIndex(idx);
+  //       }
+
+  //       // if (filePath) {
+  //       //   const idx = data.Parts.findIndex((p) => filePath.endsWith(p.url));
+  //       //   if (idx !== -1) setCurrentPartIndex(idx);
+  //       // }
+  //     })
+  //     .catch(console.error);
+  // }, [tocPath]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // const currentUrl = useMemo(() => {
   //   if (tocData) {
@@ -246,33 +299,66 @@ export const Reader: React.FC<ReaderProps> = ({
   //   return filePath ?? '';
   // }, [tocData, currentPartIndex, basePath, filePath]);
 
-  const currentUrl = useMemo(() => {
-    if (!tocData) return filePath ?? '';
+  // const currentUrl = useMemo(() => {
+  //   if (!tocData) return filePath ?? '';
 
-    // Если currentPartIndex выходит за границы, корректируем
-    const safeIndex = Math.max(
-      0,
-      Math.min(currentPartIndex, tocData.Parts.length - 1)
-    );
-    const part = tocData.Parts[safeIndex];
+  //   // Если currentPartIndex выходит за границы, корректируем
+  //   const safeIndex = Math.max(
+  //     0,
+  //     Math.min(currentPartIndex, tocData.Parts.length - 1)
+  //   );
+  //   const part = tocData.Parts[safeIndex];
 
-    if (part) return buildUrl(basePath, part.url);
-    return filePath ?? '';
-  }, [tocData, currentPartIndex, basePath, filePath]);
+  //   if (part) return buildUrl(basePath, part.url);
+  //   return filePath ?? '';
+  // }, [tocData, currentPartIndex, basePath, filePath]);
 
-  useEffect(() => {
-    if (!currentUrl) return;
-    setIsLoading(true);
-    setNextSegments(null);
-    setCurrentCol(0);
-    fetch(currentUrl)
-      .then((r) => r.json())
-      .then((data: TextSegment[]) => {
-        setSegments(data);
-        setIsLoading(false);
-      })
-      .catch(() => setIsLoading(false));
-  }, [currentUrl]);
+  // useEffect(() => {
+  //   if (!currentUrl) return;
+  //   setIsLoading(true);
+  //   setNextSegments(null);
+  //   setCurrentCol(0);
+  //   fetch(currentUrl)
+  //     .then((r) => r.json())
+  //     .then((data: TextSegment[]) => {
+  //       setSegments(data);
+  //       setIsLoading(false);
+  //     })
+  //     .catch(() => setIsLoading(false));
+  // }, [currentUrl]);
+
+  const { data: segments, isLoading } = useQuery({
+    queryKey: ['chunk', bookFileId, currentPartIndex],
+    queryFn: () => fetchChunk(bookFileId, currentPartIndex),
+    enabled: !!fetchedTocData && currentPartIndex < fetchedTocData.Parts.length,
+    staleTime: Infinity, // Какова вероятность того,
+    // что текст книги изменится во время чтения пользователя?
+    gcTime: 10 * 60 * 1000,
+  });
+  const queryClient = useQueryClient();
+
+  // useEffect(() => {
+  //   if (!fetchedTocData || currentPartIndex >= fetchedTocData.Parts.length)
+  //     return;
+
+  //   const load = async () => {
+  //     setIsLoading(true);
+  //     setNextSegments(null);
+  //     setCurrentCol(0);
+
+  //     fetchChunk(bookFileId, currentPartIndex)
+  //       .then((data: TextSegment[]) => {
+  //         setSegments(data);
+  //         setIsLoading(false);
+  //       })
+  //       .catch((err) => {
+  //         console.error('Failed to load chunk: ', err);
+  //         setIsLoading(false);
+  //       });
+  //   };
+
+  //   load();
+  // }, [bookFileId, currentPartIndex, fetchedTocData]);
 
   const recalcCols = () => {
     const vp = viewportRef.current;
@@ -344,39 +430,42 @@ export const Reader: React.FC<ReaderProps> = ({
       return () => clearTimeout(id);
     }
   }, [isLoading, fontSize, fontFamily, segments]);
-
   useEffect(() => {
     window.addEventListener('resize', recalcCols);
     return () => window.removeEventListener('resize', recalcCols);
   }, []);
 
   useEffect(() => {
-    if (!tocData || isLoading || isPrefetching || nextSegments !== null) return;
+    if (!fetchedTocData || isLoading) return;
+
     if (totalCols === 0) return;
+
     const remaining = totalCols - 1 - currentCol;
     if (remaining > PREFETCH_THRESHOLD) return;
 
     const nextIdx = currentPartIndex + 1;
-    if (nextIdx >= tocData.Parts.length) return;
+    if (nextIdx >= fetchedTocData.Parts.length) return;
 
-    const nextUrl = buildUrl(basePath, tocData.Parts[nextIdx].url);
-    setIsPrefetching(true);
-    fetch(nextUrl)
-      .then((r) => r.json())
-      .then((data: TextSegment[]) => {
-        setNextSegments(data);
-        setIsPrefetching(false);
-      })
-      .catch(() => setIsPrefetching(false));
+    queryClient.prefetchQuery({
+      queryKey: ['chunk', bookFileId, nextIdx],
+      queryFn: () => fetchChunk(bookFileId, nextIdx),
+    });
+
+    // setIsPrefetching(true);
+    // fetchChunk(bookFileId, nextIdx)
+    //   .then((data: TextSegment[]) => {
+    //     setNextSegments(data);
+    //     setIsPrefetching(false);
+    //   })
+    //   .catch(() => setIsPrefetching(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
+    bookFileId,
     currentCol,
     totalCols,
-    tocData,
+    fetchedTocData,
     currentPartIndex,
     isLoading,
-    isPrefetching,
-    nextSegments,
-    basePath,
   ]);
 
   const goToCol = (col: number) => {
@@ -388,23 +477,26 @@ export const Reader: React.FC<ReaderProps> = ({
       ? (ct!.clientWidth - pageGap) / 2 + pageGap
       : vp.clientWidth;
     console.log(pageWidth);
-    if (col >= totalCols && tocData) {
+    if (col >= totalCols && fetchedTocData) {
       const nextIdx = currentPartIndex + 1;
-      if (nextIdx < tocData.Parts.length) {
-        if (nextSegments !== null) {
-          setSegments(nextSegments);
-          setNextSegments(null);
-          setCurrentCol(0);
-          pendingColRef.current = 0;
-        } else {
-          pendingColRef.current = 0;
-        }
+      if (nextIdx < fetchedTocData.Parts.length) {
+        setCurrentCol(0);
         setCurrentPartIndex(nextIdx);
         return;
+        // if (nextSegments !== null) {
+        //   setSegments(nextSegments);
+        //   setNextSegments(null);
+        //   setCurrentCol(0);
+        //   pendingColRef.current = 0;
+        // } else {
+        //   pendingColRef.current = 0;
+        // }
+        // setCurrentPartIndex(nextIdx);
+        // return;
       }
     }
 
-    if (col < 0 && tocData) {
+    if (col < 0 && fetchedTocData) {
       const prevIdx = currentPartIndex - 1;
       if (prevIdx >= 0) {
         pendingColRef.current = 9999;
@@ -476,30 +568,31 @@ export const Reader: React.FC<ReaderProps> = ({
   }, []);
 
   const readPercent = useMemo<number>(() => {
-    if (!tocData || tocData.Body[0].e === 0 || totalCols === 0) return 0;
-    const part = tocData.Parts[currentPartIndex];
+    if (!fetchedTocData || fetchedTocData.Body[0].e === 0 || totalCols === 0)
+      return 0;
+    const part = fetchedTocData.Parts[currentPartIndex];
     if (!part) return 0;
     console.log('TOC_END');
     const colRatio = totalCols > 1 ? currentCol / (totalCols - 1) : 1;
     const globalPos = part.s + (part.e - part.s) * colRatio;
-    return Math.min(100, (globalPos / tocData.Body[0].e) * 100);
-  }, [tocData, currentPartIndex, currentCol, totalCols]);
+    return Math.min(100, (globalPos / fetchedTocData.Body[0].e) * 100);
+  }, [fetchedTocData, currentPartIndex, currentCol, totalCols]);
 
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!tocData) return;
+    if (!fetchedTocData) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const ratio = Math.max(
       0,
       Math.min(1, (e.clientX - rect.left) / rect.width)
     );
-    const targetGlobal = Math.round(ratio * tocData.Body[0].e); // 0-based
+    const targetGlobal = Math.round(ratio * fetchedTocData.Body[0].e); // 0-based
 
-    const partIdx = tocData.Parts.findIndex(
+    const partIdx = fetchedTocData.Parts.findIndex(
       (p) => targetGlobal >= p.s && targetGlobal <= p.e
     );
     if (partIdx === -1) return;
 
-    const part = tocData.Parts[partIdx];
+    const part = fetchedTocData.Parts[partIdx];
     const withinRatio = (targetGlobal - part.s) / Math.max(1, part.e - part.s);
 
     if (partIdx === currentPartIndex) {
@@ -523,22 +616,6 @@ export const Reader: React.FC<ReaderProps> = ({
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [contextMenu]);
-  // const bookFileId = 1;
-
-  // const createBookmark = useCallback(
-  //   (paraIndex: number, note: string) => {
-  //     const bm: BookmarkDetails = {
-  //       id: Math.random(),
-  //       paraIndex,
-  //       bookFileId,
-  //       note,
-  //       createdAt: Date.now(),
-  //     };
-  //     setBookmarks((prev) => [...prev, bm]);
-  //     setContextMenu(null);
-  //   },
-  //   [bookFileId]
-  // );
 
   const createBookmark = useCallback(
     (paraIndex: number, note: string) => {
@@ -576,21 +653,11 @@ export const Reader: React.FC<ReaderProps> = ({
     [deleteBookmarkMutation]
   );
 
-  // const updateBookmark = useCallback((id: number, note: string) => {
-  //   setBookmarks((prev) => prev.map((b) => (b.id === id ? { ...b, note } : b)));
-  //   setEditingBookmark(null);
-  // }, []);
-
-  // const deleteBookmark = useCallback((id: number) => {
-  //   setBookmarks((prev) => prev.filter((b) => b.id !== id));
-  //   setEditingBookmark(null);
-  // }, []);
-
   const navigateToBookmark = useCallback(
     (bm: BookmarkDetails) => {
-      if (!tocData) return;
+      if (!fetchedTocData) return;
       const globalIdx = bm.paraIndex - 1;
-      const partIdx = tocData.Parts.findIndex(
+      const partIdx = fetchedTocData.Parts.findIndex(
         (p) => globalIdx >= p.s && globalIdx <= p.e
       );
       if (partIdx === -1) return;
@@ -628,7 +695,7 @@ export const Reader: React.FC<ReaderProps> = ({
         setCurrentPartIndex(partIdx);
       }
     },
-    [tocData, currentPartIndex, currentCol, twoPageMode]
+    [fetchedTocData, currentPartIndex, currentCol, twoPageMode]
   );
 
   useEffect(() => {
@@ -636,7 +703,7 @@ export const Reader: React.FC<ReaderProps> = ({
     if (isLoading || totalCols === 0) return;
     const paraIdx = pendingBookmarkParaRef.current;
     pendingBookmarkParaRef.current = null;
-    // Небольшая задержка — DOM должен окончательно отрендериться
+    // На всякий случай задержку поставил, устал уже от всего
     setTimeout(() => {
       const el = contentRef.current?.querySelector(
         `[data-para-index="${paraIdx}"]`
@@ -703,6 +770,7 @@ export const Reader: React.FC<ReaderProps> = ({
         (n) => typeof n !== 'string' && (n as ImgNode).t === 'img'
       ) as ImgNode | undefined;
       if (!firstImg) return null;
+      const imagePath = `${import.meta.env.VITE_STORAGE_URL}/images/${bookFileId}`;
       const fullUrl = imagePath
         ? `${imagePath.replace(/\/$/, '')}/${firstImg.src}`
         : firstImg.src;
@@ -722,11 +790,13 @@ export const Reader: React.FC<ReaderProps> = ({
     }
 
     const paraIndex = seg.xp?.[2] ?? 0;
+    console.log(paraIndex, bookFileId);
+    console.log(bookmarks[0]);
     const paraBookmark =
-      bookmarks.find(
-        (bm) => bm.paraIndex === paraIndex && bm.bookFileId === bookFileId
-      ) ?? null;
-
+      bookmarks.find((bm) => {
+        return bm.paraIndex === paraIndex && bm.bookFileId === bookFileId;
+      }) ?? null;
+    console.log(paraBookmark);
     const getContent = (): React.ReactNode => {
       if (typeof seg.c === 'string') return seg.c;
       if (Array.isArray(seg.c)) {
@@ -792,7 +862,7 @@ export const Reader: React.FC<ReaderProps> = ({
     );
   };
 
-  if (isLoading && segments.length === 0) {
+  if (isLoading || !fetchedTocData || !segments || segments.length === 0) {
     return (
       <div className={styles['loading']}>
         <div className={styles['spinner']} />
@@ -802,8 +872,9 @@ export const Reader: React.FC<ReaderProps> = ({
   }
 
   const hasPrev = currentCol > 0 || currentPartIndex > 0;
-  const hasNext = tocData
-    ? currentCol < totalCols - 1 || currentPartIndex < tocData.Parts.length - 1
+  const hasNext = fetchedTocData
+    ? currentCol < totalCols - 1 ||
+      currentPartIndex < fetchedTocData.Parts.length - 1
     : currentCol < totalCols - 1;
 
   return (
@@ -811,7 +882,7 @@ export const Reader: React.FC<ReaderProps> = ({
       <TocSidebar
         open={tocOpen}
         onClose={() => setTocOpen(false)}
-        tocData={tocData}
+        tocData={fetchedTocData}
         currentPartIndex={currentPartIndex}
         onSelectPart={(idx) => {
           pendingColRef.current = 0;
@@ -831,17 +902,17 @@ export const Reader: React.FC<ReaderProps> = ({
           }
           title={toolbarCollapsed ? 'Развернуть панель' : 'Свернуть панель'}
         >
-          {toolbarCollapsed ? '▾' : '▴'}
+          {toolbarCollapsed ? <ChevronDown /> : <ChevronUp />}
         </button>
         <div className={styles['toolbar-inner']}>
           <div className={styles['controls']}>
-            {tocData && (
+            {fetchedTocData && (
               <button
                 onClick={() => setTocOpen((v) => !v)}
                 className={`${styles['nav-button']} ${tocOpen ? styles['nav-button-active'] : ''}`}
                 aria-label="Содержание"
               >
-                ☰ Содержание
+                <TableOfContents /> Содержание
               </button>
             )}
             <button
@@ -849,14 +920,14 @@ export const Reader: React.FC<ReaderProps> = ({
               disabled={!hasPrev}
               className={styles['nav-button']}
             >
-              ← Назад
+              <ChevronLeft /> Назад
             </button>
             <span className={styles['page-info']}>
               {/* {`Стр. ${currentCol + 1} / ${totalCols}`} */}
               {twoPageMode
                 ? `Стр. ${Math.min(currentCol + 2, totalCols)} / ${totalCols}`
                 : `Стр. ${currentCol + 1} / ${totalCols}`}
-              {tocData && (
+              {fetchedTocData && (
                 <span className={styles['read-percent']}>
                   {' '}
                   ({readPercent.toFixed(0)}%)
@@ -868,7 +939,7 @@ export const Reader: React.FC<ReaderProps> = ({
               disabled={!hasNext}
               className={styles['nav-button']}
             >
-              Вперёд →
+              Вперёд <ChevronRight />
             </button>
             <button
               onClick={() => {
@@ -1008,7 +1079,6 @@ export const Reader: React.FC<ReaderProps> = ({
         </div>
       </div>
 
-      {/* Кликабельный прогресс-бар */}
       <div
         className={styles['progress-bar']}
         onClick={handleProgressClick}
@@ -1024,13 +1094,6 @@ export const Reader: React.FC<ReaderProps> = ({
           style={{ width: `${readPercent}%` }}
         />
       </div>
-
-      {isPrefetching && (
-        <div
-          className={styles['prefetch-indicator']}
-          title="Загрузка следующей части…"
-        />
-      )}
 
       <FootnoteModal note={activeNote} onClose={() => setActiveNote(null)} />
       <ImageLightbox src={activeImage} onClose={() => setActiveImage(null)} />
@@ -1050,7 +1113,7 @@ export const Reader: React.FC<ReaderProps> = ({
         bookmarks={bookmarks.filter((b) => b.bookFileId === bookFileId)}
         onEdit={setEditingBookmark}
         isLoading={bookmarksLoading}
-        onDelete={() => deleteBookmark}
+        onDelete={(id: number) => deleteBookmark(id, bookFileId)}
         onNavigate={navigateToBookmark}
       />
       {contextMenu && (
@@ -1079,7 +1142,7 @@ export const Reader: React.FC<ReaderProps> = ({
           onSave={(note) =>
             updateBookmark(editingBookmark.id, note, bookFileId)
           }
-          onDelete={() => deleteBookmark(editingBookmark.id, bookFileId)}
+          onDelete={(id: number) => deleteBookmark(id, bookFileId)}
           onClose={() => setEditingBookmark(null)}
         />
       )}
@@ -1421,13 +1484,10 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
   );
 };
 
-// ─── BookmarkEditModal ────────────────────────────────────
-// Модалка редактирования/удаления закладки
-
 interface BookmarkEditModalProps {
   bookmark: BookmarkDetails;
   onSave: (note: string) => void;
-  onDelete: () => void;
+  onDelete: (id: number) => void;
   onClose: () => void;
 }
 
@@ -1470,17 +1530,14 @@ const BookmarkEditModal: React.FC<BookmarkEditModalProps> = ({
         </div>
 
         <div className={styles['bm-edit-position']}>
-          Абзац №{bookmark.paraIndex} ·{' '}
-          {new Date(bookmark.createdAt).toLocaleString('ru', {
-            day: 'numeric',
-            month: 'short',
-            hour: '2-digit',
-            minute: '2-digit',
-          })}
+          Абзац №{bookmark.paraIndex} {formatDate(bookmark.createdAt)}
         </div>
 
         <div className={styles['bm-edit-actions']}>
-          <button className={styles['bm-delete-btn']} onClick={onDelete}>
+          <button
+            className={styles['bm-delete-btn']}
+            onClick={() => onDelete(bookmark.id)}
+          >
             Удалить
           </button>
           <button
@@ -1499,16 +1556,13 @@ const BookmarkEditModal: React.FC<BookmarkEditModalProps> = ({
   );
 };
 
-// ─── BookmarkPanel ────────────────────────────────────────
-// Правая боковая панель со списком закладок
-
 interface BookmarkPanelProps {
   open: boolean;
   onClose: () => void;
   bookmarks: BookmarkDetails[];
   isLoading?: boolean;
   onEdit: (bm: BookmarkDetails) => void;
-  onDelete: () => void;
+  onDelete: (id: number) => void;
   onNavigate: (bm: BookmarkDetails) => void;
 }
 
@@ -1575,26 +1629,33 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
                     {bm.note && (
                       <div className={styles['bm-item-note']}>{bm.note}</div>
                     )}
+                    {/* {(() => {
+                      console.log('bm keys:', Object.keys(bm));
+                      console.log('bm full:', bm);
+                      console.log(bm.createdAt);
+                      return null;
+                    })()} */}
                     <div className={styles['bm-item-meta']}>
-                      {new Date(bm.createdAt).toLocaleString('ru', {
+                      {formatDate(bm.createdAt)}
+
+                      {/* {new Date(bm['createdAt']).toLocaleDateString('ru-RU', {
                         day: 'numeric',
-                        month: 'short',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
+                        month: 'long',
+                        year: 'numeric',
+                      })} */}
                     </div>
                     <div className={styles['bm-item-actions']}>
                       <button
                         className={styles['bm-item-btn']}
                         onClick={() => onEdit(bm)}
                       >
-                        ✏️ Изменить
+                        <PencilLine /> Изменить
                       </button>
                       <button
                         className={styles['bm-item-btn']}
-                        onClick={() => onDelete()}
+                        onClick={() => onDelete(bm.id)}
                       >
-                        🗑 Удалить
+                        <Trash2 /> Удалить
                       </button>
                     </div>
                   </div>
@@ -1606,8 +1667,6 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
     </>,
     document.body
   );
-
-// ─── ImageLightbox ────────────────────────────────────────
 
 interface ImageLightboxProps {
   src: string | null;
