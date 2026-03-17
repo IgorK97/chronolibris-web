@@ -10,6 +10,7 @@ import React, {
   useMemo,
 } from 'react';
 import styles from './Reader.module.css';
+import { Bookmark, Palette } from 'lucide-react';
 
 export interface Footnote {
   t: string;
@@ -39,8 +40,8 @@ export interface TextSegment {
 }
 
 export interface TocPart {
-  s: number; // глобальный 0-based индекс первого абзаца фрагмента
-  e: number; // глобальный 0-based индекс последнего абзаца фрагмента
+  s: number;
+  e: number;
   xps: number[];
   xpe: number[];
   url: string;
@@ -62,24 +63,19 @@ export interface TocMeta {
 
 export interface TocData {
   Meta: TocMeta;
-  full_length: number; // общее число абзацев в книге (1-based, т.е. абзацы 1..full_length)
+  full_length: number;
   Body: TocBodyItem[];
   Parts: TocPart[];
 }
 
 interface ReaderProps {
   tocPath?: string;
-  /** базовый путь для URL фрагментов, напр. '/data/' */
+
   basePath?: string;
-  /** начальный файл, если нет toc */
+
   filePath?: string;
   imagePath?: string;
 }
-
-// export interface BookmarkAnchor {
-//   paraIndex: number;
-//   charOffset: number;
-// }
 
 export type HighlightColor = 'yellow' | 'green' | 'blue' | 'pink' | 'none';
 
@@ -89,10 +85,6 @@ export interface Bookmark {
   bookFileId: number;
   note: string;
   createdAt: number;
-  // start: BookmarkAnchor;
-  // end: BookmarkAnchor;
-  // selectedText: string;
-  // highlightColor: HighlightColor;
 }
 
 const DEFAULT_FONT_SIZE = 18;
@@ -144,13 +136,18 @@ export const Reader: React.FC<ReaderProps> = ({
   const [activeNote, setActiveNote] = useState<Note | null>(null);
   const [activeImage, setActiveImage] = useState<string | null>(null);
 
-  const [currentCol, setCurrentCol] = useState(0); //Индекс текущей колонки-страницы
-  const [totalCols, setTotalCols] = useState(0); //Общее количество колонок-страниц
+  const [currentCol, setCurrentCol] = useState(0);
+  const [totalCols, setTotalCols] = useState(0);
 
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [bookmarkPanelOpen, setBookmarkPanelOpen] = useState<boolean>(false);
   const [toolbarCollapsed, setToolbarCollapsed] = useState(false);
-  const pageGap = 0;
+  const pageGap = 40;
+
+  // ✅ Хранит индекс параграфа, который был первым видимым до изменений
+  const visibleParaIndexRef = useRef<number | null>(null);
+  // ✅ Флаг, что нужно восстановить позицию по элементу, а не по колонке
+  const restoreByElementRef = useRef<boolean>(false);
 
   const [editingBookmark, setEditingBookmark] = useState<Bookmark | null>(null);
   const [contextMenu, setContextMenu] = useState<{
@@ -159,19 +156,45 @@ export const Reader: React.FC<ReaderProps> = ({
     y: number;
   } | null>(null);
 
+  // Находит индекс первого параграфа, который полностью виден в текущей вьюпорте
+  const captureVisibleParaIndex = useCallback(() => {
+    const vp = viewportRef.current;
+    const ct = contentRef.current;
+    if (!vp || !ct) return null;
+
+    const contentLeft = ct.scrollLeft;
+    // const contentRight = contentLeft + ct.clientWidth;
+    const paragraphs = ct.querySelectorAll(
+      '[data-para-index]'
+    ) as NodeListOf<HTMLElement>;
+
+    for (const p of paragraphs) {
+      const pLeft = p.offsetLeft;
+      // const pRight = pLeft + p.offsetWidth;
+
+      // Проверяем, что параграф полностью внутри видимой области
+      // (можно ослабить условие до pLeft >= viewportLeft, если нужно начало параграфа)
+      if (pLeft >= contentLeft) {
+        return parseInt(p.getAttribute('data-para-index') || '0', 10);
+      }
+    }
+    // Если полностью видимых нет, берем тот, чье начало ближе всего к началу вьюпорта
+    const firstVisible = Array.from(paragraphs).find(
+      (p) => p.offsetLeft + p.offsetWidth > contentLeft
+    );
+    return firstVisible
+      ? parseInt(firstVisible.getAttribute('data-para-index') || '0', 10)
+      : null;
+  }, []);
+
   const pendingBookmarkParaRef = useRef<number | null>(null);
 
-  // pendingCol: число >= 0 — конкретная колонка,
-  //             число < 0 — ratio внутри фрагмента (умножить на totalCols),
-  //             9999 — последняя страница
   const pendingColRef = useRef<number | null>(null);
 
   const viewportRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
   const [twoPageMode, setTwoPageMode] = useState(false);
-
-  // Загрузка toc
 
   useEffect(() => {
     if (!tocPath) return;
@@ -215,12 +238,43 @@ export const Reader: React.FC<ReaderProps> = ({
     if (!vp || !ct) return;
 
     const pageWidth = twoPageMode
-      ? vp.clientWidth / 2
-      : vp.clientWidth - pageGap;
-
-    const cols = Math.round(ct.scrollWidth / pageWidth);
+      ? (ct.clientWidth - pageGap) / 2 + pageGap
+      : vp.clientWidth;
+    console.log(
+      twoPageMode,
+      ' ',
+      ct.clientWidth,
+      ' ',
+      (ct.clientWidth - pageGap) / 2
+    );
+    console.log('PageSize: ', pageWidth);
+    const cols = Math.ceil(ct.scrollWidth / pageWidth);
     const newTotal = Math.max(1, cols);
+    console.log(newTotal);
     setTotalCols(newTotal);
+
+    if (restoreByElementRef.current && visibleParaIndexRef.current !== null) {
+      const targetParaIndex = visibleParaIndexRef.current;
+      const targetEl = ct.querySelector(
+        `[data-para-index="${targetParaIndex}"]`
+      ) as HTMLElement;
+
+      if (targetEl) {
+        // Вычисляем новую страницу на основе позиции элемента
+        const newCol = Math.floor(targetEl.offsetLeft / pageWidth);
+        let target = Math.min(newCol, newTotal - 1);
+
+        if (twoPageMode && target > 0) target = target - (target % 2);
+
+        setCurrentCol(target);
+        ct.scrollTo({ left: target * pageWidth, behavior: 'auto' });
+      }
+
+      // Сбрасываем флаги
+      restoreByElementRef.current = false;
+      visibleParaIndexRef.current = null;
+      return; // Выходим, так как позиция восстановлена
+    }
 
     if (pendingColRef.current !== null) {
       let target: number;
@@ -228,7 +282,6 @@ export const Reader: React.FC<ReaderProps> = ({
       if (pending === 9999) {
         target = newTotal - 1;
       } else if (pending < 0) {
-        // ratio mode: pending = -ratio
         target = Math.round(-pending * (newTotal - 1));
       } else {
         target = Math.min(pending, newTotal - 1);
@@ -284,61 +337,14 @@ export const Reader: React.FC<ReaderProps> = ({
     basePath,
   ]);
 
-  // Навигация
-
-  // const goToCol = useCallback(
-  //   (col: number) => {
-  //     const vp = viewportRef.current;
-  //     if (!vp) return;
-
-  //     // Вперёд за пределы фрагмента
-  //     if (col >= totalCols && tocData) {
-  //       const nextIdx = currentPartIndex + 1;
-  //       if (nextIdx < tocData.Parts.length) {
-  //         if (nextSegments !== null) {
-  //           // Мгновенное переключение на предзагруженный фрагмент
-  //           setSegments(nextSegments);
-  //           setNextSegments(null);
-  //           setCurrentCol(0);
-  //           pendingColRef.current = 0;
-  //         } else {
-  //           pendingColRef.current = 0;
-  //         }
-  //         setCurrentPartIndex(nextIdx);
-  //         return;
-  //       }
-  //     }
-
-  //     // Назад за пределы фрагмента
-  //     if (col < 0 && tocData) {
-  //       const prevIdx = currentPartIndex - 1;
-  //       if (prevIdx >= 0) {
-  //         pendingColRef.current = 9999;
-  //         setCurrentPartIndex(prevIdx);
-  //         return;
-  //       }
-  //       return;
-  //     }
-
-  //     const clamped = Math.max(0, Math.min(col, totalCols - 1));
-  //     console.log(col, totalCols - 1);
-  //     const gap = clamped === totalCols - 1 ? 2 * pageGap : 0;
-  //     console.log(gap);
-  //     setCurrentCol(clamped);
-  //     vp.scrollTo({
-  //       left: clamped * (vp.clientWidth - pageGap),
-  //       behavior: 'smooth',
-  //     });
-  //   },
-  //   [totalCols, tocData, currentPartIndex, nextSegments, pageGap]
-  // );
-
   const goToCol = (col: number) => {
     const vp = viewportRef.current;
     const ct = contentRef.current;
     if (!vp) return;
 
-    const pageWidth = twoPageMode ? vp.clientWidth / 2 : vp.clientWidth;
+    const pageWidth = twoPageMode
+      ? (ct!.clientWidth - pageGap) / 2 + pageGap
+      : vp.clientWidth;
     console.log(pageWidth);
     if (col >= totalCols && tocData) {
       const nextIdx = currentPartIndex + 1;
@@ -371,51 +377,71 @@ export const Reader: React.FC<ReaderProps> = ({
     if (twoPageMode && clamped > 0) clamped = clamped - (clamped % 2);
     const leftPos = clamped * pageWidth;
 
-    // if (col + 1 === totalCols) leftPos += pageGap;
     console.log(col, totalCols, leftPos);
     setCurrentCol(clamped);
     ct!.scrollTo({ left: leftPos, behavior: 'smooth' });
   };
 
-  // const nextCol = useCallback(
-  //   () => goToCol(currentCol + 1),
-  //   [currentCol, goToCol]
-  // );
-  // const prevCol = useCallback(
-  //   () => goToCol(currentCol - 1),
-  //   [currentCol, goToCol]
-  // );
+  useEffect(() => {
+    // Если recalcCols требует актуальных размеров DOM, можно использовать
+    // requestAnimationFrame или setTimeout 0, чтобы дать браузеру отрисовать.
+    // Но чаще всего эффект срабатывает уже после обновления макета.
+    const timeoutId = setTimeout(() => {
+      recalcCols();
+    }, 0); // микро-задержка для гарантии отрисовки
+
+    return () => clearTimeout(timeoutId);
+  }, [twoPageMode]); // добавьте сюда другие зависимости, если recalcCols их использует
+
+  useEffect(() => {
+    setCurrentCol(0);
+    viewportRef.current?.scrollTo({ left: 0, behavior: 'auto' });
+  }, [twoPageMode]);
 
   const nextCol = () => goToCol(currentCol + (twoPageMode ? 2 : 1));
   const prevCol = () => goToCol(currentCol - (twoPageMode ? 2 : 1));
 
   const changeFontSize = useCallback((delta: number) => {
+    // ✅ 1. Запоминаем, какой элемент сейчас видит пользователь
+    const visiblePara = captureVisibleParaIndex();
+    if (visiblePara !== null) {
+      visibleParaIndexRef.current = visiblePara;
+      restoreByElementRef.current = true;
+    }
+
     setFontSize((p) =>
       Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, p + delta))
     );
-    setCurrentCol(0);
-    viewportRef.current?.scrollTo({ left: 0, behavior: 'auto' });
+    // setFontSize((p) =>
+    //   Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, p + delta))
+    // );
+    // setCurrentCol(0);
+    // viewportRef.current?.scrollTo({ left: 0, behavior: 'auto' });
   }, []);
 
   const changeFontFamily = useCallback((value: string) => {
+    // ✅ 1. Запоминаем, какой элемент сейчас видит пользователь
+    const visiblePara = captureVisibleParaIndex();
+    if (visiblePara !== null) {
+      visibleParaIndexRef.current = visiblePara;
+      restoreByElementRef.current = true;
+    }
+
     setFontFamily(value);
-    setCurrentCol(0);
-    viewportRef.current?.scrollTo({ left: 0, behavior: 'auto' });
+    // setFontFamily(value);
+    // setCurrentCol(0);
+    // viewportRef.current?.scrollTo({ left: 0, behavior: 'auto' });
   }, []);
 
   const readPercent = useMemo<number>(() => {
-    // console.log('TOC-START');
     if (!tocData || tocData.Body[0].e === 0 || totalCols === 0) return 0;
-    // console.log('TOC-MEDIUM', tocData.full_length);
     const part = tocData.Parts[currentPartIndex];
     if (!part) return 0;
     console.log('TOC_END');
     const colRatio = totalCols > 1 ? currentCol / (totalCols - 1) : 1;
-    const globalPos = part.s + (part.e - part.s) * colRatio; // 0-based
+    const globalPos = part.s + (part.e - part.s) * colRatio;
     return Math.min(100, (globalPos / tocData.Body[0].e) * 100);
   }, [tocData, currentPartIndex, currentCol, totalCols]);
-
-  // Клик по прогресс-бару
 
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!tocData) return;
@@ -435,9 +461,6 @@ export const Reader: React.FC<ReaderProps> = ({
     const withinRatio = (targetGlobal - part.s) / Math.max(1, part.e - part.s);
 
     if (partIdx === currentPartIndex) {
-      // Тот же фрагмент
-      // const targetCol = Math.round(withinRatio * (totalCols - 1));
-      // goToCol(targetCol);
       let targetCol = Math.round(withinRatio * (totalCols - 1));
       if (twoPageMode && targetCol > 0) targetCol = targetCol - (targetCol % 2);
       goToCol(targetCol);
@@ -505,16 +528,16 @@ export const Reader: React.FC<ReaderProps> = ({
         const elRect = el.getBoundingClientRect();
         const elLeft =
           elRect.left - ctRect.left + contentRef.current!.scrollLeft;
-        // const colWidth = viewportRef.current.clientWidth - pageGap;
         const colWidth = twoPageMode
-          ? viewportRef.current.clientWidth / 2
-          : viewportRef.current.clientWidth - pageGap;
+          ? (contentRef.current!.clientWidth - pageGap) / 2 + pageGap
+          : viewportRef.current.clientWidth;
         const targetCol = Math.max(0, Math.floor(elLeft / colWidth));
 
         if (targetCol !== currentCol) {
           setCurrentCol(targetCol);
           contentRef.current!.scrollTo({
-            left: targetCol * (contentRef.current!.clientWidth - pageGap),
+            // left: targetCol * (contentRef.current!.clientWidth - pageGap),
+            left: targetCol * colWidth,
             behavior: 'smooth',
           });
         }
@@ -546,12 +569,13 @@ export const Reader: React.FC<ReaderProps> = ({
       const elLeft = elRect.left - vpRect.left + viewportRef.current.scrollLeft;
       // const colWidth = viewportRef.current.clientWidth - pageGap;
       const colWidth = twoPageMode
-        ? viewportRef.current.clientWidth / 2
-        : viewportRef.current.clientWidth - pageGap;
+        ? (contentRef.current!.clientWidth - pageGap) / 2 + pageGap
+        : viewportRef.current.clientWidth;
       const targetCol = Math.max(0, Math.floor(elLeft / colWidth));
       setCurrentCol(targetCol);
       contentRef.current!.scrollTo({
-        left: targetCol * (viewportRef.current.clientWidth - pageGap),
+        // left: targetCol * (contentRef.current!.clientWidth - pageGap),
+        left: targetCol * colWidth,
         behavior: 'smooth',
       });
     }, 80);
@@ -657,7 +681,8 @@ export const Reader: React.FC<ReaderProps> = ({
           setEditingBookmark(paraBookmark);
         }}
       >
-        🔖
+        {/* 🔖 */}
+        <Bookmark color="red" />
       </span>
     ) : null;
 
@@ -770,15 +795,10 @@ export const Reader: React.FC<ReaderProps> = ({
             <button
               onClick={() => {
                 setTwoPageMode((v) => !v);
-                setCurrentCol(0);
-                viewportRef.current?.scrollTo({ left: 0, behavior: 'auto' });
-                setTimeout(recalcCols, 50);
               }}
-              className={`${styles['nav-button']} ${twoPageMode ? styles['nav-button-active'] : ''}`}
-              title={twoPageMode ? 'Одна страница' : 'Две страницы'}
-              aria-label={twoPageMode ? 'Одна страница' : 'Две страницы'}
+              className={styles['nav-button']}
             >
-              {twoPageMode ? '□' : '▯▯'}
+              {twoPageMode ? '1 страница' : '2 страницы'}
             </button>
           </div>
 
@@ -801,7 +821,7 @@ export const Reader: React.FC<ReaderProps> = ({
               aria-label="Настройка цветов"
               title="Цвета"
             >
-              🎨
+              <Palette color="red" />
             </button>
             <button
               onClick={() => setBookmarkPanelOpen((v) => !v)}
@@ -809,7 +829,7 @@ export const Reader: React.FC<ReaderProps> = ({
               aria-label="Закладки"
               title={`Закладки (${bookmarks.filter((b) => b.bookFileId === bookFileId).length})`}
             >
-              🔖{' '}
+              <Bookmark color="red" />{' '}
               {bookmarks.filter((b) => b.bookFileId === bookFileId).length > 0
                 ? bookmarks.filter((b) => b.bookFileId === bookFileId).length
                 : ''}
@@ -862,19 +882,27 @@ export const Reader: React.FC<ReaderProps> = ({
         />
       </div> */}
       <div className={styles['reading-container']}>
-        <div className={styles['reading-area']}>
+        <div
+          className={
+            twoPageMode ? styles['reading-area-two'] : styles['reading-area']
+          }
+        >
           {/* Строка 1 */}
           <div className={styles['pad-top']} />
 
           {/* Строка 2 */}
           <div className={styles['pad-left']} />
           <div
-            className={`${styles['book-viewport']} ${twoPageMode ? styles['book-viewport-two'] : ''}`}
+            className={styles['book-viewport']}
             ref={viewportRef}
             style={{ background: pageColor }}
           >
             <div
-              className={`${styles['book-content']} ${twoPageMode ? styles['book-content-two'] : ''}`}
+              className={
+                twoPageMode
+                  ? styles['book-content-two']
+                  : styles['book-content']
+              }
               ref={contentRef}
             >
               {segments.map((seg, idx) => renderSegment(seg, idx))}
@@ -1260,14 +1288,14 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
                 onClose();
               }}
             >
-              🔖 Редактировать закладку
+              <Bookmark color="red" /> Редактировать закладку
             </button>
           ) : (
             <button
               className={styles['ctx-item']}
               onClick={() => setPhase('add')}
             >
-              🔖 Добавить закладку
+              <Bookmark color="red" /> Добавить закладку
             </button>
           )}
           <button
@@ -1340,7 +1368,9 @@ const BookmarkEditModal: React.FC<BookmarkEditModalProps> = ({
         aria-modal="true"
       >
         <div className={styles['bm-edit-header']}>
-          <span className={styles['bm-edit-title']}>🔖 Закладка</span>
+          <span className={styles['bm-edit-title']}>
+            <Bookmark color="red" /> Закладка
+          </span>
           <button className={styles['footnote-close']} onClick={onClose}>
             ✕
           </button>
@@ -1444,7 +1474,9 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
               .sort((a, b) => a.paraIndex - b.paraIndex)
               .map((bm) => (
                 <div key={bm.id} className={styles['bm-item']}>
-                  <div className={styles['bm-item-icon']}>🔖</div>
+                  <div className={styles['bm-item-icon']}>
+                    <Bookmark color="red" />
+                  </div>
                   <div className={styles['bm-item-body']}>
                     <div
                       className={styles['bm-item-title']}

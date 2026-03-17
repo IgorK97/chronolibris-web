@@ -135,18 +135,6 @@
   transition: all 0.2s;
 }
 
-.nav-button:hover:not(:disabled),
-.font-button:hover {
-  background: #8b4513;
-  color: #fff;
-  border-color: #8b4513;
-}
-
-.nav-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 .page-info {
   font-size: 14px;
   color: #666;
@@ -186,6 +174,15 @@
   justify-self: center;
 }
 
+.reading-area-two {
+  display: grid;
+  grid-template-columns: 1fr 1440px 1fr;
+  grid-template-rows: var(--page-padding) 1fr var(--page-padding);
+  width: 100%;
+  height: 100%;
+  justify-self: center;
+}
+
 .pad-top {
   grid-column: 1 / -1;
   grid-row: 1;
@@ -218,14 +215,14 @@
 .book-viewport {
   grid-column: 2;
   grid-row: 2;
-
-  /* max-width: 1400px; */
+  width: 100%;
   justify-self: center;
   height: 100%;
   overflow: hidden;
 }
 
 .book-content {
+  width: 100%;
   columns: auto;
   column-width: 700px;
   column-fill: auto;
@@ -236,45 +233,16 @@
   overflow: hidden;
 }
 
-/* .book-viewport {
-  width: 100%;
-  max-width: 700px;
-  height: 100%;
-  overflow: hidden;
-  background: #fff;
-  box-shadow: 0 4px 8px rgb(0 0 0 / 15%);
-}
-
-
-.book-content {
-  columns: 1;
-  column-fill: auto; 
-  column-gap: 40px;
-  height: 100%;
-  line-height: 1.6;
-  text-align: justify;
-  overflow: visible;
-} */
-
-.book-viewport-two {
-  width: 100%;
-  max-width: 1400px; /* максимальная ширина страницы */
-  height: 100%;
-  overflow: hidden; /* скролл только программный, через scrollTo */
-  background: #fff;
-  box-shadow: 0 4px 8px rgb(0 0 0 / 15%);
-}
-
 .book-content-two {
-  columns: 2;
-  column-fill: auto; /* Нужно, чтобы колонки заполнялись последовательно */
+  width: 100%;
+  columns: auto;
+  column-width: 700px;
+  column-fill: auto;
   column-gap: 40px;
   height: 100%;
-  padding: 40px;
-  box-sizing: border-box;
   line-height: 1.6;
   text-align: justify;
-  overflow: visible; /* Чтобы были все колонки созданы */
+  overflow: hidden;
 }
 
 .font-select {
@@ -507,6 +475,10 @@
 }
 
 @media (width <= 768px) {
+  .nav-button {
+    display: none;
+  }
+
   .reading-area {
     padding: 10px;
   }
@@ -715,12 +687,6 @@
   font-weight: 600;
   background: #fdf6f0;
   border-left-color: #8b4513;
-}
-
-.nav-button-active {
-  background: #8b4513;
-  color: #fff;
-  border-color: #8b4513;
 }
 
 .progress-bar {
