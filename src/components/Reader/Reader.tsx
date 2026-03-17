@@ -2,6 +2,10 @@
 // Reader.tsx — компонент чтения книги на CSS columns
 // ============================================================
 import { createPortal } from 'react-dom';
+import {
+  useReadingProgress,
+  useUpsertReadingProgress,
+} from '@/api/readingProgress';
 import React, {
   useState,
   useEffect,
@@ -176,8 +180,15 @@ export const Reader: React.FC<ReaderProps> = ({
     bookFileId ?? null,
     user ?? null
   );
-
+  const upsertProgress = useUpsertReadingProgress();
   console.log(bookmarks);
+  const savedPercentRef = useRef<number>(0);
+  const { data: savedProgress } = useReadingProgress(bookFileId);
+  useEffect(() => {
+    if (savedProgress) {
+      savedPercentRef.current = savedProgress.percentage;
+    }
+  }, [savedProgress]);
 
   const createBookmarkMutation = useCreateBookmark();
   const updateBookmarkMutation = useUpdateBookmark();
@@ -243,6 +254,97 @@ export const Reader: React.FC<ReaderProps> = ({
       ? parseInt(firstVisible.getAttribute('data-para-index') || '0', 10)
       : null;
   }, []);
+
+  const readPercent = useMemo<number>(() => {
+    if (!fetchedTocData || fetchedTocData.Body[0].e === 0 || totalCols === 0)
+      return 0;
+    const part = fetchedTocData.Parts[currentPartIndex];
+    if (!part) return 0;
+    console.log('TOC_END');
+    const colRatio = totalCols > 1 ? currentCol / (totalCols - 1) : 1;
+    const globalPos = part.s + (part.e - part.s) * colRatio;
+    return Math.min(100, (globalPos / fetchedTocData.Body[0].e) * 100);
+  }, [fetchedTocData, currentPartIndex, currentCol, totalCols]);
+
+  const readPercentRef = useRef(readPercent);
+
+  // Обновляем ref при каждом изменении — без перезапуска интервала
+  useEffect(() => {
+    readPercentRef.current = readPercent;
+  }, [readPercent]);
+
+  // Интервал создаётся один раз
+  useEffect(() => {
+    if (!user) return;
+
+    const interval = setInterval(
+      () => {
+        const paraIndex = captureVisibleParaIndex() ?? 0;
+        const current = readPercentRef.current;
+
+        if (current > savedPercentRef.current) {
+          savedPercentRef.current = current;
+          upsertProgress.mutate({
+            bookFileId,
+            percentage: current,
+            paraIndex,
+          });
+        }
+      },
+      3 * 60 * 1000
+    );
+
+    return () => clearInterval(interval);
+  }, [user, bookFileId]); // readPercent убран
+
+  // useEffect(() => {
+  //   if (!user) return;
+
+  //   const interval = setInterval(
+  //     () => {
+  //       const paraIndex = captureVisibleParaIndex() ?? 0;
+
+  //       if (readPercent > savedPercentRef.current) {
+  //         savedPercentRef.current = readPercent;
+  //         upsertProgress.mutate({
+  //           bookFileId,
+  //           percentage: readPercent,
+  //           paraIndex,
+  //         });
+  //       }
+  //     },
+  //     3 * 60 * 1000
+  //   );
+
+  //   return () => clearInterval(interval);
+  // }, [user, bookFileId, readPercent, captureVisibleParaIndex]);
+
+  //navigator.sendBeacon при beforeunload — обычный fetch
+  // или мутация RQ не гарантированно завершатся до закрытия вкладки.
+  // sendBeacon отправляет запрос асинхронно и браузер его не обрывает.
+  // Серверный контроллер должен принимать Content-Type: application/json
+  // на этом эндпоинте (обычно принимает по умолчанию).
+  //Возобновление чтения — savedProgress.paraIndex можно
+  // использовать при инициализации чтобы предложить
+  // пользователю продолжить с того места где остановился.
+
+  useEffect(() => {
+    if (!user) return;
+
+    const handleUnload = () => {
+      const paraIndex = captureVisibleParaIndex() ?? 0;
+      if (readPercent > savedPercentRef.current) {
+        // fetch напрямую т.к. мутации RQ не успевают при unload
+        navigator.sendBeacon(
+          '/api/ReadingProgress',
+          JSON.stringify({ bookFileId, percentage: readPercent, paraIndex })
+        );
+      }
+    };
+
+    window.addEventListener('beforeunload', handleUnload);
+    return () => window.removeEventListener('beforeunload', handleUnload);
+  }, [user, bookFileId, readPercent, captureVisibleParaIndex]);
 
   const pendingBookmarkParaRef = useRef<number | null>(null);
 
@@ -566,17 +668,6 @@ export const Reader: React.FC<ReaderProps> = ({
     // setCurrentCol(0);
     // viewportRef.current?.scrollTo({ left: 0, behavior: 'auto' });
   }, []);
-
-  const readPercent = useMemo<number>(() => {
-    if (!fetchedTocData || fetchedTocData.Body[0].e === 0 || totalCols === 0)
-      return 0;
-    const part = fetchedTocData.Parts[currentPartIndex];
-    if (!part) return 0;
-    console.log('TOC_END');
-    const colRatio = totalCols > 1 ? currentCol / (totalCols - 1) : 1;
-    const globalPos = part.s + (part.e - part.s) * colRatio;
-    return Math.min(100, (globalPos / fetchedTocData.Body[0].e) * 100);
-  }, [fetchedTocData, currentPartIndex, currentCol, totalCols]);
 
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!fetchedTocData) return;
