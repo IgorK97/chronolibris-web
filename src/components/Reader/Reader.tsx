@@ -40,6 +40,7 @@ import { useStore } from '@/stores/globalStore';
 import { formatDate } from '@/utils';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useReaderSettings } from './UseReaderSettings';
+import { Badge } from '../ui/badge';
 
 export interface PageNumberNode {
   pn: number;
@@ -102,12 +103,8 @@ export interface TocData {
 }
 
 interface ReaderProps {
-  // tocPath?: string;
-  // basePath?: string;
   bookFileId: number;
   initialChunkIndex?: number;
-  // filePath?: string;
-  // imagePath?: string;
 }
 
 export type HighlightColor = 'yellow' | 'green' | 'blue' | 'pink' | 'none';
@@ -127,9 +124,6 @@ const FONT_OPTIONS: { label: string; value: string }[] = [
   { label: 'Trebuchet MS', value: "'Trebuchet MS', sans-serif" },
 ];
 
-// const TEXT_COLORS = ['#1a1a1a', '#3b2a1a', '#1a2e1a', '#0d1b2a', '#4a4a4a'];
-// const PAGE_COLORS = ['#ffffff', '#f5f1e8', '#f0ede0', '#e8f0e8', '#e8eef5'];
-// const BG_COLORS = ['#f5f1e8', '#e8e0d0', '#d6cfc0', '#dde8dd', '#d0dce8'];
 const TEXT_COLORS = ['#2c2c2c', '#3b2e1e', '#c8bfb0'];
 const PAGE_COLORS = ['#faf8f4', '#f4ede0', '#1e1c18'];
 const BG_COLORS = ['#e8e4dc', '#d9cdb8', '#131210'];
@@ -148,16 +142,8 @@ const fetchChunk = async (
   if (!res.ok) throw new Error('Failed to fetch chunk');
   return res.json();
 };
-// function buildUrl(base: string | undefined, url: string): string {
-//   if (!base) return url;
-//   return base.replace(/\/$/, '') + '/' + url.replace(/^\//, '');
-// }
 
 export const Reader: React.FC<ReaderProps> = ({
-  // tocPath,
-  // basePath,
-  // filePath,
-  // imagePath,
   bookFileId,
   initialChunkIndex = 0,
 }) => {
@@ -241,11 +227,7 @@ export const Reader: React.FC<ReaderProps> = ({
     y: number;
   } | null>(null);
 
-  const {
-    data: fetchedTocData,
-    // isLoading: tocLoading,
-    // error: tocError,
-  } = useQuery<TocData, Error>({
+  const { data: fetchedTocData } = useQuery<TocData, Error>({
     queryKey: ['toc', bookFileId],
     queryFn: () => fetchToc(bookFileId),
     staleTime: Infinity,
@@ -349,15 +331,6 @@ export const Reader: React.FC<ReaderProps> = ({
   //   return () => clearInterval(interval);
   // }, [user, bookFileId, readPercent, captureVisibleParaIndex]);
 
-  //navigator.sendBeacon при beforeunload — обычный fetch
-  // или мутация RQ не гарантированно завершатся до закрытия вкладки.
-  // sendBeacon отправляет запрос асинхронно и браузер его не обрывает.
-  // Серверный контроллер должен принимать Content-Type: application/json
-  // на этом эндпоинте (обычно принимает по умолчанию).
-  //Возобновление чтения — savedProgress.paraIndex можно
-  // использовать при инициализации чтобы предложить
-  // пользователю продолжить с того места где остановился.
-
   useEffect(() => {
     if (!user) return;
 
@@ -402,80 +375,9 @@ export const Reader: React.FC<ReaderProps> = ({
   const contentRef = useRef<HTMLDivElement>(null);
 
   const [twoPageMode, setTwoPageMode] = useState(false);
-  useEffect(() => {
-    // setNextSegments(null);
-    setCurrentCol(0);
-  }, [currentPartIndex]);
-
   // useEffect(() => {
-  //   if (fetchedTocData) {
-  //     setTocData(fetchedTocData);
-  //     if (fetchedTocData.Parts.length > 0) {
-  //       setCurrentPartIndex(initialChunkIndex);
-  //     }
-  //   }
-  // }, [fetchedTocData, initialChunkIndex]);
-  // useEffect(() => {
-  //   if (!tocPath) return;
-  //   fetch(tocPath)
-  //     .then((r) => r.json())
-  //     .then((data: TocData) => {
-  //       setTocData(data);
-
-  //       // Если filePath не передан, берём первый Part из TOC
-  //       if (!filePath && data.Parts.length > 0) {
-  //         const firstPartUrl = buildUrl(basePath, data.Parts[0].url);
-  //         // Триггерим загрузку первого фрагмента через обновление currentUrl
-  //         // (currentUrl вычисляется через useMemo, поэтому достаточно установить currentPartIndex)
-  //         setCurrentPartIndex(0);
-  //       } else if (filePath) {
-  //         const idx = data.Parts.findIndex((p) => filePath.endsWith(p.url));
-  //         if (idx !== -1) setCurrentPartIndex(idx);
-  //       }
-
-  //       // if (filePath) {
-  //       //   const idx = data.Parts.findIndex((p) => filePath.endsWith(p.url));
-  //       //   if (idx !== -1) setCurrentPartIndex(idx);
-  //       // }
-  //     })
-  //     .catch(console.error);
-  // }, [tocPath]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // const currentUrl = useMemo(() => {
-  //   if (tocData) {
-  //     const part = tocData.Parts[currentPartIndex];
-  //     if (part) return buildUrl(basePath, part.url);
-  //   }
-  //   return filePath ?? '';
-  // }, [tocData, currentPartIndex, basePath, filePath]);
-
-  // const currentUrl = useMemo(() => {
-  //   if (!tocData) return filePath ?? '';
-
-  //   // Если currentPartIndex выходит за границы, корректируем
-  //   const safeIndex = Math.max(
-  //     0,
-  //     Math.min(currentPartIndex, tocData.Parts.length - 1)
-  //   );
-  //   const part = tocData.Parts[safeIndex];
-
-  //   if (part) return buildUrl(basePath, part.url);
-  //   return filePath ?? '';
-  // }, [tocData, currentPartIndex, basePath, filePath]);
-
-  // useEffect(() => {
-  //   if (!currentUrl) return;
-  //   setIsLoading(true);
-  //   setNextSegments(null);
   //   setCurrentCol(0);
-  //   fetch(currentUrl)
-  //     .then((r) => r.json())
-  //     .then((data: TextSegment[]) => {
-  //       setSegments(data);
-  //       setIsLoading(false);
-  //     })
-  //     .catch(() => setIsLoading(false));
-  // }, [currentUrl]);
+  // }, [currentPartIndex]);
 
   const { data: segments, isLoading } = useQuery({
     queryKey: ['chunk', bookFileId, currentPartIndex],
@@ -641,6 +543,7 @@ export const Reader: React.FC<ReaderProps> = ({
       const nextIdx = currentPartIndex + 1;
       if (nextIdx < fetchedTocData.Parts.length) {
         setCurrentCol(0);
+        pendingColRef.current = 0;
         setCurrentPartIndex(nextIdx);
         return;
         // if (nextSegments !== null) {
@@ -884,9 +787,12 @@ export const Reader: React.FC<ReaderProps> = ({
           return <React.Fragment key={idx}>{item}</React.Fragment>;
         if (typeof item === 'object' && 'pn' in item) {
           return (
-            <span key={idx} className={styles['page-num']}>
+            // <span key={idx} className={styles['page-num']}>
+            //   {(item as PageNumberNode).pn}
+            // </span>
+            <Badge key={idx} variant="outline" className={styles['page-num']}>
               {(item as PageNumberNode).pn}
-            </span>
+            </Badge>
           );
         }
         //Почему-то пока не добавил обработку сверху, выдавал ошибку,
@@ -926,10 +832,16 @@ export const Reader: React.FC<ReaderProps> = ({
     if (seg.t === 'pn') {
       return (
         <div key={index} className={styles['page-num-block']}>
-          <span className={styles['page-num']}>
+          <Badge variant="outline" className={styles['page-num']}>
             {seg.c as unknown as number}
-          </span>
+          </Badge>
         </div>
+
+        // <div key={index} className={styles['page-num-block']}>
+        //   <span className={styles['page-num']}>
+        //     {seg.c as unknown as number}
+        //   </span>
+        // </div>
       );
     }
     if (seg.t === 'img') {
@@ -938,10 +850,10 @@ export const Reader: React.FC<ReaderProps> = ({
         (n) => typeof n !== 'string' && (n as ImgNode).t === 'img'
       ) as ImgNode | undefined;
       if (!firstImg) return null;
-      const imagePath = `${import.meta.env.VITE_STORAGE_URL}/images/${bookFileId}`;
-      const fullUrl = imagePath
-        ? `${imagePath.replace(/\/$/, '')}/${firstImg.src}`
-        : firstImg.src;
+      const fullUrl = `${import.meta.env.VITE_STORAGE_URL}/images/${bookFileId}/${firstImg.src}`;
+      // const fullUrl = imagePath
+      //   ? `${imagePath.replace(/\/$/, '')}/${firstImg.src}`
+      //   : firstImg.src;
       return (
         <div key={index} className={styles['img-block']}>
           <img
