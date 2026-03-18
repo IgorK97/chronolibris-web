@@ -55,4 +55,12 @@ export const apiClient = {
   // D - тип тела для обновления
   update: <T, D extends object = object>(url: string, body?: D) =>
     axiosInstance.put<T>(url, body).then((res) => res.data),
+
+  download: (url: string) => {
+    return axiosInstance
+      .get<Blob>(url, { responseType: 'blob' })
+      .then((res) => ({
+        blob: res.data,
+      }));
+  },
 };

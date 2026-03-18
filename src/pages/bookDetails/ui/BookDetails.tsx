@@ -45,13 +45,20 @@ import {
   useMyReview,
   useUpdateReview,
 } from '@/api/reviews';
-import { useBookFiles } from '@/api/bookFiles';
+import { bookFilesApi, useBookFiles } from '@/api/bookFiles';
 interface BookDetailsProps {
   onNavigateToReviews: (id: number) => void;
   onNavigateToRead: (bookFileId?: number) => void;
   onNavigateToBack: () => void;
   onReadClick: (bookFileId?: number) => void | Promise<void>;
 }
+
+const FORMAT_EXTENSIONS: Record<number, string> = [
+  'fb2', // 1
+  'epub', // 2
+  'pdf', // 3
+  'mobi', // 4
+];
 
 function getAuthorsString(
   authorRoleId: number,
@@ -104,6 +111,9 @@ export const BookDetailsComponent = ({
     bookId ?? 0
   );
 
+  const [isDownloadPanelOpen, setIsDownloadPanelOpen] =
+    useState<boolean>(false);
+
   const defaultBookFileId =
     bookFiles?.find((f) => f.isReadable)?.id ?? bookFiles?.[0]?.id;
   // console.log(defaultBookFileId, bookFiles![0]);
@@ -134,7 +144,8 @@ export const BookDetailsComponent = ({
   const createReview = useCreateReview(bookId ?? 0);
   const updateReview = useUpdateReview(bookId ?? 0);
   const deleteReview = useDeleteReview(bookId ?? 0);
-
+  const [downloadError, setDownloadError] = useState<string | null>(null);
+  const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const handleMouseLeave = () => {
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
 
@@ -243,10 +254,31 @@ export const BookDetailsComponent = ({
     if (success) refetchBook();
   };
 
-  const handleDownload = async (bookFileId?: number) => {
+  const handleDownload = async (bookFileId: number, formatId: number) => {
     // Сервер сам резолвит путь для скачивания
     if (!bookFileId) return;
-    window.open(`/api/books/files/${bookFileId}/download`, '_blank');
+    setIsDownloading(true);
+    setDownloadError(null);
+
+    try {
+      const { blob } = await bookFilesApi.download(bookFileId);
+
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const extension = FORMAT_EXTENSIONS[formatId - 1];
+      a.download = `${fullBookDetails.title}.${extension}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+
+      setIsDownloadPanelOpen(false);
+    } catch (error) {
+      setDownloadError(t('book.download_error'));
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   return (
@@ -379,23 +411,33 @@ export const BookDetailsComponent = ({
             </div>
           )}
           <div className={styles['download-dropdown']}>
-            <button className={styles['icon-button']}>
+            <button
+              className={styles['icon-button']}
+              onClick={() => setIsDownloadPanelOpen((prev) => !prev)}
+            >
               <Download size={24} />
               <span className={styles['button-label']}>
                 {t('book.download')}
               </span>
             </button>
-            {bookFiles && bookFiles.length > 0 && (
+            {isDownloadPanelOpen && bookFiles && bookFiles.length > 0 && (
               <div className={styles['download-options']}>
                 {bookFiles.map((file) => (
                   <button
                     key={file.id}
                     className={styles['download-option']}
-                    onClick={() => handleDownload(file.id)}
+                    onClick={() => handleDownload(file.id, file.formatId)}
+                    disabled={isDownloading}
                   >
-                    {file.formatId} ({file.fileSizeBytes} {file.fileSizeBytes})
+                    {file.formatId} ({file.fileSizeBytes} {file.fileSizeDisplay}
+                    )
                   </button>
                 ))}
+                {downloadError && (
+                  <span className={styles['download-error']}>
+                    {downloadError}
+                  </span>
+                )}
               </div>
             )}
           </div>
