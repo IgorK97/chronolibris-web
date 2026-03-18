@@ -38,6 +38,7 @@ import { BookUnit } from '@/pages/adminPanel/ui/BookUnit';
 import { SelectionsPage } from '@/pages/adminPanel/Selection/SelectionsPage';
 import { TagsPage } from '@/pages/adminPanel/Tags/TagsPage';
 import { ReaderPage } from '@/pages/reader/ReaderPage';
+import ReaderLayout from './layouts/ReaderLayout';
 
 const queryClient = new QueryClient();
 
@@ -177,7 +178,7 @@ export default function App() {
             Если обучали мало, то ответ будет примерно один и тот же (но для этого обучающая выборка должна быть корректной)
             
             ++++!!!!!!Добавить ответы на вопросы с последней презентации!!!*/}
-            <Route
+            {/* <Route
               path="reader/:bookFileId"
               element={
                 <ReaderPage />
@@ -193,12 +194,14 @@ export default function App() {
                 //   // preloadAhead={3}
                 // />
               }
-            />
+            /> */}
           </Route>
-          {/* </Route> */}
-
-          {/* 404 */}
           <Route path="*" element={<Navigate to="/" />} />
+        </Route>
+        <Route element={<ReaderLayout />}>
+          <Route element={<ProtectedRoute />}>
+            <Route path="reader/:bookFileId" element={<ReaderPage />} />
+          </Route>
         </Route>
       </Routes>
     </QueryClientProvider>

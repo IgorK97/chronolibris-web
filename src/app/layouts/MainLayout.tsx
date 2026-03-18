@@ -7,7 +7,7 @@ import {
 } from 'react-router-dom';
 // import { usersApi } from '@/api/user';
 import Header from '@/components/header/ui/Header';
-import Footer from '@/components/footer';
+// import Footer from '@/components/footer';
 // import { ReaderProvider } from "./vendor/epubjs-react-web"; // Гипотетический аналог
 // import { ReferenceDataProvider } from "../shared/contexts/ReferenceDataProvider";
 // import { useColorScheme } from "../shared/lib/hooks/use-color-scheme";
