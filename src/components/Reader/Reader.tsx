@@ -591,10 +591,10 @@ export const Reader: React.FC<ReaderProps> = ({
     return () => clearTimeout(timeoutId);
   }, [twoPageMode]); // добавьте сюда другие зависимости, если recalcCols их использует
 
-  useEffect(() => {
-    setCurrentCol(0);
-    contentRef.current?.scrollTo({ left: 0, behavior: 'auto' });
-  }, [twoPageMode]);
+  // useEffect(() => {
+  //   // setCurrentCol(0);
+  //   // contentRef.current?.scrollTo({ left: 0, behavior: 'auto' });
+  // }, [twoPageMode]);
 
   const nextCol = () => goToCol(currentCol + (twoPageMode ? 2 : 1));
   const prevCol = () => goToCol(currentCol - (twoPageMode ? 2 : 1));
@@ -1030,6 +1030,11 @@ export const Reader: React.FC<ReaderProps> = ({
             </button>
             <button
               onClick={() => {
+                const visiblePara = captureVisibleParaIndex();
+                if (visiblePara !== null) {
+                  visibleParaIndexRef.current = visiblePara;
+                  restoreByElementRef.current = true;
+                }
                 setTwoPageMode((v) => !v);
               }}
               className={styles['nav-button']}
@@ -1131,21 +1136,6 @@ export const Reader: React.FC<ReaderProps> = ({
             className={styles['pad-bottom']}
             style={{ background: pageColor }}
           />
-
-          {/* <div
-            className={styles['prev-zone']}
-            onClick={prevCol}
-            role="button"
-            tabIndex={0}
-            aria-label="Предыдущая страница"
-          />
-          <div
-            className={styles['next-zone']}
-            onClick={nextCol}
-            role="button"
-            tabIndex={0}
-            aria-label="Следующая страница"
-          /> */}
         </div>
       </div>
 
@@ -1264,7 +1254,7 @@ const TocSidebar: React.FC<TocSidebarProps> = ({
         </div>
       );
     });
-
+  /*What is that? <> */
   return createPortal(
     <>
       <div
