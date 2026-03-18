@@ -34,6 +34,7 @@ import {
 } from '../../../utils';
 import { t } from 'i18next';
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 // import { CommentsSection } from './CommentSection/CommentsSection';
 import { BookTabs } from './BookTabs/BookTabs';
 import { ParticipantsInfo } from './BookTabs/ParticipantsInfo';
@@ -46,12 +47,19 @@ import {
   useUpdateReview,
 } from '@/api/reviews';
 import { bookFilesApi, useBookFiles } from '@/api/bookFiles';
+import Circles from 'react-loading-icons/dist/esm/components/circles';
 interface BookDetailsProps {
   onNavigateToReviews: (id: number) => void;
   onNavigateToRead: (bookFileId?: number) => void;
   onNavigateToBack: () => void;
   onReadClick: (bookFileId?: number) => void | Promise<void>;
 }
+
+const formatFileSize = (bytes: number): string => {
+  if (bytes < 1024) return `${bytes} Б`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} КБ`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} МБ`;
+};
 
 const FORMAT_EXTENSIONS: Record<number, string> = [
   'fb2', // 1
@@ -410,41 +418,70 @@ export const BookDetailsComponent = ({
               )}
             </div>
           )}
-          <div className={styles['download-dropdown']}>
-            <button
-              className={styles['icon-button']}
-              onClick={() => setIsDownloadPanelOpen((prev) => !prev)}
-            >
-              <Download size={24} />
-              <span className={styles['button-label']}>
-                {t('book.download')}
-              </span>
-            </button>
-            {isDownloadPanelOpen && bookFiles && bookFiles.length > 0 && (
-              <div className={styles['download-options']}>
-                {bookFiles.map((file) => (
-                  <button
-                    key={file.id}
-                    className={styles['download-option']}
-                    onClick={() => handleDownload(file.id, file.formatId)}
-                    disabled={isDownloading}
-                  >
-                    {file.formatId} ({file.fileSizeBytes} {file.fileSizeDisplay}
-                    )
-                  </button>
-                ))}
-                {downloadError && (
-                  <span className={styles['download-error']}>
-                    {downloadError}
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
-          {/* <button className={styles['icon-button']} onClick={handleDownload}>
+          {/* <div className={styles['download-dropdown']}> */}
+          <button
+            className={styles['icon-button']}
+            onClick={() => setIsDownloadPanelOpen((prev) => !prev)}
+          >
             <Download size={24} />
             <span className={styles['button-label']}>{t('book.download')}</span>
-          </button> */}
+          </button>
+          {isDownloadPanelOpen &&
+            bookFiles &&
+            bookFiles.length > 0 &&
+            createPortal(
+              <div
+                className={styles['panel-overlay']}
+                onClick={() => setIsDownloadPanelOpen(false)}
+              >
+                <div
+                  className={styles['download-panel']}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className={styles['download-panel-header']}>
+                    <span className={styles['download-panel-title']}>
+                      {t('book.download')}
+                    </span>
+                    <button
+                      className={styles['shelf-panel-close']}
+                      onClick={() => setIsDownloadPanelOpen(false)}
+                    >
+                      <X />
+                    </button>
+                  </div>
+
+                  {!bookFiles || bookFiles.length === 0 ? (
+                    <p className={styles['download-panel-empty']}>
+                      Файлы недоступны
+                    </p>
+                  ) : (
+                    <ul className={styles['download-file-list']}>
+                      {bookFiles.map((file) => (
+                        <li
+                          key={file.id}
+                          className={styles['download-file-item']}
+                          onClick={() => handleDownload(file.id, file.formatId)}
+                        >
+                          <span className={styles['download-file-format']}>
+                            {FORMAT_EXTENSIONS[
+                              (file.formatId ?? 1) - 1
+                            ]?.toUpperCase() ?? ''}
+                          </span>
+                          <span className={styles['download-file-size']}>
+                            {formatFileSize(file.fileSizeBytes)}
+                          </span>
+                          {isDownloading && <Circles />}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {downloadError && ( //Why () is necessary?
+                    <p className={styles['download-error']}>{downloadError}</p>
+                  )}
+                </div>
+              </div>,
+              document.body
+            )}
         </div>
       </header>
 

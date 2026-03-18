@@ -1,3 +1,78 @@
+.panel-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 /30%);
+  z-index: 2000;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.download-panel {
+  width: 200px;
+  height: 100%;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 12px;
+  box-shadow: -4px 0 16px rgb(0 0 0 /12%);
+}
+
+.download-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.download-panel-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.download-panel-empty {
+  color: #888;
+  font-size: 14px;
+}
+
+.download-file-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.download-file-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease; /* why is red? */
+}
+
+.download-file-item:hover {
+  background: rgb(0 0 0 / 6%);
+}
+
+.download-file-format {
+  font-weight: 600;
+  font-size: 14px;
+  min-width: 40px;
+}
+
+.download-file-size {
+  font-size: 13px;
+  color: #666;
+}
+
+.download-error {
+  color: #e53935;
+  font-size: 13px;
+}
+
 .container {
   display: flex;
   flex-direction: column;
