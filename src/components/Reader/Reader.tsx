@@ -25,6 +25,7 @@ import {
   PencilLine,
   TableOfContents,
   Trash2,
+  X,
 } from 'lucide-react';
 import type { Bookmark as BookmarkDetails } from '@/types/types';
 
@@ -598,25 +599,28 @@ export const Reader: React.FC<ReaderProps> = ({
   const nextCol = () => goToCol(currentCol + (twoPageMode ? 2 : 1));
   const prevCol = () => goToCol(currentCol - (twoPageMode ? 2 : 1));
 
-  const changeFontSize = useCallback((delta: number) => {
-    // 1. Запоминаем, какой элемент сейчас видит пользователь
-    const visiblePara = captureVisibleParaIndex();
-    if (visiblePara !== null) {
-      visibleParaIndexRef.current = visiblePara;
-      restoreByElementRef.current = true;
-    }
-    setFontSize(
-      Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, fontSize + delta))
-    );
-    // setFontSize((p) =>
-    //   Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, p + delta))
-    // );
-    // setFontSize((p) =>
-    //   Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, p + delta))
-    // );
-    // setCurrentCol(0);
-    // viewportRef.current?.scrollTo({ left: 0, behavior: 'auto' });
-  }, []);
+  const changeFontSize = useCallback(
+    (delta: number) => {
+      // 1. Запоминаем, какой элемент сейчас видит пользователь
+      const visiblePara = captureVisibleParaIndex();
+      if (visiblePara !== null) {
+        visibleParaIndexRef.current = visiblePara;
+        restoreByElementRef.current = true;
+      }
+      setFontSize(
+        Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, fontSize + delta))
+      );
+      // setFontSize((p) =>
+      //   Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, p + delta))
+      // );
+      // setFontSize((p) =>
+      //   Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, p + delta))
+      // );
+      // setCurrentCol(0);
+      // viewportRef.current?.scrollTo({ left: 0, behavior: 'auto' });
+    },
+    [fontSize]
+  );
 
   const changeFontFamily = useCallback((value: string) => {
     // 1. Запоминаем, какой элемент сейчас видит пользователь
@@ -975,6 +979,7 @@ export const Reader: React.FC<ReaderProps> = ({
 
       <div
         className={`${styles['toolbar']} ${toolbarCollapsed ? styles['toolbar-collapsed'] : ''}`}
+        style={{ background: pageColor }}
       >
         <button
           className={styles['toolbar-toggle']}
@@ -1081,37 +1086,6 @@ export const Reader: React.FC<ReaderProps> = ({
           </div>
         </div>
       </div>
-      {/* Область чтения */}
-      {/* <div className={styles['reading-area']}>
-        <div
-          // className={styles['book-viewport']}
-          className={`${styles['book-viewport']} ${twoPageMode ? styles['book-viewport-two'] : ''}`}
-          ref={viewportRef}
-          style={{ background: pageColor }}
-        >
-          <div
-            // className={styles['book-content']}
-            className={`${styles['book-content']} ${twoPageMode ? styles['book-content-two'] : ''}`}
-            ref={contentRef}
-          >
-            {segments.map((seg, idx) => renderSegment(seg, idx))}
-          </div>
-        </div>
-        <div
-          className={styles['prev-zone']}
-          onClick={prevCol}
-          role="button"
-          tabIndex={0}
-          aria-label="Предыдущая страница"
-        />
-        <div
-          className={styles['next-zone']}
-          onClick={nextCol}
-          role="button"
-          tabIndex={0}
-          aria-label="Следующая страница"
-        />
-      </div> */}
       <div className={styles['reading-container']}>
         <div
           className={
@@ -1119,10 +1093,17 @@ export const Reader: React.FC<ReaderProps> = ({
           }
         >
           {/* Строка 1 */}
-          <div className={styles['pad-top']} />
+          <div
+            className={styles['pad-top']}
+            style={{ background: pageColor }}
+          />
 
           {/* Строка 2 */}
-          <div className={styles['pad-left']} />
+          <div
+            className={[styles['pad-left'], styles['nav-pad']].join(' ')}
+            style={{ background: pageColor }}
+            onClick={prevCol}
+          />
           <div
             className={styles['book-viewport']}
             ref={viewportRef}
@@ -1139,12 +1120,19 @@ export const Reader: React.FC<ReaderProps> = ({
               {segments.map((seg, idx) => renderSegment(seg, idx))}
             </div>
           </div>
-          <div className={styles['pad-right']} />
+          <div
+            className={[styles['pad-right'], styles['nav-pad']].join(' ')}
+            style={{ background: pageColor }}
+            onClick={nextCol}
+          />
 
           {/* Строка 3 */}
-          <div className={styles['pad-bottom']} />
-
           <div
+            className={styles['pad-bottom']}
+            style={{ background: pageColor }}
+          />
+
+          {/* <div
             className={styles['prev-zone']}
             onClick={prevCol}
             role="button"
@@ -1157,7 +1145,7 @@ export const Reader: React.FC<ReaderProps> = ({
             role="button"
             tabIndex={0}
             aria-label="Следующая страница"
-          />
+          /> */}
         </div>
       </div>
 
@@ -1177,7 +1165,13 @@ export const Reader: React.FC<ReaderProps> = ({
         />
       </div>
 
-      <FootnoteModal note={activeNote} onClose={() => setActiveNote(null)} />
+      <FootnoteModal
+        note={activeNote}
+        onClose={() => setActiveNote(null)}
+        textColor={textColor}
+        fontFamily={fontFamily}
+        pageColor={pageColor}
+      />
       <ImageLightbox src={activeImage} onClose={() => setActiveImage(null)} />
       <ColorModal
         open={colorModalOpen}
@@ -1318,9 +1312,18 @@ const TocSidebar: React.FC<TocSidebarProps> = ({
 interface FootnoteModalProps {
   note: Note | null;
   onClose: () => void;
+  textColor: string;
+  pageColor: string;
+  fontFamily: string;
 }
 
-const FootnoteModal: React.FC<FootnoteModalProps> = ({ note, onClose }) => {
+const FootnoteModal: React.FC<FootnoteModalProps> = ({
+  note,
+  onClose,
+  textColor,
+  pageColor,
+  fontFamily,
+}) => {
   if (!note) return null;
   const footnoteText = note.f
     ? Array.isArray(note.f.c)
@@ -1334,17 +1337,24 @@ const FootnoteModal: React.FC<FootnoteModalProps> = ({ note, onClose }) => {
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
+        style={{ background: pageColor, color: textColor, fontFamily }}
       >
         <button
           className={styles['footnote-close']}
           onClick={onClose}
           aria-label="Закрыть"
+          style={{ color: textColor }}
         >
-          ✕
+          <X />
         </button>
         <div className={styles['footnote-content']}>
-          <span className={styles['footnote-label']}>{note.c}</span>
-          <p>{footnoteText}</p>
+          <span
+            className={styles['footnote-label']}
+            style={{ color: textColor }}
+          >
+            {note.c}
+          </span>
+          <p style={{ color: textColor }}>{footnoteText}</p>
         </div>
       </div>
     </div>,
