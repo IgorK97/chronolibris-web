@@ -560,6 +560,35 @@
   border-bottom: 1px solid #eee;
 }
 
+.page-num {
+  display: inline-block;
+  font-size: 0.72em;
+  line-height: 1;
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: 1px solid currentcolor; /* Что такое каррент колор? */
+  opacity: 0.35;
+  vertical-align: middle;
+  white-space: nowrap;
+  user-select: none;
+  font-variant-numeric: tabular-nums;
+  margin: 0 2px;
+}
+
+.page-num-block {
+  display: block;
+  margin: 0.15em 0;
+  break-inside: avoid;
+}
+
+.page-num-block .page-num {
+  vertical-align: baseline;
+  margin-bottom: 1em;
+  text-indent: 2em;
+  break-inside: avoid;
+}
+
+/* Поярдок важен стилей? */
 .color-modal-title {
   font-size: 15px;
   font-weight: 600;

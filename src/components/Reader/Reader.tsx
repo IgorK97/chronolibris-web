@@ -38,6 +38,11 @@ import {
 import { useStore } from '@/stores/globalStore';
 import { formatDate } from '@/utils';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useReaderSettings } from './UseReaderSettings';
+
+export interface PageNumberNode {
+  pn: number;
+}
 
 export interface Footnote {
   t: string;
@@ -53,7 +58,7 @@ export interface Note {
   f?: Footnote;
 }
 
-export type InlineNode = Note | { t: 'em' | 'st'; c: string };
+export type InlineNode = Note | { t: 'em' | 'st'; c: string } | PageNumberNode;
 
 export interface ImgNode {
   t: 'img';
@@ -63,7 +68,7 @@ export interface ImgNode {
 export interface TextSegment {
   t: string;
   xp?: number[];
-  c: string | TextSegment[] | (string | InlineNode)[] | ImgNode[];
+  c: string | TextSegment[] | (string | InlineNode)[] | ImgNode[]; //Это называется широйки юнион
 }
 
 export interface TocPart {
@@ -121,9 +126,12 @@ const FONT_OPTIONS: { label: string; value: string }[] = [
   { label: 'Trebuchet MS', value: "'Trebuchet MS', sans-serif" },
 ];
 
-const TEXT_COLORS = ['#1a1a1a', '#3b2a1a', '#1a2e1a', '#0d1b2a', '#4a4a4a'];
-const PAGE_COLORS = ['#ffffff', '#f5f1e8', '#f0ede0', '#e8f0e8', '#e8eef5'];
-const BG_COLORS = ['#f5f1e8', '#e8e0d0', '#d6cfc0', '#dde8dd', '#d0dce8'];
+// const TEXT_COLORS = ['#1a1a1a', '#3b2a1a', '#1a2e1a', '#0d1b2a', '#4a4a4a'];
+// const PAGE_COLORS = ['#ffffff', '#f5f1e8', '#f0ede0', '#e8f0e8', '#e8eef5'];
+// const BG_COLORS = ['#f5f1e8', '#e8e0d0', '#d6cfc0', '#dde8dd', '#d0dce8'];
+const TEXT_COLORS = ['#2c2c2c', '#3b2e1e', '#c8bfb0'];
+const PAGE_COLORS = ['#faf8f4', '#f4ede0', '#1e1c18'];
+const BG_COLORS = ['#e8e4dc', '#d9cdb8', '#131210'];
 const fetchToc = async (bookFileId: number): Promise<TocData> => {
   const res = await fetch(`/api/books/files/${bookFileId}/toc`);
   if (!res.ok) throw new Error('Failed to fetch TOC');
@@ -131,7 +139,7 @@ const fetchToc = async (bookFileId: number): Promise<TocData> => {
 };
 const fetchChunk = async (
   bookFileId: number,
-  chunkIndex: number
+  chunkIndex: string
 ): Promise<TextSegment[]> => {
   const res = await fetch(
     `/api/books/files/${bookFileId}/chunks/${chunkIndex}`
@@ -160,11 +168,29 @@ export const Reader: React.FC<ReaderProps> = ({
   // const [isLoading, setIsLoading] = useState(true);
   // const [isPrefetching, setIsPrefetching] = useState(false);
 
-  const [fontSize, setFontSize] = useState(DEFAULT_FONT_SIZE);
-  const [fontFamily, setFontFamily] = useState(FONT_OPTIONS[0].value);
-  const [textColor, setTextColor] = useState(TEXT_COLORS[0]);
-  const [pageColor, setPageColor] = useState(PAGE_COLORS[0]);
-  const [bgColor, setBgColor] = useState(BG_COLORS[0]);
+  // const [fontSize, setFontSize] = useState(DEFAULT_FONT_SIZE);
+  // const [fontFamily, setFontFamily] = useState(FONT_OPTIONS[0].value);
+  // const [textColor, setTextColor] = useState(TEXT_COLORS[0]);
+  // const [pageColor, setPageColor] = useState(PAGE_COLORS[0]);
+  // const [bgColor, setBgColor] = useState(BG_COLORS[0]);
+
+  const {
+    settings: { fontSize, fontFamily, textColor, pageColor, bgColor },
+    setFontSize,
+    setFontFamily,
+    setTextColor,
+    setPageColor,
+    setBgColor,
+  } = useReaderSettings({
+    defaults: {
+      fontSize: DEFAULT_FONT_SIZE,
+      fontFamily: FONT_OPTIONS[0].value,
+      textColor: TEXT_COLORS[0],
+      pageColor: PAGE_COLORS[0],
+      bgColor: BG_COLORS[0],
+    },
+  });
+
   const [colorModalOpen, setColorModalOpen] = useState(false);
   const [tocOpen, setTocOpen] = useState(false);
 
@@ -181,12 +207,14 @@ export const Reader: React.FC<ReaderProps> = ({
     user ?? null
   );
   const upsertProgress = useUpsertReadingProgress();
+  const progressLoaded = useRef(false);
   console.log(bookmarks);
   const savedPercentRef = useRef<number>(0);
   const { data: savedProgress } = useReadingProgress(bookFileId);
   useEffect(() => {
-    if (savedProgress) {
-      savedPercentRef.current = savedProgress.percentage;
+    if (savedProgress !== undefined) {
+      savedPercentRef.current = savedProgress?.percentage ?? 0;
+      progressLoaded.current = true;
     }
   }, [savedProgress]);
 
@@ -279,6 +307,7 @@ export const Reader: React.FC<ReaderProps> = ({
 
     const interval = setInterval(
       () => {
+        if (!progressLoaded.current) return;
         const paraIndex = captureVisibleParaIndex() ?? 0;
         const current = readPercentRef.current;
 
@@ -331,20 +360,38 @@ export const Reader: React.FC<ReaderProps> = ({
   useEffect(() => {
     if (!user) return;
 
+    // const handleUnload = () => {
+    //   const paraIndex = captureVisibleParaIndex() ?? 0;
+    //   if (readPercent > savedPercentRef.current) {
+    //     // fetch напрямую т.к. мутации RQ не успевают при unload
+    //     navigator.sendBeacon(
+    //       '/api/ReadingProgress',
+    //       JSON.stringify({ bookFileId, percentage: readPercent, paraIndex })
+    //     );
+    //   }
+    // };
+
     const handleUnload = () => {
+      if (!progressLoaded.current) return;
+
       const paraIndex = captureVisibleParaIndex() ?? 0;
-      if (readPercent > savedPercentRef.current) {
-        // fetch напрямую т.к. мутации RQ не успевают при unload
-        navigator.sendBeacon(
-          '/api/ReadingProgress',
-          JSON.stringify({ bookFileId, percentage: readPercent, paraIndex })
-        );
+      if (readPercentRef.current > savedPercentRef.current) {
+        fetch('/api/ReadingProgress', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            bookFileId,
+            percentage: readPercentRef,
+            paraIndex,
+          }),
+          keepalive: true,
+        });
       }
     };
 
     window.addEventListener('beforeunload', handleUnload);
     return () => window.removeEventListener('beforeunload', handleUnload);
-  }, [user, bookFileId, readPercent, captureVisibleParaIndex]);
+  }, [user, bookFileId, captureVisibleParaIndex]);
 
   const pendingBookmarkParaRef = useRef<number | null>(null);
 
@@ -431,7 +478,17 @@ export const Reader: React.FC<ReaderProps> = ({
 
   const { data: segments, isLoading } = useQuery({
     queryKey: ['chunk', bookFileId, currentPartIndex],
-    queryFn: () => fetchChunk(bookFileId, currentPartIndex),
+    // queryFn: () =>
+    //   fetchChunk(bookFileId, fetchedTocData?.Parts[currentPartIndex].url),
+    queryFn: () => {
+      // Проверяем, что URL существует (fetchedTocData гарантирован enabled, но url может отсутствовать)
+      const url = fetchedTocData?.Parts[currentPartIndex]?.url;
+      if (!url) {
+        // Если URL нет, отклоняем промис с ошибкой
+        return Promise.reject(new Error('URL for chunk not available'));
+      }
+      return fetchChunk(bookFileId, url);
+    },
     enabled: !!fetchedTocData && currentPartIndex < fetchedTocData.Parts.length,
     staleTime: Infinity, // Какова вероятность того,
     // что текст книги изменится во время чтения пользователя?
@@ -550,7 +607,7 @@ export const Reader: React.FC<ReaderProps> = ({
 
     queryClient.prefetchQuery({
       queryKey: ['chunk', bookFileId, nextIdx],
-      queryFn: () => fetchChunk(bookFileId, nextIdx),
+      queryFn: () => fetchChunk(bookFileId, fetchedTocData.Parts[nextIdx].url),
     });
 
     // setIsPrefetching(true);
@@ -638,16 +695,18 @@ export const Reader: React.FC<ReaderProps> = ({
   const prevCol = () => goToCol(currentCol - (twoPageMode ? 2 : 1));
 
   const changeFontSize = useCallback((delta: number) => {
-    // ✅ 1. Запоминаем, какой элемент сейчас видит пользователь
+    // 1. Запоминаем, какой элемент сейчас видит пользователь
     const visiblePara = captureVisibleParaIndex();
     if (visiblePara !== null) {
       visibleParaIndexRef.current = visiblePara;
       restoreByElementRef.current = true;
     }
-
-    setFontSize((p) =>
-      Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, p + delta))
+    setFontSize(
+      Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, fontSize + delta))
     );
+    // setFontSize((p) =>
+    //   Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, p + delta))
+    // );
     // setFontSize((p) =>
     //   Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, p + delta))
     // );
@@ -656,7 +715,7 @@ export const Reader: React.FC<ReaderProps> = ({
   }, []);
 
   const changeFontFamily = useCallback((value: string) => {
-    // ✅ 1. Запоминаем, какой элемент сейчас видит пользователь
+    // 1. Запоминаем, какой элемент сейчас видит пользователь
     const visiblePara = captureVisibleParaIndex();
     if (visiblePara !== null) {
       visibleParaIndexRef.current = visiblePara;
@@ -822,6 +881,15 @@ export const Reader: React.FC<ReaderProps> = ({
       return content.map((item, idx) => {
         if (typeof item === 'string')
           return <React.Fragment key={idx}>{item}</React.Fragment>;
+        if (typeof item === 'object' && 'pn' in item) {
+          return (
+            <span key={idx} className={styles['page-num']}>
+              {(item as PageNumberNode).pn}
+            </span>
+          );
+        }
+        //Почему-то пока не добавил обработку сверху, выдавал ошибку,
+        //что такого свойства нет в InlineNode (PageNumberNode)
         if (item.t === 'em')
           return <em key={idx}>{(item as { t: string; c: string }).c}</em>;
         if (item.t === 'st')
@@ -854,7 +922,15 @@ export const Reader: React.FC<ReaderProps> = ({
 
   const renderSegment = (seg: TextSegment, index: number): React.ReactNode => {
     if (seg.t === 'br') return <br key={index} />;
-
+    if (seg.t === 'pn') {
+      return (
+        <div key={index} className={styles['page-num-block']}>
+          <span className={styles['page-num']}>
+            {seg.c as unknown as number}
+          </span>
+        </div>
+      );
+    }
     if (seg.t === 'img') {
       const imgNodes = Array.isArray(seg.c) ? seg.c : [];
       const firstImg = imgNodes.find(

@@ -18,7 +18,7 @@ export interface UpsertReadingProgressRequest {
 
 export const readingProgressApi = {
   get: (bookFileId: number): Promise<ReadingProgressDto | null> =>
-    apiClient.get(`/ReadingProgress/${bookFileId}`),
+    apiClient.get<ReadingProgressDto | null>(`/ReadingProgress/${bookFileId}`),
 
   upsert: (data: UpsertReadingProgressRequest): Promise<ReadingProgressDto> =>
     apiClient.post('/ReadingProgress', data),
