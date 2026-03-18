@@ -106,6 +106,7 @@ export interface TocData {
 interface ReaderProps {
   bookFileId: number;
   initialChunkIndex?: number;
+  onBack?: () => void;
 }
 
 export type HighlightColor = 'yellow' | 'green' | 'blue' | 'pink' | 'none';
@@ -147,6 +148,7 @@ const fetchChunk = async (
 export const Reader: React.FC<ReaderProps> = ({
   bookFileId,
   initialChunkIndex = 0,
+  onBack,
 }) => {
   // const [tocData, setTocData] = useState<TocData | null>(null);
   const [currentPartIndex, setCurrentPartIndex] = useState(initialChunkIndex);
@@ -310,41 +312,8 @@ export const Reader: React.FC<ReaderProps> = ({
     return () => clearInterval(interval);
   }, [user, bookFileId]); // readPercent убран
 
-  // useEffect(() => {
-  //   if (!user) return;
-
-  //   const interval = setInterval(
-  //     () => {
-  //       const paraIndex = captureVisibleParaIndex() ?? 0;
-
-  //       if (readPercent > savedPercentRef.current) {
-  //         savedPercentRef.current = readPercent;
-  //         upsertProgress.mutate({
-  //           bookFileId,
-  //           percentage: readPercent,
-  //           paraIndex,
-  //         });
-  //       }
-  //     },
-  //     3 * 60 * 1000
-  //   );
-
-  //   return () => clearInterval(interval);
-  // }, [user, bookFileId, readPercent, captureVisibleParaIndex]);
-
   useEffect(() => {
     if (!user) return;
-
-    // const handleUnload = () => {
-    //   const paraIndex = captureVisibleParaIndex() ?? 0;
-    //   if (readPercent > savedPercentRef.current) {
-    //     // fetch напрямую т.к. мутации RQ не успевают при unload
-    //     navigator.sendBeacon(
-    //       '/api/ReadingProgress',
-    //       JSON.stringify({ bookFileId, percentage: readPercent, paraIndex })
-    //     );
-    //   }
-    // };
 
     const handleUnload = () => {
       if (!progressLoaded.current) return;
@@ -993,6 +962,11 @@ export const Reader: React.FC<ReaderProps> = ({
         </button>
         <div className={styles['toolbar-inner']}>
           <div className={styles['controls']}>
+            {onBack && (
+              <button onClick={onBack} className={styles['nav-button']}>
+                <ChevronLeft /> Вернуться к книге
+              </button>
+            )}
             {fetchedTocData && (
               <button
                 onClick={() => setTocOpen((v) => !v)}
@@ -1002,6 +976,19 @@ export const Reader: React.FC<ReaderProps> = ({
                 <TableOfContents /> Содержание
               </button>
             )}
+            <button
+              onClick={() => {
+                const visiblePara = captureVisibleParaIndex();
+                if (visiblePara !== null) {
+                  visibleParaIndexRef.current = visiblePara;
+                  restoreByElementRef.current = true;
+                }
+                setTwoPageMode((v) => !v);
+              }}
+              className={styles['nav-button']}
+            >
+              {twoPageMode ? '1 страница' : '2 страницы'}
+            </button>
             <button
               onClick={prevCol}
               disabled={!hasPrev}
@@ -1027,19 +1014,6 @@ export const Reader: React.FC<ReaderProps> = ({
               className={styles['nav-button']}
             >
               Вперёд <ChevronRight />
-            </button>
-            <button
-              onClick={() => {
-                const visiblePara = captureVisibleParaIndex();
-                if (visiblePara !== null) {
-                  visibleParaIndexRef.current = visiblePara;
-                  restoreByElementRef.current = true;
-                }
-                setTwoPageMode((v) => !v);
-              }}
-              className={styles['nav-button']}
-            >
-              {twoPageMode ? '1 страница' : '2 страницы'}
             </button>
           </div>
 
