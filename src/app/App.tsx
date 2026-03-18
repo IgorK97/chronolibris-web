@@ -32,33 +32,23 @@ import {
   ThemeManager,
 } from '@/pages/adminPanel';
 import { ContentUnit } from '@/pages/adminPanel/ui/ContentUnit';
-import { Reader } from '@/components/Reader';
+// import { Reader } from '@/components/Reader';
 import { BookManagement } from '@/pages/adminPanel/ui/BookManagement';
 import { BookUnit } from '@/pages/adminPanel/ui/BookUnit';
 import { SelectionsPage } from '@/pages/adminPanel/Selection/SelectionsPage';
 import { TagsPage } from '@/pages/adminPanel/Tags/TagsPage';
+import { ReaderPage } from '@/pages/reader/ReaderPage';
 
 const queryClient = new QueryClient();
 
 export default function App() {
   const { setUser, isInitialized, setInitialized, setCurrentBook } = useStore();
   const navigate = useNavigate(); // Добавляем хук навигации
-  const handleReadClick = async (bookId: number, bookFileId?: number) => {
+  const handleReadClick = async (bookFileId?: number) => {
     // Можно добавить логику: проверка прав, загрузка метаданных и т.д.
 
     // Переход с параметрами для Reader
-    navigate('/reader', {
-      state: {
-        bookId,
-        bookFileId,
-        // Опционально: базовые пути для API
-        // basePath: `/api/books/${bookId}/fragments`,
-        // tocPath: `/api/books/${bookId}/toc`,
-        tocPath: '/data/toc.json',
-        filePath: '/data/000.json',
-        basePath: '/data',
-      },
-    });
+    navigate(`/reader/${bookFileId}`);
   };
   useEffect(() => {
     const initApp = async () => {
@@ -188,18 +178,20 @@ export default function App() {
             
             ++++!!!!!!Добавить ответы на вопросы с последней презентации!!!*/}
             <Route
-              path="reader"
+              path="reader/:bookFileId"
               element={
-                <Reader
-                  tocPath="/data/toc.json"
-                  filePath="/data/000.json"
-                  basePath="/data"
-                  bookFileId={3}
-                  // imagePath={`${import.meta.env.VITE_STORAGE_URL}/books/v1/4/images`}
-                  imagePath={`${import.meta.env.VITE_STORAGE_URL}/covers/4`}
-                  // cacheSize={10}
-                  // preloadAhead={3}
-                />
+                <ReaderPage />
+                // <Reader
+                //   // tocPath="/data/toc.json"
+                //   // filePath="/data/000.json"
+                //   // basePath="/data"
+                //   bookFileId={3}
+                //   initialChunkIndex={0}
+                //   // imagePath={`${import.meta.env.VITE_STORAGE_URL}/books/v1/4/images`}
+                //   // imagePath={`${import.meta.env.VITE_STORAGE_URL}/covers/4`}
+                //   // cacheSize={10}
+                //   // preloadAhead={3}
+                // />
               }
             />
           </Route>

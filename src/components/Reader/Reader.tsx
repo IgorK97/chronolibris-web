@@ -6,6 +6,7 @@ import {
   useReadingProgress,
   useUpsertReadingProgress,
 } from '@/api/readingProgress';
+import { Puff } from 'react-loading-icons';
 import React, {
   useState,
   useEffect,
@@ -1032,7 +1033,9 @@ export const Reader: React.FC<ReaderProps> = ({
   if (isLoading || !fetchedTocData || !segments || segments.length === 0) {
     return (
       <div className={styles['loading']}>
-        <div className={styles['spinner']} />
+        {/* <div className={styles['spinner']} />
+         */}
+        <Puff stroke="#f55a42" strokeOpacity={0.5} speed={0.75} />
         <p>Загрузка книги...</p>
       </div>
     );

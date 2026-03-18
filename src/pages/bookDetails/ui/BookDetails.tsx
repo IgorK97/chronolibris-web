@@ -11,6 +11,8 @@ import {
   SquareCheckBig,
   Square,
   WandSparkles,
+  X,
+  Plus,
   // XCircle,
   // ArrowUpCircle,
 } from 'lucide-react';
@@ -46,9 +48,9 @@ import {
 import { useBookFiles } from '@/api/bookFiles';
 interface BookDetailsProps {
   onNavigateToReviews: (id: number) => void;
-  onNavigateToRead: (id: number, bookFileId?: number) => void;
+  onNavigateToRead: (bookFileId?: number) => void;
   onNavigateToBack: () => void;
-  onReadClick: (bookId: number, bookFileId?: number) => void | Promise<void>;
+  onReadClick: (bookFileId?: number) => void | Promise<void>;
 }
 
 function getAuthorsString(
@@ -104,7 +106,7 @@ export const BookDetailsComponent = ({
 
   const defaultBookFileId =
     bookFiles?.find((f) => f.isReadable)?.id ?? bookFiles?.[0]?.id;
-
+  // console.log(defaultBookFileId, bookFiles![0]);
   const handleToggleShelf = async (shelf: ShelfDetails) => {
     const isOnShelf = seekedShelves?.includes(shelf.id);
     if (!bookId) return;
@@ -316,7 +318,7 @@ export const BookDetailsComponent = ({
                   setNewShelfName('');
                 }}
               >
-                ✕
+                <X />
               </button>
 
               <ul className={styles['shelf-list']}>
@@ -363,7 +365,7 @@ export const BookDetailsComponent = ({
                       setNewShelfName('');
                     }}
                   >
-                    ✕
+                    <X />
                   </button>
                 </div>
               ) : (
@@ -371,7 +373,7 @@ export const BookDetailsComponent = ({
                   className={styles['shelf-create-btn']}
                   onClick={() => setIsCreating(true)}
                 >
-                  + {t('book.create_new_collection')}
+                  <Plus /> {t('book.create_new_collection')}
                 </button>
               )}
             </div>
@@ -589,7 +591,7 @@ export const BookDetailsComponent = ({
           <button
             className={styles['read-button']}
             disabled={!defaultBookFileId}
-            onClick={() => onReadClick(fullBookDetails.id, 3)}
+            onClick={() => onReadClick(defaultBookFileId)}
           >
             {defaultBookFileId ? t('book.read') : t('book.no_files_available')}
           </button>
