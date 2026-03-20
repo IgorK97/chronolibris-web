@@ -92,7 +92,7 @@ export const BookDetailsComponent = ({
   // const [isDownloaded, setIsDownloaded] = useState<boolean>(false);
   // const [isNewVersionAvailable] = useState<boolean>(false);
 
-  const { currentBook, setCurrentBook, user } = useStore();
+  const { currentBook, setCurrentBook, user, isReader } = useStore();
   const { data: roles } = useRoles();
   const [isReportOpen, setIsReportOpen] = useState(false);
   const { data: seekedShelves, refetch: refetchSeekedShelves } =
@@ -503,7 +503,7 @@ export const BookDetailsComponent = ({
               </span>
             )}
 
-            {isAuth && (
+            {isReader() && (
               <button
                 className={styles['report-book-btn']}
                 onClick={() => setIsReportOpen(true)}

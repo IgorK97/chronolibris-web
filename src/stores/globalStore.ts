@@ -1,6 +1,6 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import type { BookListItem, UserProfile } from "../types/types";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import type { BookListItem, UserProfile } from '../types/types';
 
 interface AppState {
   user: UserProfile | null;
@@ -10,11 +10,22 @@ interface AppState {
   setCurrentBook: (book: BookListItem | null) => void;
   setInitialized: (val: boolean) => void;
   clearStore: () => void;
+  isReader: () => boolean;
+  isModerator: () => boolean;
+  isAdmin: () => boolean;
 }
+
+export const USER_ROLES = {
+  READER: 'reader',
+  MODERATOR: 'moderator',
+  ADMIN: 'admin',
+} as const;
+
+export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];
 
 export const useStore = create<AppState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       currentBook: null,
       isInitialized: false,
@@ -23,14 +34,17 @@ export const useStore = create<AppState>()(
       setInitialized: (val) => set({ isInitialized: val }),
       clearStore: () => {
         set({ currentBook: null, user: null, isInitialized: true });
-        localStorage.removeItem("elibrary-app-storage");
+        localStorage.removeItem('elibrary-app-storage');
       },
+      isReader: () => get().user?.role === USER_ROLES.READER,
+      isModerator: () => get().user?.role === USER_ROLES.MODERATOR,
+      isAdmin: () => get().user?.role === USER_ROLES.ADMIN,
     }),
     {
-      name: "elibrary-app-storage",
+      name: 'elibrary-app-storage',
       // В вебе persist сам выгрузит данные из localStorage в стейт при загрузке страницы
-    },
-  ),
+    }
+  )
 );
 
 // interface AppState {

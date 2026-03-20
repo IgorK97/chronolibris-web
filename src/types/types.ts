@@ -516,6 +516,7 @@ export interface UserProfile {
   email?: string;
   userName: string;
   phoneNumber: string;
+  role: string;
 }
 
 export interface ReviewDetails {

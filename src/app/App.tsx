@@ -17,7 +17,7 @@ import Reviews from '../pages/reviews';
 import Library from '@/pages/library';
 import MyBooks from '../pages/myBooks';
 import { usersApi } from '../api/user';
-import { ProtectedRoute } from './ProtectedRoute';
+import { ModeratorRoute, ProtectedRoute } from './ProtectedRoute';
 import { SelectionListView } from '../pages/library/ui/SectionList';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -140,6 +140,9 @@ export default function App() {
             path="book/:id/reviews"
             element={<Reviews onNavigate={() => navigate(-1)} />}
           />
+          {/* <Route element={<ModeratorRoute />}>
+            <Route path="moderation" element={<ModerationPage />} />
+          </Route> */}
           <Route element={<ProtectedRoute />}>
             {/* <Route path="/" element={<TabsLayout />}> */}
             <Route index element={<Navigate to="/library" replace />} />

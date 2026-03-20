@@ -9,7 +9,7 @@ import {
 import styles from './BookTabs.module.css';
 import { getInitials, getAvatarColor } from './BookTabsData';
 import { ReportModal } from '@/components/reports/ui/ReportModal';
-
+import { useStore } from '@stores/globalStore';
 export function Avatar({ userName }: { userName: string }) {
   return (
     <div
@@ -28,8 +28,6 @@ export function Avatar({ userName }: { userName: string }) {
     </div>
   );
 }
-
-// ─── VoteButton ───────────────────────────────────────────────────────────────
 
 export function VoteButton({
   type,
@@ -78,23 +76,23 @@ export function ScoreDisplay({
   );
 }
 
-// ─── Three-dots menu ──────────────────────────────────────────────────────────
-
 export function ThreeDotsMenu({
   // type,
   canDelete,
   onDelete,
   targetId,
   targetTypeId,
-  isAuth = false,
+  // isAuth = false,
 }: {
   type?: 'comment' | 'review';
   canDelete: boolean;
   onDelete: () => Promise<void>;
   targetId: number;
   targetTypeId: number;
-  isAuth?: boolean;
+  // isAuth?: boolean;
 }) {
+  const { user, isReader } = useStore();
+  const isAuth = !!user;
   const [menuOpen, setMenuOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   useEffect(() => {
@@ -103,9 +101,9 @@ export function ThreeDotsMenu({
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [menuOpen]);
-  const showReport = isAuth && !canDelete;
+  const showReport = isAuth && !canDelete && isReader();
   // const [reported, setReported] = useState(false);
-
+  if (!canDelete && !showReport) return null;
   return (
     <>
       <div

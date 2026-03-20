@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 import { useCreateReport } from '@/api/reports';
 import { TARGET_TYPE } from '@/api/reports';
 import styles from './ReportModal.module.css';
+import { useStore } from 'zustand';
 
 export interface ReportModalProps {
   targetId: number;
@@ -37,7 +38,7 @@ export function ReportModal({
 }: ReportModalProps) {
   const [reasonTypeId, setReasonTypeId] = useState<number | null>(null);
   const [description, setDescription] = useState('');
-
+  const { isReader } = useStore();
   const [result, setResult] = useState<'success' | 'cooldown' | 'error' | null>(
     null
   );
@@ -61,6 +62,9 @@ export function ReportModal({
       setResult(status === 409 ? 'cooldown' : 'error');
     }
   };
+  if (!isReader()) {
+    return null;
+  }
 
   return (
     <div className={styles.overlay} onClick={onClose}>

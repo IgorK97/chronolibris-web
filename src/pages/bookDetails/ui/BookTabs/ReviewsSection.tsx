@@ -187,7 +187,7 @@ function ReviewItem({
               onDelete={onDelete}
               targetId={review.id}
               targetTypeId={TARGET_TYPE.REVIEW}
-              isAuth={isAuth}
+              // isAuth={isAuth}
             />
           </div>
 

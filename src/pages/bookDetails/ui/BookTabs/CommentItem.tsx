@@ -178,7 +178,7 @@ export function CommentItem({
               onDelete={async () => deleteMutation.mutate()}
               targetId={comment.id}
               targetTypeId={TARGET_TYPE.COMMENT}
-              isAuth={isAuth}
+              // isAuth={isAuth}
             />
           )}
         </div>
