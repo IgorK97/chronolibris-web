@@ -39,6 +39,7 @@ import { SelectionsPage } from '@/pages/adminPanel/Selection/SelectionsPage';
 import { TagsPage } from '@/pages/adminPanel/Tags/TagsPage';
 import { ReaderPage } from '@/pages/reader/ReaderPage';
 import ReaderLayout from './layouts/ReaderLayout';
+import { ModerationPage } from '@/pages/moderation/ModerationPage';
 
 const queryClient = new QueryClient();
 
@@ -142,6 +143,7 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             {/* <Route path="/" element={<TabsLayout />}> */}
             <Route index element={<Navigate to="/library" replace />} />
+            <Route path="moderation" element={<ModerationPage />} />
             <Route
               path="profile"
               element={<Profile onNavigate={() => navigate(-1)} />}

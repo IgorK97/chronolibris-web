@@ -7,10 +7,8 @@ import {
 } from 'lucide-react';
 // import type { ItemAuthor } from './bookTabsData';
 import styles from './BookTabs.module.css';
-
-// ─── Avatar ───────────────────────────────────────────────────────────────────
-
 import { getInitials, getAvatarColor } from './BookTabsData';
+import { ReportModal } from '@/components/reports/ui/ReportModal';
 
 export function Avatar({ userName }: { userName: string }) {
   return (
@@ -63,8 +61,6 @@ export function VoteButton({
   );
 }
 
-// ─── Score display ────────────────────────────────────────────────────────────
-
 export function ScoreDisplay({
   likes,
   dislikes,
@@ -88,55 +84,80 @@ export function ThreeDotsMenu({
   // type,
   canDelete,
   onDelete,
+  targetId,
+  targetTypeId,
+  isAuth = false,
 }: {
   type?: 'comment' | 'review';
   canDelete: boolean;
   onDelete: () => Promise<void>;
+  targetId: number;
+  targetTypeId: number;
+  isAuth?: boolean;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handler = () => setMenuOpen(false);
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [menuOpen]);
+  const showReport = isAuth && !canDelete;
   // const [reported, setReported] = useState(false);
 
   return (
-    <div className={styles['comment-menu-wrapper']}>
-      <button
-        className={styles['comment-menu-btn']}
-        onClick={() => setMenuOpen((v) => !v)}
-        aria-label="Действия"
+    <>
+      <div
+        className={styles['comment-menu-wrapper']}
+        onMouseDown={(e) => e.stopPropagation()}
       >
-        <MoreHorizontal size={15} />
-      </button>
-      {menuOpen && (
-        <div className={styles['comment-menu']}>
-          {!canDelete && (
-            <button
-              className={styles['comment-menu-item']}
-              onClick={() => {
-                // setReported(true);
-                setMenuOpen(false);
-              }}
-            >
-              Пожаловаться
-            </button>
-          )}
+        <button
+          className={styles['comment-menu-btn']}
+          onClick={() => setMenuOpen((v) => !v)}
+          aria-label="Действия"
+        >
+          <MoreHorizontal size={15} />
+        </button>
+        {menuOpen && (
+          <div className={styles['comment-menu']}>
+            {showReport && (
+              <button
+                className={styles['comment-menu-item']}
+                onClick={() => {
+                  // setReported(true);
+                  setMenuOpen(false);
+                  setReportOpen(true);
+                }}
+              >
+                Пожаловаться
+              </button>
+            )}
 
-          {canDelete && (
-            <button
-              className={styles['comment-menu-item']}
-              onClick={async () => {
-                await onDelete();
-                setMenuOpen(false);
-              }}
-            >
-              Удалить
-            </button>
-          )}
-        </div>
+            {canDelete && (
+              <button
+                className={styles['comment-menu-item']}
+                onClick={async () => {
+                  await onDelete();
+                  setMenuOpen(false);
+                }}
+              >
+                Удалить
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+      {reportOpen && (
+        <ReportModal
+          targetId={targetId}
+          targetTypeId={targetTypeId}
+          onClose={() => setReportOpen(false)}
+        />
       )}
-    </div>
+    </>
   );
 }
-
-// ─── ComposeBox ───────────────────────────────────────────────────────────────
 
 export function ComposeBox({
   placeholder,

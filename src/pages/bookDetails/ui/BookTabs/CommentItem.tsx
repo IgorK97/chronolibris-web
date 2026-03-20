@@ -21,6 +21,7 @@ import { formatDate } from '@/utils';
 import type { CommentDto } from '@/types/types';
 import { useStore } from '@/stores/globalStore';
 import styles from './BookTabs.module.css';
+import { TARGET_TYPE } from '@/api/reports';
 
 const MAX_INDENT_DEPTH = 3; // После 3 уровня перестаем сдвигать вправо
 
@@ -175,6 +176,9 @@ export function CommentItem({
             <ThreeDotsMenu
               canDelete={true}
               onDelete={async () => deleteMutation.mutate()}
+              targetId={comment.id}
+              targetTypeId={TARGET_TYPE.COMMENT}
+              isAuth={isAuth}
             />
           )}
         </div>

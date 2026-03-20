@@ -599,6 +599,29 @@
   }
 }
 
+.report-book-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid #e0e0ea;
+  background: #fff;
+  color: #888;
+  font-size: 12px;
+  cursor: pointer;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
+  align-self: flex-start;
+}
+
+.report-book-btn:hover {
+  color: #dc2626;
+  border-color: #fca5a5;
+}
+
 /* * {
   outline: 1px solid rgb(255 0 0 / 30%) !important;
   outline-offset: -1px;

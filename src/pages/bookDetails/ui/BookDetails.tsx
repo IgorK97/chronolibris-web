@@ -48,6 +48,9 @@ import {
 } from '@/api/reviews';
 import { bookFilesApi, useBookFiles } from '@/api/bookFiles';
 import Circles from 'react-loading-icons/dist/esm/components/circles';
+import { ReportModal } from '@/components/reports/ui/ReportModal';
+import { TARGET_TYPE } from '@/api/reports';
+import { Flag } from 'lucide-react';
 interface BookDetailsProps {
   onNavigateToReviews: (id: number) => void;
   onNavigateToRead: (bookFileId?: number) => void;
@@ -91,6 +94,7 @@ export const BookDetailsComponent = ({
 
   const { currentBook, setCurrentBook, user } = useStore();
   const { data: roles } = useRoles();
+  const [isReportOpen, setIsReportOpen] = useState(false);
   const { data: seekedShelves, refetch: refetchSeekedShelves } =
     useSeekedShelves(currentBook?.id ?? 0);
   const { data: shelves, refetch: refetchShelves } = useShelves(
@@ -498,6 +502,16 @@ export const BookDetailsComponent = ({
                 {fullBookDetails.year} {t('book.year')}
               </span>
             )}
+
+            {isAuth && (
+              <button
+                className={styles['report-book-btn']}
+                onClick={() => setIsReportOpen(true)}
+              >
+                <Flag size={13} />
+                Пожаловаться
+              </button>
+            )}
           </div>
 
           <div className={styles['book-meta']}>
@@ -676,6 +690,13 @@ export const BookDetailsComponent = ({
           </button>
         </div>
       </div>
+      {isReportOpen && (
+        <ReportModal
+          targetId={fullBookDetails.id}
+          targetTypeId={TARGET_TYPE.BOOK}
+          onClose={() => setIsReportOpen(false)}
+        />
+      )}
     </div>
   );
 };

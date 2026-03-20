@@ -19,8 +19,7 @@ import {
 } from '@/api/reviews';
 import type { ReviewDetails } from '@/types/types';
 import { useStore } from '@/stores/globalStore';
-
-// ─── Star row (display only) ──────────────────────────────────────────────────
+import { TARGET_TYPE } from '@/api/reports';
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -39,8 +38,6 @@ function StarRating({ rating }: { rating: number }) {
     </div>
   );
 }
-
-// ─── Interactive star picker (for composing) ──────────────────────────────────
 
 function StarPicker({
   value,
@@ -105,8 +102,6 @@ function SubmitBanner({
     </div>
   );
 }
-
-// ─── Single review ────────────────────────────────────────────────────────────
 
 const TRUNCATE_LINES = 5;
 
@@ -187,7 +182,13 @@ function ReviewItem({
             <span className={styles['comment-date']}>
               {formatDate(new Date(review.createdAt).toISOString())}
             </span>
-            <ThreeDotsMenu canDelete={canDelete} onDelete={onDelete} />
+            <ThreeDotsMenu
+              canDelete={canDelete}
+              onDelete={onDelete}
+              targetId={review.id}
+              targetTypeId={TARGET_TYPE.REVIEW}
+              isAuth={isAuth}
+            />
           </div>
 
           {/* Truncated text block */}
