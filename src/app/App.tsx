@@ -40,6 +40,7 @@ import { TagsPage } from '@/pages/adminPanel/Tags/TagsPage';
 import { ReaderPage } from '@/pages/reader/ReaderPage';
 import ReaderLayout from './layouts/ReaderLayout';
 import { ModerationPage } from '@/pages/moderation/ModerationPage';
+import SearchPage from '@/pages/search/ui/SearchPage';
 
 const queryClient = new QueryClient();
 
@@ -98,8 +99,8 @@ export default function App() {
           <Route
             path="search"
             element={
-              <Search
-                setCurrentBook={setCurrentBook}
+              <SearchPage
+                // setCurrentBook={setCurrentBook}
                 onNavigateToBook={handleBookSelection}
               />
             }

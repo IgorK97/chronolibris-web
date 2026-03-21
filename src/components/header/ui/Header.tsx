@@ -1,33 +1,40 @@
 // import React from 'react';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useStore } from '@/stores/globalStore';
 // import { usersApi } from '@/api/user';
 import styles from './Header.module.css';
+import { useEffect, useRef, useState } from 'react';
+import { Search } from 'lucide-react';
 
 export default function Header() {
   const { user } = useStore();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // const handleLogout = async () => {
-  //   try {
-  //     await usersApi.logout();
-  //     setUser(null);
-  //     navigate('/auth');
-  //   } catch (error) {
-  //     console.error('Logout failed', error);
-  //     setUser(null);
-  //     navigate('/auth');
-  //   }
-  // };
+  const currentQuery = new URLSearchParams(location.search).get('q') ?? '';
+  const [inputValue, setInputValue] = useState(currentQuery);
+  const inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    setInputValue(currentQuery);
+  }, [currentQuery]);
+
+  const handleSearch = () => {
+    const trimmed = inputValue.trim();
+    if (!trimmed) return;
+    navigate(`/search?q=${encodeURIComponent(trimmed)}`);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') handleSearch();
+    if (e.key === 'Escape') inputRef.current?.blur();
+  };
 
   return (
     <NavigationMenu.Root className={styles['navigation-menu-root']}>
       <NavigationMenu.List className={styles['navigation-menu-list']}>
-        {/* LEFT: Logo */}
         <NavigationMenu.Item>
           <Link to="/" className={styles['logo']}>
-            {/* 📚 ELibrary */}
             Chronolibris
           </Link>
         </NavigationMenu.Item>
@@ -60,14 +67,19 @@ export default function Header() {
             />
           </div>
         </div>
-        {/* MIDDLE: Categories & Search */}
+
         <div className={styles['middle-section']}>
           <div className={styles['search-container']}>
             <input
+              ref={inputRef}
               type="text"
-              placeholder="Искать..."
+              placeholder="Введите название книги..."
+              value={inputValue}
               className={styles['search-input']}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
             />
+            <Search onClick={handleSearch} />
           </div>
         </div>
 

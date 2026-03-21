@@ -1,0 +1,239 @@
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 16px 64px;
+  font-family:
+    Georgia, 'Times New Roman', Times, serif; /* Их все вместе надо писать? */
+}
+
+.search-bar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.search-input-wrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 44px 12px 18px;
+  border: 2px solid #d8d0c4;
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: inherit;
+  background: #faf9f7;
+  color: #2a2218;
+  outline: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.search-input:focus {
+  border-color: #8b6f47;
+  box-shadow: 0 0 0 3px rgb(139 111 71 / 12%);
+}
+
+.search-btn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #8b6f47;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  transition: color 0.15s;
+}
+
+.search-btn:hover {
+  color: #5c4230;
+}
+
+.advanced-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: 2px solid #d8d0c4;
+  border-radius: 8px;
+  background: #faf9f7;
+  color: #6b5744;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+
+.advanced-toggle:hover {
+  border-color: #8b6f47;
+  background: #f3ede5;
+}
+
+.advanced-toggle-active {
+  border-color: #8b6f47;
+  background: #f3ede5;
+  color: #5c4230;
+}
+
+.advanced-panel {
+  border: 1.5px solid #d8d0c4;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  background: #faf9f7;
+  overflow: hidden;
+}
+
+.advanced-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid #e8e0d8;
+}
+
+.advanced-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #3a2e24;
+}
+
+.advanced-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition:
+    color 0.15s,
+    background 0.15s;
+}
+
+.advanced-close:hover {
+  color: #555;
+  background: #ede6dc;
+}
+
+.advanced-stub {
+  padding: 36px 20px;
+  text-align: center;
+}
+
+.stub-icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+
+.stub-text {
+  font-size: 15px;
+  color: #5a4a3a;
+  margin: 0 0 6px;
+  font-weight: 500;
+}
+
+.stub-sub {
+  font-size: 13px;
+  color: #9e8e7e;
+  margin: 0;
+}
+
+.result-header {
+  margin-bottom: 20px;
+}
+
+.results-count {
+  font-size: 14px;
+  color: #7a6a58;
+  font-style: italic;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80px 0;
+  gap: 12px;
+}
+
+.empty-icon {
+  font-size: 48px;
+  opacity: 0.4;
+}
+
+.empty-text {
+  font-size: 16px;
+  color: #9e8e7e;
+  margin: 0;
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 60px 0;
+  color: #9e8e7e;
+  font-size: 15px;
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid #e8e0d8;
+  border-top-color: #8b6f47;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #e8e0d8;
+  border-top-color: #8b6f47;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error-state {
+  text-align: center;
+  padding: 48px 0;
+  color: #c0392b;
+  font-size: 15px;
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.loading-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px 0;
+  color: #9e8e7e;
+  font-size: 14px;
+}
+
+.sentinel {
+  height: 1px;
+}
