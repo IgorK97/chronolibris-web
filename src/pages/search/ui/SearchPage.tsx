@@ -30,6 +30,7 @@ import {
   type AdvancedFilters,
 } from '../utils/filterParams';
 import { useStore } from '@/stores/globalStore';
+import { AdvancedSearchPanel } from './AdvancedSearchPanel';
 
 function AdvancedSearchStub({ onClose }: { onClose: () => void }) {
   return (
@@ -189,7 +190,7 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
 
   return (
     <div className={styles.page}>
-      <div className={styles['search-bar']}>
+      <div className={styles['filter-bar']}>
         <button
           className={`${styles['advanced-toggle']} ${
             showAdvanced ? styles['advanced-toggle-active'] : ''
@@ -223,7 +224,12 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
         )}
       </div>
       {showAdvanced && (
-        <AdvancedSearchStub onClose={() => setShowAdvanced(false)} />
+        <AdvancedSearchPanel
+          filters={filters}
+          onChange={setFilters}
+          onClose={() => setShowAdvanced(false)}
+        />
+        // <AdvancedSearchStub onClose={() => setShowAdvanced(false)} />
       )}
       {urlQuery && !isLoading && !isError && (
         <div className={styles['results-header']}>
