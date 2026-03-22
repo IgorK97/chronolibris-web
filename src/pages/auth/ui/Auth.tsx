@@ -84,6 +84,8 @@ export const Auth = ({ onNavigate }: AuthProps) => {
       phone: null,
       password: null,
       confirmPassword: null,
+      firstName: null,
+      lastName: null,
     };
     let ok = true;
 

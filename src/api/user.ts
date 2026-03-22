@@ -43,4 +43,15 @@ export const usersApi = {
   changePassword: async (data: ChangePasswordRequest): Promise<void> => {
     await apiClient.post<void>(`/users/password`, data);
   },
+  registerStaff: async (data: {
+    userName: string;
+    lastName: string;
+    firstName: string;
+    email: string;
+    phoneNumber: string;
+    password: string;
+    role: 'moderator' | 'admin';
+  }) => {
+    await apiClient.post<void, typeof data>('/users/staff', data);
+  },
 };

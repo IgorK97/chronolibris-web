@@ -10,14 +10,16 @@ import MainLayout from './layouts/MainLayout';
 
 // Импорт страниц (замените на свои пути)
 import { BookDetailsComponent } from '../pages/bookDetails';
-import Search from '../pages/search';
 import { Profile } from '../pages/profile';
 import { Auth } from '../pages/auth';
 import Reviews from '../pages/reviews';
 import Library from '@/pages/library';
 import MyBooks from '../pages/myBooks';
 import { usersApi } from '../api/user';
-import { ModeratorRoute, ProtectedRoute } from './ProtectedRoute';
+import {
+  // ModeratorRoute,
+  ProtectedRoute,
+} from './ProtectedRoute';
 import { SelectionListView } from '../pages/library/ui/SectionList';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -41,6 +43,7 @@ import { ReaderPage } from '@/pages/reader/ReaderPage';
 import ReaderLayout from './layouts/ReaderLayout';
 import { ModerationPage } from '@/pages/moderation/ModerationPage';
 import SearchPage from '@/pages/search/ui/SearchPage';
+import { RegisterStaffPage } from '@/pages/RegisterStaffPage/RegisterStuffPage';
 
 const queryClient = new QueryClient();
 
@@ -167,6 +170,7 @@ export default function App() {
             <Route path="contents" element={<ContentManagement />} />
             <Route path="contents/:contentId" element={<ContentUnit />} />
             <Route path="tags" element={<TagsPage />} />
+            <Route path="register-staff" element={<RegisterStaffPage />} />
 
             {/*Add barrel export later */}
             <Route path="books" element={<BookManagement />} />
