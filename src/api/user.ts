@@ -14,11 +14,11 @@ export const usersApi = {
   register: async (request: RegisterRequest) => {
     await apiClient.post<void, RegisterRequest>('/users/register', request);
   },
-  login: async (email: string, password: string) => {
+  login: async (userName: string, password: string) => {
     const res = await apiClient.post<LoginResult, LoginRequest>(
       '/users/login',
       {
-        email,
+        userName,
         password,
       }
     );

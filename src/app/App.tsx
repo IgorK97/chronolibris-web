@@ -172,7 +172,7 @@ export default function App() {
             <Route path="books" element={<BookManagement />} />
             <Route path="books/:bookId" element={<BookUnit />} />
           </Route>
-          <Route path="*" element={<Navigate to="/" />} />
+          <Route path="*" element={<Navigate to="/library" />} />
         </Route>
         <Route element={<ReaderLayout />}>
           <Route element={<ProtectedRoute />}>

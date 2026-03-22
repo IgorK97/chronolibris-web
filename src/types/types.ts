@@ -582,14 +582,16 @@ export interface RegistrationResult {
 }
 
 export interface RegisterRequest {
-  name: string;
-  familyName: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
+  userName: string;
+  phoneNumber: string;
 }
 
 export interface LoginRequest {
-  email: string;
+  userName: string;
   password: string;
 }
 

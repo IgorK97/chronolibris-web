@@ -1,12 +1,17 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import tailwindcss from '@tailwindcss/vite';
+// import basicSsl from '@vitejs/plugin-basic-ssl';
+import fs from 'fs';
 import path from 'path';
-import basicSsl from '@vitejs/plugin-basic-ssl';
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss(), basicSsl()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    // basicSsl()
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -23,7 +28,15 @@ export default defineConfig({
     include: ['.json', '.js'],
   },
   server: {
-    // https: true,
+    port: 5173,
+    https: {
+      // Указываем пути к созданным файлам
+      key: fs.readFileSync(
+        path.resolve(__dirname, './certs/localhost+2-key.pem')
+      ),
+      cert: fs.readFileSync(path.resolve(__dirname, './certs/localhost+2.pem')),
+    },
+    strictPort: true,
     proxy: {
       '/api': {
         target: 'https://localhost:7016',

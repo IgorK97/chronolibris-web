@@ -7,23 +7,33 @@ import { useStore } from '../../../stores/globalStore';
 import { t } from 'i18next';
 import axios from 'axios';
 // import { Button } from "@/components/ui/button";
-
-interface MyError {
-  username: string | null;
-  email: string | null;
-  fullName: string | null;
-  password: string | null;
-  confirmPassword: string | null;
-  phone: string | null;
-}
-
-interface FormValues {
-  username: string;
+interface RegisterForm {
+  userName: string;
   email: string;
-  fullName: string;
+  phone: string;
   password: string;
   confirmPassword: string;
-  phone: string;
+  lastName: string;
+  firstName: string;
+}
+interface LoginForm {
+  userName: string;
+  password: string;
+}
+
+interface RegisterErrors {
+  userName: string | null;
+  email: string | null;
+  phone: string | null;
+  password: string | null;
+  confirmPassword: string | null;
+  firstName: string | null;
+  lastName: string | null;
+}
+
+interface LoginErrors {
+  userName: string | null;
+  password: string | null;
 }
 
 interface AuthProps {
@@ -32,112 +42,121 @@ interface AuthProps {
 
 export const Auth = ({ onNavigate }: AuthProps) => {
   const [isRegister, setIsRegister] = useState(false);
-  const [form, setForm] = useState<FormValues>({
-    username: '',
-    email: '',
-    fullName: '',
-    password: '',
-    confirmPassword: '',
-    phone: '',
-  });
-  const [errors, setErrors] = useState<MyError>({
-    confirmPassword: null,
-    email: null,
-    fullName: null,
-    password: null,
-    phone: null,
-    username: null,
-  });
 
   const { setUser } = useStore();
 
-  const handleChange = (field: keyof FormValues, value: string) => {
-    setForm({ ...form, [field]: value });
+  const [regForm, setRegForm] = useState<RegisterForm>({
+    userName: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirmPassword: '',
+    lastName: '',
+    firstName: '',
+  });
+
+  const [regErrors, setRegErrors] = useState<RegisterErrors>({
+    userName: null,
+    email: null,
+    phone: null,
+    password: null,
+    confirmPassword: null,
+    firstName: null,
+    lastName: null,
+  });
+
+  const [loginForm, setLoginForm] = useState<LoginForm>({
+    userName: '',
+    password: '',
+  });
+
+  const [loginErrors, setLoginErrors] = useState<LoginErrors>({
+    userName: null,
+    password: null,
+  });
+
+  const [serverError, setServerError] = useState<string | null>(null);
+
+  const validateRegister = (): boolean => {
+    const e: RegisterErrors = {
+      userName: null,
+      email: null,
+      phone: null,
+      password: null,
+      confirmPassword: null,
+    };
+    let ok = true;
+
+    if (!regForm.userName.trim()) {
+      e.userName = t('auth.error_name');
+      ok = false;
+    } else if (regForm.userName.trim().length < 3) {
+      e.userName = 'Имя пользователя должно быть не менее 3 символов';
+      ok = false;
+    }
+
+    if (regForm.email.trim() && !/\S+@\S+\.\S+/.test(regForm.email)) {
+      e.email = t('auth.incorr_email');
+      ok = false;
+    }
+
+    if (regForm.phone.trim() && !/^(\+7|8)?[0-9]{10}$/.test(regForm.phone)) {
+      e.phone = t('auth.error_phone');
+      ok = false;
+    }
+
+    if (!regForm.password.trim()) {
+      e.password = t('auth.error_pass');
+      ok = false;
+    } else if (regForm.password.length < 8) {
+      e.password = t('auth.short_pass');
+      ok = false;
+    }
+
+    if (regForm.password !== regForm.confirmPassword) {
+      e.confirmPassword = t('auth.error_conf_pass');
+      ok = false;
+    }
+    setRegErrors(e);
+    return ok;
   };
 
-  const validateForm = () => {
-    let valid = true;
-    const newErrors: MyError = {
-      confirmPassword: null,
-      email: null,
-      fullName: null,
-      password: null,
-      phone: null,
-      username: null,
-    };
+  const validateLogin = (): boolean => {
+    const e: LoginErrors = { userName: null, password: null };
+    let ok = true;
 
-    if (isRegister && !form.username.trim()) {
-      newErrors.username = 'auth.error_name';
-      valid = false;
-    }
-    if (!form.email.trim()) {
-      newErrors.email = 'auth.error_email';
-      valid = false;
-    } else if (!/\S+@\S+\.\S+/.test(form.email)) {
-      newErrors.email = 'auth.incorr_email';
-      valid = false;
-    }
-    if (isRegister && !form.fullName.trim()) {
-      newErrors.fullName = 'auth.error_fullname';
-      valid = false;
-    }
-    if (!form.password.trim()) {
-      newErrors.password = 'auth.error_pass';
-      valid = false;
-    } else if (form.password.length < 6) {
-      newErrors.password = 'auth.short_pass';
-      valid = false;
-    }
-    if (isRegister && form.password !== form.confirmPassword) {
-      newErrors.confirmPassword = 'auth.error_conf_pass';
-      valid = false;
-    }
-    if (isRegister && !/^(\+7|8)?[0-9]{10}$/.test(form.phone)) {
-      newErrors.phone = 'auth.error_phone';
-      valid = false;
+    if (!loginForm.userName.trim()) {
+      e.userName = 'Введите имя пользователя';
+      ok = false;
     }
 
-    setErrors(newErrors);
-    return valid;
+    if (!loginForm.password.trim()) {
+      e.password = t('auth.error_pass');
+      ok = false;
+    }
+    setLoginErrors(e);
+    return ok;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); // Prevent page reload on form submit
-    if (!validateForm()) return;
+    setServerError(null);
+
+    const valid = isRegister ? validateRegister() : validateLogin();
+    if (!valid) return;
 
     try {
       if (isRegister) {
         await usersApi.register({
-          name: form.username,
-          familyName: form.fullName,
-          email: form.email,
-          password: form.password,
+          userName: regForm.userName,
+          firstName: regForm.firstName,
+          lastName: regForm.lastName,
+          email: regForm.email,
+          password: regForm.password,
+          phoneNumber: regForm.phone,
         });
-
-        alert('Registration successful!');
-
-        // if (!res.success) {
-        //   alert(res.message || "Registration failed");
-        //   return;
-        // }
-
-        // alert(res.message || "Registration successful");
-        // const resProfile = await usersApi.getProfile();
-        // setUser(resProfile);
-        // onNavigate();
       } else {
-        console.log('Attempting login with', form.email);
-        await usersApi.login(form.email, form.password);
-        // await usersApi.getProfile(); // Ensure cookie is set before fetching profile
-        // if (!res.success) {
-        //   alert(res.message || "Login failed");
-        //   return;
-        // }
-
-        alert('Login successful');
-        // const resProfile = await usersApi.getProfile();
-        // setUser(resProfile);
-        // onNavigate();
+        await usersApi.login(loginForm.userName, loginForm.password);
       }
       const resProfile = await usersApi.getProfile();
       setUser(resProfile);
@@ -165,64 +184,74 @@ export const Auth = ({ onNavigate }: AuthProps) => {
       </h1>
 
       <form onSubmit={handleSubmit}>
-        {isRegister && (
+        {isRegister ? (
           <>
             <InputField
-              label={t('auth.l_name')}
-              value={form.username}
-              onChange={(v) => handleChange('username', v)}
-              error={errors.username}
+              label={t('auth.u_name')}
+              value={regForm.userName}
+              onChange={(v) => setRegForm({ ...regForm, userName: v })}
+              error={regErrors.userName}
             />
             <InputField
-              label={t('auth.l_fullname')}
-              value={form.fullName}
-              onChange={(v) => handleChange('fullName', v)}
-              error={errors.fullName}
+              label={t('auth.f_name')}
+              value={regForm.firstName}
+              onChange={(v) => setRegForm({ ...regForm, firstName: v })}
+              error={regErrors.firstName}
+            />
+            <InputField
+              label={t('auth.l_name')}
+              value={regForm.lastName}
+              onChange={(v) => setRegForm({ ...regForm, lastName: v })}
+              error={regErrors.lastName}
+            />
+            <InputField
+              label={t('auth.l_email')}
+              value={regForm.email}
+              onChange={(v) => setRegForm({ ...regForm, email: v })}
+              error={regErrors.email}
+              type="email"
             />
             <InputField
               label={t('auth.l_phone')}
-              value={form.phone}
-              onChange={(v) => handleChange('phone', v)}
-              error={errors.phone}
+              value={regForm.phone}
+              onChange={(v) => setRegForm({ ...regForm, phone: v })}
+              error={regErrors.phone}
               type="tel"
+            />
+            <InputField
+              label={t('auth.l_pass')}
+              value={regForm.password}
+              onChange={(v) => setRegForm({ ...regForm, password: v })}
+              error={regErrors.password}
+              type="password"
+            />
+            <InputField
+              label={t('auth.l_conf_pass')}
+              value={regForm.confirmPassword}
+              onChange={(v) => setRegForm({ ...regForm, confirmPassword: v })}
+              error={regErrors.confirmPassword}
+              type="password"
+            />
+          </>
+        ) : (
+          <>
+            <InputField
+              label={t('auth.l_name')}
+              value={loginForm.userName}
+              onChange={(v) => setLoginForm({ ...loginForm, userName: v })}
+              error={loginErrors.userName}
+            />
+            <InputField
+              label={t('auth.l_pass')}
+              value={loginForm.password}
+              onChange={(v) => setLoginForm({ ...loginForm, password: v })}
+              error={loginErrors.password}
+              type="password"
             />
           </>
         )}
 
-        <InputField
-          label={t('auth.l_email')}
-          value={form.email}
-          onChange={(v) => handleChange('email', v)}
-          error={errors.email}
-          type="email"
-        />
-
-        <InputField
-          label={t('auth.l_pass')}
-          value={form.password}
-          onChange={(v) => handleChange('password', v)}
-          error={errors.password}
-          type="password"
-        />
-        {/* <div className="tw:p-10 tw:bg-red-500 tw:text-white tw:font-bold">
-          Если я на красном фоне — префикс работает!
-        </div>
-
-        <div className="p-10 bg-blue-500">
-          А я должен быть обычным текстом без фона, потому что у меня нет
-          префикса.
-        </div>
-        <Button variant="outline">Я с префиксом!</Button> */}
-
-        {isRegister && (
-          <InputField
-            label={t('auth.l_conf_pass')}
-            value={form.confirmPassword}
-            onChange={(v) => handleChange('confirmPassword', v)}
-            error={errors.confirmPassword}
-            type="password"
-          />
-        )}
+        {serverError && <p className={styles['server-error']}>{serverError}</p>}
 
         <button type="submit" className={styles['button']}>
           {isRegister ? t('auth.action_reg') : t('auth.action_auth')}
@@ -231,7 +260,10 @@ export const Auth = ({ onNavigate }: AuthProps) => {
 
       <button
         className={styles['switch-button']}
-        onClick={() => setIsRegister(!isRegister)}
+        onClick={() => {
+          setIsRegister(!isRegister);
+          setServerError(null);
+        }}
       >
         {isRegister ? t('auth.switch_to_auth') : t('auth.switch_to_reg')}
       </button>
