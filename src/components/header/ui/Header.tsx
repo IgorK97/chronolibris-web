@@ -79,11 +79,10 @@ export default function Header() {
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
             />
-            <Search onClick={handleSearch} />
           </div>
+          <Search onClick={handleSearch} />
         </div>
 
-        {/* RIGHT: Auth Logic */}
         <div className={styles['right-section']}>
           {user ? (
             <>

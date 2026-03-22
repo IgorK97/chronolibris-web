@@ -249,7 +249,7 @@ export const BookDetailsComponent = ({
 
   const authorRoleId = roles?.find((role) => role.name === 'Автор')?.id ?? 1;
   const authors = getAuthorsString(authorRoleId, fullBookDetails);
-
+  console.log('FULLBOOK', fullBookDetails.id);
   const toggleShelfAction = async (
     shelfId: number | undefined,
     isCurrentStatus: boolean
