@@ -146,7 +146,7 @@ export default function App() {
           </Route> */}
           <Route element={<ProtectedRoute />}>
             {/* <Route path="/" element={<TabsLayout />}> */}
-            <Route index element={<Navigate to="/library" replace />} />
+            {/* <Route index element={<Navigate to="/library" replace />} /> */}
             <Route path="moderation" element={<ModerationPage />} />
             <Route
               path="profile"
@@ -171,36 +171,6 @@ export default function App() {
             {/*Add barrel export later */}
             <Route path="books" element={<BookManagement />} />
             <Route path="books/:bookId" element={<BookUnit />} />
-            {/*Полносвязные, не инициализируются нулем (а случайными числами), третье отличие - 
-            сам алгоритм (прямой проход и обратный - с распространением ошибки, и только после этого производится коррекция ошибки.
-            + Введено смещение (заменяют собой пороговую функцию перцептрона, что дает возможность обучать тем же самым алгоритммом само смещение - т.е.
-            вручную их подбирать не нужно) + еще один момент - логичстическая функция, а не пороговая функция 
-            Принцип победитель забирает все
-
-            Тест проверки на обученность проходит на данных, которые нейросети неизвестны, при этом будет только прямое распространение
-            Перед этим можно провести тест на память у нейросети - проверить на тех данных, которые она уже знает, на которых обучалась,
-            но только без обучения
-
-            Если обучали мало, то ответ будет примерно один и тот же (но для этого обучающая выборка должна быть корректной)
-            
-            ++++!!!!!!Добавить ответы на вопросы с последней презентации!!!*/}
-            {/* <Route
-              path="reader/:bookFileId"
-              element={
-                <ReaderPage />
-                // <Reader
-                //   // tocPath="/data/toc.json"
-                //   // filePath="/data/000.json"
-                //   // basePath="/data"
-                //   bookFileId={3}
-                //   initialChunkIndex={0}
-                //   // imagePath={`${import.meta.env.VITE_STORAGE_URL}/books/v1/4/images`}
-                //   // imagePath={`${import.meta.env.VITE_STORAGE_URL}/covers/4`}
-                //   // cacheSize={10}
-                //   // preloadAhead={3}
-                // />
-              }
-            /> */}
           </Route>
           <Route path="*" element={<Navigate to="/" />} />
         </Route>

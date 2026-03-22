@@ -549,14 +549,14 @@ export interface MyReviewDetails {
 export interface UpdateProfileRequest {
   firstName: string;
   lastName: string;
-  email: string;
-  userId: number;
+  email?: string;
+  userName: string;
+  phoneNumber?: string;
 }
 
 export interface ChangePasswordRequest {
   currentPassword: string;
   newPassword: string;
-  userId: number;
 }
 
 export interface ShelfDetails {

@@ -141,3 +141,28 @@
   cursor: pointer;
   font-size: 16px;
 }
+
+.section-title {
+  padding: 0 16px;
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.success-msg {
+  margin: 6px 16px 0;
+  font-size: 13px;
+  color: #16a34a;
+}
+
+.error-msg {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #dc2626;
+}
+
+.save-button-bottom:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

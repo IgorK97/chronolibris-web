@@ -3,7 +3,7 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { ArrowLeft, ChevronRight, User } from 'lucide-react';
+import { User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import styles from './Profile.module.css';
 
@@ -21,33 +21,50 @@ interface ProfileProps {
 }
 
 export const Profile = ({ onNavigate }: ProfileProps) => {
-  const [isProfileModalVisible, setIsProfileModalVisible] = useState(false);
-  const [isSecurityModalVisible, setIsSecurityModalVisible] = useState(false);
   const { user, setUser, clearStore } = useStore();
 
-  const [formData, setFormData] = useState({
+  const [profileForm, setProfileForm] = useState({
     firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    phoneNumber: user?.phoneNumber || '',
     email: user?.email || '',
+    userName: user?.userName || '',
   });
 
-  // const [userName, setUserName] = useState(user?.firstName || "");
-  // const [userEmail, setUserEmail] = useState(user?.email || "");
-
+  const [profileSnapshot, setProfileSnapshot] = useState({ ...profileForm });
+  const profileChanged =
+    profileForm.firstName !== profileSnapshot.firstName ||
+    profileForm.email !== profileSnapshot.email ||
+    profileForm.lastName !== profileSnapshot.lastName ||
+    profileForm.userName !== profileSnapshot.userName ||
+    profileForm.phoneNumber !== profileSnapshot.phoneNumber;
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const { t } = useTranslation();
+  const passwordReady =
+    currentPassword.length > 0 &&
+    newPassword.length > 0 &&
+    newPassword === confirmPassword;
 
+  const [passwordError, setPasswordError] = useState('');
+  const [profileSuccess, setProfileSuccess] = useState(false);
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
   useEffect(() => {
     const loadProfile = async () => {
       try {
         const profile = await usersApi.getProfile();
         setUser(profile);
-        setFormData({
-          firstName: profile.firstName,
-          email: profile.email || '',
-        }); //так как юзстате принимает инитиал стейт, который после первого рендера игнорируется
+        const initial = {
+          firstName: profile.firstName ?? '',
+          lastName: profile.lastName ?? '',
+          userName: profile.userName ?? '',
+          email: profile.email ?? '',
+          phoneNumber: profile.phoneNumber ?? '',
+        };
+        setProfileForm(initial);
+        setProfileSnapshot(initial);
       } catch (e) {
         console.error('Failed to load profile', e);
       }
@@ -55,72 +72,60 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
     loadProfile();
   }, [setUser]);
 
-  // useEffect(() => {
-  //   if (user) {
-  //     setFormData({ firstName: user.firstName, email: user.email || "" });
-  //   }
-  // }, [user]);
-
   const logout = () => {
-    //usersApi.logout(); // Если есть API для логаута
-    clearStore(); // Очистка состояния хранилища - юзер, книги и т.д.
+    clearStore();
     onNavigate();
-    // localStorage.removeItem("token");
-    // localStorage.removeItem("refresh");
-    // localStorage.removeItem("profile");
-    // setUser(null);
   };
 
   const handleSaveProfile = async () => {
-    if (!user) return;
+    if (!user || !profileChanged) return;
     try {
       const updatedProfile = await usersApi.updateProfile({
-        firstName: formData.firstName,
-        lastName: user?.lastName || '',
-        email: formData.email,
-        userId: user.userId,
+        firstName: profileForm.firstName,
+        lastName: profileForm.lastName,
+        email: profileForm.email,
+        phoneNumber: profileForm.phoneNumber,
+        userName: profileForm.userName,
       });
       setUser({
         ...user,
-        firstName: updatedProfile.firstName,
-        email: updatedProfile.email,
+        ...updatedProfile,
       });
-      setIsProfileModalVisible(false);
+      setProfileSuccess(true);
     } catch (e) {
       console.error(e);
     }
   };
 
-  const handleSaveSecurity = async () => {
-    if (!user || !currentPassword || !newPassword || !confirmPassword) return;
-    if (newPassword !== confirmPassword) return;
+  const handleChangePassword = async () => {
+    if (!user || !passwordReady) return;
+    setPasswordError('');
 
     try {
       await usersApi.changePassword({
         currentPassword: currentPassword,
         newPassword: newPassword,
-        userId: user.userId,
       });
-      setIsSecurityModalVisible(false);
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
+      setPasswordSuccess(true);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
-      console.error(e);
+      setPasswordError('Не удалось сменить пароль. Попробуйте снова');
     }
   };
 
   return (
     <div className={styles['container']}>
       <div className={styles['scroll-container']}>
-        {/* Profile Summary Section */}
         <section className={styles['profile-section']}>
           <div className={styles['avatar']}>
             <User size={24} color="#9ca3af" />
           </div>
           <div>
             <p style={{ margin: 0, fontWeight: 500 }}>
-              {user ? user.firstName : 'profile.guest'}
+              {user ? user.userName : t('profile.guest')}
             </p>
             <p style={{ margin: 0, fontSize: '12px', color: '#6b7280' }}>
               {user ? user.email : ''}
@@ -128,60 +133,10 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
           </div>
         </section>
 
-        {/* Settings Section */}
         <div className={styles['section']}>
-          <h3 style={{ padding: '0 16px', fontSize: '14px', color: '#6b7280' }}>
+          <h3 className={styles['section-title']}>
             {t('profile.label_settings')}
           </h3>
-          <button
-            className={styles['row']}
-            onClick={() => setIsProfileModalVisible(true)}
-          >
-            <span>{t('profile.label_profile_settings')}</span>
-            <ChevronRight size={20} color="#d1d5db" />
-          </button>
-          <button
-            className={styles['row']}
-            onClick={() => setIsSecurityModalVisible(true)}
-          >
-            <span>{t('profile.label_security')}</span>
-            <ChevronRight size={20} color="#d1d5db" />
-          </button>
-        </div>
-
-        {/* Help/Auth Section */}
-        <div className={styles['section']}>
-          <h3 style={{ padding: '0 16px', fontSize: '14px', color: '#6b7280' }}>
-            {t('profile.label_help')}
-          </h3>
-          <button
-            className={styles['row']}
-            onClick={() => (user ? logout() : onNavigate())}
-          >
-            <span style={{ color: '#D32F2F', fontWeight: 500 }}>
-              {user ? t('profile.exit') : t('profile.enter')}
-            </span>
-            <ChevronRight size={20} color="#d1d5db" />
-          </button>
-        </div>
-      </div>
-
-      {/* Profile Settings Modal Overlay */}
-      {isProfileModalVisible && (
-        <div className={styles['modal-overlay']}>
-          <div className={styles['modal-header']}>
-            <button
-              className={styles['close-button']}
-              onClick={() => setIsProfileModalVisible(false)}
-            >
-              <ArrowLeft size={24} color="#000" />
-            </button>
-            <h2 style={{ fontSize: '18px', fontWeight: 600 }}>
-              {t('profile.title_prof_sett')}
-            </h2>
-            <div style={{ width: 40 }} /> {/* Spacer to center title */}
-          </div>
-
           <div className={styles['form']}>
             <div className={styles['input-group']}>
               <label className={styles['label']}>
@@ -189,103 +144,130 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
               </label>
               <input
                 className={styles['text-input']}
-                value={formData.firstName}
+                value={profileForm.firstName}
                 onChange={(e) =>
-                  setFormData({ ...formData, firstName: e.target.value })
+                  setProfileForm({ ...profileForm, firstName: e.target.value })
                 }
                 placeholder={t('profile.ph_name')}
               />
             </div>
+
             <div className={styles['input-group']}>
               <label className={styles['label']}>
                 {t('profile.label_email')}
               </label>
               <input
                 type="email"
-                className={styles.textInput}
-                value={formData.email}
+                className={styles['text-input']}
+                value={profileForm.email}
                 onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
+                  setProfileForm({ ...profileForm, email: e.target.value })
                 }
                 placeholder={t('profile.ph_email')}
               />
             </div>
-          </div>
 
-          <div className={styles['bottom-actions']}>
-            <button
-              className={styles['save-button-bottom']}
-              onClick={handleSaveProfile}
-            >
-              {t('profile.save')}
-            </button>
+            <div className={styles['input-group']}>
+              <label className={styles['label']}>Телефон</label>
+              <input
+                type="tel"
+                className={styles['text-input']}
+                value={profileForm.phoneNumber}
+                onChange={(e) =>
+                  setProfileForm({
+                    ...profileForm,
+                    phoneNumber: e.target.value,
+                  })
+                }
+                placeholder="+7 (999) 000-00-00"
+              />
+            </div>
           </div>
         </div>
-      )}
+        {profileSuccess && (
+          <p className={styles['success-msg']}>Данные сохранены</p>
+        )}
+        <button
+          className={styles['save-button-bottom']}
+          onClick={handleSaveProfile}
+          disabled={!profileChanged}
+        >
+          {t('profile.save')}
+        </button>
+      </div>
+      <div className={styles['section']}>
+        <h3 className={styles['section-title']}>
+          {t('profile.label_security')}
+        </h3>
 
-      {/* Security Settings Modal Overlay */}
-      {isSecurityModalVisible && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalHeader}>
-            <button
-              className={styles.closeButton}
-              onClick={() => setIsSecurityModalVisible(false)}
-            >
-              <ArrowLeft size={24} color="#000" />
-            </button>
-            <h2 style={{ fontSize: '18px', fontWeight: 600 }}>
-              {t('profile.title_sec_sett')}
-            </h2>
-            <div style={{ width: 40 }} />
+        <div className={styles['form']}>
+          <div className={styles['input-group']}>
+            <label className={styles['label']}>{t('profile.label_pass')}</label>
+            <input
+              type="password"
+              className={styles['text-input']}
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              placeholder={t('profile.ph_pass')}
+            />
           </div>
 
-          <div className={styles.form}>
-            <div className={styles.inputGroup}>
-              <label className={styles.label}>{t('profile.label_pass')}</label>
-              <input
-                type="password"
-                className={styles.textInput}
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                placeholder={t('profile.ph_pass')}
-              />
-            </div>
-            <div className={styles.inputGroup}>
-              <label className={styles.label}>
-                {t('profile.label_new_pass')}
-              </label>
-              <input
-                type="password"
-                className={styles.textInput}
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder={t('profile.ph_new_pass')}
-              />
-            </div>
-            <div className={styles.inputGroup}>
-              <label className={styles.label}>
-                {t('profile.label_conf_pass')}
-              </label>
-              <input
-                type="password"
-                className={styles.textInput}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder={t('profile.ph_conf_pass')}
-              />
-            </div>
+          <div className={styles['input-group']}>
+            <label className={styles['label']}>
+              {t('profile.label_new_pass')}
+            </label>
+            <input
+              type="password"
+              className={styles['text-input']}
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder={t('profile.ph_new_pass')}
+            />
           </div>
 
-          <div className={styles.bottomActions}>
-            <button
-              className={styles.saveButtonBottom}
-              onClick={handleSaveSecurity}
-            >
-              {t('profile.save')}
-            </button>
+          <div className={styles['input-group']}>
+            <label className={styles['label']}>
+              {t('profile.label_conf_pass')}
+            </label>
+            <input
+              type="password"
+              className={styles['text-input']}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder={t('profile.ph_conf_pass')}
+            />
+            {/* Подсказка о несовпадении — показывается только когда оба поля заполнены */}
+            {newPassword.length > 0 &&
+              confirmPassword.length > 0 &&
+              newPassword !== confirmPassword && (
+                <p className={styles['error-msg']}>Пароли не совпадают</p>
+              )}
           </div>
+          {passwordError && (
+            <p className={styles['error-msg']}>{passwordError}</p>
+          )}
+          {passwordSuccess && (
+            <p className={styles['success-msg']}>Пароль изменён</p>
+          )}
         </div>
-      )}
+        <button
+          className={styles['save-button-bottom']}
+          onClick={handleChangePassword}
+          disabled={!passwordReady}
+        >
+          Изменить пароль
+        </button>
+        <div className={styles['section']}>
+          <button
+            className={styles['row']}
+            onClick={() => (user ? logout() : onNavigate())}
+          >
+            <span style={{ color: '#D32F2F', fontWeight: 500 }}>
+              {user ? t('profile.exit') : t('profile.enter')}
+            </span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

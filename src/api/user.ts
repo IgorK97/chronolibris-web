@@ -36,7 +36,7 @@ export const usersApi = {
 
   updateProfile: async (data: UpdateProfileRequest) => {
     return await apiClient.update<UserProfile, UpdateProfileRequest>(
-      `/users/${data.userId}`,
+      `/users`,
       data
     );
   },
