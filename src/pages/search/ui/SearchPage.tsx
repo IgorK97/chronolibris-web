@@ -1,11 +1,35 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { useStore } from '@stores/globalStore';
-import { useInfiniteSimpleSearch } from '@/api/search';
+import {
+  useState,
+  // useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from 'react';
+import {
+  useSearchParams,
+  // useNavigate
+} from 'react-router-dom';
+// import { useStore } from '@stores/globalStore';
+import {
+  useInfiniteAdvancedSearch,
+  useInfiniteSimpleSearch,
+} from '@/api/search';
 import type { BookSearchResult } from '@/api/search';
 import { BookCard } from '@/components';
 import styles from './SearchPage.module.css';
-import { Search, Wrench, X } from 'lucide-react';
+import {
+  // Search,
+  Wrench,
+  X,
+} from 'lucide-react';
+import type { BookListItem } from '@/types/types';
+import {
+  EMPTY_FILTERS,
+  filtersFromParams,
+  filtersToParams,
+  type AdvancedFilters,
+} from '../utils/filterParams';
+import { useStore } from '@/stores/globalStore';
 
 function AdvancedSearchStub({ onClose }: { onClose: () => void }) {
   return (
@@ -45,68 +69,127 @@ function toBookListItem(book: BookSearchResult): BookListItem {
 
 export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const { user } = useStore();
-  const urlQuery = searchParams.get('q') ?? '';
-  const [inputValue, setInputValue] = useState(urlQuery);
   const [showAdvanced, setShowAdvanced] = useState(false);
-  useEffect(() => {
-    setInputValue(urlQuery);
-  }, [urlQuery]);
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-    isError,
-  } = useInfiniteSimpleSearch(urlQuery, 20, urlQuery.trim().length > 0);
+  const urlQuery = searchParams.get('q') ?? '';
+  const { setCurrentBook } = useStore();
+  //to save for f5
+  const filters: AdvancedFilters = useMemo(
+    () => filtersFromParams(searchParams),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [searchParams.toString()]
+  );
 
-  const allBooks = data?.pages.flatMap((p) => p.items) ?? [];
-
-  const handleSearch = () => {
-    const trimmed = inputValue.trim();
-    if (!trimmed) return;
-    setSearchParams({ q: trimmed });
+  const setFilters = (next: AdvancedFilters) => {
+    setSearchParams((prev) => {
+      const updated = new URLSearchParams(prev);
+      filtersToParams(next, updated);
+      return updated;
+    });
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') handleSearch();
-  };
+  const hasFilters =
+    filters.personFilters.length > 0 ||
+    filters.requiredTagIds.length > 0 ||
+    filters.excludedTagIds.length > 0 ||
+    filters.languageIds.length > 0 ||
+    filters.countryIds.length > 0 ||
+    filters.yearFrom !== null ||
+    filters.yearTo !== null;
 
-  const sentinelRef = useRef<HTMLDivElement>(null);
+  // const navigate = useNavigate();
+  // const { user } = useStore();
+  // const [inputValue, setInputValue] = useState(urlQuery);
+  // useEffect(() => {
+  //   setInputValue(urlQuery);
+  // }, [urlQuery]);
+
+  const queryReady = urlQuery.trim().length > 0;
+
+  const simpleSearch = useInfiniteSimpleSearch(
+    urlQuery,
+    20,
+    !hasFilters && queryReady
+  );
+
+  const advancedSearch = useInfiniteAdvancedSearch(
+    urlQuery,
+    {
+      personFilters: filters.personFilters,
+      requiredTagIds: filters.requiredTagIds,
+      excludedTagIds: filters.excludedTagIds,
+      languageIds: filters.languageIds,
+      countryIds: filters.countryIds,
+      yearFrom: filters.yearFrom ?? undefined,
+      yearTo: filters.yearTo ?? undefined,
+    },
+    20,
+    hasFilters && queryReady
+  );
+
+  const active = hasFilters ? advancedSearch : simpleSearch;
+  const allBooks = active.data?.pages.flatMap((p) => p.items) ?? [];
+  const isLoading = active.isLoading;
+  const isError = active.isError;
+  const hasNextPage = active.hasNextPage;
+  const isFetchingNext = active.isFetchingNextPage;
+  const fetchNextPage = active.fetchNextPage;
+
   const observerRef = useRef<IntersectionObserver | null>(null);
-
   const setSentinel = useCallback(
     (node: HTMLDivElement | null) => {
       if (observerRef.current) observerRef.current.disconnect();
       if (!node) return;
       observerRef.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNext)
           fetchNextPage();
-        }
       });
       observerRef.current.observe(node);
     },
-    [hasNextPage, isFetchingNextPage, fetchNextPage]
+    [hasNextPage, isFetchingNext, fetchNextPage]
   );
+
+  // const {
+  //   data,
+  //   fetchNextPage,
+  //   hasNextPage,
+  //   isFetchingNextPage,
+  //   isLoading,
+  //   isError,
+  // } = useInfiniteSimpleSearch(urlQuery, 20, urlQuery.trim().length > 0);
+
+  // const allBooks = data?.pages.flatMap((p) => p.items) ?? [];
+
+  // const handleSearch = () => {
+  //   const trimmed = inputValue.trim();
+  //   if (!trimmed) return;
+  //   setSearchParams({ q: trimmed });
+  // };
+
+  // const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  //   if (e.key === 'Enter') handleSearch();
+  // };
+
+  // const sentinelRef = useRef<HTMLDivElement>(null);
+  // const observerRef = useRef<IntersectionObserver | null>(null);
+
+  // const setSentinel = useCallback(
+  //   (node: HTMLDivElement | null) => {
+  //     if (observerRef.current) observerRef.current.disconnect();
+  //     if (!node) return;
+  //     observerRef.current = new IntersectionObserver((entries) => {
+  //       if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+  //         fetchNextPage();
+  //       }
+  //     });
+  //     observerRef.current.observe(node);
+  //   },
+  //   [hasNextPage, isFetchingNextPage, fetchNextPage]
+  // );
 
   return (
     <div className={styles.page}>
       <div className={styles['search-bar']}>
-        <div className={styles['search-input-wrapper']}>
-          <input
-            type="text"
-            className={styles.searchInput}
-            placeholder="Введите название книги..."
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            autoFocus
-          />
-          <Search />
-        </div>
         <button
           className={`${styles['advanced-toggle']} ${
             showAdvanced ? styles['advanced-toggle-active'] : ''
@@ -128,38 +211,47 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
             <line x1="12" y1="18" x2="20" y2="18" />
           </svg>
           Фильтры
+          {hasFilters && <span className={styles['filter-badge']} />}
         </button>
+        {hasFilters && (
+          <button
+            className={styles['reset-filters']}
+            onClick={() => setFilters(EMPTY_FILTERS)}
+          >
+            <X size={14} /> Сбросить фильтры
+          </button>
+        )}
       </div>
       {showAdvanced && (
         <AdvancedSearchStub onClose={() => setShowAdvanced(false)} />
       )}
-      {urlQuery && (
-        <div className={styles.resultsHeader}>
-          {!isLoading && !isError && (
-            <span className={styles.resultsCount}>
-              {allBooks.length > 0
-                ? `Результаты по запросу «${urlQuery}»`
-                : `Ничего не найдено по запросу «${urlQuery}»`}
-            </span>
-          )}
+      {urlQuery && !isLoading && !isError && (
+        <div className={styles['results-header']}>
+          {/* {!isLoading && !isError && ( */}
+          <span className={styles['results-count']}>
+            {allBooks.length > 0
+              ? `Результаты по запросу «${urlQuery}»`
+              : `Ничего не найдено по запросу «${urlQuery}»`}
+          </span>
+          {/* )} */}
         </div>
       )}
       {!urlQuery && (
-        <div className={styles.emptyState}>
-          <div className={styles.emptyIcon}>🔍</div>
-          <p className={styles.emptyText}>Начните вводить название книги</p>
+        <div className={styles['empty-state']}>
+          <div className={styles['empty-icon']}>🔍</div>
+          <p className={styles['empty-text']}>Начните вводить название книги</p>
         </div>
       )}
 
       {isLoading && (
-        <div className={styles.loadingState}>
+        <div className={styles['loading-state']}>
           <div className={styles.spinner} />
           <span>Поиск...</span>
         </div>
       )}
 
       {isError && (
-        <div className={styles.errorState}>
+        <div className={styles['error-state']}>
           Не удалось выполнить поиск. Попробуйте ещё раз.
         </div>
       )}
@@ -169,16 +261,19 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
             <BookCard
               key={book.id}
               bookInfo={toBookListItem(book)}
-              onPress={() => onNavigateToBook(book.id)}
+              onPress={() => {
+                setCurrentBook(toBookListItem(book));
+                onNavigateToBook(book.id);
+              }}
             />
           ))}
 
           {/* Sentinel для IntersectionObserver */}
           <div ref={setSentinel} className={styles.sentinel} />
 
-          {isFetchingNextPage && (
-            <div className={styles.loadingMore}>
-              <div className={styles.spinnerSmall} />
+          {isFetchingNext && (
+            <div className={styles['loading-more']}>
+              <div className={styles['spinner-small']} />
               Загрузка...
             </div>
           )}

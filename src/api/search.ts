@@ -38,8 +38,8 @@ export interface AdvancedSearchBody {
   lastBestSimilarity?: number | null;
   lastId?: number | null;
   personFilters?: PersonRoleFilterRequest[];
-  requiredThemeIds?: number[];
-  excludedThemeIds?: number[];
+  requiredTagIds?: number[];
+  excludedTagIds?: number[];
   publisherIds?: number[];
   languageIds?: number[];
   countryIds?: number[];
