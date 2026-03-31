@@ -31,45 +31,16 @@ export default function Header() {
   };
 
   return (
-    <NavigationMenu.Root className={styles['navigation-menu-root']}>
-      <NavigationMenu.List className={styles['navigation-menu-list']}>
-        <NavigationMenu.Item>
-          <Link to="/" className={styles['logo']}>
+    <header className={styles.header}>
+      <div className={styles['nav-row']}>
+        <div className={styles['left-section']}>
+          <Link to="/" className={styles.logo}>
             Chronolibris
           </Link>
-        </NavigationMenu.Item>
-        <div className={styles['categories-wrapper']}>
-          <NavigationMenu.Item>
-            <NavigationMenu.Trigger
-              className={styles['navigation-menu-trigger']}
-            >
-              Категории
-            </NavigationMenu.Trigger>
-            <NavigationMenu.Content
-              className={styles['navigation-menu-content']}
-            >
-              <ul className={styles['list']}>
-                <li>
-                  <Link to="/category/history">History</Link>
-                </li>
-                <li>
-                  <Link to="/category/fiction">Fiction</Link>
-                </li>
-                <li>
-                  <Link to="/category/science">Science</Link>
-                </li>
-              </ul>
-            </NavigationMenu.Content>
-          </NavigationMenu.Item>
-          <div className={styles['viewport-position']}>
-            <NavigationMenu.Viewport
-              className={styles['navigation-menu-viewport']}
-            />
-          </div>
+          <button className={styles['catalog-btn']}>Каталог</button>
         </div>
-
-        <div className={styles['middle-section']}>
-          <div className={styles['search-container']}>
+        <div className={styles['center-section']}>
+          <div className={styles['search-wrapper']}>
             <input
               ref={inputRef}
               type="text"
@@ -79,26 +50,18 @@ export default function Header() {
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
             />
+            <Search onClick={handleSearch} />
           </div>
-          <Search onClick={handleSearch} />
         </div>
-
         <div className={styles['right-section']}>
           {user ? (
             <>
-              <NavigationMenu.Item>
-                <Link to="/mybooks" className={styles['navigation-menu-link']}>
-                  Мои книги
-                </Link>
-              </NavigationMenu.Item>
-              <NavigationMenu.Item>
-                <Link to="/profile" className={styles['profile-icon']}>
-                  {user.email?.charAt(0).toUpperCase() || 'U'}
-                </Link>
-              </NavigationMenu.Item>
-              {/* <button onClick={handleLogout} className={styles['logout-btn']}>
-                Выйти
-              </button> */}
+              <Link to="/mybooks" className={styles['navigation-menu-link']}>
+                Мои книги
+              </Link>
+              <Link to="/profile" className={styles['profile-icon']}>
+                {user.email?.charAt(0).toUpperCase() || 'U'}
+              </Link>
             </>
           ) : (
             <>
@@ -117,7 +80,109 @@ export default function Header() {
             </>
           )}
         </div>
-      </NavigationMenu.List>
-    </NavigationMenu.Root>
+      </div>
+      <div className={styles['search-row']}>
+        <div className={styles['search-wrapper']}>
+          <input
+            type="text"
+            placeholder="Введите название книги..."
+            value={inputValue}
+            className={styles['search-input']}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+          <Search onClick={handleSearch} />
+        </div>
+      </div>
+    </header>
+
+    // <NavigationMenu.Root className={styles['navigation-menu-root']}>
+    //   <NavigationMenu.List className={styles['navigation-menu-list']}>
+    //     <NavigationMenu.Item>
+    //       <Link to="/" className={styles['logo']}>
+    //         Chronolibris
+    //       </Link>
+    //     </NavigationMenu.Item>
+    //     <div className={styles['categories-wrapper']}>
+    //       <NavigationMenu.Item>
+    //         <NavigationMenu.Trigger
+    //           className={styles['navigation-menu-trigger']}
+    //         >
+    //           Категории
+    //         </NavigationMenu.Trigger>
+    //         <NavigationMenu.Content
+    //           className={styles['navigation-menu-content']}
+    //         >
+    //           <ul className={styles['list']}>
+    //             <li>
+    //               <Link to="/category/history">History</Link>
+    //             </li>
+    //             <li>
+    //               <Link to="/category/fiction">Fiction</Link>
+    //             </li>
+    //             <li>
+    //               <Link to="/category/science">Science</Link>
+    //             </li>
+    //           </ul>
+    //         </NavigationMenu.Content>
+    //       </NavigationMenu.Item>
+    //       <div className={styles['viewport-position']}>
+    //         <NavigationMenu.Viewport
+    //           className={styles['navigation-menu-viewport']}
+    //         />
+    //       </div>
+    //     </div>
+
+    //     <div className={styles['middle-section']}>
+    //       <div className={styles['search-container']}>
+    //         <input
+    //           ref={inputRef}
+    //           type="text"
+    //           placeholder="Введите название книги..."
+    //           value={inputValue}
+    //           className={styles['search-input']}
+    //           onChange={(e) => setInputValue(e.target.value)}
+    //           onKeyDown={handleKeyDown}
+    //         />
+    //       </div>
+    //       <Search onClick={handleSearch} />
+    //     </div>
+
+    //     <div className={styles['right-section']}>
+    //       {user ? (
+    //         <>
+    //           <NavigationMenu.Item>
+    //             <Link to="/mybooks" className={styles['navigation-menu-link']}>
+    //               Мои книги
+    //             </Link>
+    //           </NavigationMenu.Item>
+    //           <NavigationMenu.Item>
+    //             <Link to="/profile" className={styles['profile-icon']}>
+    //               {user.email?.charAt(0).toUpperCase() || 'U'}
+    //             </Link>
+    //           </NavigationMenu.Item>
+    //           {/* <button onClick={handleLogout} className={styles['logout-btn']}>
+    //             Выйти
+    //           </button> */}
+    //         </>
+    //       ) : (
+    //         <>
+    //           <button
+    //             onClick={() => navigate('/auth')}
+    //             className={styles['login-btn']}
+    //           >
+    //             Войти
+    //           </button>
+    //           <button
+    //             onClick={() => navigate('/auth')}
+    //             className={styles['register-btn']}
+    //           >
+    //             Зарегистрироваться
+    //           </button>
+    //         </>
+    //       )}
+    //     </div>
+    //   </NavigationMenu.List>
+    // </NavigationMenu.Root>
   );
 }
