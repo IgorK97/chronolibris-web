@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useMemo } from 'react';
-import { SectionHeader } from './SectionHeader'; // Наш переписанный заголовок
+import { SectionHeader } from './SectionHeader';
 import { BookCard } from '../../../components/books';
 import {
   SELECTION_TYPE,
@@ -85,23 +85,23 @@ export const Library = ({
   //   { id: 3, title: 'История мира' },
   // ];
 
-  const sortedSections = useMemo<SelectionDetails[]>(() => {
-    if (!selections) return [];
+  // const sortedSections = useMemo<SelectionDetails[]>(() => {
+  //   if (!selections) return [];
 
-    const permanent = selections
-      .filter(
-        (s) =>
-          s.selectionTypeId === SELECTION_TYPE.NEWEST ||
-          s.selectionTypeId === SELECTION_TYPE.POPULAR
-      )
-      .sort((a, b) => a.selectionTypeId - b.selectionTypeId);
+  //   const permanent = selections
+  //     .filter(
+  //       (s) =>
+  //         s.selectionTypeId === SELECTION_TYPE.NEWEST ||
+  //         s.selectionTypeId === SELECTION_TYPE.POPULAR
+  //     )
+  //     .sort((a, b) => a.selectionTypeId - b.selectionTypeId);
 
-    const manual = selections.filter(
-      (s) => s.selectionTypeId === SELECTION_TYPE.MANUAL
-    );
+  //   const manual = selections.filter(
+  //     (s) => s.selectionTypeId === SELECTION_TYPE.MANUAL
+  //   );
 
-    return [...permanent, ...manual];
-  }, [selections]);
+  //   return [...permanent, ...manual];
+  // }, [selections]);
 
   const navigateToBookHandler = (book: BookListItem) => {
     setCurrentBook(book);
@@ -121,7 +121,7 @@ export const Library = ({
   return (
     <main className={styles['library-container']}>
       <div className={styles['scroll-container']}>
-        {sortedSections.map((section) => (
+        {selections?.map((section) => (
           <ErrorBoundary key={section.id}>
             <SelectionSection
               id={section.id}

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { usersApi } from '@/api/user';
 import axios from 'axios';
-import styles from './RegisterStaffPage.module.css';
+import styles from './RegisterStuffPage.module.css';
 
 type StaffRole = 'moderator' | 'admin';
 
@@ -81,11 +81,10 @@ export function RegisterStaffPage() {
       e.email = 'Некорректный email';
       ok = false;
     }
-
-    if (
-      form.phoneNumber.trim() &&
-      !/^(\+7|8)?[0-9]{10}$/.test(form.phoneNumber)
-    ) {
+    if (!form.phoneNumber.trim()) {
+      e.phoneNumber = 'Введите номер телефона';
+      ok = false;
+    } else if (!/^(\+7|8)?[0-9]{10}$/.test(form.phoneNumber)) {
       e.phoneNumber = 'Некорректный номер';
       ok = false;
     }

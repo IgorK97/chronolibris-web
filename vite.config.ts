@@ -44,7 +44,7 @@ export default defineConfig({
         secure: false,
       },
       '/storage': {
-        target: 'http://127.0.0.1:9000',
+        target: 'https://127.0.0.1:9000',
         rewrite: (path) => path.replace(/^\/storage/, ''),
         changeOrigin: true,
         secure: false,

@@ -503,12 +503,12 @@ export const Reader: React.FC<ReaderProps> = ({
   const goToCol = (col: number) => {
     const vp = viewportRef.current;
     const ct = contentRef.current;
-    if (!vp) return;
+    if (!vp || !ct) return;
 
     const pageWidth = twoPageMode
       ? (ct!.clientWidth - pageGap) / 2 + pageGap
       : vp.clientWidth;
-    console.log(pageWidth);
+    // console.log(pageWidth);
     if (col >= totalCols && fetchedTocData) {
       const nextIdx = currentPartIndex + 1;
       if (nextIdx < fetchedTocData.Parts.length) {
@@ -527,6 +527,7 @@ export const Reader: React.FC<ReaderProps> = ({
         // setCurrentPartIndex(nextIdx);
         // return;
       }
+      return; // -
     }
 
     if (col < 0 && fetchedTocData) {
@@ -544,9 +545,9 @@ export const Reader: React.FC<ReaderProps> = ({
     if (twoPageMode && clamped > 0) clamped = clamped - (clamped % 2);
     const leftPos = clamped * pageWidth;
 
-    console.log(col, totalCols, leftPos);
+    // console.log(col, totalCols, leftPos);
     setCurrentCol(clamped);
-    ct!.scrollTo({ left: leftPos, behavior: 'smooth' });
+    ct.scrollTo({ left: leftPos, behavior: 'smooth' });
   };
 
   useEffect(() => {
@@ -683,7 +684,7 @@ export const Reader: React.FC<ReaderProps> = ({
   const navigateToBookmark = useCallback(
     (bm: BookmarkDetails) => {
       if (!fetchedTocData) return;
-      const globalIdx = bm.paraIndex - 1;
+      const globalIdx = bm.paraIndex; //-1
       const partIdx = fetchedTocData.Parts.findIndex(
         (p) => globalIdx >= p.s && globalIdx <= p.e
       );
@@ -1569,7 +1570,7 @@ const BookmarkEditModal: React.FC<BookmarkEditModalProps> = ({
             <Bookmark color="red" /> Закладка
           </span>
           <button className={styles['footnote-close']} onClick={onClose}>
-            ✕
+            <X />
           </button>
         </div>
 

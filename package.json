@@ -7,6 +7,7 @@
     "dev": "vite",
     "type-check": "tsc --noEmit",
     "build": "tsc -b && vite build",
+    "blind-build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },

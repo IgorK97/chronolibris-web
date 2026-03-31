@@ -19,7 +19,7 @@ import { BookCard } from '@/components';
 import styles from './SearchPage.module.css';
 import {
   // Search,
-  Wrench,
+  // Wrench,
   X,
 } from 'lucide-react';
 import type { BookListItem } from '@/types/types';
@@ -32,24 +32,24 @@ import {
 import { useStore } from '@/stores/globalStore';
 import { AdvancedSearchPanel } from './AdvancedSearchPanel';
 
-function AdvancedSearchStub({ onClose }: { onClose: () => void }) {
-  return (
-    <div className={styles['advanced-panel']}>
-      <div className={styles['advanced-header']}>
-        <span className={styles['advanced-title']}>Расширенный поиск</span>
-        <button className={styles['advanced-close']} onClick={onClose}>
-          <X />
-        </button>
-      </div>
-      <div className={styles['advanced-stub']}>
-        <div className={styles['stub-icon']}>
-          <Wrench />
-        </div>
-        <p className={styles['stub-text']}>В разработке</p>
-      </div>
-    </div>
-  );
-}
+// function AdvancedSearchStub({ onClose }: { onClose: () => void }) {
+//   return (
+//     <div className={styles['advanced-panel']}>
+//       <div className={styles['advanced-header']}>
+//         <span className={styles['advanced-title']}>Расширенный поиск</span>
+//         <button className={styles['advanced-close']} onClick={onClose}>
+//           <X />
+//         </button>
+//       </div>
+//       <div className={styles['advanced-stub']}>
+//         <div className={styles['stub-icon']}>
+//           <Wrench />
+//         </div>
+//         <p className={styles['stub-text']}>В разработке</p>
+//       </div>
+//     </div>
+//   );
+// }
 
 interface SearchPageProps {
   onNavigateToBook: (bookdId: number) => void;

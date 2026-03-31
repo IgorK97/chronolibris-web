@@ -478,7 +478,7 @@ export interface SelectionDetails {
   description: string;
   createdAt: string;
   updatedAt?: string;
-  selectionTypeId: number;
+  // selectionTypeId: number;
   booksCount: number;
   isActive?: boolean;
 }
