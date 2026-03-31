@@ -12,6 +12,7 @@ import type { PersonRoleFilterRequest } from '@/api/search';
 import styles from './AdvancedSearchPanel.module.css';
 import type { AdvancedFilters } from '../utils/filterParams';
 import { EMPTY_FILTERS } from '../utils/filterParams';
+import { X } from 'lucide-react';
 interface Props {
   filters: AdvancedFilters;
   onChange: (filters: AdvancedFilters) => void;
@@ -319,13 +320,17 @@ function TagFilter({
 
 export function AdvancedSearchPanel({ filters, onChange, onClose }: Props) {
   const { data: roles = [] } = usePersonRoles();
-
+  const [draft, setDraft] = useState<AdvancedFilters>(filters);
   const resetAll = () => onChange(EMPTY_FILTERS);
-
+  const handleApply = () => {
+    onChange(draft);
+  };
   const hasAnyFilter =
     filters.personFilters.length > 0 ||
     filters.requiredTagIds.length > 0 ||
     filters.excludedTagIds.length > 0;
+
+  const isDirty = JSON.stringify(draft) !== JSON.stringify(filters);
 
   return (
     <div className={styles.panel}>
@@ -338,7 +343,7 @@ export function AdvancedSearchPanel({ filters, onChange, onClose }: Props) {
             </button>
           )}
           <button className={styles['close-btn']} onClick={onClose}>
-            ✕
+            <X />
           </button>
         </div>
       </div>
@@ -348,7 +353,7 @@ export function AdvancedSearchPanel({ filters, onChange, onClose }: Props) {
         <PersonFilter
           value={filters.personFilters}
           roles={roles}
-          onChange={(pf) => onChange({ ...filters, personFilters: pf })}
+          onChange={(pf) => setDraft({ ...draft, personFilters: pf })}
         />
 
         {/* Теги */}
@@ -356,9 +361,18 @@ export function AdvancedSearchPanel({ filters, onChange, onClose }: Props) {
           requiredTagIds={filters.requiredTagIds}
           excludedTagIds={filters.excludedTagIds}
           onChange={(req, exc) =>
-            onChange({ ...filters, requiredTagIds: req, excludedTagIds: exc })
+            setDraft({ ...draft, requiredTagIds: req, excludedTagIds: exc })
           }
         />
+        <div className={styles.footer}>
+          <button
+            className={styles['apply-btn']}
+            onClick={handleApply}
+            disabled={!isDirty}
+          >
+            Применить
+          </button>
+        </div>
       </div>
     </div>
   );

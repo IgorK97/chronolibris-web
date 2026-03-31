@@ -43,9 +43,9 @@ function toBookListItem(book: BookSearchResult): BookListItem {
     title: book.title,
     coverUri: book.coverPath || null,
     averageRating: book.averageRating ?? 0,
-    ratingsCount: 0, // не возвращается из поиска — BookCard отобразит как есть
+    ratingsCount: 0, // не возвращается из поиска
     isFavorite: book.isFavorite,
-    authors: [], // не возвращается из поиска — при необходимости добавить в BookSearchResult
+    authors: [], // не возвращается из поиска
     isReviewable: book.isReviewable,
   };
 }
@@ -164,7 +164,7 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
       )}
       {!urlQuery && (
         <div className={styles['empty-state']}>
-          <p className={styles['empty-text']}>Начните вводить название книги</p>
+          <p className={styles['empty-text']}>Введите название книги...</p>
         </div>
       )}
 
@@ -177,7 +177,7 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
 
       {isError && (
         <div className={styles['error-state']}>
-          Не удалось выполнить поиск. Попробуйте ещё раз.
+          Не удалось выполнить поиск. Попробуйте ещё раз
         </div>
       )}
       {allBooks.length > 0 && (

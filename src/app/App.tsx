@@ -51,8 +51,6 @@ export default function App() {
   const { setUser, isInitialized, setInitialized, setCurrentBook } = useStore();
   const navigate = useNavigate(); // Добавляем хук навигации
   const handleReadClick = async (bookFileId?: number) => {
-    // Можно добавить логику: проверка прав, загрузка метаданных и т.д.
-
     // Переход с параметрами для Reader
     navigate(`/reader/${bookFileId}`);
   };
