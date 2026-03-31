@@ -182,7 +182,7 @@ export const Reader: React.FC<ReaderProps> = ({
 
   const { data: bookmarks = [], isLoading: bookmarksLoading } = useBookmarks(
     bookFileId ?? null,
-    user ?? null
+    user?.userName ?? null
   );
   const upsertProgress = useUpsertReadingProgress();
   const progressLoaded = useRef(false);
@@ -196,7 +196,7 @@ export const Reader: React.FC<ReaderProps> = ({
     }
   }, [savedProgress]);
 
-  const createBookmarkMutation = useCreateBookmark();
+  const createBookmarkMutation = useCreateBookmark(user?.userName ?? '');
   const updateBookmarkMutation = useUpdateBookmark();
   const deleteBookmarkMutation = useDeleteBookmark();
 
@@ -642,7 +642,7 @@ export const Reader: React.FC<ReaderProps> = ({
       const request: CreateBookmarkRequest = {
         bookFileId: bookFileId,
         paraIndex,
-        note: note.trim() || undefined,
+        noteText: note.trim() || undefined,
       };
 
       createBookmarkMutation.mutate(request);

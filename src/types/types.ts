@@ -165,7 +165,7 @@ export interface Bookmark {
   id: number;
   paraIndex: number;
   bookFileId: number;
-  note: string;
+  note?: string;
   createdAt: string;
 }
 

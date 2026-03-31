@@ -6,7 +6,7 @@ import type { Bookmark, UserProfile } from '@/types/types';
 export interface CreateBookmarkRequest {
   bookFileId: number;
   paraIndex: number;
-  note?: string;
+  noteText?: string;
 }
 
 export interface UpdateBookmarkRequest {
@@ -41,30 +41,44 @@ export const bookmarksApi = {
 
 export const useBookmarks = (
   bookFileId: number | null,
-  user: UserProfile | null
+  userName: string | null
 ) => {
   return useQuery({
-    queryKey: ['bookmarks', bookFileId, user],
+    queryKey: ['bookmarks', bookFileId, userName],
     queryFn: () => {
-      if (bookFileId === null || user === null) {
-        throw new Error('bookFileId и userId обязательны');
+      if (bookFileId === null || userName === null) {
+        throw new Error('bookFileId и userName обязательны');
       }
       return bookmarksApi.getBookmarks(bookFileId);
     },
-    enabled: bookFileId !== null && user !== null,
+    enabled: bookFileId !== null && userName !== null,
     staleTime: 5 * 60 * 1000,
   });
 };
 
-export const useCreateBookmark = () => {
+export const useCreateBookmark = (userName: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: bookmarksApi.createBookmark,
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ['bookmarks', variables.bookFileId],
-      });
+    onSuccess: (bookmarkDataFromServer, variables) => {
+      // queryClient.invalidateQueries({
+      //   queryKey: ['bookmarks', variables.bookFileId],
+      // });
+      const newBookmark: Bookmark = {
+        bookFileId: variables.bookFileId,
+        paraIndex: variables.paraIndex,
+        note: variables.noteText,
+        id: bookmarkDataFromServer.id,
+        createdAt: bookmarkDataFromServer.createdAt,
+      };
+      console.log('Bookmark created:', newBookmark);
+      queryClient.setQueryData<Bookmark[]>(
+        ['bookmarks', variables.bookFileId, userName],
+        (oldBookmarks) => {
+          return oldBookmarks ? [...oldBookmarks, newBookmark] : [newBookmark];
+        }
+      );
     },
   });
 };
