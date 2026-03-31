@@ -6,6 +6,15 @@
     Georgia, 'Times New Roman', Times, serif; /* Их все вместе надо писать? */
 }
 
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-self: flex-start;
+  position: sticky;
+  top: 80px; /* adjust to your header height */
+}
+
 .content-layout {
   display: flex;
   flex: 1;

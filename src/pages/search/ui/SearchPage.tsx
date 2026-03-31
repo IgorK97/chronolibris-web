@@ -33,6 +33,7 @@ import {
 import { useStore } from '@/stores/globalStore';
 import { AdvancedSearchPanel } from './AdvancedSearchPanel';
 import { ThemePanel } from './ThemePanel';
+import { SelectionPanel } from './SelectionPanel';
 
 interface SearchPageProps {
   onNavigateToBook: (bookdId: number) => void;
@@ -86,11 +87,27 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
     });
   };
 
+  const selectionId: number =
+    Number(searchParams.get('selectionId') ?? '0') || 0;
+
+  const setSelectionId = (id: number | null) => {
+    setSearchParams((prev) => {
+      const updated = new URLSearchParams(prev);
+      if (id == null || id === 0) {
+        updated.delete('selectionId');
+      } else {
+        updated.set('selectionId', String(id));
+      }
+      return updated;
+    });
+  };
+
   const hasFilters =
     filters.personFilters.length > 0 ||
     filters.requiredTagIds.length > 0 ||
     filters.excludedTagIds.length > 0 ||
-    themeId > 0;
+    themeId > 0 ||
+    selectionId > 0;
 
   // const navigate = useNavigate();
   // const { user } = useStore();
@@ -114,9 +131,10 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
       requiredTagIds: filters.requiredTagIds,
       excludedTagIds: filters.excludedTagIds,
       themeId,
+      selectionId,
     },
     20,
-    hasFilters && queryReady
+    hasFilters || queryReady
   );
 
   const active = hasFilters ? advancedSearch : simpleSearch;
@@ -149,10 +167,16 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
   return (
     <div className={styles.page}>
       <div className={styles['content-layout']}>
-        <ThemePanel
-          selectedThemeId={themeId || null}
-          onSelect={(id) => setThemeId(id)}
-        />
+        <div className={styles['sidebar']}>
+          <ThemePanel
+            selectedThemeId={themeId || null}
+            onSelect={(id) => setThemeId(id)}
+          />
+          <SelectionPanel
+            selectedSelectionId={selectionId || null}
+            onSelect={(id) => setSelectionId(id)}
+          />
+        </div>
 
         <div style={{ marginLeft: '32px', flex: 1 }}>
           <div className={styles['filter-bar']}>

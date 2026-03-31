@@ -83,8 +83,8 @@ export default function App() {
   const handleBookSelection = (bookId: number) => {
     navigate(`/book/${bookId}`);
   };
-  const handleBookListSelection = (selectionId: number, title: string) => {
-    navigate(`/selection/${selectionId}`, { state: { title } });
+  const handleBookListSelection = (selectionId: number) => {
+    navigate(`/search/?selectionId=${selectionId}`);
   };
   const handleNavigateToReviews = (bookId: number) => {
     navigate(`/book/${bookId}/reviews`);

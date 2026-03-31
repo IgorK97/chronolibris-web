@@ -41,6 +41,7 @@ export interface AdvancedSearchBody {
   requiredTagIds?: number[];
   excludedTagIds?: number[];
   themeId: number;
+  selectionId: number;
 }
 
 export const searchApi = {
@@ -125,6 +126,6 @@ export const useInfiniteAdvancedSearch = (
         lastId: lastPage.lastId,
       };
     },
-    enabled: enabled && query.trim().length > 0,
+    enabled: enabled,
   });
 };

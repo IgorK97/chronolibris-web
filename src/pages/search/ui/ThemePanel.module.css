@@ -4,11 +4,22 @@
   flex-shrink: 0;
   background: #fff;
   border-right: 1px solid #e8e8e8;
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
+  transition:
+    width 0.2s,
+    min-width 0.2s;
   padding: 12px 0;
   min-height: 0;
-  overflow-y: auto;
+  overflow: hidden;
+  align-self: flex-start;
+  max-height: calc(100vh - 120px);
+}
+
+.panel-collapsed {
+  width: 48px;
+  min-width: 48px;
 }
 
 .header {
@@ -16,8 +27,10 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 12px 8px;
+  cursor: pointer;
   border-bottom: 1px solid #f0f0f0;
   margin-bottom: 4px;
+  gap: 6px;
 }
 
 .title {
@@ -29,6 +42,24 @@
 }
 
 .apply-btn {
+  margin: 8px 10px 2px;
+  padding: 6px 12px;
+  background: var(--color-primary, #4f46e5);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  text-align: center;
+}
+
+.apply-btn:hover {
+  opacity: 0.88;
+}
+
+/* .apply-btn {
   font-size: 12px;
   padding: 3px 10px;
   border-radius: 4px;
@@ -42,6 +73,23 @@
 
 .apply-btn:hover {
   background: #3a6aaa;
+} */
+
+.toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: var(--color-text-muted, #6b7280);
+  padding: 2px;
+  border-radius: 4px;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+.toggle-btn:hover {
+  background: var(--color-hover, #f3f4f6);
 }
 
 .back-btn {
@@ -64,8 +112,24 @@
   color: #333;
 }
 
-/* The drilled-into parent shown at top */
 .current-parent {
+  padding: 8px 14px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: background 0.13s;
+}
+
+.current-parent:hover {
+  background: var(--color-hover, #f3f4f6);
+}
+
+.current-parent-name {
+  color: var(--color-text, #111);
+}
+
+/* .current-parent {
   display: flex;
   align-items: center;
   padding: 7px 12px;
@@ -79,14 +143,14 @@
 
 .current-parent:hover {
   background: #eee;
-}
+} */
 
-.current-parent-name {
+/* .current-parent-name {
   font-size: 13px;
   font-weight: 600;
   color: #333;
   flex: 1;
-}
+} */
 
 /* Theme list */
 .theme-list {
