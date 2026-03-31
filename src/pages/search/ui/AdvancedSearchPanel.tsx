@@ -1,8 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
 import {
-  useLanguages,
-  useCountries,
   usePersonRoles,
   usePersonSuggestions,
   useTagSuggestions,
@@ -170,8 +168,8 @@ interface SelectedTag {
 }
 
 function TagFilter({
-  requiredTagIds,
-  excludedTagIds,
+  // requiredTagIds,
+  // excludedTagIds,
   onChange,
 }: {
   requiredTagIds: number[];
@@ -318,136 +316,16 @@ function TagFilter({
     </div>
   );
 }
-function CheckboxList({
-  items,
-  selected,
-  onToggle,
-  label,
-}: {
-  items: { id: number; name: string }[];
-  selected: number[];
-  onToggle: (id: number) => void;
-  label: string;
-}) {
-  const [search, setSearch] = useState('');
-  const filtered = items.filter((i) =>
-    i.name.toLowerCase().includes(search.toLowerCase())
-  );
-
-  return (
-    <div className={styles['filter-section']}>
-      <label className={styles['filter-label']}>{label}</label>
-      <input
-        className={styles['filter-input']}
-        placeholder={`Фильтр по ${label.toLowerCase()}...`}
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
-      <div className={styles['checkbox-list']}>
-        {filtered.map((item) => (
-          <label key={item.id} className={styles['checkbox-item']}>
-            <input
-              type="checkbox"
-              checked={selected.includes(item.id)}
-              onChange={() => onToggle(item.id)}
-            />
-            <span>{item.name}</span>
-          </label>
-        ))}
-        {filtered.length === 0 && (
-          <span className={styles['empty-hint']}>Ничего не найдено</span>
-        )}
-      </div>
-      {selected.length > 0 && (
-        <p className={styles['filter-hint']}>Выбрано: {selected.length}</p>
-      )}
-    </div>
-  );
-}
-
-// ─── Подкомпонент: период лет ─────────────────────────────────────────────────
-
-function YearRangeFilter({
-  yearFrom,
-  yearTo,
-  onChange,
-}: {
-  yearFrom: number | null;
-  yearTo: number | null;
-  onChange: (from: number | null, to: number | null) => void;
-}) {
-  const currentYear = new Date().getFullYear();
-
-  const handleFrom = (raw: string) => {
-    const v = raw === '' ? null : parseInt(raw, 10);
-    if (v !== null && (v < 0 || v > currentYear + 10)) return;
-    onChange(v, yearTo);
-  };
-
-  const handleTo = (raw: string) => {
-    const v = raw === '' ? null : parseInt(raw, 10);
-    if (v !== null && (v < 0 || v > currentYear + 10)) return;
-    onChange(yearFrom, v);
-  };
-
-  const isInvalid = yearFrom !== null && yearTo !== null && yearFrom > yearTo;
-
-  return (
-    <div className={styles['filter-section']}>
-      <label className={styles['filter-label']}>Год издания</label>
-      <div className={styles['year-range']}>
-        <input
-          type="number"
-          className={`${styles['year-input']} ${isInvalid ? styles['year-input-error'] : ''}`}
-          placeholder="с"
-          value={yearFrom ?? ''}
-          min={0}
-          max={currentYear + 10}
-          onChange={(e) => handleFrom(e.target.value)}
-        />
-        <span className={styles['year-dash']}>—</span>
-        <input
-          type="number"
-          className={`${styles['year-input']} ${isInvalid ? styles['year-input-error'] : ''}`}
-          placeholder="по"
-          value={yearTo ?? ''}
-          min={0}
-          max={currentYear + 10}
-          onChange={(e) => handleTo(e.target.value)}
-        />
-      </div>
-      {isInvalid && (
-        <p className={styles['error-hint']}>«С» не может быть больше «по»</p>
-      )}
-    </div>
-  );
-}
-
-// ─── AdvancedSearchPanel ──────────────────────────────────────────────────────
 
 export function AdvancedSearchPanel({ filters, onChange, onClose }: Props) {
-  const { data: languages = [] } = useLanguages();
-  const { data: countries = [] } = useCountries();
   const { data: roles = [] } = usePersonRoles();
-
-  const toggle = <K extends keyof AdvancedFilters>(key: K, id: number) => {
-    const arr = filters[key] as number[];
-    onChange({
-      ...filters,
-      [key]: arr.includes(id) ? arr.filter((x) => x !== id) : [...arr, id],
-    });
-  };
 
   const resetAll = () => onChange(EMPTY_FILTERS);
 
   const hasAnyFilter =
     filters.personFilters.length > 0 ||
     filters.requiredTagIds.length > 0 ||
-    filters.excludedTagIds.length > 0 ||
-    filters.languageIds.length > 0 ||
-    filters.countryIds.length > 0 ||
-    filters.yearFrom !== null ||
-    filters.yearTo !== null;
+    filters.excludedTagIds.length > 0;
 
   return (
     <div className={styles.panel}>
@@ -480,31 +358,6 @@ export function AdvancedSearchPanel({ filters, onChange, onClose }: Props) {
           onChange={(req, exc) =>
             onChange({ ...filters, requiredTagIds: req, excludedTagIds: exc })
           }
-        />
-
-        {/* Год */}
-        <YearRangeFilter
-          yearFrom={filters.yearFrom}
-          yearTo={filters.yearTo}
-          onChange={(from, to) =>
-            onChange({ ...filters, yearFrom: from, yearTo: to })
-          }
-        />
-
-        {/* Языки */}
-        <CheckboxList
-          label="Языки"
-          items={languages}
-          selected={filters.languageIds}
-          onToggle={(id) => toggle('languageIds', id)}
-        />
-
-        {/* Страны */}
-        <CheckboxList
-          label="Страны"
-          items={countries}
-          selected={filters.countryIds}
-          onToggle={(id) => toggle('countryIds', id)}
         />
       </div>
     </div>

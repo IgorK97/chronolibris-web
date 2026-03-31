@@ -652,10 +652,10 @@ export const Reader: React.FC<ReaderProps> = ({
   );
 
   const updateBookmark = useCallback(
-    (id: number, note: string, bookFileId: number) => {
+    (id: number, bookFileId: number, note?: string) => {
       updateBookmarkMutation.mutate({
         id,
-        data: { note: note.trim() || undefined },
+        data: { note: note?.trim() || undefined },
         bookFileId,
       });
       setEditingBookmark(null);
@@ -1171,7 +1171,7 @@ export const Reader: React.FC<ReaderProps> = ({
         <BookmarkEditModal
           bookmark={editingBookmark}
           onSave={(note) =>
-            updateBookmark(editingBookmark.id, note, bookFileId)
+            updateBookmark(editingBookmark.id, bookFileId, note)
           }
           onDelete={(id: number) => deleteBookmark(id, bookFileId)}
           onClose={() => setEditingBookmark(null)}
@@ -1533,7 +1533,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
 
 interface BookmarkEditModalProps {
   bookmark: BookmarkDetails;
-  onSave: (note: string) => void;
+  onSave: (note?: string) => void;
   onDelete: (id: number) => void;
   onClose: () => void;
 }
@@ -1590,7 +1590,7 @@ const BookmarkEditModal: React.FC<BookmarkEditModalProps> = ({
           <button
             className={styles['bm-save-btn']}
             onClick={() => {
-              onSave(note.trim());
+              onSave(note?.trim());
               onClose();
             }}
           >

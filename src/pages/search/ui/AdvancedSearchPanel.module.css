@@ -1,7 +1,9 @@
 .panel {
-  border: 1.5px solid #d8d0c4;
+  border: 1.5px solid #1c255a;
   border-radius: 10px;
-  background: #faf9f7;
+  background: #fff;
+
+  /* #c0c0ff; */
   margin-bottom: 20px;
   overflow: hidden;
 }
@@ -11,13 +13,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 14px 20px;
-  border-bottom: 1px solid #e8e0d8;
+  border-bottom: 1px solid #1c255a;
 }
 
 .title {
   font-size: 15px;
   font-weight: 600;
-  color: #3a2e24;
+  color: #1c255a;
   font-family: Georgia, serif;
 }
 
@@ -29,11 +31,11 @@
 
 .reset-btn {
   background: none;
-  border: 1px solid #c4a882;
+  border: 1px solid #1c255a;
   border-radius: 6px;
   padding: 4px 10px;
   font-size: 12px;
-  color: #8b6f47;
+  color: #1c255a;
   cursor: pointer;
   transition: background 0.15s;
 }
@@ -46,7 +48,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #999;
+  color: #1c255a;
   font-size: 16px;
   padding: 2px 6px;
   border-radius: 4px;
@@ -56,7 +58,7 @@
 }
 
 .close-btn:hover {
-  color: #555;
+  color: #1c255a;
   background: #ede6dc;
 }
 
@@ -82,29 +84,29 @@
 .filter-label {
   font-size: 13px;
   font-weight: 600;
-  color: #5a4a3a;
+  color: #1c255a;
   letter-spacing: 0.02em;
 }
 
 .filter-input {
   padding: 7px 10px;
-  border: 1.5px solid #d8d0c4;
+  border: 1.5px solid #1c255a;
   border-radius: 6px;
   font-size: 13px;
   font-family: inherit;
   background: #fff;
-  color: #2a2218;
+  color: #1c255a;
   outline: none;
   transition: border-color 0.15s;
 }
 
 .filter-input:focus {
-  border-color: #8b6f47;
+  border-color: #1c255a;
 }
 
 .filter-hint {
   font-size: 11px;
-  color: #b0a090;
+  color: #1c255a;
   margin: 0;
 }
 
@@ -124,7 +126,7 @@
   left: 0;
   right: 0;
   background: #fff;
-  border: 1.5px solid #d8d0c4;
+  border: 1.5px solid #1c255a;
   border-radius: 8px;
   box-shadow: 0 4px 16px rgb(0 0 0 / 10%);
   z-index: 100;
@@ -142,7 +144,7 @@
   padding: 8px 12px;
   cursor: pointer;
   font-size: 13px;
-  color: #2a2218;
+  color: #1c255a;
   transition: background 0.15s;
 }
 
@@ -153,7 +155,7 @@
 .synonym-hint {
   margin-left: auto;
   font-size: 11px;
-  color: #b0a090;
+  color: #1c255a;
   font-style: italic;
 }
 
@@ -168,22 +170,22 @@
   align-items: center;
   gap: 6px;
   padding: 6px 10px;
-  background: #f3ede5;
+  background: #fff;
   border-radius: 6px;
-  border: 1px solid #e0d4c4;
+  border: 1px solid #1c255a;
 }
 
-.person-avatar {
+/* .person-avatar {
   width: 24px;
   height: 24px;
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
-}
+} */
 
 .person-name {
   font-size: 13px;
-  color: #3a2e24;
+  color: #1c255a;
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -197,7 +199,7 @@
   border-radius: 4px;
   font-size: 12px;
   background: #fff;
-  color: #3a2e24;
+  color: #1c255a;
   cursor: pointer;
   max-width: 140px;
 }
@@ -206,7 +208,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #b0a090;
+  color: #1c255a;
   font-size: 12px;
   padding: 2px 4px;
   border-radius: 3px;
@@ -273,64 +275,4 @@
   font-size: 10px;
   opacity: 0.65;
   font-style: italic;
-}
-
-.checkbox-list {
-  max-height: 160px;
-  overflow-y: auto;
-  border: 1.5px solid #e8e0d8;
-  border-radius: 6px;
-  background: #fff;
-  padding: 4px 0;
-}
-
-.checkbox-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 10px;
-  font-size: 13px;
-  color: #3a2e24;
-  cursor: pointer;
-  transition: background 0.1s;
-}
-
-.checkbox-item:hover {
-  background: #f3ede5;
-}
-
-.checkbox-item input[type='checkbox'] {
-  cursor: pointer;
-  accent-color: #8b6f47;
-}
-
-.year-range {
-  width: 90px;
-  padding: 7px 10px;
-  border: 1.5px solid #d8d0c4;
-  border-radius: 6px;
-  font-size: 13px;
-  font-family: inherit;
-  background: #fff;
-  color: #2a2218;
-  outline: none;
-  transition: border-color 0.15s;
-}
-
-.year-input:focus {
-  border-color: #8b6f47;
-}
-
-.year-input::-webkit-inner-spin-button,
-.year-input::-webkit-outer-spin-button {
-  opacity: 1;
-}
-
-.year-input-error {
-  border-color: #c0392b !important;
-}
-
-.year-dash {
-  color: #9e8e7e;
-  font-size: 16px;
 }

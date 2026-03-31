@@ -40,11 +40,7 @@ export interface AdvancedSearchBody {
   personFilters?: PersonRoleFilterRequest[];
   requiredTagIds?: number[];
   excludedTagIds?: number[];
-  publisherIds?: number[];
-  languageIds?: number[];
-  countryIds?: number[];
-  yearFrom?: number | null;
-  yearTo?: number | null;
+  themeId: number;
 }
 
 export const searchApi = {

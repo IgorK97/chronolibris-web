@@ -18,6 +18,7 @@ import type { BookSearchResult } from '@/api/search';
 import { BookCard } from '@/components';
 import styles from './SearchPage.module.css';
 import {
+  Funnel,
   // Search,
   // Wrench,
   X,
@@ -31,25 +32,6 @@ import {
 } from '../utils/filterParams';
 import { useStore } from '@/stores/globalStore';
 import { AdvancedSearchPanel } from './AdvancedSearchPanel';
-
-// function AdvancedSearchStub({ onClose }: { onClose: () => void }) {
-//   return (
-//     <div className={styles['advanced-panel']}>
-//       <div className={styles['advanced-header']}>
-//         <span className={styles['advanced-title']}>Расширенный поиск</span>
-//         <button className={styles['advanced-close']} onClick={onClose}>
-//           <X />
-//         </button>
-//       </div>
-//       <div className={styles['advanced-stub']}>
-//         <div className={styles['stub-icon']}>
-//           <Wrench />
-//         </div>
-//         <p className={styles['stub-text']}>В разработке</p>
-//       </div>
-//     </div>
-//   );
-// }
 
 interface SearchPageProps {
   onNavigateToBook: (bookdId: number) => void;
@@ -93,10 +75,7 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
     filters.personFilters.length > 0 ||
     filters.requiredTagIds.length > 0 ||
     filters.excludedTagIds.length > 0 ||
-    filters.languageIds.length > 0 ||
-    filters.countryIds.length > 0 ||
-    filters.yearFrom !== null ||
-    filters.yearTo !== null;
+    filters.themeId > 0;
 
   // const navigate = useNavigate();
   // const { user } = useStore();
@@ -119,10 +98,7 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
       personFilters: filters.personFilters,
       requiredTagIds: filters.requiredTagIds,
       excludedTagIds: filters.excludedTagIds,
-      languageIds: filters.languageIds,
-      countryIds: filters.countryIds,
-      yearFrom: filters.yearFrom ?? undefined,
-      yearTo: filters.yearTo ?? undefined,
+      themeId: filters.themeId,
     },
     20,
     hasFilters && queryReady
@@ -150,44 +126,6 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
     [hasNextPage, isFetchingNext, fetchNextPage]
   );
 
-  // const {
-  //   data,
-  //   fetchNextPage,
-  //   hasNextPage,
-  //   isFetchingNextPage,
-  //   isLoading,
-  //   isError,
-  // } = useInfiniteSimpleSearch(urlQuery, 20, urlQuery.trim().length > 0);
-
-  // const allBooks = data?.pages.flatMap((p) => p.items) ?? [];
-
-  // const handleSearch = () => {
-  //   const trimmed = inputValue.trim();
-  //   if (!trimmed) return;
-  //   setSearchParams({ q: trimmed });
-  // };
-
-  // const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-  //   if (e.key === 'Enter') handleSearch();
-  // };
-
-  // const sentinelRef = useRef<HTMLDivElement>(null);
-  // const observerRef = useRef<IntersectionObserver | null>(null);
-
-  // const setSentinel = useCallback(
-  //   (node: HTMLDivElement | null) => {
-  //     if (observerRef.current) observerRef.current.disconnect();
-  //     if (!node) return;
-  //     observerRef.current = new IntersectionObserver((entries) => {
-  //       if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-  //         fetchNextPage();
-  //       }
-  //     });
-  //     observerRef.current.observe(node);
-  //   },
-  //   [hasNextPage, isFetchingNextPage, fetchNextPage]
-  // );
-
   return (
     <div className={styles.page}>
       <div className={styles['filter-bar']}>
@@ -197,22 +135,8 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
           }`}
           onClick={() => setShowAdvanced((v) => !v)}
         >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <line x1="4" y1="6" x2="20" y2="6" />
-            <line x1="8" y1="12" x2="20" y2="12" />
-            <line x1="12" y1="18" x2="20" y2="18" />
-          </svg>
+          <Funnel />
           Фильтры
-          {hasFilters && <span className={styles['filter-badge']} />}
         </button>
         {hasFilters && (
           <button
@@ -233,18 +157,13 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
       )}
       {urlQuery && !isLoading && !isError && (
         <div className={styles['results-header']}>
-          {/* {!isLoading && !isError && ( */}
-          <span className={styles['results-count']}>
-            {allBooks.length > 0
-              ? `Результаты по запросу «${urlQuery}»`
-              : `Ничего не найдено по запросу «${urlQuery}»`}
-          </span>
-          {/* )} */}
+          {allBooks.length > 0
+            ? `Результаты по запросу`
+            : `По вашему запросу ничего не найдено`}
         </div>
       )}
       {!urlQuery && (
         <div className={styles['empty-state']}>
-          <div className={styles['empty-icon']}>🔍</div>
           <p className={styles['empty-text']}>Начните вводить название книги</p>
         </div>
       )}
