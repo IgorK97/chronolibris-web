@@ -130,8 +130,6 @@ export const booksApi = {
     apiClient.delete(`/Books/${bookId}/contents/${contentId}`),
 };
 
-// --- Hooks ---
-
 type UseBookDetailsOptions = Omit<
   UseQueryOptions<BookDetails, Error>,
   'queryKey' | 'queryFn'

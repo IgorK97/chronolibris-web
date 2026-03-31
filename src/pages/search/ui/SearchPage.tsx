@@ -32,6 +32,7 @@ import {
 } from '../utils/filterParams';
 import { useStore } from '@/stores/globalStore';
 import { AdvancedSearchPanel } from './AdvancedSearchPanel';
+import { ThemePanel } from './ThemePanel';
 
 interface SearchPageProps {
   onNavigateToBook: (bookdId: number) => void;
@@ -71,11 +72,25 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
     });
   };
 
+  const themeId: number = Number(searchParams.get('themeId') ?? '0') || 0;
+
+  const setThemeId = (id: number | null) => {
+    setSearchParams((prev) => {
+      const updated = new URLSearchParams(prev);
+      if (id == null || id === 0) {
+        updated.delete('themeId');
+      } else {
+        updated.set('themeId', String(id));
+      }
+      return updated;
+    });
+  };
+
   const hasFilters =
     filters.personFilters.length > 0 ||
     filters.requiredTagIds.length > 0 ||
     filters.excludedTagIds.length > 0 ||
-    filters.themeId > 0;
+    themeId > 0;
 
   // const navigate = useNavigate();
   // const { user } = useStore();
@@ -98,7 +113,7 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
       personFilters: filters.personFilters,
       requiredTagIds: filters.requiredTagIds,
       excludedTagIds: filters.excludedTagIds,
-      themeId: filters.themeId,
+      themeId,
     },
     20,
     hasFilters && queryReady
@@ -126,84 +141,102 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
     [hasNextPage, isFetchingNext, fetchNextPage]
   );
 
+  const hasNonThemeFilters =
+    filters.personFilters.length > 0 ||
+    filters.requiredTagIds.length > 0 ||
+    filters.excludedTagIds.length > 0;
+
   return (
     <div className={styles.page}>
-      <div className={styles['filter-bar']}>
-        <button
-          className={`${styles['advanced-toggle']} ${
-            showAdvanced ? styles['advanced-toggle-active'] : ''
-          }`}
-          onClick={() => setShowAdvanced((v) => !v)}
-        >
-          <Funnel />
-          Фильтры
-        </button>
-        {hasFilters && (
-          <button
-            className={styles['reset-filters']}
-            onClick={() => setFilters(EMPTY_FILTERS)}
-          >
-            <X size={14} /> Сбросить фильтры
-          </button>
-        )}
-      </div>
-      {showAdvanced && (
-        <AdvancedSearchPanel
-          filters={filters}
-          onChange={setFilters}
-          onClose={() => setShowAdvanced(false)}
+      <div className={styles['content-layout']}>
+        <ThemePanel
+          selectedThemeId={themeId || null}
+          onSelect={(id) => setThemeId(id)}
         />
-        // <AdvancedSearchStub onClose={() => setShowAdvanced(false)} />
-      )}
-      {urlQuery && !isLoading && !isError && (
-        <div className={styles['results-header']}>
-          {allBooks.length > 0
-            ? `Результаты по запросу`
-            : `По вашему запросу ничего не найдено`}
-        </div>
-      )}
-      {!urlQuery && (
-        <div className={styles['empty-state']}>
-          <p className={styles['empty-text']}>Введите название книги...</p>
-        </div>
-      )}
 
-      {isLoading && (
-        <div className={styles['loading-state']}>
-          <div className={styles.spinner} />
-          <span>Поиск...</span>
-        </div>
-      )}
-
-      {isError && (
-        <div className={styles['error-state']}>
-          Не удалось выполнить поиск. Попробуйте ещё раз
-        </div>
-      )}
-      {allBooks.length > 0 && (
-        <div className={styles.results}>
-          {allBooks.map((book) => (
-            <BookCard
-              key={book.id}
-              bookInfo={toBookListItem(book)}
-              onPress={() => {
-                setCurrentBook(toBookListItem(book));
-                onNavigateToBook(book.id);
-              }}
+        <div style={{ marginLeft: '32px', flex: 1 }}>
+          <div className={styles['filter-bar']}>
+            <button
+              className={`${styles['advanced-toggle']} ${
+                showAdvanced ? styles['advanced-toggle-active'] : ''
+              }`}
+              onClick={() => setShowAdvanced((v) => !v)}
+            >
+              <Funnel />
+              Фильтры
+            </button>
+            {hasNonThemeFilters && (
+              <button
+                className={styles['reset-filters']}
+                onClick={() => setFilters(EMPTY_FILTERS)}
+              >
+                <X size={14} /> Сбросить фильтры
+              </button>
+            )}
+          </div>
+          {showAdvanced && (
+            <AdvancedSearchPanel
+              filters={filters}
+              onChange={setFilters}
+              onClose={() => setShowAdvanced(false)}
             />
-          ))}
-
-          {/* Sentinel для IntersectionObserver */}
-          <div ref={setSentinel} className={styles.sentinel} />
-
-          {isFetchingNext && (
-            <div className={styles['loading-more']}>
-              <div className={styles['spinner-small']} />
-              Загрузка...
-            </div>
+            // <AdvancedSearchStub onClose={() => setShowAdvanced(false)} />
           )}
+
+          <div className={styles['results-area']}>
+            {urlQuery && !isLoading && !isError && (
+              <div className={styles['results-header']}>
+                {allBooks.length > 0
+                  ? `Результаты по запросу`
+                  : `По вашему запросу ничего не найдено`}
+              </div>
+            )}
+            {!urlQuery && (
+              <div className={styles['empty-state']}>
+                <p className={styles['empty-text']}>
+                  Введите название книги...
+                </p>
+              </div>
+            )}
+            {isLoading && (
+              <div className={styles['loading-state']}>
+                <div className={styles.spinner} />
+                <span>Поиск...</span>
+              </div>
+            )}
+
+            {isError && (
+              <div className={styles['error-state']}>
+                Не удалось выполнить поиск. Попробуйте ещё раз
+              </div>
+            )}
+            {allBooks.length > 0 && (
+              <div className={styles.results}>
+                {allBooks.map((book) => (
+                  <BookCard
+                    key={book.id}
+                    bookInfo={toBookListItem(book)}
+                    onPress={() => {
+                      setCurrentBook(toBookListItem(book));
+                      onNavigateToBook(book.id);
+                    }}
+                  />
+                ))}
+
+                {/* Sentinel для IntersectionObserver */}
+                <div ref={setSentinel} className={styles.sentinel} />
+
+                {isFetchingNext && (
+                  <div className={styles['loading-more']}>
+                    <div className={styles['spinner-small']} />
+                    Загрузка...
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

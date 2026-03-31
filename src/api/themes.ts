@@ -3,7 +3,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from './apiClient';
 import type { ThemeDto } from '../types/types';
 
-// --- Типы запросов ---
 export interface CreateThemeRequest {
   name: string;
   parentThemeId?: number | null;
@@ -15,13 +14,11 @@ export interface UpdateThemeRequest {
   parentThemeId?: number | null;
 }
 
-// --- API методы ---
 export const themesApi = {
   /**
    * Получает список всех тем верхнего уровня
    */
-  getThemes: (): Promise<ThemeDto[]> =>
-    apiClient.get<ThemeDto[]>('/Themes'),
+  getThemes: (): Promise<ThemeDto[]> => apiClient.get<ThemeDto[]>('/Themes'),
 
   /**
    * Получает список дочерних тем для указанной родительской темы
@@ -50,11 +47,8 @@ export const themesApi = {
   /**
    * Удаляет запись темы
    */
-  deleteTheme: (id: number): Promise<void> =>
-    apiClient.delete(`/Themes/${id}`),
+  deleteTheme: (id: number): Promise<void> => apiClient.delete(`/Themes/${id}`),
 };
-
-// --- Hooks ---
 
 /**
  * Хук для получения списка всех тем верхнего уровня
@@ -75,7 +69,8 @@ export const useThemesByParentId = (parentThemeId: number | null) => {
   return useQuery({
     queryKey: ['themes', 'parent', parentThemeId],
     queryFn: () => {
-      if (parentThemeId === null) throw new Error('ID родительской темы не указан');
+      if (parentThemeId === null)
+        throw new Error('ID родительской темы не указан');
       return themesApi.getThemesByParentId(parentThemeId);
     },
     enabled: parentThemeId !== null,
