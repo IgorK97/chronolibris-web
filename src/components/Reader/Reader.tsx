@@ -71,7 +71,7 @@ export interface ImgNode {
 export interface TextSegment {
   t: string;
   xp?: number[];
-  c: string | TextSegment[] | (string | InlineNode)[] | ImgNode[]; //Это называется широйки юнион
+  c: string | TextSegment[] | (string | InlineNode)[] | ImgNode[]; //широкий юнион
 }
 
 export interface TocPart {
@@ -141,7 +141,7 @@ const fetchChunk = async (
   const res = await fetch(
     `/api/books/files/${bookFileId}/chunks/${chunkIndex}`
   );
-  if (!res.ok) throw new Error('Failed to fetch chunk');
+  if (!res.ok) throw new Error('Ошибка загрузки фрагмента');
   return res.json();
 };
 
@@ -150,19 +150,7 @@ export const Reader: React.FC<ReaderProps> = ({
   initialChunkIndex = 0,
   onBack,
 }) => {
-  // const [tocData, setTocData] = useState<TocData | null>(null);
   const [currentPartIndex, setCurrentPartIndex] = useState(initialChunkIndex);
-
-  // const [segments, setSegments] = useState<TextSegment[]>([]);
-  // const [nextSegments, setNextSegments] = useState<TextSegment[] | null>(null);
-  // const [isLoading, setIsLoading] = useState(true);
-  // const [isPrefetching, setIsPrefetching] = useState(false);
-
-  // const [fontSize, setFontSize] = useState(DEFAULT_FONT_SIZE);
-  // const [fontFamily, setFontFamily] = useState(FONT_OPTIONS[0].value);
-  // const [textColor, setTextColor] = useState(TEXT_COLORS[0]);
-  // const [pageColor, setPageColor] = useState(PAGE_COLORS[0]);
-  // const [bgColor, setBgColor] = useState(BG_COLORS[0]);
 
   const {
     settings: { fontSize, fontFamily, textColor, pageColor, bgColor },
@@ -310,7 +298,7 @@ export const Reader: React.FC<ReaderProps> = ({
     );
 
     return () => clearInterval(interval);
-  }, [user, bookFileId]); // readPercent убран
+  }, [user, bookFileId]);
 
   useEffect(() => {
     if (!user) return;
@@ -433,7 +421,7 @@ export const Reader: React.FC<ReaderProps> = ({
       // Сбрасываем флаги
       restoreByElementRef.current = false;
       visibleParaIndexRef.current = null;
-      return; // Выходим, так как позиция восстановлена
+      return; //позиция восстановлена
     }
 
     if (pendingColRef.current !== null) {
@@ -458,8 +446,9 @@ export const Reader: React.FC<ReaderProps> = ({
   };
   useEffect(() => {
     if (!isLoading) {
-      const id = setTimeout(recalcCols, 50);
-      return () => clearTimeout(id);
+      recalcCols();
+      // const id = setTimeout(recalcCols, 50);
+      // return () => clearTimeout(id);
     }
   }, [isLoading, fontSize, fontFamily, segments]);
   useEffect(() => {
@@ -467,6 +456,7 @@ export const Reader: React.FC<ReaderProps> = ({
     return () => window.removeEventListener('resize', recalcCols);
   }, []);
 
+  //Подзагрузка следующего фрагмента
   useEffect(() => {
     if (!fetchedTocData || isLoading) return;
 
@@ -515,7 +505,7 @@ export const Reader: React.FC<ReaderProps> = ({
         setCurrentCol(0);
         pendingColRef.current = 0;
         setCurrentPartIndex(nextIdx);
-        return;
+        // return;
         // if (nextSegments !== null) {
         //   setSegments(nextSegments);
         //   setNextSegments(null);
@@ -629,7 +619,7 @@ export const Reader: React.FC<ReaderProps> = ({
       goToCol(targetCol);
     } else {
       // Другой фрагмент: сохраняем ratio, меняем фрагмент
-      pendingColRef.current = -withinRatio; // отрицательное = ratio mode
+      pendingColRef.current = -withinRatio;
       setCurrentPartIndex(partIdx);
     }
   };
