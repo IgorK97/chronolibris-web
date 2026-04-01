@@ -172,13 +172,20 @@ export function CommentItem({
               {formatDate(comment.createdAt)}
             </span>
           </div>
-          {user?.userName === comment.userLogin && (
+          {user?.userName === comment.userLogin ? (
             <ThreeDotsMenu
               canDelete={true}
               onDelete={async () => deleteMutation.mutate()}
               targetId={comment.id}
               targetTypeId={TARGET_TYPE.COMMENT}
               // isAuth={isAuth}
+            />
+          ) : (
+            <ThreeDotsMenu
+              canDelete={false}
+              onDelete={async () => {}}
+              targetId={comment.id}
+              targetTypeId={TARGET_TYPE.COMMENT}
             />
           )}
         </div>

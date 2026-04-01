@@ -11,8 +11,7 @@ import {
   useResolveTask,
   type ReportShortDto,
 } from '../../api/reports';
-
-// ─── Filter state ─────────────────────────────────────────────────────────────
+import { ArrowBigRight, X } from 'lucide-react';
 
 type StatusFilter = 'free' | 'inProgress' | 'resolved';
 
@@ -35,8 +34,6 @@ const REASON_TYPES: { id: number; label: string }[] = [
   { id: 3, label: 'Нарушение авторских прав' },
   { id: 4, label: 'Неприемлемый контент' },
 ];
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatDate(iso: string | null): string {
   if (!iso) return '—';
@@ -72,8 +69,6 @@ function buildFiltersRequest(filters: Filters) {
   };
 }
 
-// ─── ReportsModal ─────────────────────────────────────────────────────────────
-
 interface ReportsModalProps {
   targetId: number;
   targetTypeId: number;
@@ -100,7 +95,7 @@ function ReportsModal({
             Жалобы на {TARGET_TYPE_LABEL[targetTypeId]} #{targetId}
           </span>
           <button style={styles.closeBtn} onClick={onClose}>
-            ✕
+            <X />
           </button>
         </div>
 
@@ -140,8 +135,6 @@ function ReportsModal({
     </div>
   );
 }
-
-// ─── TargetInfoPanel ──────────────────────────────────────────────────────────
 
 interface TargetInfoPanelProps {
   targetId: number;
@@ -183,7 +176,7 @@ function TargetInfoPanel({ targetId, targetTypeId }: TargetInfoPanelProps) {
             rel="noopener noreferrer"
             style={styles.bookLink}
           >
-            Перейти к книге →
+            Перейти к книге <ArrowBigRight />
           </a>
         </>
       ) : (
@@ -198,13 +191,27 @@ function TargetInfoPanel({ targetId, targetTypeId }: TargetInfoPanelProps) {
               <span style={styles.targetDescription}>{data.text}</span>
             </div>
           )}
+          {targetTypeId === TARGET_TYPE.COMMENT && data.parentCommentText && (
+            <div style={styles.targetField}>
+              <span style={styles.fieldLabel}>Родительский комментарий:</span>
+              <span style={styles.targetDescription}>
+                {data.parentCommentText}
+              </span>
+            </div>
+          )}
+          <a
+            href={`/book/${data.bookId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={styles.bookLink}
+          >
+            Перейти к книге <ArrowBigRight />
+          </a>
         </>
       )}
     </div>
   );
 }
-
-// ─── ReportRow ────────────────────────────────────────────────────────────────
 
 interface ReportRowProps {
   report: ReportShortDto;
@@ -358,8 +365,6 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
     </>
   );
 }
-
-// ─── ModerationPage ───────────────────────────────────────────────────────────
 
 export function ModerationPage() {
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
@@ -517,8 +522,6 @@ export function ModerationPage() {
     </div>
   );
 }
-
-// ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles: Record<string, React.CSSProperties> = {
   page: {

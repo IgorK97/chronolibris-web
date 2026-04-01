@@ -250,6 +250,7 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder={t('profile.ph_new_pass')}
+                autoComplete="new-password"
               />
             </div>
 

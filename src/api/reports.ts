@@ -6,8 +6,6 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 export interface ReportShortDto {
   targetId: number;
   targetTypeId: number;
@@ -49,6 +47,8 @@ export interface TargetInfoResponse {
   readerId: number | null;
   bookTitle: string | null;
   bookDescription: string | null;
+  bookId: number | null;
+  parentCommentText: string | null;
 }
 
 export interface ReportDto {
@@ -84,8 +84,6 @@ export interface CreateReportRequest {
   description?: string;
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-
 export const TASK_STATUS = {
   IN_PROGRESS: 1,
   ACCEPTED: 2,
@@ -109,8 +107,6 @@ export const TASK_STATUS_LABEL: Record<number, string> = {
   [TASK_STATUS.ACCEPTED]: 'Принята',
   [TASK_STATUS.REJECTED]: 'Отклонена',
 };
-
-// ─── API ──────────────────────────────────────────────────────────────────────
 
 export const reportsApi = {
   // POST /api/reports
@@ -156,13 +152,11 @@ export const reportsApi = {
 
   // PATCH /api/reports/tasks/{id}/resolution
   resolveTask: (taskId: number, resolution: boolean) =>
-    apiClient.update<
-      TaskResolutionResponse,
-      { id: number; resolution: boolean }
-    >(`/reports/tasks/${taskId}/resolution`, { id: taskId, resolution }),
+    apiClient.put<TaskResolutionResponse, { id: number; resolution: boolean }>(
+      `/reports/tasks/${taskId}/resolution`,
+      { id: taskId, resolution }
+    ),
 };
-
-// ─── React Query hooks ────────────────────────────────────────────────────────
 
 const PAGE_SIZE = 20;
 
