@@ -333,6 +333,9 @@ export interface BookDetails {
   participants: BookPersonGroupDetails[];
   themes: ThemeDeatils[];
   userRating: number;
+  bbk?: string;
+  udk?: string;
+  source?: string;
 }
 
 export interface DownloadedBook {

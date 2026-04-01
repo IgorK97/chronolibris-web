@@ -683,6 +683,7 @@ export const BookDetailsComponent = ({
               // infoContent={<p>Дополнительная информация о книге...</p>}
               infoContent={
                 <ParticipantsInfo
+                  bookInfo={fullBookDetails}
                   participants={fullBookDetails.participants}
                   roles={roles ?? []}
                 />

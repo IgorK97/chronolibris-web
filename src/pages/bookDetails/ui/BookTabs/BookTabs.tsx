@@ -3,27 +3,21 @@ import styles from './BookTabs.module.css';
 import { CommentsSection } from './CommentsSection';
 import { ReviewsSection } from './ReviewsSection';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 type TabId = 'info' | 'discussion' | 'reviews';
 
 interface BookTabsProps {
-  /** Slot for the "Информация" tab content — pass whatever info panel you have */
   infoContent?: React.ReactNode;
-  /** Whether this book supports ratings/reviews */
   canReview: boolean;
   discussionCount?: number;
   reviewsCount?: number;
   bookId: number;
   isAuth: boolean;
-  userReviewId: number | null; // If the user has already reviewed, their review ID (for edit/delete)
-  userCurrentScore: number; // If the user has already reviewed, their current rating score
+  userReviewId: number | null;
+  userCurrentScore: number;
   userReviewText: string | undefined;
   userReviewStatus: string | undefined;
-  onRatingChanged: () => void; // Callback when user changes their rating
+  onRatingChanged: () => void;
 }
-
-// ─── Component ────────────────────────────────────────────────────────────────
 
 export function BookTabs({
   infoContent,
@@ -58,7 +52,6 @@ export function BookTabs({
 
   return (
     <div className={styles['tabs-root']}>
-      {/* Tab bar */}
       <div className={styles['tab-bar']} role="tablist">
         {tabs.map((tab) => (
           <button
