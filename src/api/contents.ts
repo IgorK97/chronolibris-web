@@ -42,6 +42,10 @@ export interface BookContentLinkRequest {
   order: number;
 }
 
+export type PatchContentRequest = Partial<UpdateContentRequest> & {
+  id: number;
+};
+
 export const contentsApi = {
   getContents: (filter: ContentFilterRequest): Promise<ContentListResponse> =>
     apiClient.get<ContentListResponse>('/Contents', filter),
@@ -55,11 +59,14 @@ export const contentsApi = {
   createContent: (data: CreateContentRequest): Promise<number> =>
     apiClient.post<number, CreateContentRequest>('/Contents', data),
 
-  updateContent: (id: number, data: UpdateContentRequest): Promise<void> =>
-    apiClient.put<void, UpdateContentRequest>(`/Contents/${id}`, data),
+  // updateContent: (id: number, data: UpdateContentRequest): Promise<void> =>
+  //   apiClient.put<void, UpdateContentRequest>(`/Contents/${id}`, data),
 
   deleteContent: (id: number): Promise<void> =>
     apiClient.delete(`/Contents/${id}`),
+
+  patchContent: (data: PatchContentRequest): Promise<void> =>
+    apiClient.put<void, PatchContentRequest>(`/Contents/${data.id}`, data),
 
   linkBookToContent: (
     contentId: number,
@@ -140,16 +147,27 @@ export const useCreateContent = () => {
   });
 };
 
-export const useUpdateContent = () => {
+export const usePatchContent = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: UpdateContentRequest }) =>
-      contentsApi.updateContent(id, data),
-    onSuccess: () => {
+    mutationFn: contentsApi.patchContent,
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['contents', variables.id] });
       queryClient.invalidateQueries({ queryKey: ['contents'] });
     },
   });
 };
+
+// export const useUpdateContent = () => {
+//   const queryClient = useQueryClient();
+//   return useMutation({
+//     mutationFn: ({ id, data }: { id: number; data: UpdateContentRequest }) =>
+//       contentsApi.updateContent(id, data),
+//     onSuccess: () => {
+//       queryClient.invalidateQueries({ queryKey: ['contents'] });
+//     },
+//   });
+// };
 
 export const useDeleteContent = () => {
   const queryClient = useQueryClient();

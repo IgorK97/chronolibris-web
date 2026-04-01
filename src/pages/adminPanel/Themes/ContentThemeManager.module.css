@@ -1,0 +1,32 @@
+/* ContentThemeManager.module.css */
+.manager {
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+}
+.actions {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+}
+.saveBtn {
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.cancelBtn {
+  background: #9e9e9e;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.savedLabel {
+  color: #4caf50;
+  font-weight: bold;
+}

@@ -1,0 +1,61 @@
+/* ThemeSelector.module.css */
+.container {
+  margin-bottom: 1rem;
+}
+
+.inputWrapper {
+  position: relative;
+  width: 100%;
+}
+.input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  z-index: 10;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.suggestions li {
+  padding: 8px;
+  cursor: pointer;
+}
+.suggestions li:hover {
+  background: #f0f0f0;
+}
+
+.chipList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.chip {
+  display: flex;
+  align-items: center;
+  background: #e0e0e0;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 14px;
+}
+.removeBtn {
+  background: none;
+  border: none;
+  margin-left: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #888;
+}
+.removeBtn:hover {
+  color: #f44336;
+}

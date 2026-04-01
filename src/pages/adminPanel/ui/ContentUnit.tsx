@@ -14,6 +14,7 @@ import { BookSearchPopup } from './BookSearchPopup';
 import styles from './ContentUnit.module.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ContentTagsManager } from './ContentTagsManagement';
+import { ContentThemeManager } from '../Themes/ContentThemeManager';
 
 interface ContentUnitProps {
   contentId: number;
@@ -62,6 +63,17 @@ export const ContentUnit = () => {
       }
     }
   };
+
+  //   // В компоненте создания нового контента
+  // const [selectedThemes, setSelectedThemes] = useState<ThemeDto[]>([]);
+
+  // // ... внутри формы
+  // <ThemeSelector
+  //   selectedThemes={selectedThemes}
+  //   onAdd={(t) => setSelectedThemes([...selectedThemes, t])}
+  //   onRemove={(id) => setSelectedThemes(selectedThemes.filter(t => t.id !== id))}
+  // />
+  // // Темы уйдут в общий объект при нажатии большой кнопки "Создать"
 
   const handleBack = () => {
     navigate('/contents');
@@ -118,7 +130,11 @@ export const ContentUnit = () => {
             </div>
             <div className={styles['metadata-item']}>
               <label>Темы:</label>
-              <span>{content.themes.map((t) => t.name).join(', ') || '—'}</span>
+              <ContentThemeManager
+                contentId={content.id}
+                initialThemes={content.themes}
+              />
+              {/* <span>{content.themes.map((t) => t.name).join(', ') || '—'}</span> */}
             </div>
           </div>
         </div>

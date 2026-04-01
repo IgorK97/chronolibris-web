@@ -51,6 +51,7 @@ import Circles from 'react-loading-icons/dist/esm/components/circles';
 import { ReportModal } from '@/components/reports/ui/ReportModal';
 import { TARGET_TYPE } from '@/api/reports';
 import { Flag } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 interface BookDetailsProps {
   onNavigateToReviews: (id: number) => void;
   onNavigateToRead: (bookFileId?: number) => void;
@@ -122,6 +123,7 @@ export const BookDetailsComponent = ({
   const { data: bookFiles, isLoading: filesLoading } = useBookFiles(
     bookId ?? 0
   );
+  const navigate = useNavigate();
 
   const [isDownloadPanelOpen, setIsDownloadPanelOpen] =
     useState<boolean>(false);
@@ -640,7 +642,13 @@ export const BookDetailsComponent = ({
               <h2 className={styles['section-title']}>{t('book.themes')}</h2>
               <div className={styles['genres-container']}>
                 {fullBookDetails.themes?.map((theme, index) => (
-                  <button key={index} className={styles['genre-chip']}>
+                  <button
+                    key={index}
+                    className={styles['genre-chip']}
+                    onClick={() => {
+                      navigate(`/search?themeId=${theme.id}`);
+                    }}
+                  >
                     {theme.name}
                   </button>
                 ))}

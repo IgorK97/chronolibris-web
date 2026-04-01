@@ -18,7 +18,11 @@ export const themesApi = {
   /**
    * Получает список всех тем верхнего уровня
    */
-  getThemes: (): Promise<ThemeDto[]> => apiClient.get<ThemeDto[]>('/Themes'),
+  getThemes: (): Promise<ThemeDto[]> =>
+    apiClient.get<ThemeDto[]>('/Themes/all'),
+
+  getThemesByName: (name: string): Promise<ThemeDto[]> =>
+    apiClient.get<ThemeDto[]>(`/Themes/?q=${name}`),
 
   /**
    * Получает список дочерних тем для указанной родительской темы
@@ -139,11 +143,12 @@ export const useDeleteTheme = () => {
 /**
  * Хук для получения всех тем (плоский список для селекта)
  */
-export const useAllThemesFlat = () => {
+export const useAllThemesFlat = (name: string) => {
   return useQuery({
     queryKey: ['themes', 'flat'],
-    queryFn: themesApi.getThemes,
+    queryFn: () => themesApi.getThemesByName(name),
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
+    enabled: name.trim().length > 0,
   });
 };
