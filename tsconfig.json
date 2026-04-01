@@ -1,10 +1,13 @@
 {
+  // "include": ["env.d.ts", "global.d.ts", "src/**/*"],
+  // "include": ["vite-plugin-pwa/vanillajs", "vite-plugin-pwa/info"],
   "files": [],
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
+    // "types": ["vite-plugin-pwa/info.d.ts", "vite-plugin-pwa/client.d.ts"],
     "strict": true,
     "baseUrl": ".",
     "paths": {
