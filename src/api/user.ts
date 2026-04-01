@@ -35,7 +35,7 @@ export const usersApi = {
   },
 
   updateProfile: async (data: UpdateProfileRequest) => {
-    return await apiClient.update<UserProfile, UpdateProfileRequest>(
+    return await apiClient.put<UserProfile, UpdateProfileRequest>(
       `/users`,
       data
     );

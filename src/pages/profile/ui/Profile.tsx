@@ -154,6 +154,34 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
 
             <div className={styles['input-group']}>
               <label className={styles['label']}>
+                {t('profile.label_name')}
+              </label>
+              <input
+                className={styles['text-input']}
+                value={profileForm.lastName}
+                onChange={(e) =>
+                  setProfileForm({ ...profileForm, lastName: e.target.value })
+                }
+                placeholder={t('profile.ph_name')}
+              />
+            </div>
+
+            <div className={styles['input-group']}>
+              <label className={styles['label']}>
+                {t('profile.label_name')}
+              </label>
+              <input
+                className={styles['text-input']}
+                value={profileForm.userName}
+                onChange={(e) =>
+                  setProfileForm({ ...profileForm, userName: e.target.value })
+                }
+                placeholder={t('profile.ph_name')}
+              />
+            </div>
+
+            <div className={styles['input-group']}>
+              <label className={styles['label']}>
                 {t('profile.label_email')}
               </label>
               <input
@@ -179,7 +207,6 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
                     phoneNumber: e.target.value,
                   })
                 }
-                placeholder="+7 (999) 000-00-00"
               />
             </div>
           </div>
@@ -194,78 +221,80 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
         >
           {t('profile.save')}
         </button>
-      </div>
-      <div className={styles['section']}>
-        <h3 className={styles['section-title']}>
-          {t('profile.label_security')}
-        </h3>
-
-        <div className={styles['form']}>
-          <div className={styles['input-group']}>
-            <label className={styles['label']}>{t('profile.label_pass')}</label>
-            <input
-              type="password"
-              className={styles['text-input']}
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder={t('profile.ph_pass')}
-            />
-          </div>
-
-          <div className={styles['input-group']}>
-            <label className={styles['label']}>
-              {t('profile.label_new_pass')}
-            </label>
-            <input
-              type="password"
-              className={styles['text-input']}
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder={t('profile.ph_new_pass')}
-            />
-          </div>
-
-          <div className={styles['input-group']}>
-            <label className={styles['label']}>
-              {t('profile.label_conf_pass')}
-            </label>
-            <input
-              type="password"
-              className={styles['text-input']}
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder={t('profile.ph_conf_pass')}
-            />
-            {/* Подсказка о несовпадении — показывается только когда оба поля заполнены */}
-            {newPassword.length > 0 &&
-              confirmPassword.length > 0 &&
-              newPassword !== confirmPassword && (
-                <p className={styles['error-msg']}>Пароли не совпадают</p>
-              )}
-          </div>
-          {passwordError && (
-            <p className={styles['error-msg']}>{passwordError}</p>
-          )}
-          {passwordSuccess && (
-            <p className={styles['success-msg']}>Пароль изменён</p>
-          )}
-        </div>
-        <button
-          className={styles['save-button-bottom']}
-          onClick={handleChangePassword}
-          disabled={!passwordReady}
-        >
-          Изменить пароль
-        </button>
         <div className={styles['section']}>
+          <h3 className={styles['section-title']}>
+            {t('profile.label_security')}
+          </h3>
+
+          <div className={styles['form']}>
+            <div className={styles['input-group']}>
+              <label className={styles['label']}>
+                {t('profile.label_pass')}
+              </label>
+              <input
+                type="password"
+                className={styles['text-input']}
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder={t('profile.ph_pass')}
+              />
+            </div>
+
+            <div className={styles['input-group']}>
+              <label className={styles['label']}>
+                {t('profile.label_new_pass')}
+              </label>
+              <input
+                type="password"
+                className={styles['text-input']}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder={t('profile.ph_new_pass')}
+              />
+            </div>
+
+            <div className={styles['input-group']}>
+              <label className={styles['label']}>
+                {t('profile.label_conf_pass')}
+              </label>
+              <input
+                type="password"
+                className={styles['text-input']}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder={t('profile.ph_conf_pass')}
+              />
+
+              {newPassword.length > 0 &&
+                confirmPassword.length > 0 &&
+                newPassword !== confirmPassword && (
+                  <p className={styles['error-msg']}>Пароли не совпадают</p>
+                )}
+            </div>
+            {passwordError && (
+              <p className={styles['error-msg']}>{passwordError}</p>
+            )}
+            {passwordSuccess && (
+              <p className={styles['success-msg']}>Пароль изменён</p>
+            )}
+          </div>
           <button
-            className={styles['row']}
-            onClick={() => (user ? logout() : onNavigate())}
+            className={styles['save-button-bottom']}
+            onClick={handleChangePassword}
+            disabled={!passwordReady}
           >
-            <span style={{ color: '#D32F2F', fontWeight: 500 }}>
-              {user ? t('profile.exit') : t('profile.enter')}
-            </span>
+            Изменить пароль
           </button>
+          <div className={styles['section']}>
+            <button
+              className={styles['row']}
+              onClick={() => (user ? logout() : onNavigate())}
+            >
+              <span style={{ color: '#D32F2F', fontWeight: 500 }}>
+                {user ? t('profile.exit') : t('profile.enter')}
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

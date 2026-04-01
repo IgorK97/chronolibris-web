@@ -52,9 +52,8 @@ export const apiClient = {
   delete: <T>(url: string) =>
     axiosInstance.delete<T>(url).then((res) => res.data),
 
-  // D - тип тела для обновления
-  update: <T, D extends object = object>(url: string, body?: D) =>
-    axiosInstance.put<T>(url, body).then((res) => res.data),
+  // update: <T, D extends object = object>(url: string, body?: D) =>
+  //   axiosInstance.put<T>(url, body).then((res) => res.data),
 
   download: (url: string) => {
     return axiosInstance

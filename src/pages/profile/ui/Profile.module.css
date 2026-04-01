@@ -57,11 +57,10 @@
   background-color: #f9fafb;
 }
 
-/* Modal / Overlay Styling */
 .modal-overlay {
   position: fixed;
   margin: 0;
-  background-color: #fff; /* Full screen modal as per RN presentationStyle */
+  background-color: #fff;
   z-index: 1000;
   display: flex;
   flex-direction: column;
@@ -99,6 +98,7 @@
   margin-bottom: 24px;
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 
 .label {
@@ -115,6 +115,7 @@
   font-size: 16px;
   background-color: #fff;
   outline: none;
+  width: 100%;
 }
 
 .text-input:focus {
