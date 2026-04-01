@@ -185,9 +185,7 @@ export const BookUnit: React.FC = () => {
       <div className={styles['files-section']}>
         <h3>Файлы книги</h3>
         <div className={styles['files-placeholder']}>
-          <BookFileManagement bookId={id!} />
-          {/* <p>Список файлов книги будет отображаться здесь</p>
-          <p className={styles['hint']}>(Функционал в разработке)</p> */}
+          <BookFileManagement bookId={id!} bookTitle={book?.title ?? ''} />
         </div>
       </div>
 

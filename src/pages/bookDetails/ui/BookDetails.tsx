@@ -154,7 +154,6 @@ export const BookDetailsComponent = ({
   // const userReview =
   //   allReviews.find((r) => r.userName === user?.userName) ?? null;
 
-  // ── Mutations ───────────────────────────────────────────────────────────────
   const createReview = useCreateReview(bookId ?? 0);
   const updateReview = useUpdateReview(bookId ?? 0);
   const deleteReview = useDeleteReview(bookId ?? 0);
@@ -171,7 +170,7 @@ export const BookDetailsComponent = ({
     // closeTimerRef.current = setTimeout(() => {
     //   setIsRatingPopupOpen(false);
     //   setHoverRating(0);
-    // }, 300); // enough time to move mouse into popup
+    // }, 300);
   };
   useEffect(() => {
     return () => {

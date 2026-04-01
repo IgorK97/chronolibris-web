@@ -75,10 +75,10 @@ export default function App() {
   }, []);
 
   if (!isInitialized) {
-    return <div>Загрузка...</div>; // Или твой ActivityIndicator
+    return <div>Загрузка...</div>;
   }
   const handleAuthSuccess = () => {
-    navigate('/library'); // Или на ту страницу, которая нужна
+    navigate('/library');
   };
   const handleBookSelection = (bookId: number) => {
     navigate(`/book/${bookId}`);

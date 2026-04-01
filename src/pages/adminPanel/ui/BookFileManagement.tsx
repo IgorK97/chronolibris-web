@@ -8,18 +8,30 @@ import {
   useUpdateBookFile,
   useDeleteBookFile,
   useDownloadBookFile,
+  bookFilesApi,
 } from '@/api/bookFiles';
 import { useFormats } from '@/api/references';
 import type { BookFileDto, FormatDto } from '@/types/types';
 import { BookFileStatuses } from '@/types/types';
 import styles from './BookFileManagement.module.css';
+import { Download, Pencil, Trash } from 'lucide-react';
+import { t } from 'i18next';
 
 interface BookFileManagementProps {
   bookId: number;
+  bookTitle: string;
 }
+
+const FORMAT_EXTENSIONS: Record<number, string> = [
+  'fb2', // 1
+  'epub', // 2
+  'pdf', // 3
+  'mobi', // 4
+];
 
 export const BookFileManagement: React.FC<BookFileManagementProps> = ({
   bookId,
+  bookTitle,
 }) => {
   const { data: bookFiles, isLoading, error, refetch } = useBookFiles(bookId);
   const { data: formats } = useFormats();
@@ -27,6 +39,8 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
   const updateMutation = useUpdateBookFile();
   const deleteMutation = useDeleteBookFile();
   const downloadMutation = useDownloadBookFile();
+  const [isDownloading, setIsDownloading] = useState<boolean>(false);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
 
   const [selectedFormat, setSelectedFormat] = useState<number>(0);
   const [isReadable, setIsReadable] = useState<boolean>(false);
@@ -120,21 +134,46 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
     }
   };
 
-  const handleDownload = async (file: BookFileDto) => {
+  const handleDownload = async (bookFileId: number, formatId: number) => {
+    // Сервер сам резолвит путь для скачивания
+    if (!bookFileId) return;
+    setIsDownloading(true);
+    setDownloadError(null);
+
     try {
-      const blob = await downloadMutation.mutateAsync(file.id);
+      const { blob } = await bookFilesApi.download(bookFileId);
+
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `book_file_${file.id}.${file.formatName?.toLowerCase() || 'file'}`;
+      const extension = FORMAT_EXTENSIONS[formatId - 1];
+      a.download = `${bookTitle}.${extension}`;
       document.body.appendChild(a);
       a.click();
-      window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-    } catch (err: any) {
-      alert('Ошибка скачивания файла');
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      setDownloadError(t('book.download_error'));
+    } finally {
+      setIsDownloading(false);
     }
   };
+
+  // const handleDownload = async (file: BookFileDto) => {
+  //   try {
+  //     const blob = await downloadMutation.mutateAsync(file.id);
+  //     const url = window.URL.createObjectURL(blob);
+  //     const a = document.createElement('a');
+  //     a.href = url;
+  //     a.download = `book_file_${file.id}.${file.formatName?.toLowerCase() || 'file'}`;
+  //     document.body.appendChild(a);
+  //     a.click();
+  //     window.URL.revokeObjectURL(url);
+  //     document.body.removeChild(a);
+  //   } catch (err: any) {
+  //     alert('Ошибка скачивания файла');
+  //   }
+  // };
 
   const getStatusBadge = (statusId: number) => {
     const statusMap: Record<number, { label: string; color: string }> = {
@@ -295,13 +334,13 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
                     </td>
                     <td>
                       <button
-                        onClick={() => handleDownload(file)}
+                        onClick={() => handleDownload(file.id, file.formatId)}
                         className={`${styles['btn']} ${styles['btn-info']} ${styles['btn-sm']}`}
                         disabled={
                           file.bookFileStatusId !== BookFileStatuses.COMPLETED
                         }
                       >
-                        ⬇️
+                        <Download />
                       </button>
                       <button
                         onClick={() => setEditingFile(file)}
@@ -310,7 +349,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
                           deleteMutation.isPending || updateMutation.isPending
                         }
                       >
-                        ✏️
+                        <Pencil />
                       </button>
                       <button
                         onClick={() => handleDelete(file.id)}
@@ -319,7 +358,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
                           deleteMutation.isPending || updateMutation.isPending
                         }
                       >
-                        🗑️
+                        <Trash />
                       </button>
                     </td>
                   </>
