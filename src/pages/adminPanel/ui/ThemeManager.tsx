@@ -7,7 +7,6 @@ import {
   useCreateTheme,
   useUpdateTheme,
   useDeleteTheme,
-  useAllThemesFlat,
 } from '@/api/themes';
 import type { CreateThemeRequest, UpdateThemeRequest } from '@/api/themes';
 import type { ThemeDto } from '@/types/types';
@@ -18,18 +17,21 @@ export const ThemeManager: React.FC = () => {
   const createMutation = useCreateTheme();
   const updateMutation = useUpdateTheme();
   const deleteMutation = useDeleteTheme();
-  const { data: allThemes } = useAllThemesFlat();
 
   const [formData, setFormData] = useState<CreateThemeRequest>({
     name: '',
     parentThemeId: null,
   });
 
+  // Храним имя выбранного родителя для отображения в форме
+  const [selectedParentName, setSelectedParentName] = useState<string | null>(
+    null
+  );
+
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editFormData, setEditFormData] = useState<UpdateThemeRequest | null>(
     null
   );
-  const [selectedParentId, setSelectedParentId] = useState<number | null>(null);
   const [expandedThemes, setExpandedThemes] = useState<Set<number>>(new Set());
 
   const handleCreate = async () => {
@@ -41,6 +43,7 @@ export const ThemeManager: React.FC = () => {
     try {
       await createMutation.mutateAsync(formData);
       setFormData({ name: '', parentThemeId: null });
+      setSelectedParentName(null); // Сброс после создания
       refetch();
     } catch (err: any) {
       console.error('Ошибка создания темы:', err);
@@ -110,9 +113,15 @@ export const ThemeManager: React.FC = () => {
     });
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // Метод для выбора родительской темы кликом в списке
   const handleSelectParent = (theme: ThemeDto) => {
-    setSelectedParentId(selectedParentId === theme.id ? null : theme.id);
+    if (formData.parentThemeId === theme.id) {
+      setFormData({ ...formData, parentThemeId: null });
+      setSelectedParentName(null);
+    } else {
+      setFormData({ ...formData, parentThemeId: theme.id });
+      setSelectedParentName(theme.name);
+    }
   };
 
   if (isLoading) {
@@ -156,24 +165,27 @@ export const ThemeManager: React.FC = () => {
           </div>
 
           <div className={styles['form-group']}>
-            <label>Родительская тема</label>
-            <select
-              value={formData.parentThemeId || ''}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  parentThemeId: e.target.value ? Number(e.target.value) : null,
-                })
-              }
-              className={styles['input-field']}
-            >
-              <option value="">Без родительской темы (верхний уровень)</option>
-              {allThemes?.map((theme) => (
-                <option key={theme.id} value={theme.id}>
-                  {theme.name}
-                </option>
-              ))}
-            </select>
+            <label>Родительская тема (выберите в списке ниже)</label>
+            <div className={styles['parent-selection-display']}>
+              <span className={styles['selected-parent-text']}>
+                {selectedParentName || 'Без родительской темы'}
+              </span>
+              {formData.parentThemeId && (
+                <button
+                  type="button"
+                  className={styles['btn-clear']}
+                  onClick={() => {
+                    setFormData({ ...formData, parentThemeId: null });
+                    setSelectedParentName(null);
+                  }}
+                >
+                  Сбросить
+                </button>
+              )}
+            </div>
+            <small className="hint">
+              Кликните на тему в списке, чтобы сделать её родительской
+            </small>
           </div>
 
           <div className={styles['form-actions']}>
@@ -200,7 +212,7 @@ export const ThemeManager: React.FC = () => {
               editingId={editingId}
               editFormData={editFormData}
               setEditFormData={setEditFormData}
-              allThemes={allThemes || []}
+              allThemes={themes || []}
               onStartEditing={startEditing}
               onCancelEditing={cancelEditing}
               onUpdate={handleUpdate}
@@ -210,6 +222,9 @@ export const ThemeManager: React.FC = () => {
               expandedThemes={expandedThemes}
               updateMutation={updateMutation}
               deleteMutation={deleteMutation}
+              // Передаем новые пропсы для выбора
+              onSelectParent={handleSelectParent}
+              selectedParentId={formData.parentThemeId}
             />
           ))}
         </div>
@@ -234,6 +249,8 @@ interface ThemeTreeNodeProps {
   expandedThemes: Set<number>;
   updateMutation: any;
   deleteMutation: any;
+  onSelectParent: (theme: ThemeDto) => void;
+  selectedParentId: number | null;
 }
 
 const ThemeTreeNode: React.FC<ThemeTreeNodeProps> = ({
@@ -248,12 +265,15 @@ const ThemeTreeNode: React.FC<ThemeTreeNodeProps> = ({
   onDelete,
   onToggleExpand,
   isExpanded,
-  expandedThemes, // ← ДОБАВЛЕНО
+  expandedThemes,
   updateMutation,
   deleteMutation,
+  onSelectParent,
+  selectedParentId,
 }) => {
   const { data: subThemes } = useThemesByParentId(isExpanded ? theme.id : null);
   const hasSubThemes = (theme.subThemesCount || 0) > 0;
+  const isSelectedAsParent = selectedParentId === theme.id;
 
   if (editingId === theme.id) {
     return (
@@ -317,24 +337,39 @@ const ThemeTreeNode: React.FC<ThemeTreeNodeProps> = ({
 
   return (
     <div className={styles['theme-node']}>
-      <div className={styles['theme-content']}>
+      <div
+        className={`${styles['theme-content']} ${isSelectedAsParent ? styles['selected-parent'] : ''}`}
+      >
         <button
           className={
             styles[
               `expand-btn ${hasSubThemes ? 'has-children' : 'no-children'}`
             ]
           }
-          onClick={() => onToggleExpand(theme.id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleExpand(theme.id);
+          }}
           disabled={!hasSubThemes}
         >
           {hasSubThemes ? (isExpanded ? '▼' : '▶') : '•'}
         </button>
-        <span className={styles['theme-name']}>{theme.name}</span>
+
+        {/* Кликабельное название темы */}
+        <span
+          className={styles['theme-name-clickable']}
+          onClick={() => onSelectParent(theme)}
+          title="Нажмите, чтобы выбрать как родителя"
+        >
+          {theme.name}
+        </span>
+
         {theme.subThemesCount ? (
           <span className={styles['sub-themes-count']}>
             ({theme.subThemesCount} дочерних)
           </span>
         ) : null}
+
         <div className={styles['theme-actions']}>
           <button
             onClick={() => onStartEditing(theme)}
@@ -377,6 +412,8 @@ const ThemeTreeNode: React.FC<ThemeTreeNodeProps> = ({
               expandedThemes={expandedThemes}
               updateMutation={updateMutation}
               deleteMutation={deleteMutation}
+              onSelectParent={onSelectParent}
+              selectedParentId={selectedParentId}
             />
           ))}
         </div>
