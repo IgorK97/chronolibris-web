@@ -59,7 +59,7 @@ export const ContentManagement: React.FC = () => {
 
   const handleSelectContent = (content: ContentDto) => {
     // Переход на страницу контента по ID
-    navigate(`/contents/${content.id}`);
+    navigate(`/contents/${content.id}/edit`);
   };
 
   const handleNextPage = () => {
@@ -83,6 +83,9 @@ export const ContentManagement: React.FC = () => {
   return (
     <div className={styles['content-management']}>
       <h2>Управление контентом</h2>
+      <button>
+        <a href="/contents/new">Создать новый контент</a>
+      </button>
 
       {/* Фильтры */}
       <div className={styles['filters-section']}>

@@ -33,7 +33,7 @@ import {
   SeriesManager,
   ThemeManager,
 } from '@/pages/adminPanel';
-import { ContentUnit } from '@/pages/adminPanel/ui/ContentUnit';
+import { ContentForm } from '@/pages/adminPanel/ui/ContentUnit';
 // import { Reader } from '@/components/Reader';
 import { BookManagement } from '@/pages/adminPanel/ui/BookManagement';
 import { BookUnit } from '@/pages/adminPanel/ui/BookUnit';
@@ -166,7 +166,10 @@ export default function App() {
             <Route path="person" element={<PersonManager />} />
             <Route path="themes" element={<ThemeManager />} />
             <Route path="contents" element={<ContentManagement />} />
-            <Route path="contents/:contentId" element={<ContentUnit />} />
+            {/* <Route path="contents/:contentId" element={<ContentUnit />} />
+             */}
+            <Route path="/contents/new" element={<ContentForm />} />
+            <Route path="/contents/:contentId/edit" element={<ContentForm />} />
             <Route path="tags" element={<TagsPage />} />
             <Route path="register-staff" element={<RegisterStaffPage />} />
 
