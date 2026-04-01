@@ -22,12 +22,19 @@ interface BookFileManagementProps {
   bookTitle: string;
 }
 
-const FORMAT_EXTENSIONS: Record<number, string> = [
-  'fb2', // 1
-  'epub', // 2
-  'pdf', // 3
-  'mobi', // 4
-];
+const FORMAT_EXTENSIONS: Record<number, string> = {
+  1: 'fb2',
+  2: 'epub',
+  3: 'pdf',
+  4: 'txt',
+};
+
+// const FORMAT_EXTENSIONS: Record<number, string> = [
+//   'fb2', // 1
+//   'epub', // 2
+//   'pdf', // 3
+//   'txt', // 4
+// ];
 
 export const BookFileManagement: React.FC<BookFileManagementProps> = ({
   bookId,
@@ -60,7 +67,15 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
     }
 
     const file = fileInputRef.current.files[0];
+    const fileName = file.name.toLowerCase();
+    const expectedExtension = FORMAT_EXTENSIONS[selectedFormat];
 
+    if (expectedExtension && !fileName.endsWith(`.${expectedExtension}`)) {
+      alert(
+        `Выбранный файл не соответствует формату ${expectedExtension.toUpperCase()}`
+      );
+      return;
+    }
     // Проверка размера (100 MB)
     const MAX_SIZE = 100 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
@@ -251,8 +266,13 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
             <input
               ref={fileInputRef}
               type="file"
-              accept=".fb2,.epub,.pdf,.txt"
+              accept={
+                selectedFormat > 0
+                  ? `.${FORMAT_EXTENSIONS[selectedFormat]}`
+                  : '.fb2'
+              }
               className={styles['file-input']}
+              disabled={selectedFormat < 1}
             />
             <span className={styles['hint']}>Макс. 100 MB</span>
           </div>

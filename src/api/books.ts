@@ -15,7 +15,9 @@ import type {
   BookListItem,
   BookListResponse,
   ContentDto,
+  CreateBookRequest,
   PagedResult,
+  UpdateBookRequest,
   UpdateReadingProgressCommand,
 } from '../types/types';
 import { useDebounce } from '../hooks/useDebounce';
@@ -30,41 +32,6 @@ interface SearchParams {
   rating?: number | null;
   yearFrom?: string;
   yearTo?: string;
-}
-
-export interface CreateBookRequest {
-  title: string;
-  description: string;
-  countryId: number;
-  languageId: number;
-  year?: number | null;
-  isbn?: string | null;
-  filePath?: string | null;
-  coverPath?: string | null;
-  isAvailable?: boolean;
-  isReviewable?: boolean;
-  publisherId?: number | null;
-  seriesId?: number | null;
-  personIds?: number[];
-  themeIds?: number[];
-}
-
-export interface UpdateBookRequest {
-  id: number;
-  title: string;
-  description: string;
-  countryId: number;
-  languageId: number;
-  year?: number | null;
-  isbn?: string | null;
-  filePath?: string | null;
-  coverPath?: string | null;
-  isAvailable?: boolean;
-  isReviewable?: boolean;
-  publisherId?: number | null;
-  seriesId?: number | null;
-  personIds?: number[];
-  themeIds?: number[];
 }
 
 export interface BookContentLinkRequest {

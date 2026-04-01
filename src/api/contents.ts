@@ -22,6 +22,11 @@ export interface CreateContentRequest {
   themeIds?: number[];
 }
 
+export interface PersonRoleFilter {
+  roleId: number;
+  personIds: number[];
+}
+
 export interface UpdateContentRequest {
   id: number;
   title: string;
@@ -30,9 +35,10 @@ export interface UpdateContentRequest {
   contentTypeId: number;
   languageId: number;
   year?: number | null;
+  yearProvided: boolean; // Флаг для указания, что год был явно предоставлен (даже если null)
   parentContentId?: number | null;
   position?: number | null;
-  personIds?: number[];
+  personFilters?: PersonRoleFilter[];
   themeIds?: number[];
 }
 

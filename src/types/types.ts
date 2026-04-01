@@ -1,3 +1,5 @@
+import type { PersonRoleFilter } from '@/api/contents';
+
 export const SELECTION_TYPE = { NEWEST: 1, POPULAR: 2, MANUAL: 3 } as const;
 
 // File: src/types/types.ts
@@ -72,7 +74,7 @@ export interface FormatDto {
   id: number;
   name: string;
 }
-// --- Типы запросов ---
+
 export interface CreatePublisherRequest {
   name: string;
   description: string;
@@ -256,7 +258,7 @@ export interface CommentDto {
   dislikesCount: number;
   parentCommentId: number | null;
   replies?: CommentDto[]; // Для первого уровня вложенности
-  repliesCount: number; // Добавь это поле в DTO на сервере или считай на клиенте
+  repliesCount: number;
 }
 
 export interface CreateCommentRequest {
@@ -311,6 +313,52 @@ export interface PublisherDetails {
 export interface ThemeDeatils {
   id: number;
   name: string;
+}
+
+export interface CreateBookRequest {
+  title: string;
+  description: string;
+  countryId: number;
+  languageId: number;
+  year: number | null;
+  isbn: string | null;
+  bbk: string | null;
+  udk: string | null;
+  source: string | null;
+  // filePath?: string | null;
+  coverFile: File;
+  isAvailable: boolean;
+  isReviewable: boolean;
+  publisherId: number | null;
+  seriesId: number | null;
+  personFilters: PersonRoleFilter[];
+}
+
+export interface UpdateBookRequest {
+  id: number;
+  title: string;
+  description: string;
+  countryId: number | null;
+  languageId: number | null;
+  year: number | null;
+  yearProvided: boolean;
+  isbn: string | null;
+  isbnProvided: boolean;
+  bbk: string | null;
+  bbkProvided: boolean;
+  udk: string | null;
+  udkProvided: boolean;
+  source: string | null;
+  sourceProvided: boolean;
+  // filePath?: string | null;
+  coverFile: File | null;
+  isAvailable: boolean;
+  isReviewable: boolean;
+  publisherId: number | null;
+  publisherIdProvided: boolean;
+  seriesId: number | null;
+  seriesIdProvided: boolean;
+  personFilters?: PersonRoleFilter[];
 }
 
 export interface BookDetails {
