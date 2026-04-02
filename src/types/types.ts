@@ -153,8 +153,8 @@ export interface ContentDto {
   languageId: number;
   languageName?: string | null;
   year?: number | null;
-  parentContentId?: number | null;
-  position?: number | null;
+  // parentContentId?: number | null;
+  // position?: number | null;
   createdAt: string;
   updatedAt?: string | null;
   authors: string[];
@@ -667,10 +667,9 @@ export interface LoginRequest {
   password: string;
 }
 
-// Определяем интерфейс фильтров
 export interface BookFilters {
   languages: string[];
-  genreIds: number[]; // Путь жанра и его состояние
+  genreIds: number[];
   rating: number | null;
   yearFrom: string;
   yearTo: string;
@@ -697,6 +696,7 @@ export interface ContentDto {
   createdAt: string;
   updatedAt?: string | null;
   authors: string[];
+  participants: BookPersonGroupDetails[];
   themes: ThemeDto[];
 }
 
