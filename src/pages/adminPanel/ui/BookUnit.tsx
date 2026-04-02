@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // File: src/components/BookUnit.tsx
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useDropzone } from 'react-dropzone';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   // useBookById,
@@ -29,12 +30,8 @@ import type {
 import { ContentSearchPopup } from './ContentSearchPopup';
 import { BookFileManagement } from './BookFileManagement';
 import styles from './BookUnit.module.css';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, X } from 'lucide-react';
 import { useStore } from '@/stores/globalStore';
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
 
 interface SelectedPerson {
   id: number;
@@ -47,29 +44,38 @@ interface AutocompleteItem {
   name: string;
 }
 
-// ---------------------------------------------------------------------------
-// PersonFilter – переиспользован из AdvancedSearchPanel, расширен для формы
-// ---------------------------------------------------------------------------
-
 function PersonFilter({
   value,
   roles,
   onChange,
+  initialPersons,
+  readOnly = false,
 }: {
   value: PersonRoleFilterRequest[];
   roles: PersonRoleDto[];
   onChange: (v: PersonRoleFilterRequest[]) => void;
+  initialPersons?: SelectedPerson[];
+  readOnly?: boolean;
 }) {
   const [input, setInput] = useState('');
-  const [selected, setSelected] = useState<SelectedPerson[]>(() =>
-    value.flatMap((pf) =>
+  const [selected, setSelected] = useState<SelectedPerson[]>(() => {
+    if (initialPersons && initialPersons.length > 0) return initialPersons;
+    return value.flatMap((pf) =>
       pf.personIds.map((id) => ({ id, name: `#${id}`, roleId: pf.roleId }))
-    )
-  );
+    );
+  });
   const [showDropDown, setShowDropDown] = useState(false);
   const debouncedInput = useDebounce(input, 300);
   const { data: suggestions = [] } = usePersonSuggestions(debouncedInput);
   const wrapperRef = useRef<HTMLDivElement>(null);
+
+  // Sync when initialPersons changes (e.g. after book data loads)
+  useEffect(() => {
+    if (initialPersons && initialPersons.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSelected(initialPersons);
+    }
+  }, [initialPersons]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -130,7 +136,10 @@ function PersonFilter({
               <select
                 className={styles['role-select']}
                 value={p.roleId ?? ''}
-                onChange={(e) => handleRoleChange(p.id, Number(e.target.value))}
+                onChange={(e) =>
+                  !readOnly && handleRoleChange(p.id, Number(e.target.value))
+                }
+                disabled={readOnly}
               >
                 <option value="" disabled>
                   Выберите роль
@@ -141,58 +150,58 @@ function PersonFilter({
                   </option>
                 ))}
               </select>
-              <button
-                type="button"
-                className={styles['remove-btn']}
-                onClick={() => handleRemove(p.id)}
-                aria-label="Удалить"
-              >
-                ✕
-              </button>
+              {!readOnly && (
+                <button
+                  type="button"
+                  className={styles['remove-btn']}
+                  onClick={() => handleRemove(p.id)}
+                  aria-label="Удалить"
+                >
+                  <X />
+                </button>
+              )}
             </div>
           ))}
         </div>
       )}
 
-      <div className={styles['autocomplete-wrapper']} ref={wrapperRef}>
-        <input
-          className={styles['field-input']}
-          placeholder="Введите имя персоны..."
-          value={input}
-          onChange={(e) => {
-            setInput(e.target.value);
-            setShowDropDown(true);
-          }}
-          onFocus={() => input.length >= 2 && setShowDropDown(true)}
-        />
-        {showDropDown && suggestions.length > 0 && (
-          <ul className={styles['autocomplete-dropdown']}>
-            {suggestions.map((s) => (
-              <li
-                key={s.id}
-                className={styles['autocomplete-item']}
-                onMouseDown={() => handleSelect(s)}
-              >
-                {s.imagePath && (
-                  <img
-                    src={s.imagePath}
-                    alt=""
-                    className={styles['person-avatar']}
-                  />
-                )}
-                <span>{s.name}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      {!readOnly && (
+        <div className={styles['autocomplete-wrapper']} ref={wrapperRef}>
+          <input
+            className={styles['field-input']}
+            placeholder="Введите имя персоны..."
+            value={input}
+            onChange={(e) => {
+              setInput(e.target.value);
+              setShowDropDown(true);
+            }}
+            onFocus={() => input.length >= 2 && setShowDropDown(true)}
+          />
+          {showDropDown && suggestions.length > 0 && (
+            <ul className={styles['autocomplete-dropdown']}>
+              {suggestions.map((s) => (
+                <li
+                  key={s.id}
+                  className={styles['autocomplete-item']}
+                  onMouseDown={() => handleSelect(s)}
+                >
+                  {s.imagePath && (
+                    <img
+                      src={s.imagePath}
+                      alt=""
+                      className={styles['person-avatar']}
+                    />
+                  )}
+                  <span>{s.name}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
     </div>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Generic autocomplete field (language, country, publisher)
-// ---------------------------------------------------------------------------
 
 function AutocompleteField({
   label,
@@ -215,7 +224,6 @@ function AutocompleteField({
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  // sync when external selectedName changes (e.g. after book load)
   useEffect(() => {
     setInput(selectedName);
   }, [selectedName]);
@@ -257,7 +265,7 @@ function AutocompleteField({
                 setInput('');
               }}
             >
-              ✕
+              <X />
             </button>
           )}
         </div>
@@ -287,9 +295,59 @@ function AutocompleteField({
   );
 }
 
-// ---------------------------------------------------------------------------
-// CoverUpload
-// ---------------------------------------------------------------------------
+// function CoverUpload({
+//   currentCoverPath,
+//   onFileChange,
+// }: {
+//   currentCoverPath?: string | null;
+//   onFileChange: (file: File | null) => void;
+// }) {
+//   const [preview, setPreview] = useState<string | null>(
+//     currentCoverPath ?? null
+//   );
+//   const inputRef = useRef<HTMLInputElement>(null);
+
+//   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const file = e.target.files?.[0] ?? null;
+//     onFileChange(file);
+//     if (file) {
+//       const reader = new FileReader();
+//       reader.onload = () => setPreview(reader.result as string);
+//       reader.readAsDataURL(file);
+//     } else {
+//       setPreview(currentCoverPath ?? null);
+//     }
+//   };
+
+//   return (
+//     <div className={styles['field-group']}>
+//       <label className={styles['field-label']}>Обложка</label>
+//       <div
+//         className={styles['cover-upload']}
+//         onClick={() => inputRef.current?.click()}
+//       >
+//         {preview ? (
+//           <img
+//             src={preview}
+//             alt="Обложка"
+//             className={styles['cover-preview']}
+//           />
+//         ) : (
+//           <div className={styles['cover-placeholder']}>
+//             <span>Нажмите для загрузки</span>
+//           </div>
+//         )}
+//       </div>
+//       <input
+//         ref={inputRef}
+//         type="file"
+//         accept="image/*"
+//         style={{ display: 'none' }}
+//         onChange={handleChange}
+//       />
+//     </div>
+//   );
+// }
 
 function CoverUpload({
   currentCoverPath,
@@ -298,56 +356,30 @@ function CoverUpload({
   currentCoverPath?: string | null;
   onFileChange: (file: File | null) => void;
 }) {
-  const [preview, setPreview] = useState<string | null>(
-    currentCoverPath ?? null
-  );
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [preview, setPreview] = useState(currentCoverPath ?? null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] ?? null;
-    onFileChange(file);
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => setPreview(reader.result as string);
-      reader.readAsDataURL(file);
-    } else {
-      setPreview(currentCoverPath ?? null);
-    }
-  };
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    accept: { 'image/*': [] },
+    maxFiles: 1,
+    onDrop: ([file]) => {
+      onFileChange(file);
+      setPreview(URL.createObjectURL(file)); // проще чем FileReader
+    },
+  });
 
   return (
-    <div className={styles['field-group']}>
-      <label className={styles['field-label']}>Обложка</label>
-      <div
-        className={styles['cover-upload']}
-        onClick={() => inputRef.current?.click()}
-      >
-        {preview ? (
-          <img
-            src={preview}
-            alt="Обложка"
-            className={styles['cover-preview']}
-          />
-        ) : (
-          <div className={styles['cover-placeholder']}>
-            <span>Нажмите для загрузки</span>
-          </div>
-        )}
-      </div>
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        style={{ display: 'none' }}
-        onChange={handleChange}
-      />
+    <div {...getRootProps()} className={styles['cover-upload']}>
+      <input {...getInputProps()} />
+      {preview ? (
+        <img src={preview} className={styles['cover-preview']} />
+      ) : (
+        <span>
+          {isDragActive ? 'Отпустите файл...' : 'Нажмите или перетащите'}
+        </span>
+      )}
     </div>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Helpers – build request bodies
-// ---------------------------------------------------------------------------
 
 interface FormState {
   title: string;
@@ -388,10 +420,6 @@ const emptyForm = (): FormState => ({
   coverFile: null,
   personFilters: [],
 });
-
-// ---------------------------------------------------------------------------
-// Main component
-// ---------------------------------------------------------------------------
 
 export const BookUnit: React.FC = () => {
   const { bookId } = useParams<{ bookId: string }>();
@@ -453,7 +481,10 @@ export const BookUnit: React.FC = () => {
         publisherId: book.publisher?.id ?? null,
         publisherName: book.publisher?.name ?? '',
         coverFile: null,
-        personFilters: [],
+        personFilters: (book.participants ?? []).map((group) => ({
+          roleId: group.role,
+          personIds: group.persons.map((p) => p.id),
+        })),
       });
     }
   }, [book]);
@@ -566,16 +597,15 @@ export const BookUnit: React.FC = () => {
           publisherId: book.publisher?.id ?? null,
           publisherName: book.publisher?.name ?? '',
           coverFile: null,
-          personFilters: [],
+          personFilters: (book.participants ?? []).map((group) => ({
+            roleId: group.role,
+            personIds: group.persons.map((p) => p.id),
+          })),
         });
       }
       setMode('view');
     }
   };
-
-  // -------------------------------------------------------------------------
-  // Content link / unlink
-  // -------------------------------------------------------------------------
 
   const handleUnlinkContent = async (contentId: number) => {
     if (window.confirm('Удалить этот контент из книги?')) {
@@ -608,10 +638,6 @@ export const BookUnit: React.FC = () => {
     }
   };
 
-  // -------------------------------------------------------------------------
-  // Render helpers
-  // -------------------------------------------------------------------------
-
   const isSaving = createMutation.isPending || updateMutation.isPending;
 
   if (isLoading) return <div className={styles['loading']}>Загрузка...</div>;
@@ -620,9 +646,15 @@ export const BookUnit: React.FC = () => {
 
   const isEditing = mode === 'edit';
 
-  // -------------------------------------------------------------------------
-  // JSX
-  // -------------------------------------------------------------------------
+  // Build initialPersons with names from book.participants for PersonFilter
+  const initialPersons: SelectedPerson[] = (book?.participants ?? []).flatMap(
+    (group) =>
+      group.persons.map((p) => ({
+        id: p.id,
+        name: p.fullName,
+        roleId: group.role,
+      }))
+  );
 
   return (
     <div className={styles['book-unit']}>
@@ -831,46 +863,168 @@ export const BookUnit: React.FC = () => {
                 value={form.personFilters}
                 roles={roles}
                 onChange={(pf) => set('personFilters', pf)}
+                initialPersons={initialPersons}
               />
             </div>
           ) : (
-            <div className={styles['metadata-grid']}>
+            <div className={styles['edit-form']}>
+              {/* Cover */}
               {book?.coverUri && (
-                <div
-                  className={styles['metadata-item']}
-                  style={{ gridColumn: '1 / -1' }}
-                >
-                  <img
-                    src={book.coverUri}
-                    alt="Обложка"
-                    style={{
-                      maxHeight: 200,
-                      borderRadius: 8,
-                      objectFit: 'cover',
-                    }}
-                  />
+                <div className={styles['field-group']}>
+                  <label className={styles['field-label']}>Обложка</label>
+                  <div
+                    className={styles['cover-upload']}
+                    style={{ cursor: 'default' }}
+                  >
+                    <img
+                      src={book.coverUri}
+                      alt="Обложка"
+                      className={styles['cover-preview']}
+                    />
+                  </div>
                 </div>
               )}
-              <MetaRow label="ID" value={book?.id} />
-              <MetaRow label="Название" value={book?.title} />
-              <MetaRow label="Описание" value={book?.description} />
-              <MetaRow label="ISBN" value={book?.isbn} />
-              <MetaRow label="ББК" value={(book as any)?.bbk} />
-              <MetaRow label="УДК" value={(book as any)?.udk} />
-              <MetaRow label="Источник" value={(book as any)?.source} />
-              <MetaRow label="Год" value={book?.year} />
-              <MetaRow label="Язык" value={book?.language?.name} />
-              <MetaRow label="Страна" value={book?.country?.name} />
-              <MetaRow label="Издательство" value={book?.publisher?.name} />
-              {/* <MetaRow label="Авторы" value={book?.authors.join(', ')} /> */}
-              <MetaRow
-                label="Темы"
-                value={book?.themes.map((t) => t.name).join(', ')}
-              />
-              <MetaRow label="Доступно" value={book?.isAvailable ? '✓' : '✗'} />
-              <MetaRow
-                label="Рецензируется"
-                value={book?.isReviewable ? '✓' : '✗'}
+
+              {/* Title */}
+              <div className={styles['field-group']}>
+                <label className={styles['field-label']}>Название *</label>
+                <input
+                  className={styles['field-input']}
+                  value={form.title}
+                  readOnly
+                  placeholder="Название книги"
+                />
+              </div>
+
+              {/* Description */}
+              <div className={styles['field-group']}>
+                <label className={styles['field-label']}>Описание</label>
+                <textarea
+                  className={styles['field-textarea']}
+                  value={form.description}
+                  readOnly
+                  rows={4}
+                  placeholder="Описание книги"
+                />
+              </div>
+
+              {/* ISBN / Year */}
+              <div className={styles['fields-row']}>
+                <div className={styles['field-group']}>
+                  <label className={styles['field-label']}>ISBN</label>
+                  <input
+                    className={styles['field-input']}
+                    value={form.isbn}
+                    readOnly
+                    placeholder="ISBN"
+                  />
+                </div>
+                <div className={styles['field-group']}>
+                  <label className={styles['field-label']}>Год</label>
+                  <input
+                    className={styles['field-input']}
+                    value={form.year}
+                    readOnly
+                    placeholder="Год"
+                  />
+                </div>
+              </div>
+
+              {/* BBK / UDK */}
+              <div className={styles['fields-row']}>
+                <div className={styles['field-group']}>
+                  <label className={styles['field-label']}>ББК</label>
+                  <input
+                    className={styles['field-input']}
+                    value={form.bbk}
+                    readOnly
+                    placeholder="ББК"
+                  />
+                </div>
+                <div className={styles['field-group']}>
+                  <label className={styles['field-label']}>УДК</label>
+                  <input
+                    className={styles['field-input']}
+                    value={form.udk}
+                    readOnly
+                    placeholder="УДК"
+                  />
+                </div>
+              </div>
+
+              {/* Source */}
+              <div className={styles['field-group']}>
+                <label className={styles['field-label']}>Источник</label>
+                <input
+                  className={styles['field-input']}
+                  value={form.source}
+                  readOnly
+                  placeholder="Источник"
+                />
+              </div>
+
+              {/* Language */}
+              <div className={styles['field-group']}>
+                <label className={styles['field-label']}>Язык</label>
+                <input
+                  className={styles['field-input']}
+                  value={form.languageName}
+                  readOnly
+                  placeholder="Язык"
+                />
+              </div>
+
+              {/* Country */}
+              <div className={styles['field-group']}>
+                <label className={styles['field-label']}>Страна</label>
+                <input
+                  className={styles['field-input']}
+                  value={form.countryName}
+                  readOnly
+                  placeholder="Страна"
+                />
+              </div>
+
+              {/* Publisher */}
+              <div className={styles['field-group']}>
+                <label className={styles['field-label']}>Издательство</label>
+                <input
+                  className={styles['field-input']}
+                  value={form.publisherName}
+                  readOnly
+                  placeholder="Издательство"
+                />
+              </div>
+
+              {/* Flags */}
+              <div className={styles['fields-row']}>
+                <label className={styles['checkbox-label']}>
+                  <input
+                    type="checkbox"
+                    checked={form.isAvailable}
+                    readOnly
+                    onChange={() => {}}
+                  />
+                  Доступно
+                </label>
+                <label className={styles['checkbox-label']}>
+                  <input
+                    type="checkbox"
+                    checked={form.isReviewable}
+                    readOnly
+                    onChange={() => {}}
+                  />
+                  Рецензируется
+                </label>
+              </div>
+
+              {/* Persons – read-only */}
+              <PersonFilter
+                value={form.personFilters}
+                roles={roles}
+                onChange={() => {}}
+                initialPersons={initialPersons}
+                readOnly
               />
             </div>
           )}
@@ -946,15 +1100,11 @@ export const BookUnit: React.FC = () => {
   );
 };
 
-// ---------------------------------------------------------------------------
-// Small helper for view-mode rows
-// ---------------------------------------------------------------------------
-
-function MetaRow({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div className={styles['metadata-item']}>
-      <label>{label}:</label>
-      <span>{value ?? '—'}</span>
-    </div>
-  );
-}
+// function MetaRow({ label, value }: { label: string; value: React.ReactNode }) {
+//   return (
+//     <div className={styles['metadata-item']}>
+//       <label>{label}:</label>
+//       <span>{value ?? '—'}</span>
+//     </div>
+//   );
+// }
