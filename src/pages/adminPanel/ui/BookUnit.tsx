@@ -356,8 +356,13 @@ function CoverUpload({
   currentCoverPath?: string | null;
   onFileChange: (file: File | null) => void;
 }) {
-  const [preview, setPreview] = useState(currentCoverPath ?? null);
-
+  const [preview, setPreview] = useState(storageUrl(currentCoverPath));
+  console.log(
+    'Current cover path:',
+    currentCoverPath,
+    'Resolved URL:',
+    preview
+  );
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: { 'image/*': [] },
     maxFiles: 1,
@@ -877,7 +882,7 @@ export const BookUnit: React.FC = () => {
                     style={{ cursor: 'default' }}
                   >
                     <img
-                      src={book.coverUri}
+                      src={storageUrl(book.coverUri) ?? ''}
                       alt="Обложка"
                       className={styles['cover-preview']}
                     />
@@ -1108,3 +1113,10 @@ export const BookUnit: React.FC = () => {
 //     </div>
 //   );
 // }
+
+const storageUrl = (path: string | null | undefined): string | null => {
+  if (!path) return null;
+  if (path.startsWith('http')) return path; // уже полный URL
+  const base = import.meta.env.VITE_STORAGE_URL ?? '';
+  return `${base}/${path.replace(/^\//, '')}`;
+};
