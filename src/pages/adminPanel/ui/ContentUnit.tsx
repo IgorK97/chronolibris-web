@@ -7,7 +7,11 @@ import {
   useCreateContent,
   usePatchContent,
 } from '@/api/contents';
-import { useLanguages, useCountries, useFormats } from '@/api/references';
+import {
+  useLanguages,
+  useCountries,
+  // useFormats
+} from '@/api/references';
 import {
   usePersonRoles,
   usePersonSuggestions,
@@ -19,12 +23,33 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { ThemeSelector } from '../Themes/ThemeSelector';
 import { ContentTagsManager } from './ContentTagsManagement';
 import type { ThemeDto } from '@/types/types';
-import styles from './BookUnit.module.css'; // переиспользуем стили BookUnit
+import styles from './BookUnit.module.css';
 import { ArrowLeft, X } from 'lucide-react';
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
+const DOCUMENT_TYPES = [
+  { id: 1, name: 'Дневник', nature: 'Document' },
+  { id: 2, name: 'Письмо', nature: 'Document' },
+  { id: 3, name: 'Мемуары', nature: 'Document' },
+  { id: 4, name: 'Автобиография', nature: 'Document' },
+  { id: 5, name: 'Хроника', nature: 'Document' },
+  { id: 6, name: 'Летопись', nature: 'Document' },
+  { id: 7, name: 'Манифест', nature: 'Document' },
+  { id: 8, name: 'Речь', nature: 'Document' },
+  { id: 9, name: 'Указ', nature: 'Document' },
+  { id: 10, name: 'Рассказ', nature: 'Work' },
+  { id: 11, name: 'Роман', nature: 'Work' },
+  { id: 12, name: 'Философский трактат', nature: 'Work' },
+  { id: 13, name: 'Богословский трактат', nature: 'Work' },
+  { id: 14, name: 'Политический трактат', nature: 'Work' },
+  { id: 15, name: 'Биография', nature: 'Work' },
+  { id: 16, name: 'Путевые заметки', nature: 'Work' },
+  { id: 17, name: 'Сборник', nature: 'Work' },
+  { id: 18, name: 'Учебник', nature: 'Work' },
+  { id: 19, name: 'Историческое исследование', nature: 'Analysis' },
+  { id: 20, name: 'Монография', nature: 'Analysis' },
+  { id: 21, name: 'Научная статья', nature: 'Analysis' },
+  { id: 22, name: 'Неизвестно', nature: 'Unknown' },
+];
 
 interface SelectedPerson {
   id: number;
@@ -231,7 +256,7 @@ export const ContentForm: React.FC = () => {
   const { data: content, isLoading, error } = useContentById(id);
   const { data: languages = [] } = useLanguages();
   const { data: countries = [] } = useCountries();
-  const { data: contentTypes = [] } = useFormats();
+  const contentTypes = DOCUMENT_TYPES;
   const { data: roles = [] } = usePersonRoles();
 
   const createMutation = useCreateContent();
