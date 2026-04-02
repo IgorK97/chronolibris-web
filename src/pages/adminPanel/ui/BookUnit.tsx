@@ -30,7 +30,7 @@ import type {
 import { ContentSearchPopup } from './ContentSearchPopup';
 import { BookFileManagement } from './BookFileManagement';
 import styles from './BookUnit.module.css';
-import { ArrowLeft, X } from 'lucide-react';
+import { ArrowLeft, Book, X } from 'lucide-react';
 import { useStore } from '@/stores/globalStore';
 import { storageUrl } from '@/utils';
 
@@ -673,6 +673,7 @@ export const BookUnit: React.FC = () => {
           <ArrowLeft /> Назад к списку
         </button>
         <h2>{isNew ? 'Новая книга' : book?.title}</h2>
+        {!isNew && <Book onClick={() => navigate(`/book/${book!.id}`)} />}
         <div className={styles['header-actions']}>
           {!isNew && !isEditing && (
             <button

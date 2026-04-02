@@ -704,7 +704,7 @@ export const ContentForm: React.FC = () => {
                 >
                   {book.coverPath && (
                     <img
-                      src={storageUrl(book.coverPath)}
+                      src={storageUrl(book.coverPath) ?? ''}
                       alt={book.title}
                       style={{
                         width: '40px',
