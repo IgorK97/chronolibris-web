@@ -32,6 +32,7 @@ import { BookFileManagement } from './BookFileManagement';
 import styles from './BookUnit.module.css';
 import { ArrowLeft, X } from 'lucide-react';
 import { useStore } from '@/stores/globalStore';
+import { storageUrl } from '@/utils';
 
 interface SelectedPerson {
   id: number;
@@ -368,7 +369,7 @@ function CoverUpload({
     maxFiles: 1,
     onDrop: ([file]) => {
       onFileChange(file);
-      setPreview(URL.createObjectURL(file)); // проще чем FileReader
+      setPreview(URL.createObjectURL(file));
     },
   });
 
@@ -1113,10 +1114,3 @@ export const BookUnit: React.FC = () => {
 //     </div>
 //   );
 // }
-
-const storageUrl = (path: string | null | undefined): string | null => {
-  if (!path) return null;
-  if (path.startsWith('http')) return path; // уже полный URL
-  const base = import.meta.env.VITE_STORAGE_URL ?? '';
-  return `${base}/${path.replace(/^\//, '')}`;
-};

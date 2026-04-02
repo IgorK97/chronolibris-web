@@ -13,6 +13,7 @@ import {
   WandSparkles,
   X,
   Plus,
+  Cog,
   // XCircle,
   // ArrowUpCircle,
 } from 'lucide-react';
@@ -487,6 +488,15 @@ export const BookDetailsComponent = ({
               </div>,
               document.body
             )}
+          <button
+            className={styles['icon-button']}
+            onClick={() => {
+              navigate(`/books/${fullBookDetails.id}`);
+            }}
+          >
+            <Cog size={24} />
+            <span className={styles['button-label']}>{t('book.settings')}</span>
+          </button>
         </div>
       </header>
 

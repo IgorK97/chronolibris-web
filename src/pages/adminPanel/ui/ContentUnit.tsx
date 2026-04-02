@@ -6,6 +6,7 @@ import {
   useContentById,
   useCreateContent,
   usePatchContent,
+  useContentBooks,
 } from '@/api/contents';
 import {
   useLanguages,
@@ -25,6 +26,7 @@ import { ContentTagsManager } from './ContentTagsManagement';
 import type { ThemeDto } from '@/types/types';
 import styles from './BookUnit.module.css';
 import { ArrowLeft, X } from 'lucide-react';
+import { storageUrl } from '@/utils';
 
 const DOCUMENT_TYPES = [
   { id: 1, name: 'Дневник', nature: 'Document' },
@@ -258,6 +260,8 @@ export const ContentForm: React.FC = () => {
   const { data: countries = [] } = useCountries();
   const contentTypes = DOCUMENT_TYPES;
   const { data: roles = [] } = usePersonRoles();
+  const { data: associatedBooks = [], isLoading: isLoadingAssociatedBooks } =
+    useContentBooks(id);
 
   const createMutation = useCreateContent();
   const patchMutation = usePatchContent();
@@ -658,6 +662,72 @@ export const ContentForm: React.FC = () => {
         <div className={styles['contents-section']}>
           <h3>Управление тегами</h3>
           <ContentTagsManager contentId={id} />
+        </div>
+      )}
+      {!isNew && id && (
+        <div className={styles['contents-section']}>
+          <h3>Входит в состав книг</h3>
+          {isLoadingAssociatedBooks ? (
+            <div className={styles['loading']}>Загрузка списка книг...</div>
+          ) : associatedBooks.length > 0 ? (
+            <div
+              className={styles['books-list']}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+                marginTop: '12px',
+              }}
+            >
+              {associatedBooks.map((book) => (
+                <div
+                  key={book.id}
+                  className={styles['book-item']}
+                  style={{
+                    padding: '12px',
+                    border: '1px solid var(--color-border, #ddd)',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    transition: 'background-color 0.2s',
+                  }}
+                  onClick={() => navigate(`/books/${book.id}`)}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.backgroundColor =
+                      'var(--color-bg-secondary, #f9f9f9)')
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.backgroundColor = 'transparent')
+                  }
+                >
+                  {book.coverPath && (
+                    <img
+                      src={storageUrl(book.coverPath)}
+                      alt={book.title}
+                      style={{
+                        width: '40px',
+                        height: '60px',
+                        objectFit: 'cover',
+                        borderRadius: '4px',
+                      }}
+                    />
+                  )}
+                  <div>
+                    <div style={{ fontWeight: '500' }}>{book.title}</div>
+                    <div style={{ fontSize: '12px', color: '#666' }}>
+                      {book.year ? `${book.year} г.` : 'Год не указан'}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{ color: '#999', marginTop: '10px' }}>
+              Этот контент пока не привязан ни к одной книге.
+            </div>
+          )}
         </div>
       )}
     </div>

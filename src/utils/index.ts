@@ -26,3 +26,10 @@ export function formatDate(iso: string): string {
     year: 'numeric',
   });
 }
+
+export const storageUrl = (path: string | null | undefined): string | null => {
+  if (!path) return null;
+  if (path.startsWith('http')) return path; // уже полный URL
+  const base = import.meta.env.VITE_STORAGE_URL ?? '';
+  return `${base}/${path.replace(/^\//, '')}`;
+};
