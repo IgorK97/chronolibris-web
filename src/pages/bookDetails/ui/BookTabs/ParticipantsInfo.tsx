@@ -61,6 +61,11 @@ export const ParticipantsInfo = ({
           Источник данных: <em>{bookInfo.source ?? 'неизвестно'}</em>
         </p>
       </div>
+      <div className={styles['isbn']}>
+        <p>
+          ISBN: <em>{bookInfo.isbn ?? 'нет данных'}</em>
+        </p>
+      </div>
       <div className={styles['bbk-udk']}>
         <p>
           ББК: <em>{bookInfo.bbk ?? 'нет данных'}</em>
@@ -71,12 +76,12 @@ export const ParticipantsInfo = ({
       </div>
       <div className={styles['language']}>
         <p>
-          Язык: <em>{bookInfo.language ?? 'неизвестно'}</em>
+          Язык: <em>{bookInfo.language?.name ?? 'неизвестно'}</em>
         </p>
       </div>
       <div className={styles['country']}>
         <p>
-          Страна: <em>{bookInfo.country ?? 'неизвестно'}</em>
+          Страна: <em>{bookInfo.country?.name ?? 'неизвестно'}</em>
         </p>
       </div>
       <div className={styles['publication-year']}>

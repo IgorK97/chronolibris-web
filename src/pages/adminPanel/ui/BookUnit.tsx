@@ -3,13 +3,14 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  useBookById,
+  // useBookById,
   useBookContents,
   useUnlinkContentFromBook,
   useLinkContentToBook,
   useCreateBook,
   useUpdateBook,
   fileToBase64,
+  useBookDetails,
 } from '@/api/books';
 import { useLanguages, useCountries } from '@/api/references';
 import {
@@ -28,6 +29,8 @@ import type {
 import { ContentSearchPopup } from './ContentSearchPopup';
 import { BookFileManagement } from './BookFileManagement';
 import styles from './BookUnit.module.css';
+import { ArrowLeft } from 'lucide-react';
+import { useStore } from '@/stores/globalStore';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -394,9 +397,14 @@ export const BookUnit: React.FC = () => {
   const { bookId } = useParams<{ bookId: string }>();
   const navigate = useNavigate();
   const isNew = bookId === 'new';
+  const { user } = useStore();
   const id = bookId && !isNew ? parseInt(bookId, 10) : null;
 
-  const { data: book, isLoading, error } = useBookById(id);
+  const {
+    data: book,
+    isLoading,
+    error,
+  } = useBookDetails(id ?? 0, user?.userName ?? '');
   const { data: contents, refetch: refetchContents } = useBookContents(id);
   const unlinkMutation = useUnlinkContentFromBook();
   const linkMutation = useLinkContentToBook();
@@ -419,6 +427,7 @@ export const BookUnit: React.FC = () => {
   // When book loads, initialise view mode
   useEffect(() => {
     if (isNew) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMode('edit');
       setForm(emptyForm());
     }
@@ -426,6 +435,7 @@ export const BookUnit: React.FC = () => {
 
   useEffect(() => {
     if (book) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setForm({
         title: book.title ?? '',
         description: book.description ?? '',
@@ -436,12 +446,12 @@ export const BookUnit: React.FC = () => {
         year: book.year != null ? String(book.year) : '',
         isAvailable: book.isAvailable,
         isReviewable: book.isReviewable,
-        languageId: book.languageId ?? null,
-        languageName: book.languageName ?? '',
-        countryId: book.countryId ?? null,
-        countryName: book.countryName ?? '',
-        publisherId: book.publisherId ?? null,
-        publisherName: book.publisherName ?? '',
+        languageId: book.language?.id ?? null,
+        languageName: book.language?.name ?? '',
+        countryId: book.country?.id ?? null,
+        countryName: book.country?.name ?? '',
+        publisherId: book.publisher?.id ?? null,
+        publisherName: book.publisher?.name ?? '',
         coverFile: null,
         personFilters: [],
       });
@@ -453,75 +463,6 @@ export const BookUnit: React.FC = () => {
       setForm((prev) => ({ ...prev, [key]: value })),
     []
   );
-
-  // -------------------------------------------------------------------------
-  // Save
-  // -------------------------------------------------------------------------
-
-  // const handleSave = async () => {
-  //   if (!form.title.trim()) {
-  //     alert('Название обязательно');
-  //     return;
-  //   }
-
-  //   try {
-  //     if (isNew) {
-  //       if (!form.coverFile) {
-  //         alert('Выберите обложку');
-  //         return;
-  //       }
-  //       const payload: CreateBookRequest = {
-  //         title: form.title,
-  //         description: form.description,
-  //         isbn: form.isbn || null,
-  //         bbk: form.bbk || null,
-  //         udk: form.udk || null,
-  //         source: form.source || null,
-  //         year: form.year ? parseInt(form.year) : null,
-  //         isAvailable: form.isAvailable,
-  //         isReviewable: form.isReviewable,
-  //         languageId: form.languageId!,
-  //         countryId: form.countryId!,
-  //         publisherId: form.publisherId,
-  //         seriesId: null,
-  //         coverFile: form.coverFile,
-  //         personFilters: form.personFilters,
-  //       };
-  //       const newId = await createMutation.mutateAsync(payload);
-  //       navigate(`/books/${newId}`);
-  //     } else {
-  //       const payload: UpdateBookRequest = {
-  //         id: id!,
-  //         title: form.title,
-  //         description: form.description,
-  //         isbn: form.isbn || null,
-  //         isbnProvided: true,
-  //         bbk: form.bbk || null,
-  //         bbkProvided: true,
-  //         udk: form.udk || null,
-  //         udkProvided: true,
-  //         source: form.source || null,
-  //         sourceProvided: true,
-  //         year: form.year ? parseInt(form.year) : null,
-  //         yearProvided: true,
-  //         isAvailable: form.isAvailable,
-  //         isReviewable: form.isReviewable,
-  //         languageId: form.languageId,
-  //         countryId: form.countryId,
-  //         publisherId: form.publisherId,
-  //         publisherIdProvided: true,
-  //         seriesId: null,
-  //         seriesIdProvided: true,
-  //         coverFile: form.coverFile,
-  //         personFilters: form.personFilters,
-  //       };
-  //       await updateMutation.mutateAsync({ id: id!, data: payload });
-  //       setMode('view');
-  //     }
-  //   } catch (err: any) {
-  //     alert(err.response?.data?.message || 'Ошибка сохранения');
-  //   }
-  // };
 
   const handleSave = async () => {
     if (!form.title.trim()) {
@@ -554,7 +495,7 @@ export const BookUnit: React.FC = () => {
           seriesId: null,
           coverBase64,
           coverContentType: form.coverFile.type,
-          coverFileName: form.coverFile.name,
+          // coverFileName: form.coverFile.name,
           personFilters: form.personFilters,
         };
 
@@ -590,7 +531,7 @@ export const BookUnit: React.FC = () => {
           seriesIdProvided: true,
           coverBase64,
           coverContentType: form.coverFile?.type ?? null,
-          coverFileName: form.coverFile?.name ?? null,
+          // coverFileName: form.coverFile?.name ?? null,
           personFilters: form.personFilters,
         };
 
@@ -618,12 +559,12 @@ export const BookUnit: React.FC = () => {
           year: book.year != null ? String(book.year) : '',
           isAvailable: book.isAvailable,
           isReviewable: book.isReviewable,
-          languageId: book.languageId ?? null,
-          languageName: book.languageName ?? '',
-          countryId: book.countryId ?? null,
-          countryName: book.countryName ?? '',
-          publisherId: book.publisherId ?? null,
-          publisherName: book.publisherName ?? '',
+          languageId: book.language?.id ?? null,
+          languageName: book.language?.name ?? '',
+          countryId: book.country?.id ?? null,
+          countryName: book.country?.name ?? '',
+          publisherId: book.publisher?.id ?? null,
+          publisherName: book.publisher?.name ?? '',
           coverFile: null,
           personFilters: [],
         });
@@ -691,7 +632,7 @@ export const BookUnit: React.FC = () => {
           onClick={() => navigate('/books')}
           className={styles['btn btn-secondary']}
         >
-          ← Назад к списку
+          <ArrowLeft /> Назад к списку
         </button>
         <h2>{isNew ? 'Новая книга' : book?.title}</h2>
         <div className={styles['header-actions']}>
@@ -730,11 +671,10 @@ export const BookUnit: React.FC = () => {
           <h3>Основная информация</h3>
 
           {isEditing ? (
-            /* ── EDIT FORM ─────────────────────────────────────────────── */
             <div className={styles['edit-form']}>
               {/* Cover */}
               <CoverUpload
-                currentCoverPath={book?.coverPath}
+                currentCoverPath={book?.coverUri ?? null}
                 onFileChange={(file) => set('coverFile', file)}
               />
 
@@ -894,15 +834,14 @@ export const BookUnit: React.FC = () => {
               />
             </div>
           ) : (
-            /* ── VIEW MODE ─────────────────────────────────────────────── */
             <div className={styles['metadata-grid']}>
-              {book?.coverPath && (
+              {book?.coverUri && (
                 <div
                   className={styles['metadata-item']}
                   style={{ gridColumn: '1 / -1' }}
                 >
                   <img
-                    src={book.coverPath}
+                    src={book.coverUri}
                     alt="Обложка"
                     style={{
                       maxHeight: 200,
@@ -920,11 +859,10 @@ export const BookUnit: React.FC = () => {
               <MetaRow label="УДК" value={(book as any)?.udk} />
               <MetaRow label="Источник" value={(book as any)?.source} />
               <MetaRow label="Год" value={book?.year} />
-              <MetaRow label="Язык" value={book?.languageName} />
-              <MetaRow label="Страна" value={book?.countryName} />
-              <MetaRow label="Издательство" value={book?.publisherName} />
-              <MetaRow label="Серия" value={book?.seriesName} />
-              <MetaRow label="Авторы" value={book?.authors.join(', ')} />
+              <MetaRow label="Язык" value={book?.language?.name} />
+              <MetaRow label="Страна" value={book?.country?.name} />
+              <MetaRow label="Издательство" value={book?.publisher?.name} />
+              {/* <MetaRow label="Авторы" value={book?.authors.join(', ')} /> */}
               <MetaRow
                 label="Темы"
                 value={book?.themes.map((t) => t.name).join(', ')}
@@ -955,7 +893,7 @@ export const BookUnit: React.FC = () => {
           <table className={styles['contents-table']}>
             <thead>
               <tr>
-                <th>Порядок</th>
+                <th>Id</th>
                 <th>Название</th>
                 <th>Тип</th>
                 <th>Авторы</th>
@@ -964,9 +902,10 @@ export const BookUnit: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {contents?.map((content, index) => (
+              {contents?.map((content) => (
                 <tr key={content.id}>
-                  <td>{index + 1}</td>
+                  {/* <td>{index}</td> */}
+                  <td>{content.id}</td>
                   <td>{content.title}</td>
                   <td>{content.contentType}</td>
                   <td>{content.authors.join(', ')}</td>

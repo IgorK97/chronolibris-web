@@ -326,7 +326,9 @@ export interface CreateBookRequest {
   udk: string | null;
   source: string | null;
   // filePath?: string | null;
-  coverFile: File;
+  // coverFile: File;
+  coverBase64: string;
+  coverContentType: string;
   isAvailable: boolean;
   isReviewable: boolean;
   publisherId: number | null;
@@ -351,7 +353,9 @@ export interface UpdateBookRequest {
   source: string | null;
   sourceProvided: boolean;
   // filePath?: string | null;
-  coverFile: File | null;
+  // coverFile: File | null;
+  coverBase64: string | null;
+  coverContentType: string | null;
   isAvailable: boolean;
   isReviewable: boolean;
   publisherId: number | null;
@@ -360,6 +364,21 @@ export interface UpdateBookRequest {
   seriesIdProvided: boolean;
   personFilters?: PersonRoleFilter[];
 }
+
+export interface LanguageDetails {
+  id: number;
+  name: string;
+}
+
+export interface CountryDetails {
+  id: number;
+  name: string;
+}
+
+// export interface PublisherDetails {
+//   id: number;
+//   name: string;
+// }
 
 export interface BookDetails {
   id: number;
@@ -376,8 +395,10 @@ export interface BookDetails {
   isRead: boolean;
   isReviewable: boolean;
   publisher: PublisherDetails | null;
-  country: string | null;
-  language: string;
+  // country: string | null;
+  country: CountryDetails | null;
+  // language: string;
+  language: LanguageDetails | null;
   participants: BookPersonGroupDetails[];
   themes: ThemeDeatils[];
   userRating: number;

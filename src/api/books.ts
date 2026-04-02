@@ -346,7 +346,7 @@
 import {
   useQuery,
   useInfiniteQuery,
-  type UseQueryOptions,
+  // type UseQueryOptions,
   useQueryClient,
   useMutation,
 } from '@tanstack/react-query';
@@ -401,7 +401,7 @@ export interface CreateBookRequest {
   /** Base64-строка файла обложки (с префиксом data URI или без). */
   coverBase64: string;
   coverContentType: string;
-  coverFileName: string;
+  // coverFileName: string;
   isAvailable: boolean;
   isReviewable: boolean;
   publisherId?: number | null;
@@ -465,8 +465,8 @@ export function fileToBase64(file: File): Promise<string> {
 // ---------------------------------------------------------------------------
 
 export const booksApi = {
-  getMetadata: (bookId: number, userId: number) =>
-    apiClient.get<BookDetails>(`/Books/${bookId}/info?userId=${userId}`),
+  getMetadata: (bookId: number) =>
+    apiClient.get<BookDetails>(`/Books/${bookId}/info`),
 
   getReadBooks: (params: { userId: number; lastId?: number; limit: number }) =>
     apiClient.get<PagedResult<BookListItem>>(
@@ -514,20 +514,21 @@ export const booksApi = {
 // Hooks
 // ---------------------------------------------------------------------------
 
-type UseBookDetailsOptions = Omit<
-  UseQueryOptions<BookDetails, Error>,
-  'queryKey' | 'queryFn'
->;
+// type UseBookDetailsOptions = Omit<
+//   UseQueryOptions<BookDetails, Error>,
+//   'queryKey' | 'queryFn'
+// >;
 
 export const useBookDetails = (
   bookId: number,
-  userId: number,
-  options?: UseBookDetailsOptions
+  userName: string
+  // options?: UseBookDetailsOptions
 ) =>
   useQuery({
-    queryKey: ['books', bookId, userId],
-    queryFn: () => booksApi.getMetadata(bookId, userId),
-    ...options,
+    queryKey: ['books', bookId, userName],
+    queryFn: () => booksApi.getMetadata(bookId),
+    enabled: bookId > 0,
+    // ...options,
   });
 
 export const useInfiniteReadBooks = (userId: number) =>
