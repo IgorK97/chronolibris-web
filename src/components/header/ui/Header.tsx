@@ -5,8 +5,9 @@ import { useStore } from '@/stores/globalStore';
 // import { usersApi } from '@/api/user';
 import styles from './Header.module.css';
 import { useEffect, useRef, useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search, UserStar } from 'lucide-react';
 import { CatalogPanel } from '@/pages/search/ui/CatalogPanel';
+import { AdminSidebar } from '@/components/adminSideBar/AdminSideBar';
 
 const FILTER_PARAMS = [
   'themeId',
@@ -20,6 +21,7 @@ export default function Header() {
   const { user } = useStore();
   const navigate = useNavigate();
   const location = useLocation();
+  const [adminOpen, setAdminOpen] = useState(false);
   const searchParams = new URLSearchParams(location.search);
   const currentQuery = new URLSearchParams(location.search).get('q') ?? '';
   const [inputValue, setInputValue] = useState(currentQuery);
@@ -89,6 +91,11 @@ export default function Header() {
           <div className={styles['right-section']}>
             {user ? (
               <>
+                <UserStar
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => setAdminOpen(true)}
+                  aria-label="Открыть панель администратора"
+                />
                 <Link to="/mybooks" className={styles['navigation-menu-link']}>
                   Мои книги
                 </Link>
@@ -133,6 +140,7 @@ export default function Header() {
         isOpen={catalogOpen}
         onClose={() => setCatalogOpen(false)}
       />
+      <AdminSidebar isOpen={adminOpen} onClose={() => setAdminOpen(false)} />
     </>
     // <NavigationMenu.Root className={styles['navigation-menu-root']}>
     //   <NavigationMenu.List className={styles['navigation-menu-list']}>
