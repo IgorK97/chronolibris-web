@@ -7,6 +7,7 @@ type TabId = 'info' | 'discussion' | 'reviews';
 
 interface BookTabsProps {
   infoContent?: React.ReactNode;
+  isReviewable: boolean;
   canReview: boolean;
   discussionCount?: number;
   reviewsCount?: number;
@@ -22,6 +23,7 @@ interface BookTabsProps {
 export function BookTabs({
   infoContent,
   canReview,
+  isReviewable,
   discussionCount,
   reviewsCount,
   bookId,
@@ -53,24 +55,26 @@ export function BookTabs({
   return (
     <div className={styles['tabs-root']}>
       <div className={styles['tab-bar']} role="tablist">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            role="tab"
-            aria-selected={activeTab === tab.id}
-            disabled={tab.disabled}
-            className={`${styles['tab-btn']} ${activeTab === tab.id ? styles['tab-btn--active'] : ''} ${tab.disabled ? styles['tab-btn--disabled'] : ''}`}
-            onClick={() => !tab.disabled && setActiveTab(tab.id)}
-          >
-            {tab.label}
-            {tab.count !== undefined && (
-              <span className={styles['tab-count']}>{tab.count}</span>
-            )}
-          </button>
-        ))}
+        {tabs.map((tab) => {
+          if (isReviewable || (!isReviewable && tab.id != 'reviews'))
+            return (
+              <button
+                key={tab.id}
+                role="tab"
+                aria-selected={activeTab === tab.id}
+                disabled={tab.disabled}
+                className={`${styles['tab-btn']} ${activeTab === tab.id ? styles['tab-btn--active'] : ''} ${tab.disabled ? styles['tab-btn--disabled'] : ''}`}
+                onClick={() => !tab.disabled && setActiveTab(tab.id)}
+              >
+                {tab.label}
+                {tab.count !== undefined && (
+                  <span className={styles['tab-count']}>{tab.count}</span>
+                )}
+              </button>
+            );
+        })}
       </div>
 
-      {/* Tab panels */}
       {activeTab === 'info' && (
         <div className={styles['tab-content']}>
           {infoContent ?? (

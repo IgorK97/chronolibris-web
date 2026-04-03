@@ -676,7 +676,8 @@ export const BookDetailsComponent = ({
               onNavigateToReviews={onNavigateToReviews}
             /> */}
             <BookTabs
-              canReview={fullBookDetails.isReviewable} // your actual condition
+              canReview={fullBookDetails.isReviewable}
+              isReviewable={fullBookDetails.isReviewable}
               discussionCount={fullBookDetails.commentsCount ?? 10}
               reviewsCount={fullBookDetails.reviewsCount}
               bookId={fullBookDetails.id}
