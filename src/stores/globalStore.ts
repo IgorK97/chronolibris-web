@@ -46,38 +46,3 @@ export const useStore = create<AppState>()(
     }
   )
 );
-
-// interface AppState {
-//   currentBook: BookListItem | null;
-//   user: UserProfile | null;
-//   shelves: ShelfDetails[] | null;
-//   setCurrentBook: (book: BookListItem | null) => void;
-//   setUser: (user: UserProfile | null) => void;
-//   setShelves: (shelves: ShelfDetails[] | null) => void;
-//   clearStore: () => void;
-// }
-
-// export const useStore = create<AppState>()(
-//   persist(
-//     (set) => ({
-//       currentBook: null,
-//       user: null,
-//       shelves: null,
-
-//       setCurrentBook: (book) => set({ currentBook: book }),
-
-//       setUser: (user) => set({ user }),
-
-//       setShelves: (shelves) => set({ shelves }),
-
-//       clearStore: () => {
-//         set({ currentBook: null, user: null, shelves: null });
-//         localStorage.removeItem("app-storage"); // Полная очистка
-//       },
-//     }),
-//     {
-//       name: "app-storage", // Ключ в localStorage
-//       storage: createJSONStorage(() => localStorage), // В вебе используем стандартный localStorage
-//     },
-//   ),
-// );

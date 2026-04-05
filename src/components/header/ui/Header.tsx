@@ -5,7 +5,7 @@ import { useStore } from '@/stores/globalStore';
 // import { usersApi } from '@/api/user';
 import styles from './Header.module.css';
 import { useEffect, useRef, useState } from 'react';
-import { Search, UserStar } from 'lucide-react';
+import { Search, ShieldCheck, UserStar } from 'lucide-react';
 import { CatalogPanel } from '@/pages/search/ui/CatalogPanel';
 import { AdminSidebar } from '@/components/adminSideBar/AdminSideBar';
 
@@ -91,14 +91,27 @@ export default function Header() {
           <div className={styles['right-section']}>
             {user ? (
               <>
-                <UserStar
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => setAdminOpen(true)}
-                  aria-label="Открыть панель администратора"
-                />
-                <Link to="/mybooks" className={styles['navigation-menu-link']}>
-                  Мои книги
-                </Link>
+                {user.role == 'admin' && (
+                  <UserStar
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => setAdminOpen(true)}
+                    aria-label="Открыть панель администратора"
+                  />
+                )}
+                {user.role == 'moderator' && (
+                  <ShieldCheck
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => navigate('/moderation')}
+                  />
+                )}
+                {user.role == 'reader' && (
+                  <Link
+                    to="/mybooks"
+                    className={styles['navigation-menu-link']}
+                  >
+                    Мои книги
+                  </Link>
+                )}
                 <Link to="/profile" className={styles['profile-icon']}>
                   {user.email?.charAt(0).toUpperCase() || 'U'}
                 </Link>

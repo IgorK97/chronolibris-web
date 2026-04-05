@@ -314,196 +314,220 @@ export const BookDetailsComponent = ({
           <ArrowLeft size={24} />
         </button>
 
-        <div className={styles['header-icons']}>
-          <button
-            className={styles['icon-button']}
-            onClick={() => {
-              toggleShelfAction(READ_SHELF_ID, !!fullBookDetails.isRead);
-            }}
-          >
-            <Bookmark
-              size={24}
-              color={fullBookDetails.isRead ? favColor : '#000'}
-              fill={fullBookDetails.isRead ? favColor : 'none'}
-            />
-            <span className={styles['button-label']}>
-              {fullBookDetails.isRead ? t('book.read_done') : t('book.to_read')}
-            </span>
-          </button>
-
-          <button
-            className={styles['icon-button']}
-            onClick={() =>
-              toggleShelfAction(
-                FAVORITES_SHELF_ID,
-                !!fullBookDetails.isFavorite
-              )
-            }
-          >
-            <Heart
-              size={24}
-              color={fullBookDetails.isFavorite ? favColor : '#000'}
-              fill={fullBookDetails.isFavorite ? fillFavColor : fillUnfavColor}
-            />
-            <span className={styles['button-label']}>
-              {fullBookDetails.isFavorite
-                ? t('book.in_favorites')
-                : t('book.to_favorites')}
-            </span>
-          </button>
-          <button
-            className={styles['icon-button']}
-            onClick={() => setIsShelfPanelOpen(true)}
-          >
-            <ListPlus size={24} />
-            <span className={styles['button-label']}>
-              {t('book.add_to_collection')}
-            </span>
-          </button>
-          {isShelfPanelOpen && (
-            <div className={styles['shelf-panel']}>
-              <button
-                className={styles['shelf-panel-close']}
-                onClick={() => {
-                  setIsShelfPanelOpen(false);
-                  setIsCreating(false);
-                  setNewShelfName('');
-                }}
-              >
-                <X />
-              </button>
-
-              <ul className={styles['shelf-list']}>
-                {shelves?.map((shelf) => {
-                  const isOnShelf = seekedShelves?.includes(shelf.id);
-                  return (
-                    <li key={shelf.id} className={styles['shelf-item']}>
-                      <span className={styles['shelf-name']}>{shelf.name}</span>
-                      <button
-                        className={styles['shelf-toggle']}
-                        onClick={() => handleToggleShelf(shelf)}
-                      >
-                        {isOnShelf ? (
-                          <SquareCheckBig size={24} />
-                        ) : (
-                          <Square size={24} />
-                        )}
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-
-              {isCreating ? (
-                <div className={styles['shelf-create-row']}>
-                  <input
-                    className={styles['shelf-create-row']}
-                    value={newShelfName}
-                    onChange={(e) => setNewShelfName(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleCreateShelf()}
-                    placeholder="Название новой полки"
-                    autoFocus
-                  />
-                  <button
-                    className={styles['shelf-confirm']}
-                    onClick={handleCreateShelf}
-                  >
-                    <WandSparkles size={20} />
-                  </button>
-                  <button
-                    className={styles['shelf-cancel']}
-                    onClick={() => {
-                      setIsCreating(false);
-                      setNewShelfName('');
-                    }}
-                  >
-                    <X />
-                  </button>
-                </div>
-              ) : (
+        {user && (
+          <div className={styles['header-icons']}>
+            {user.role == 'reader' && (
+              <div style={{ display: 'flex', flexDirection: 'row' }}>
                 <button
-                  className={styles['shelf-create-btn']}
-                  onClick={() => setIsCreating(true)}
+                  className={styles['icon-button']}
+                  onClick={() => {
+                    toggleShelfAction(READ_SHELF_ID, !!fullBookDetails.isRead);
+                  }}
                 >
-                  <Plus /> {t('book.create_new_collection')}
+                  <Bookmark
+                    size={24}
+                    color={fullBookDetails.isRead ? favColor : '#000'}
+                    fill={fullBookDetails.isRead ? favColor : 'none'}
+                  />
+                  <span className={styles['button-label']}>
+                    {fullBookDetails.isRead
+                      ? t('book.read_done')
+                      : t('book.to_read')}
+                  </span>
                 </button>
-              )}
-            </div>
-          )}
-          {/* <div className={styles['download-dropdown']}> */}
-          <button
-            className={styles['icon-button']}
-            onClick={() => setIsDownloadPanelOpen((prev) => !prev)}
-          >
-            <Download size={24} />
-            <span className={styles['button-label']}>{t('book.download')}</span>
-          </button>
-          {isDownloadPanelOpen &&
-            bookFiles &&
-            bookFiles.length > 0 &&
-            createPortal(
-              <div
-                className={styles['panel-overlay']}
-                onClick={() => setIsDownloadPanelOpen(false)}
-              >
-                <div
-                  className={styles['download-panel']}
-                  onClick={(e) => e.stopPropagation()}
+
+                <button
+                  className={styles['icon-button']}
+                  onClick={() =>
+                    toggleShelfAction(
+                      FAVORITES_SHELF_ID,
+                      !!fullBookDetails.isFavorite
+                    )
+                  }
                 >
-                  <div className={styles['download-panel-header']}>
-                    <span className={styles['download-panel-title']}>
-                      {t('book.download')}
-                    </span>
+                  <Heart
+                    size={24}
+                    color={fullBookDetails.isFavorite ? favColor : '#000'}
+                    fill={
+                      fullBookDetails.isFavorite ? fillFavColor : fillUnfavColor
+                    }
+                  />
+                  <span className={styles['button-label']}>
+                    {fullBookDetails.isFavorite
+                      ? t('book.in_favorites')
+                      : t('book.to_favorites')}
+                  </span>
+                </button>
+                <button
+                  className={styles['icon-button']}
+                  onClick={() => setIsShelfPanelOpen(true)}
+                >
+                  <ListPlus size={24} />
+                  <span className={styles['button-label']}>
+                    {t('book.add_to_collection')}
+                  </span>
+                </button>
+              </div>
+            )}
+            {isShelfPanelOpen && (
+              <div className={styles['shelf-panel']}>
+                <button
+                  className={styles['shelf-panel-close']}
+                  onClick={() => {
+                    setIsShelfPanelOpen(false);
+                    setIsCreating(false);
+                    setNewShelfName('');
+                  }}
+                >
+                  <X />
+                </button>
+
+                <ul className={styles['shelf-list']}>
+                  {shelves?.map((shelf) => {
+                    const isOnShelf = seekedShelves?.includes(shelf.id);
+                    return (
+                      <li key={shelf.id} className={styles['shelf-item']}>
+                        <span className={styles['shelf-name']}>
+                          {shelf.name}
+                        </span>
+                        <button
+                          className={styles['shelf-toggle']}
+                          onClick={() => handleToggleShelf(shelf)}
+                        >
+                          {isOnShelf ? (
+                            <SquareCheckBig size={24} />
+                          ) : (
+                            <Square size={24} />
+                          )}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+
+                {isCreating ? (
+                  <div className={styles['shelf-create-row']}>
+                    <input
+                      className={styles['shelf-create-row']}
+                      value={newShelfName}
+                      onChange={(e) => setNewShelfName(e.target.value)}
+                      onKeyDown={(e) =>
+                        e.key === 'Enter' && handleCreateShelf()
+                      }
+                      placeholder="Название новой полки"
+                      autoFocus
+                    />
                     <button
-                      className={styles['shelf-panel-close']}
-                      onClick={() => setIsDownloadPanelOpen(false)}
+                      className={styles['shelf-confirm']}
+                      onClick={handleCreateShelf}
+                    >
+                      <WandSparkles size={20} />
+                    </button>
+                    <button
+                      className={styles['shelf-cancel']}
+                      onClick={() => {
+                        setIsCreating(false);
+                        setNewShelfName('');
+                      }}
                     >
                       <X />
                     </button>
                   </div>
-
-                  {!bookFiles || bookFiles.length === 0 ? (
-                    <p className={styles['download-panel-empty']}>
-                      Файлы недоступны
-                    </p>
-                  ) : (
-                    <ul className={styles['download-file-list']}>
-                      {bookFiles.map((file) => (
-                        <li
-                          key={file.id}
-                          className={styles['download-file-item']}
-                          onClick={() => handleDownload(file.id, file.formatId)}
-                        >
-                          <span className={styles['download-file-format']}>
-                            {FORMAT_EXTENSIONS[
-                              (file.formatId ?? 1) - 1
-                            ]?.toUpperCase() ?? ''}
-                          </span>
-                          <span className={styles['download-file-size']}>
-                            {formatFileSize(file.fileSizeBytes)}
-                          </span>
-                          {isDownloading && <Circles />}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                  {downloadError && ( //Why () is necessary?
-                    <p className={styles['download-error']}>{downloadError}</p>
-                  )}
-                </div>
-              </div>,
-              document.body
+                ) : (
+                  <button
+                    className={styles['shelf-create-btn']}
+                    onClick={() => setIsCreating(true)}
+                  >
+                    <Plus /> {t('book.create_new_collection')}
+                  </button>
+                )}
+              </div>
             )}
-          <button
-            className={styles['icon-button']}
-            onClick={() => {
-              navigate(`/books/${fullBookDetails.id}`);
-            }}
-          >
-            <Cog size={24} />
-            <span className={styles['button-label']}>{t('book.settings')}</span>
-          </button>
-        </div>
+            {/* <div className={styles['download-dropdown']}> */}
+            <button
+              className={styles['icon-button']}
+              onClick={() => setIsDownloadPanelOpen((prev) => !prev)}
+            >
+              <Download size={24} />
+              <span className={styles['button-label']}>
+                {t('book.download')}
+              </span>
+            </button>
+            {isDownloadPanelOpen &&
+              bookFiles &&
+              bookFiles.length > 0 &&
+              createPortal(
+                <div
+                  className={styles['panel-overlay']}
+                  onClick={() => setIsDownloadPanelOpen(false)}
+                >
+                  <div
+                    className={styles['download-panel']}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className={styles['download-panel-header']}>
+                      <span className={styles['download-panel-title']}>
+                        {t('book.download')}
+                      </span>
+                      <button
+                        className={styles['shelf-panel-close']}
+                        onClick={() => setIsDownloadPanelOpen(false)}
+                      >
+                        <X />
+                      </button>
+                    </div>
+
+                    {!bookFiles || bookFiles.length === 0 ? (
+                      <p className={styles['download-panel-empty']}>
+                        Файлы недоступны
+                      </p>
+                    ) : (
+                      <ul className={styles['download-file-list']}>
+                        {bookFiles.map((file) => (
+                          <li
+                            key={file.id}
+                            className={styles['download-file-item']}
+                            onClick={() =>
+                              handleDownload(file.id, file.formatId)
+                            }
+                          >
+                            <span className={styles['download-file-format']}>
+                              {FORMAT_EXTENSIONS[
+                                (file.formatId ?? 1) - 1
+                              ]?.toUpperCase() ?? ''}
+                            </span>
+                            <span className={styles['download-file-size']}>
+                              {formatFileSize(file.fileSizeBytes)}
+                            </span>
+                            {isDownloading && <Circles />}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {downloadError && ( //Why () is necessary?
+                      <p className={styles['download-error']}>
+                        {downloadError}
+                      </p>
+                    )}
+                  </div>
+                </div>,
+                document.body
+              )}
+            {user.role == 'admin' && (
+              <button
+                className={styles['icon-button']}
+                onClick={() => {
+                  navigate(`/books/${fullBookDetails.id}`);
+                }}
+              >
+                <Cog size={24} />
+                <span className={styles['button-label']}>
+                  {t('book.settings')}
+                </span>
+              </button>
+            )}
+          </div>
+        )}
       </header>
 
       <div className={styles['scroll-container']}>
@@ -603,7 +627,6 @@ export const BookDetailsComponent = ({
                                     await deleteReview.mutateAsync(
                                       userReview.id
                                     );
-                                    // Закрываем попап после удаления, если нужно
                                     setIsRatingPopupOpen(false);
                                   }
                                 }}
@@ -706,13 +729,15 @@ export const BookDetailsComponent = ({
               }
             />
           </div>
-          <button
-            className={styles['read-button']}
-            disabled={!defaultBookFileId}
-            onClick={() => onReadClick(defaultBookFileId)}
-          >
-            {defaultBookFileId ? t('book.read') : t('book.no_files_available')}
-          </button>
+          {user && (
+            <button
+              className={styles['read-button']}
+              disabled={!defaultBookFileId}
+              onClick={() => onReadClick(defaultBookFileId)}
+            >
+              {defaultBookFileId ? t('book.read') : t('book.no_read_available')}
+            </button>
+          )}
         </div>
       </div>
       {isReportOpen && (

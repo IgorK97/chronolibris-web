@@ -105,7 +105,10 @@
     "change_rating": "Изменить оценку",
     "confirm_delete_review": "Вы действительно хотите удалить оценку и отзыв?",
     "deleting": "Удаление",
-    "delete_rating_and_review": "Удалить оценку и отзыв"
+    "delete_rating_and_review": "Удалить оценку и отзыв",
+    "no_files_available": "Файлы книги пока недоступны для скачивания",
+    "no_read_available": "Чтение пока недоступно",
+    "settings": "Изменить"
   },
   "not_found": {
     "title": "404 - Страница не найдена",

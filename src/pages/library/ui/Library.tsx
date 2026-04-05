@@ -108,12 +108,12 @@ export const Library = ({
     onNavigateToBook(book.id);
   };
 
-  if (!user)
-    return (
-      <div className={styles['error-wrapper']}>
-        Пожалуйста, войдите в систему
-      </div>
-    );
+  // if (!user)
+  //   return (
+  //     <div className={styles['error-wrapper']}>
+  //       Пожалуйста, войдите в систему
+  //     </div>
+  //   );
 
   if (selectionsIsLoading)
     return <div className={styles['error-wrapper']}>Загрузка подборок...</div>;
@@ -126,7 +126,7 @@ export const Library = ({
             <SelectionSection
               id={section.id}
               title={section.name}
-              userId={user.userId}
+              userId={user?.userId ?? 0}
               onNavigateToBook={navigateToBookHandler}
               onNavigateToList={onNavigateToList}
             />

@@ -1,4 +1,7 @@
-import { BookCard } from "./books";
-import { ReviewCard } from "./reviews";
+import { BookCard } from './books';
+// import { ReviewCard } from "./reviews";
 
-export { BookCard, ReviewCard };
+export {
+  BookCard,
+  // ReviewCard
+};

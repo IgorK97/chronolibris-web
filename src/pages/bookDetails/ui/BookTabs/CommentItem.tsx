@@ -127,7 +127,7 @@ export function CommentItem({
     userVote: 'like' | 'dislike' | null;
   });
   const handleVote = async (type: 'like' | 'dislike') => {
-    if (!isAuth) return; // guard: must be authenticated to vote
+    if (!isAuth) return;
     const score = type === 'like' ? 1 : -1;
 
     // Optimistic UI update
@@ -211,12 +211,14 @@ export function CommentItem({
               onClick={() => handleVote('dislike')}
             />
           </div>
-          <button
-            className={styles['reply-btn']}
-            onClick={() => setIsReplying(!isReplying)}
-          >
-            Ответить
-          </button>
+          {user?.role == 'reader' && (
+            <button
+              className={styles['reply-btn']}
+              onClick={() => setIsReplying(!isReplying)}
+            >
+              Ответить
+            </button>
+          )}
         </div>
 
         {isReplying && (
@@ -284,7 +286,7 @@ export function CommentItem({
           ))}
           {hasNextPage && (
             <button
-              className={styles['load-more-replies']} // Добавьте стиль в CSS по аналогии с load-more
+              className={styles['load-more-replies']}
               onClick={() => fetchNextPage()}
               disabled={isFetchingNextPage}
               style={{

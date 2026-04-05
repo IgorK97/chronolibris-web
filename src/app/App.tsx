@@ -191,10 +191,18 @@ export default function App() {
           <Route path="*" element={<Navigate to="/library" />} />
         </Route>
 
-        {/* Читательский интерфейс, отдельные страницы для чтения книг */}
+        {/* Отдельный макет для читалки */}
         <Route element={<ReaderLayout />}>
           <Route
-            element={<ProtectedRoute allowedRoles={[USER_ROLES.READER]} />}
+            element={
+              <ProtectedRoute
+                allowedRoles={[
+                  USER_ROLES.READER,
+                  USER_ROLES.ADMIN,
+                  USER_ROLES.MODERATOR,
+                ]}
+              />
+            }
           >
             <Route path="reader/:bookFileId" element={<ReaderPage />} />
           </Route>

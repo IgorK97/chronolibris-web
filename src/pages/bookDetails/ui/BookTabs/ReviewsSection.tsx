@@ -237,8 +237,6 @@ function ReviewItem({
   );
 }
 
-// ─── Reviews section ──────────────────────────────────────────────────────────
-
 type SortMode = 'popular' | 'recent';
 
 interface ReviewsSectionProps {
@@ -308,7 +306,7 @@ export function ReviewsSection({
   } = useInfiniteReviews(bookId, isAuth);
 
   const allReviews: ReviewDetails[] = data?.pages.flatMap((p) => p.items) ?? [];
-  const { user } = useStore(); // Достаем пользователя здесь
+  const { user } = useStore();
   const createReview = useCreateReview(bookId);
   const updateReview = useUpdateReview(bookId);
   const deleteReview = useDeleteReview(bookId);
@@ -386,19 +384,18 @@ export function ReviewsSection({
 
   return (
     <div className={styles['tab-content']}>
-      {/* Баннер модерации: показывается всегда, пока статус Pending */}
-      {isPending && (
+      {/* {isPending && (
         <div
           className={`${styles['submit-banner']} ${styles['submit-banner-pending']}`}
         >
-          ✓ Ваш отзыв находится на модерации и будет опубликован после проверки.
+          Ваш отзыв находится на модерации и будет опубликован после проверки.
         </div>
-      )}
+      )} */}
       <SubmitBanner
         status={submitStatus}
         onDismiss={() => setSubmitStatus(null)}
       />
-      {canReview ? (
+      {canReview && user?.role == 'reader' && (
         <ComposeBox
           placeholder="Поделитесь своим впечатлением о книге..."
           onSubmit={handleSubmit}
@@ -413,12 +410,12 @@ export function ReviewsSection({
             disabled={isMutating}
           />
         </ComposeBox>
-      ) : (
+      )}
+      {!canReview && (
         <div className={styles['reviews-locked']}>
           Рецензии для этой книги недоступны
         </div>
       )}
-
       <div className={styles['sort-row']}>
         <div className={styles['sort-tabs']}>
           <button
