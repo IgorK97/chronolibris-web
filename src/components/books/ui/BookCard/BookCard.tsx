@@ -11,6 +11,7 @@ import {
 // import { useStore } from "../../../../stores/globalStore";
 
 import styles from './BookCard.module.css';
+import { useStore } from '@/stores/globalStore';
 
 interface BookCardProps {
   bookInfo: BookListItem;
@@ -20,7 +21,7 @@ interface BookCardProps {
 export const BookCard: React.FC<BookCardProps> = ({ bookInfo, onPress }) => {
   const [isFavorite, setIsFavorite] = useState(bookInfo.isFavorite);
   // const { shelves } = useStore();
-
+  const { user } = useStore();
   // В Vite используем import.meta.env
   // const BASE_URL = import.meta.env.VITE_PUBLIC_BASE_DEV_URL || '';
   const coverUrl = import.meta.env.VITE_STORAGE_URL;
@@ -67,18 +68,22 @@ export const BookCard: React.FC<BookCardProps> = ({ bookInfo, onPress }) => {
           loading="lazy"
         />
 
-        <button
-          type="button"
-          className={styles['favorite-button']}
-          onClick={() => setIsFavorite(!isFavorite)}
-          aria-label="Toggle favorite"
-        >
-          <Heart
-            size={16}
-            color={isFavorite ? favColor : unfavColor}
-            fill={isFavorite ? fillFavColor : fillUnfavColor}
-          />
-        </button>
+        {user?.role == 'reader' && (
+          <button
+            type="button"
+            className={styles['favorite-button']}
+            onClick={() => {
+              setIsFavorite(!isFavorite);
+            }}
+            aria-label="Toggle favorite"
+          >
+            <Heart
+              size={16}
+              color={isFavorite ? favColor : unfavColor}
+              fill={isFavorite ? fillFavColor : fillUnfavColor}
+            />
+          </button>
+        )}
       </div>
 
       <h3 className={styles['book-title']}>{bookInfo.title}</h3>

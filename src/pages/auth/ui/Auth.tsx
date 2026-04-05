@@ -6,6 +6,7 @@ import { usersApi } from '../../../api/user';
 import { useStore } from '../../../stores/globalStore';
 import { t } from 'i18next';
 import axios from 'axios';
+import { useSearchParams } from 'react-router-dom';
 // import { Button } from "@/components/ui/button";
 interface RegisterForm {
   userName: string;
@@ -41,7 +42,19 @@ interface AuthProps {
 }
 
 export const Auth = ({ onNavigate }: AuthProps) => {
-  const [isRegister, setIsRegister] = useState(false);
+  // const searchParams = new URLSearchParams(window.location.search);
+  // const [isRegister, setIsRegister] = useState(
+  //   searchParams.get('mode') === 'register'
+  // );
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const isRegister = searchParams.get('mode') === 'register';
+
+  // убрать useState для isRegister, управлять через URL
+  const setIsRegister = (value: boolean) => {
+    setSearchParams({ mode: value ? 'register' : 'login' });
+    setServerError(null);
+  };
 
   const { setUser } = useStore();
 
@@ -262,10 +275,17 @@ export const Auth = ({ onNavigate }: AuthProps) => {
 
       <button
         className={styles['switch-button']}
-        onClick={() => {
-          setIsRegister(!isRegister);
-          setServerError(null);
-        }}
+        onClick={
+          () => setIsRegister(!isRegister)
+          //   () => {
+          //   const next = !isRegister;
+          //   setIsRegister(next);
+          //   setServerError(null);
+          //   const url = new URL(window.location.href);
+          //   url.searchParams.set('mode', next ? 'register' : 'login');
+          //   window.history.replaceState(null, '', url.toString());
+          // }
+        }
       >
         {isRegister ? t('auth.switch_to_auth') : t('auth.switch_to_reg')}
       </button>

@@ -119,13 +119,13 @@ export default function Header() {
             ) : (
               <>
                 <button
-                  onClick={() => navigate('/auth')}
+                  onClick={() => navigate('/auth?mode=login')}
                   className={styles['login-btn']}
                 >
                   Войти
                 </button>
                 <button
-                  onClick={() => navigate('/auth')}
+                  onClick={() => navigate('/auth?mode=register')}
                   className={styles['register-btn']}
                 >
                   Зарегистрироваться
