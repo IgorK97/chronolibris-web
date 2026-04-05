@@ -438,7 +438,7 @@ export const BookUnit: React.FC = () => {
     data: book,
     isLoading,
     error,
-  } = useBookDetails(id ?? 0, user?.userName ?? '');
+  } = useBookDetails(id ?? 0, user?.userName ?? '', true, !!id);
   const { data: contents, refetch: refetchContents } = useBookContents(id);
   const unlinkMutation = useUnlinkContentFromBook();
   const linkMutation = useLinkContentToBook();
@@ -667,10 +667,10 @@ export const BookUnit: React.FC = () => {
       {/* Header */}
       <div className={styles['book-unit-header']}>
         <button
-          onClick={() => navigate('/books')}
+          onClick={() => navigate(-1)}
           className={styles['btn btn-secondary']}
         >
-          <ArrowLeft /> Назад к списку
+          <ArrowLeft /> Назад
         </button>
         <h2>{isNew ? 'Новая книга' : book?.title}</h2>
         {!isNew && <Book onClick={() => navigate(`/book/${book!.id}`)} />}

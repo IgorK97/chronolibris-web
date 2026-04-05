@@ -65,6 +65,8 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
     [searchParams.toString()]
   );
 
+  const [mode, setMode] = useState(false);
+
   const setFilters = (next: AdvancedFilters) => {
     setSearchParams((prev) => {
       const updated = new URLSearchParams(prev);
@@ -110,7 +112,8 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
     selectionId > 0;
 
   // const navigate = useNavigate();
-  // const { user } = useStore();
+  const { user } = useStore();
+  const isAdmin = user?.role === 'admin';
   // const [inputValue, setInputValue] = useState(urlQuery);
   // useEffect(() => {
   //   setInputValue(urlQuery);
@@ -203,6 +206,8 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
               filters={filters}
               onChange={setFilters}
               onClose={() => setShowAdvanced(false)}
+              mode={mode}
+              onModeChange={isAdmin ? setMode : undefined}
             />
             // <AdvancedSearchStub onClose={() => setShowAdvanced(false)} />
           )}

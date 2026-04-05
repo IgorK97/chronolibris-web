@@ -17,6 +17,8 @@ interface Props {
   filters: AdvancedFilters;
   onChange: (filters: AdvancedFilters) => void;
   onClose: () => void;
+  mode?: boolean;
+  onModeChange?: (mode: boolean) => void;
 }
 
 interface SelectedPerson {
@@ -332,7 +334,13 @@ function TagFilter({
   );
 }
 
-export function AdvancedSearchPanel({ filters, onChange, onClose }: Props) {
+export function AdvancedSearchPanel({
+  filters,
+  onChange,
+  onClose,
+  mode,
+  onModeChange,
+}: Props) {
   const { data: roles = [] } = usePersonRoles();
   const [draft, setDraft] = useState<AdvancedFilters>(filters);
   const resetAll = () => onChange(EMPTY_FILTERS);
@@ -367,6 +375,25 @@ export function AdvancedSearchPanel({ filters, onChange, onClose }: Props) {
       </div>
 
       <div className={styles.body}>
+        {onModeChange && (
+          <div className={styles['filter-section']}>
+            <label className={styles['filter-label']}>Режим отображения</label>
+            <div className={styles['mode-toggle']}>
+              <button
+                className={`${styles['mode-btn']} ${!mode ? styles['mode-btn-active'] : ''}`}
+                onClick={() => onModeChange(false)}
+              >
+                Только активные
+              </button>
+              <button
+                className={`${styles['mode-btn']} ${mode ? styles['mode-btn-active'] : ''}`}
+                onClick={() => onModeChange(true)}
+              >
+                Все (включая скрытые)
+              </button>
+            </div>
+          </div>
+        )}
         {/* Персоналии */}
         <PersonFilter
           value={filters.personFilters}

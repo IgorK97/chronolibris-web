@@ -25,12 +25,11 @@ interface AdminSidebarProps {
 
 const SECTIONS = [
   {
-    title: 'Контент',
+    title: 'Управление книгами и контентами',
     items: [
-      { label: 'Книги', path: '/books', icon: BookOpen },
-      { label: 'Материалы', path: '/contents', icon: FileText },
+      { label: 'Создать книгу', path: '/books/new', icon: BookOpen },
+      { label: 'Контенты', path: '/contents', icon: FileText },
       { label: 'Подборки', path: '/selections', icon: Layers },
-      { label: 'Теги', path: '/tags', icon: Tag },
     ],
   },
   {
@@ -43,10 +42,11 @@ const SECTIONS = [
       { label: 'Серии', path: '/series', icon: Scroll },
       { label: 'Персоны', path: '/person', icon: User },
       { label: 'Темы', path: '/themes', icon: Palette },
+      { label: 'Теги', path: '/tags', icon: Tag },
     ],
   },
   {
-    title: 'Управление',
+    title: 'Управление сотрудниками',
     items: [
       // { label: 'Модерация', path: '/moderation', icon: ShieldCheck },
       {

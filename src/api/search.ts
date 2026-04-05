@@ -47,9 +47,9 @@ export interface AdvancedSearchBody {
 export const searchApi = {
   simple: (params: SimpleSearchParams) =>
     apiClient.get<SearchPagedResult, SimpleSearchParams>('/search', params),
-  advanced: (body: AdvancedSearchBody) =>
+  advanced: (body: AdvancedSearchBody, mode: boolean = false) =>
     apiClient.post<SearchPagedResult, AdvancedSearchBody>(
-      '/search/advanced',
+      `/search/advanced${mode ? '?mode=true' : ''}`,
       body
     ), //Почему в одном случае гет, а в дргуом пост?
 };
@@ -101,18 +101,22 @@ export const useInfiniteAdvancedSearch = (
     'query' | 'pageSize' | 'lastBestSimilarity' | 'lastId'
   >,
   pageSize = 20,
-  enabled = true
+  enabled = true,
+  mode = false
 ) => {
   return useInfiniteQuery({
     queryKey: ['search', 'advanced', query, pageSize, filters],
     queryFn: ({ pageParam }) =>
-      searchApi.advanced({
-        query,
-        pageSize,
-        lastBestSimilarity: pageParam?.lastBestSimilarity ?? null,
-        lastId: pageParam?.lastId ?? null,
-        ...filters,
-      }),
+      searchApi.advanced(
+        {
+          query,
+          pageSize,
+          lastBestSimilarity: pageParam?.lastBestSimilarity ?? null,
+          lastId: pageParam?.lastId ?? null,
+          ...filters,
+        },
+        mode
+      ),
     initialPageParam: undefined as SearchCursor,
     getNextPageParam: (lastPage): SearchCursor => {
       if (
