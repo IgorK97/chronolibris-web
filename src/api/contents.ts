@@ -1,5 +1,10 @@
 // File: src/api/contents.ts
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+} from '@tanstack/react-query';
 import { apiClient } from './apiClient';
 import type {
   ContentDto,
@@ -115,6 +120,27 @@ export const useContents = (filter: ContentFilterRequest) => {
   return useQuery({
     queryKey: ['contents', filter],
     queryFn: () => contentsApi.getContents(filter),
+    staleTime: 2 * 60 * 1000,
+  });
+};
+
+export const useInfiniteContents = (filter: ContentFilterRequest) => {
+  return useInfiniteQuery({
+    queryKey: ['contents', 'infinite', filter],
+
+    // Теперь pageParam будет автоматически распознан как string | undefined
+    queryFn: ({ pageParam }) =>
+      contentsApi.getContents({
+        ...filter,
+        cursor: pageParam,
+      }),
+
+    // Явно указываем тип для начального значения параметра страницы
+    initialPageParam: undefined as string | undefined,
+
+    // Гарантируем возврат undefined, если следующей страницы нет
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+
     staleTime: 2 * 60 * 1000,
   });
 };

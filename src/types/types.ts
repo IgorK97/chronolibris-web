@@ -213,12 +213,13 @@ export interface BookListResponse {
 export interface ContentFilterRequest {
   searchQuery?: string | null;
   authorName?: string | null;
-  includeThemeIds?: number[] | null;
-  excludeThemeIds?: number[] | null;
-  contentTypeId?: number | null;
-  languageId?: number | null;
-  yearFrom?: number | null;
-  yearTo?: number | null;
+  personFilters?: PersonRoleFilter[];
+  // includeThemeIds?: number[] | null;
+  // excludeThemeIds?: number[] | null;
+  // contentTypeId?: number | null;
+  // languageId?: number | null;
+  // yearFrom?: number | null;
+  // yearTo?: number | null;
   cursor?: string | null;
   limit?: number;
 }
