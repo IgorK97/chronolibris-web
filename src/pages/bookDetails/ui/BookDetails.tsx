@@ -77,7 +77,7 @@ function getAuthorsString(
   authorRoleId: number,
   bookDetails: BookDetails
 ): string {
-  const authorGroup = bookDetails.participants.find(
+  const authorGroup = bookDetails.participants?.find(
     (group) => group.role === authorRoleId
   );
   if (!authorGroup || authorGroup.persons.length === 0)
@@ -127,6 +127,17 @@ export const BookDetailsComponent = ({
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
     setIsRatingPopupOpen(true);
   };
+  const {
+    data: fullBookDetails,
+    refetch: refetchBook,
+    isLoading,
+    isError,
+  } = useBookDetails(
+    Number(bookId) || 0,
+    String(user?.userId || 0),
+    true,
+    !!Number(bookId)
+  );
 
   const { data: bookFiles, isLoading: filesLoading } = useBookFiles(
     Number(bookId) || 0
@@ -239,14 +250,6 @@ export const BookDetailsComponent = ({
       setIsCreating(false);
     }
   };
-  const {
-    data: fullBookDetails,
-    refetch: refetchBook,
-    isLoading,
-    isError,
-  } = useBookDetails(Number(bookId) || 0, user?.userId || 0, {
-    enabled: !!Number(bookId) && !!user,
-  });
 
   if (isLoading) return <div className={styles.loader}>Загрузка...</div>;
   if (isError || !fullBookDetails)

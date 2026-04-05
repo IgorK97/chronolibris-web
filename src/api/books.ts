@@ -465,8 +465,8 @@ export function fileToBase64(file: File): Promise<string> {
 // ---------------------------------------------------------------------------
 
 export const booksApi = {
-  getMetadata: (bookId: number) =>
-    apiClient.get<BookDetails>(`/Books/${bookId}/info`),
+  getMetadata: (bookId: number, administration: boolean) =>
+    apiClient.get<BookDetails>(`/Books/${bookId}/info?mode=${administration}`),
 
   getReadBooks: (params: { userId: number; lastId?: number; limit: number }) =>
     apiClient.get<PagedResult<BookListItem>>(
@@ -521,13 +521,15 @@ export const booksApi = {
 
 export const useBookDetails = (
   bookId: number,
-  userName: string
+  userName: string,
+  administration: boolean = false,
+  enabled: boolean
   // options?: UseBookDetailsOptions
 ) =>
   useQuery({
     queryKey: ['books', bookId, userName],
-    queryFn: () => booksApi.getMetadata(bookId),
-    enabled: bookId > 0,
+    queryFn: () => booksApi.getMetadata(bookId, administration),
+    enabled: enabled,
     // ...options,
   });
 
