@@ -27,7 +27,6 @@ const DEFAULT_FILTERS: Filters = {
   reasonTypeId: null,
 };
 
-// Перечень типов жалоб — должен соответствовать справочнику ReportReasonType в БД
 const REASON_TYPES: { id: number; label: string }[] = [
   { id: 1, label: 'Спам' },
   { id: 2, label: 'Оскорбление' },
@@ -386,7 +385,7 @@ export function ModerationPage() {
   const allReports = data?.pages.flatMap((p) => p.reports) ?? [];
 
   // Sentinel для IntersectionObserver (автоподгрузка при скролле)
-  const sentinelRef = useRef<HTMLDivElement>(null);
+  // const sentinelRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   const setSentinel = useCallback(

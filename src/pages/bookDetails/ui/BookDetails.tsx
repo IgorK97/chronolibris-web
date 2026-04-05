@@ -52,7 +52,7 @@ import Circles from 'react-loading-icons/dist/esm/components/circles';
 import { ReportModal } from '@/components/reports/ui/ReportModal';
 import { TARGET_TYPE } from '@/api/reports';
 import { Flag } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 interface BookDetailsProps {
   onNavigateToReviews: (id: number) => void;
   onNavigateToRead: (bookFileId?: number) => void;
@@ -94,11 +94,17 @@ export const BookDetailsComponent = ({
   // const [isDownloaded, setIsDownloaded] = useState<boolean>(false);
   // const [isNewVersionAvailable] = useState<boolean>(false);
 
-  const { currentBook, setCurrentBook, user, isReader } = useStore();
+  const {
+    // currentBook,
+    setCurrentBook,
+    user,
+    isReader,
+  } = useStore();
   const { data: roles } = useRoles();
   const [isReportOpen, setIsReportOpen] = useState(false);
+  const { id: bookId } = useParams();
   const { data: seekedShelves, refetch: refetchSeekedShelves } =
-    useSeekedShelves(currentBook?.id ?? 0);
+    useSeekedShelves(Number(bookId) || 0);
   const { data: shelves, refetch: refetchShelves } = useShelves(
     user?.userId || 0
   );
@@ -106,7 +112,7 @@ export const BookDetailsComponent = ({
 
   const FAVORITES_SHELF_ID = shelves?.find((s) => s.shelfType === 1)?.id;
   const READ_SHELF_ID = shelves?.find((s) => s.shelfType === 2)?.id;
-  const bookId = currentBook ? currentBook.id : null;
+  // const bookId = currentBook ? currentBook.id : null;
   const [hoverRating, setHoverRating] = useState<number>(0);
   const [isRatingPopupOpen, setIsRatingPopupOpen] = useState(false);
   const ratingRef = useRef<HTMLDivElement>(null);
@@ -122,7 +128,7 @@ export const BookDetailsComponent = ({
   };
 
   const { data: bookFiles, isLoading: filesLoading } = useBookFiles(
-    bookId ?? 0
+    Number(bookId) || 0
   );
   const navigate = useNavigate();
 
@@ -136,8 +142,8 @@ export const BookDetailsComponent = ({
     const isOnShelf = seekedShelves?.includes(shelf.id);
     if (!bookId) return;
     const success = !isOnShelf
-      ? await collectionsApi.addBookToShelf(shelf.id, bookId)
-      : await collectionsApi.removeBookFromShelf(shelf.id, bookId);
+      ? await collectionsApi.addBookToShelf(shelf.id, Number(bookId) || 0)
+      : await collectionsApi.removeBookFromShelf(shelf.id, Number(bookId) || 0);
 
     if (success) {
       refetchSeekedShelves();
@@ -145,19 +151,19 @@ export const BookDetailsComponent = ({
   };
 
   const { data: reviewsData, refetch: refetchReviews } = useInfiniteReviews(
-    bookId ?? 0,
+    Number(bookId) || 0,
     isAuth
   );
 
-  const { data: userReview } = useMyReview(bookId ?? 0, isAuth);
+  const { data: userReview } = useMyReview(Number(bookId) || 0, isAuth);
 
   const allReviews = reviewsData?.pages.flatMap((p) => p.items) ?? [];
   // const userReview =
   //   allReviews.find((r) => r.userName === user?.userName) ?? null;
 
-  const createReview = useCreateReview(bookId ?? 0);
-  const updateReview = useUpdateReview(bookId ?? 0);
-  const deleteReview = useDeleteReview(bookId ?? 0);
+  const createReview = useCreateReview(Number(bookId) || 0);
+  const updateReview = useUpdateReview(Number(bookId) || 0);
+  const deleteReview = useDeleteReview(Number(bookId) || 0);
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const handleMouseLeave = () => {
@@ -202,7 +208,7 @@ export const BookDetailsComponent = ({
       // No review yet — create a score-only one (server sets status = Published)
 
       await createReview.mutateAsync({
-        bookId,
+        bookId: Number(bookId) || 0,
         score: rating,
       });
     }
@@ -237,8 +243,8 @@ export const BookDetailsComponent = ({
     refetch: refetchBook,
     isLoading,
     isError,
-  } = useBookDetails(bookId ?? 0, user?.userId || 0, {
-    enabled: !!bookId && !!user,
+  } = useBookDetails(Number(bookId) || 0, user?.userId || 0, {
+    enabled: !!Number(bookId) && !!user,
   });
 
   if (isLoading) return <div className={styles.loader}>Загрузка...</div>;

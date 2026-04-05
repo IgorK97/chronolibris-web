@@ -85,9 +85,9 @@ export interface CreateReportRequest {
 }
 
 export const TASK_STATUS = {
-  IN_PROGRESS: 1,
-  ACCEPTED: 2,
-  REJECTED: 3,
+  IN_PROGRESS: 2,
+  ACCEPTED: 3,
+  REJECTED: 4,
 } as const;
 
 export const TARGET_TYPE = {
