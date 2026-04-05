@@ -39,6 +39,7 @@ function useInfiniteBooks(selectionId: number) {
   // Добавляем новую порцию к накопленному списку
   useEffect(() => {
     if (data?.items && data.items.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setAllBooks((prev) => {
         // Защита от дублей при повторном рендере
         const existingIds = new Set(prev.map((b) => b.id));

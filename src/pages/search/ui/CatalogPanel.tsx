@@ -8,7 +8,10 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useThemes } from '@/api/themes';
-import { useSelectionsInfinite } from '@/api/collections';
+import {
+  useAllSelections,
+  // useSelectionsInfinite
+} from '@/api/collections';
 import styles from './CatalogPanel.module.css';
 
 interface CatalogPanelProps {
@@ -159,7 +162,7 @@ function SelectionsView({
   onClose: () => void;
   navigate: ReturnType<typeof useNavigate>;
 }) {
-  const { data: selections, isLoading } = useSelectionsInfinite();
+  const { data: selections, isLoading } = useAllSelections();
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
   const handleGoToSelection = (selectionId: number) => {

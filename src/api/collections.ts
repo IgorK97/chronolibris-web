@@ -6,6 +6,7 @@ import type {
   PagedResult,
 } from '../types/types';
 import {
+  keepPreviousData,
   useInfiniteQuery,
   useMutation,
   useQuery,
@@ -14,7 +15,7 @@ import {
 
 export const collectionsApi = {
   // Selections
-  // getAllSelections: () => apiClient.get<SelectionDetails[]>('/Selections'),
+  getAllSelections: () => apiClient.get<SelectionDetails[]>('/Selections'),
 
   // getSelections: (page = 1, pageSize = 20) =>
   //   apiClient.get<PagedResult<SelectionDetails>>(
@@ -31,7 +32,7 @@ export const collectionsApi = {
     params.set('limit', String(limit));
     if (onlyActive !== undefined) params.set('onlyActive', String(onlyActive));
     return apiClient.get<PagedResult<SelectionDetails>>(
-      `/selections?${params.toString()}`
+      `/selections/paged?${params.toString()}`
     );
   },
 
@@ -41,7 +42,7 @@ export const collectionsApi = {
   getSelectionBooks: (
     selectionId: number,
     // userId: number,
-    lastId: number,
+    lastId: number | null,
     limit: number = 10
   ) =>
     apiClient.get<PagedResult<BookListItem>>(
@@ -147,6 +148,19 @@ export const useSelections = (
   });
 };
 
+// export const useSelectionBooks = (
+//   selectionId: number,
+//   lastId: number | null,
+//   limit: number = 10
+// ) => {
+//   return useQuery({
+//     queryKey: ['selectionBooks', selectionId, lastId, limit],
+//     queryFn: () =>
+//       collectionsApi.getSelectionBooks(selectionId, lastId ?? 0, limit),
+//     enabled: !!selectionId,
+//   });
+// };
+
 export const useSelectionBooks = (
   selectionId: number,
   lastId: number | null,
@@ -154,19 +168,21 @@ export const useSelectionBooks = (
 ) => {
   return useQuery({
     queryKey: ['selectionBooks', selectionId, lastId, limit],
-    queryFn: () =>
-      collectionsApi.getSelectionBooks(selectionId, lastId ?? 0, limit),
+    queryFn: () => collectionsApi.getSelectionBooks(selectionId, lastId, limit),
     enabled: !!selectionId,
+    // Пока идёт рефетч после инвалидации — возвращаем старые данные вместо undefined.
+    // Это предотвращает crash в Library.tsx при data?.items.slice()
+    placeholderData: keepPreviousData,
   });
 };
 
-// export const useSelections = (page = 1, pageSize = 20) => {
-//   return useQuery({
-//     queryKey: ['selections', page, pageSize],
-//     queryFn: () => collectionsApi.getSelections(page, pageSize),
-//     staleTime: 5 * 60 * 1000,
-//   });
-// };
+export const useAllSelections = () => {
+  return useQuery({
+    queryKey: ['selections'],
+    queryFn: () => collectionsApi.getAllSelections(),
+    staleTime: 5 * 60 * 1000,
+  });
+};
 
 export const useSelection = (selectionId: number) => {
   return useQuery({

@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronRight, X } from 'lucide-react';
-import { useSelectionsInfinite } from '@/api/collections';
+import {
+  useAllSelections,
+  // useSelectionsInfinite
+} from '@/api/collections';
 import styles from './SelectionPanel.module.css';
+import type { SelectionDetails } from '@/types/types';
 
 interface SelectionPanelProps {
   selectedSelectionId: number | null;
@@ -13,7 +17,7 @@ export function SelectionPanel({
   onSelect,
 }: SelectionPanelProps) {
   const [collapsed, setCollapsed] = useState(false);
-  const { data: selections, isLoading } = useSelectionsInfinite();
+  const { data: selections, isLoading } = useAllSelections();
 
   return (
     <aside
@@ -43,7 +47,7 @@ export function SelectionPanel({
             <p className={styles.empty}>Нет подборок</p>
           ) : (
             <ul className={styles['selection-list']}>
-              {(selections ?? []).map((sel) => {
+              {(selections ?? []).map((sel: SelectionDetails) => {
                 const isSelected = sel.id === selectedSelectionId;
                 return (
                   <li
