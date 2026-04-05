@@ -22,10 +22,12 @@ export const SelectionsPage: React.FC = () => {
         <SelectionManager
           selectionId={selectedSelectionId}
           onBack={handleBack}
-          userId={1} // Получать из контекста авторизации
         />
       ) : (
-        <SelectionsList onSelectSelection={handleSelectSelection} />
+        <SelectionsList
+          isAdmin={true}
+          onSelectSelection={handleSelectSelection}
+        />
       )}
     </div>
   );

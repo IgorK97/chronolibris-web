@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { SectionHeader } from './SectionHeader';
 import { BookCard } from '../../../components/books';
 import {
@@ -11,7 +11,7 @@ import { useStore } from '../../../stores/globalStore';
 import { useSelectionBooks } from '../../../api/books';
 import styles from './Library.module.css';
 import ErrorBoundary from '@/components/ErrorBoundary/ErrorBoundary';
-import { useAllSelection } from '@/api/collections';
+import { useSelectionsInfinite } from '@/api/collections';
 
 interface LibraryProps {
   onNavigateToBook: (id: number) => void;
@@ -72,10 +72,12 @@ export const Library = ({
   const { user, setCurrentBook } = useStore();
 
   const {
-    data: selections,
+    data,
     isLoading: selectionsIsLoading,
-    error,
-  } = useAllSelection();
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useSelectionsInfinite(20);
 
   // const sections = [
   //   { id: 4, title: 'Новое' },
@@ -114,6 +116,30 @@ export const Library = ({
   //       Пожалуйста, войдите в систему
   //     </div>
   //   );
+  const selections = data?.pages.flatMap((p) => p.items) ?? [];
+
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  const handleIntersection = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const [entry] = entries;
+      if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    },
+    [hasNextPage, isFetchingNextPage, fetchNextPage]
+  );
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(handleIntersection, {
+      rootMargin: '200px', //чуть раньше конца начинается подгрузка
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [handleIntersection]);
 
   if (selectionsIsLoading)
     return <div className={styles['error-wrapper']}>Загрузка подборок...</div>;
@@ -132,6 +158,10 @@ export const Library = ({
             />
           </ErrorBoundary>
         ))}
+        <div ref={sentinelRef} style={{ height: 1 }} />
+        {isFetchingNextPage && (
+          <div className={styles['loading-wrapper']}>Загрузка подборок...</div>
+        )}
       </div>
     </main>
   );

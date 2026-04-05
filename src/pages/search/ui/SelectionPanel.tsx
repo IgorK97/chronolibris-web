@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronRight, X } from 'lucide-react';
-import { useAllSelection } from '@/api/collections';
+import { useSelectionsInfinite } from '@/api/collections';
 import styles from './SelectionPanel.module.css';
 
 interface SelectionPanelProps {
@@ -13,7 +13,7 @@ export function SelectionPanel({
   onSelect,
 }: SelectionPanelProps) {
   const [collapsed, setCollapsed] = useState(false);
-  const { data: selections, isLoading } = useAllSelection();
+  const { data: selections, isLoading } = useSelectionsInfinite();
 
   return (
     <aside

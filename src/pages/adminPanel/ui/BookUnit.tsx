@@ -449,7 +449,7 @@ export const BookUnit: React.FC = () => {
   const { data: countries = [] } = useCountries();
   const { data: roles = [] } = usePersonRoles();
 
-  // Publishers – если у вас есть хук usePublishers, замените заглушку
+  // Publishers - если у вас есть хук usePublishers, замените заглушку
   // const { data: publishers = [] } = usePublishers();
   // Для примера используем пустой массив; подключите реальный хук при необходимости
   const publishers: AutocompleteItem[] = [];
@@ -707,7 +707,7 @@ export const BookUnit: React.FC = () => {
       {/* Metadata */}
       <div className={styles['book-metadata']}>
         <div className={styles['metadata-section']}>
-          <h3>Основная информация</h3>
+          <h3>Основная информация о книге {book?.id}</h3>
 
           {isEditing ? (
             <div className={styles['edit-form']}>

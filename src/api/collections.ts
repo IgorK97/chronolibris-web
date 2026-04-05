@@ -5,16 +5,35 @@ import type {
   BookListItem,
   PagedResult,
 } from '../types/types';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 
 export const collectionsApi = {
   // Selections
-  getAllSelections: () => apiClient.get<SelectionDetails[]>('/Selections'),
+  // getAllSelections: () => apiClient.get<SelectionDetails[]>('/Selections'),
 
-  getSelections: (page = 1, pageSize = 20) =>
-    apiClient.get<PagedResult<SelectionDetails>>(
-      `/Selections/paged?page=${page}&pageSize=${pageSize}`
-    ),
+  // getSelections: (page = 1, pageSize = 20) =>
+  //   apiClient.get<PagedResult<SelectionDetails>>(
+  //     `/Selections/paged?page=${page}&pageSize=${pageSize}`
+  //   ),
+
+  getSelections: (
+    lastId?: number | null,
+    limit: number = 20,
+    onlyActive?: boolean
+  ) => {
+    const params = new URLSearchParams();
+    if (lastId) params.set('lastId', String(lastId));
+    params.set('limit', String(limit));
+    if (onlyActive !== undefined) params.set('onlyActive', String(onlyActive));
+    return apiClient.get<PagedResult<SelectionDetails>>(
+      `/selections?${params.toString()}`
+    );
+  },
 
   getSelection: (selectionId: number) =>
     apiClient.get<SelectionDetails>(`/Selections/${selectionId}`),
@@ -97,11 +116,34 @@ export const useShelves = (userId: number) => {
   });
 };
 
-export const useAllSelection = () => {
+export const useSelectionsInfinite = (
+  limit: number = 20,
+  onlyActive?: boolean
+) => {
+  return useInfiniteQuery({
+    queryKey: ['selections', 'infinite', limit, onlyActive],
+    queryFn: ({ pageParam }) =>
+      collectionsApi.getSelections(
+        pageParam as number | null,
+        limit,
+        onlyActive
+      ),
+    initialPageParam: null as number | null,
+    getNextPageParam: (lastPage) =>
+      lastPage.hasNext ? lastPage.lastId : undefined,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+export const useSelections = (
+  lastId?: number | null,
+  limit: number = 20,
+  onlyActive?: boolean
+) => {
   return useQuery({
-    queryKey: ['selections'],
-    queryFn: () => collectionsApi.getAllSelections(),
-    staleTime: 5 * 60 * 1000, // 5 минут
+    queryKey: ['selections', 'paged', lastId, limit, onlyActive],
+    queryFn: () => collectionsApi.getSelections(lastId, limit, onlyActive),
+    staleTime: 5 * 60 * 1000,
   });
 };
 
@@ -118,13 +160,13 @@ export const useSelectionBooks = (
   });
 };
 
-export const useSelections = (page = 1, pageSize = 20) => {
-  return useQuery({
-    queryKey: ['selections', page, pageSize],
-    queryFn: () => collectionsApi.getSelections(page, pageSize),
-    staleTime: 5 * 60 * 1000,
-  });
-};
+// export const useSelections = (page = 1, pageSize = 20) => {
+//   return useQuery({
+//     queryKey: ['selections', page, pageSize],
+//     queryFn: () => collectionsApi.getSelections(page, pageSize),
+//     staleTime: 5 * 60 * 1000,
+//   });
+// };
 
 export const useSelection = (selectionId: number) => {
   return useQuery({
