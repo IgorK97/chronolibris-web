@@ -1,7 +1,11 @@
 import { Navigate, Outlet } from 'react-router-dom';
-import { USER_ROLES, useStore } from '../stores/globalStore';
+import { useStore } from '../stores/globalStore';
 
-export const ProtectedRoute = () => {
+interface ProtectedRouteProps {
+  allowedRoles?: ('moderator' | 'admin' | 'reader')[];
+}
+
+export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
   const { user, isInitialized } = useStore();
 
   if (!isInitialized) return null;
@@ -10,22 +14,25 @@ export const ProtectedRoute = () => {
     return <Navigate to="/auth" replace />;
   }
 
-  return <Outlet />;
-};
-
-export const ModeratorRoute = () => {
-  const { user, isInitialized } = useStore();
-
-  if (!isInitialized) return null;
-
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
-
-  // Читатели и администраторы на страницу модерации не попадают
-  if (user.role !== USER_ROLES.MODERATOR) {
+  if (allowedRoles && !allowedRoles.includes(user.role as 'moderator' | 'admin' | 'reader')) {
     return <Navigate to="/library" replace />;
   }
 
   return <Outlet />;
 };
+
+// export const ModeratorRoute = () => {
+//   const { user, isInitialized } = useStore();
+
+//   if (!isInitialized) return null;
+
+//   if (!user) {
+//     return <Navigate to="/auth" replace />;
+//   }
+
+//   if (user.role !== USER_ROLES.MODERATOR) {
+//     return <Navigate to="/library" replace />;
+//   }
+
+//   return <Outlet />;
+// };
