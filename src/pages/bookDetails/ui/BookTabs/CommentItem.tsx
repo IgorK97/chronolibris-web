@@ -172,7 +172,7 @@ export function CommentItem({
               {formatDate(comment.createdAt)}
             </span>
           </div>
-          {user?.userName === comment.userLogin ? (
+          {user?.role == 'reader' && user?.userName === comment.userLogin ? (
             <ThreeDotsMenu
               canDelete={true}
               onDelete={async () => deleteMutation.mutate()}

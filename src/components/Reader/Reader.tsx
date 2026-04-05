@@ -861,6 +861,7 @@ export const Reader: React.FC<ReaderProps> = ({
 
     const handleContextMenu = (e: React.MouseEvent) => {
       e.preventDefault();
+      if (user?.role !== 'reader') return;
       setContextMenu({ paraIndex, x: e.clientX, y: e.clientY });
     };
 
@@ -873,7 +874,6 @@ export const Reader: React.FC<ReaderProps> = ({
           setEditingBookmark(paraBookmark);
         }}
       >
-        {/* 🔖 */}
         <Bookmark color="red" />
       </span>
     ) : null;
@@ -1029,17 +1029,19 @@ export const Reader: React.FC<ReaderProps> = ({
             >
               <Palette color="red" />
             </button>
-            <button
-              onClick={() => setBookmarkPanelOpen((v) => !v)}
-              className={`${styles['color-button']} ${bookmarkPanelOpen ? styles['nav-button-active'] : ''}`}
-              aria-label="Закладки"
-              title={`Закладки (${bookmarks.filter((b) => b.bookFileId === bookFileId).length})`}
-            >
-              <Bookmark color="red" />{' '}
-              {bookmarks.filter((b) => b.bookFileId === bookFileId).length > 0
-                ? bookmarks.filter((b) => b.bookFileId === bookFileId).length
-                : ''}
-            </button>
+            {user?.role == 'reader' && (
+              <button
+                onClick={() => setBookmarkPanelOpen((v) => !v)}
+                className={`${styles['color-button']} ${bookmarkPanelOpen ? styles['nav-button-active'] : ''}`}
+                aria-label="Закладки"
+                title={`Закладки (${bookmarks.filter((b) => b.bookFileId === bookFileId).length})`}
+              >
+                <Bookmark color="red" />{' '}
+                {bookmarks.filter((b) => b.bookFileId === bookFileId).length > 0
+                  ? bookmarks.filter((b) => b.bookFileId === bookFileId).length
+                  : ''}
+              </button>
+            )}
             <button
               onClick={() => changeFontSize(-2)}
               className={styles['font-button']}
@@ -1238,7 +1240,7 @@ const TocSidebar: React.FC<TocSidebarProps> = ({
             onClick={onClose}
             aria-label="Закрыть"
           >
-            ✕
+            <X />
           </button>
         </div>
         {tocData.Meta.Title && (

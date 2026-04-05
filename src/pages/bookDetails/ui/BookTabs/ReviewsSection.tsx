@@ -116,8 +116,9 @@ function ReviewItem({
   canDelete: boolean; // Получаем снаружи
   onDelete: () => Promise<void>; // Получаем снаружи
 }) {
-  // const { user } = useStore();
-  console.log(canDelete, isAuth, review.userName, 'TRUTATA');
+  const { user } = useStore();
+  // console.log(canDelete, isAuth, review.userName, 'TRUTATA');
+
   const [votes, setVotes] = useState({
     likes: review.likesCount,
     dislikes: review.dislikesCount,
@@ -182,13 +183,15 @@ function ReviewItem({
             <span className={styles['comment-date']}>
               {formatDate(new Date(review.createdAt).toISOString())}
             </span>
-            <ThreeDotsMenu
-              canDelete={canDelete}
-              onDelete={onDelete}
-              targetId={review.id}
-              targetTypeId={TARGET_TYPE.REVIEW}
-              // isAuth={isAuth}
-            />
+            {user?.role == 'reader' && (
+              <ThreeDotsMenu
+                canDelete={canDelete}
+                onDelete={onDelete}
+                targetId={review.id}
+                targetTypeId={TARGET_TYPE.REVIEW}
+                // isAuth={isAuth}
+              />
+            )}
           </div>
 
           {/* Truncated text block */}
@@ -237,7 +240,7 @@ function ReviewItem({
   );
 }
 
-type SortMode = 'popular' | 'recent';
+// type SortMode = 'popular' | 'recent';
 
 interface ReviewsSectionProps {
   canReview: boolean;
@@ -260,11 +263,11 @@ export function ReviewsSection({
   userReviewId,
   userCurrentScore,
   userReviewText,
-  userReviewStatus,
+  // userReviewStatus,
   onRatingChanged,
 }: ReviewsSectionProps) {
   // const [reviews, setReviews] = useState<Review[]>(MOCK_REVIEWS);
-  const [sort, setSort] = useState<SortMode>('popular');
+  // const [sort, setSort] = useState<SortMode>('popular');
   const [pickedRating, setPickedRating] = useState<number>(userCurrentScore);
   const [submitStatus, setSubmitStatus] = useState<'pending' | 'error' | null>(
     null
@@ -282,7 +285,7 @@ export function ReviewsSection({
     }
   };
 
-  const isPending = userReviewStatus === 'На проверке';
+  // const isPending = userReviewStatus === 'На проверке';
 
   useEffect(() => {
     setPickedRating(userCurrentScore);
@@ -416,7 +419,7 @@ export function ReviewsSection({
           Рецензии для этой книги недоступны
         </div>
       )}
-      <div className={styles['sort-row']}>
+      {/* <div className={styles['sort-row']}>
         <div className={styles['sort-tabs']}>
           <button
             className={`${styles['sort-tab']} ${sort === 'popular' ? styles['sort-tab--active'] : ''}`}
@@ -434,7 +437,7 @@ export function ReviewsSection({
         <span className={styles['sort-count']}>
           {allReviews.length} рецензий
         </span>
-      </div>
+      </div> */}
 
       {isLoading && <p className={styles['tab-empty']}>Загрузка отзывов...</p>}
       {isError && (

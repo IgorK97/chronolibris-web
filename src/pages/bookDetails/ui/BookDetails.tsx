@@ -123,6 +123,7 @@ export const BookDetailsComponent = ({
   const [newShelfName, setNewShelfName] = useState('');
 
   const handleMouseEnter = () => {
+    if (user?.role !== 'reader') return;
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
     setIsRatingPopupOpen(true);
   };
@@ -262,20 +263,15 @@ export const BookDetailsComponent = ({
     shelfId: number | undefined,
     isCurrentStatus: boolean
   ) => {
-    // console.log(
-    //   `Toggling ----shelf ${shelfId} for book ${fullBookDetails.id}, current status: ${isCurrentStatus}`
-    // );
     if (!user || !shelfId) return;
     const success = !isCurrentStatus
       ? await collectionsApi.addBookToShelf(shelfId, fullBookDetails.id)
       : await collectionsApi.removeBookFromShelf(shelfId, fullBookDetails.id);
-    // console.log('Shelf toggle success:', success);
-    // if (success) fetchBookDetails(user.userId, fullBookDetails.id);
+
     if (success) refetchBook();
   };
 
   const handleDownload = async (bookFileId: number, formatId: number) => {
-    // Сервер сам резолвит путь для скачивания
     if (!bookFileId) return;
     setIsDownloading(true);
     setDownloadError(null);
