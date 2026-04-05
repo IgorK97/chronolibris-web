@@ -55,6 +55,13 @@ function PersonFilter({
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  useEffect(() => {
+    if (value.length === 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSelected([]);
+    }
+  }, [value]);
+
   const emitChange = (next: SelectedPerson[]) => {
     setSelected(next);
     const grouped = new Map<number, number[]>();
@@ -119,7 +126,7 @@ function PersonFilter({
                 onClick={() => handleRemove(p.id)}
                 aria-label="Удалить"
               >
-                ✕
+                <X style={{ cursor: 'pointer' }} />
               </button>
             </div>
           ))}
@@ -169,8 +176,8 @@ interface SelectedTag {
 }
 
 function TagFilter({
-  // requiredTagIds,
-  // excludedTagIds,
+  requiredTagIds,
+  excludedTagIds,
   onChange,
 }: {
   requiredTagIds: number[];
@@ -192,6 +199,13 @@ function TagFilter({
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
+
+  useEffect(() => {
+    if (requiredTagIds.length === 0 && excludedTagIds.length === 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSelected([]);
+    }
+  }, [requiredTagIds, excludedTagIds]);
 
   const emitChange = (next: SelectedTag[]) => {
     setSelected(next);
@@ -274,7 +288,7 @@ function TagFilter({
                 onClick={() => handleRemove(t.id)}
                 aria-label="Удалить"
               >
-                ✕
+                <X style={{ cursor: 'pointer' }} />
               </button>
             </div>
           ))}
@@ -332,6 +346,10 @@ export function AdvancedSearchPanel({ filters, onChange, onClose }: Props) {
 
   const isDirty = JSON.stringify(draft) !== JSON.stringify(filters);
 
+  useEffect(() => {
+    setDraft(filters);
+  }, [filters]);
+
   return (
     <div className={styles.panel}>
       <div className={styles.header}>
@@ -343,7 +361,7 @@ export function AdvancedSearchPanel({ filters, onChange, onClose }: Props) {
             </button>
           )}
           <button className={styles['close-btn']} onClick={onClose}>
-            <X />
+            <X style={{ cursor: 'pointer' }} />
           </button>
         </div>
       </div>
