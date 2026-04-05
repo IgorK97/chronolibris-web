@@ -258,24 +258,24 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useDeleteContent, useInfiniteContents } from '@/api/contents';
-import { usePersonRoles } from '@api/searchReference';
-import {
-  PersonFilter,
-  type PersonRoleFilterRequest,
-} from '@components/Filters/PersonFilter';
+// import { usePersonRoles } from '@api/searchReference';
+// import {
+//   PersonFilter,
+//   type PersonRoleFilterRequest,
+// } from '@components/Filters/PersonFilter';
 import { useDebounce } from '@/hooks/useDebounce';
 import styles from './ContentManagement.module.css';
 import { useNavigate } from 'react-router-dom';
 
 export const ContentManagement: React.FC = () => {
   const navigate = useNavigate();
-  const { data: roles = [] } = usePersonRoles();
+  // const { data: roles = [] } = usePersonRoles();
 
   // 1. Состояние фильтров
   const [searchQuery, setSearchQuery] = useState('');
-  const [personFilters, setPersonFilters] = useState<PersonRoleFilterRequest[]>(
-    []
-  );
+  // const [personFilters, setPersonFilters] = useState<PersonRoleFilterRequest[]>(
+  //   []
+  // );
   const deleteMutation = useDeleteContent();
   // 2. Дебаунс только для текстового поиска
   const debouncedSearch = useDebounce(searchQuery, 500);
@@ -294,7 +294,7 @@ export const ContentManagement: React.FC = () => {
   // но запрос сработает только когда personFilters изменится (внутри useInfiniteContents)
   const apiFilter = {
     searchQuery: debouncedSearch,
-    personFilters: personFilters,
+    // personFilters: personFilters,
     limit: 20,
   };
 
@@ -346,11 +346,11 @@ export const ContentManagement: React.FC = () => {
         </div>
 
         {/* Переиспользуемый компонент персоналий */}
-        <PersonFilter
+        {/* <PersonFilter
           value={personFilters}
           roles={roles}
           onChange={(newFilters) => setPersonFilters(newFilters)}
-        />
+        /> */}
       </div>
 
       <div className={styles['contents-list']}>
