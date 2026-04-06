@@ -17,6 +17,8 @@ export interface ReportShortDto {
   taskCreatedAt: string | null;
   taskResolvedAt: string | null;
   taskStatusId: number | null;
+  comment: string;
+  ModerationTaskId: string;
 }
 
 export interface GetReportsResponse {
@@ -120,13 +122,11 @@ export const reportsApi = {
       params
     ),
 
-  // GET /api/reports/targets/{targetTypeId}/{targetId}
   getTargetInfo: (targetTypeId: number, targetId: number) =>
     apiClient.get<TargetInfoResponse>(
       `/reports/targets/${targetTypeId}/${targetId}`
     ),
 
-  // GET /api/reports/reports/target
   getTargetReports: (params: {
     targetId: number;
     targetTypeId: number;
@@ -151,11 +151,15 @@ export const reportsApi = {
     ),
 
   // PATCH /api/reports/tasks/{id}/resolution
-  resolveTask: (taskId: number, resolution: boolean) =>
-    apiClient.put<TaskResolutionResponse, { id: number; resolution: boolean }>(
-      `/reports/tasks/${taskId}/resolution`,
-      { id: taskId, resolution }
-    ),
+  resolveTask: (taskId: number, resolution: boolean, reportText: string) =>
+    apiClient.put<
+      TaskResolutionResponse,
+      { id: number; resolution: boolean; comment: string }
+    >(`/reports/tasks/${taskId}/resolution`, {
+      id: taskId,
+      resolution,
+      comment: reportText,
+    }),
 };
 
 const PAGE_SIZE = 20;
@@ -227,10 +231,12 @@ export const useResolveTask = () => {
     mutationFn: ({
       taskId,
       resolution,
+      reportText,
     }: {
       taskId: number;
       resolution: boolean;
-    }) => reportsApi.resolveTask(taskId, resolution),
+      reportText: string;
+    }) => reportsApi.resolveTask(taskId, resolution, reportText),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['moderation', 'reports'] });
     },

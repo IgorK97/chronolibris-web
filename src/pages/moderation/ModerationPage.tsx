@@ -220,7 +220,7 @@ interface ReportRowProps {
 function ReportRow({ report, onUpdated }: ReportRowProps) {
   const [expanded, setExpanded] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-
+  const [reportText, setReportText] = useState<string>(report.comment);
   const createTask = useCreateModerationTask();
   const resolveTask = useResolveTask();
 
@@ -249,9 +249,11 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
 
   const handleResolve = async (resolution: boolean) => {
     if (!report.moderationTaskId) return;
+    if (reportText.length < 50) return;
     await resolveTask.mutateAsync({
       taskId: report.moderationTaskId,
       resolution,
+      reportText,
     });
     onUpdated();
   };
@@ -320,6 +322,12 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
 
           {isInProgress && (
             <>
+              <textarea
+                placeholder="Комментарий"
+                value={reportText}
+                onChange={(e) => setReportText(e.target.value)}
+                minLength={50}
+              />
               <button
                 style={{ ...styles.actionBtn, ...styles.acceptBtn }}
                 onClick={() => handleResolve(true)}
@@ -338,9 +346,12 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
           )}
 
           {isResolved && (
-            <span style={styles.resolvedInfo}>
-              Решено: {formatDate(report.taskResolvedAt)}
-            </span>
+            <>
+              <span style={styles.resolvedInfo}>
+                Решено: {formatDate(report.taskResolvedAt)}
+              </span>
+              <textarea placeholder="Комментарий" value={reportText} readOnly />
+            </>
           )}
         </div>
 

@@ -2,7 +2,6 @@ import type { PersonRoleFilter } from '@/api/contents';
 
 export const SELECTION_TYPE = { NEWEST: 1, POPULAR: 2, MANUAL: 3 } as const;
 
-// File: src/types/types.ts
 export interface BookFileDto {
   id: number;
   bookId: number;
@@ -36,24 +35,16 @@ export const BookFileStatuses = {
 
 export interface CreateLanguageRequest {
   name: string;
-  ftsConfiguration: string;
 }
 
 export interface UpdateLanguageRequest {
   id: number;
   name: string;
-  ftsConfiguration: string;
 }
 
 export interface LanguageDto {
   id: number;
   name: string;
-  ftsConfiguration: string;
-}
-
-export interface FtsConfigurationDto {
-  configOid: number;
-  configName: string;
 }
 
 export interface CountryDto {
@@ -88,26 +79,6 @@ export interface UpdatePublisherRequest {
   countryId: number;
 }
 
-export interface SeriesDto {
-  id: number;
-  name: string;
-  publisherId: number;
-  publisherName?: string | null;
-  createdAt: string;
-  booksCount?: number;
-}
-
-export interface CreateSeriesRequest {
-  name: string;
-  publisherId: number;
-}
-
-export interface UpdateSeriesRequest {
-  id: number;
-  name: string;
-  publisherId: number;
-}
-
 export interface CreateFormatRequest {
   name: string;
 }
@@ -121,7 +92,6 @@ export interface PersonDto {
   id: number;
   name: string;
   description: string;
-  imageUrl?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -136,7 +106,6 @@ export interface ThemeDto {
   updatedAt?: string;
 }
 
-// File: src/types/types.ts
 export interface ThemeDto {
   id: number;
   name: string;
@@ -214,12 +183,6 @@ export interface ContentFilterRequest {
   searchQuery?: string | null;
   authorName?: string | null;
   personFilters?: PersonRoleFilter[];
-  // includeThemeIds?: number[] | null;
-  // excludeThemeIds?: number[] | null;
-  // contentTypeId?: number | null;
-  // languageId?: number | null;
-  // yearFrom?: number | null;
-  // yearTo?: number | null;
   cursor?: string | null;
   limit?: number;
 }
@@ -376,11 +339,6 @@ export interface CountryDetails {
   name: string;
 }
 
-// export interface PublisherDetails {
-//   id: number;
-//   name: string;
-// }
-
 export interface BookDetails {
   id: number;
   title: string;
@@ -408,68 +366,10 @@ export interface BookDetails {
   source?: string;
 }
 
-export interface DownloadedBook {
-  id: string;
-  title: string;
-  localPath: string;
-  downloadedAt: string;
-  lastOpenedAt?: string;
-  progress?: number;
-}
-
-export interface User {
-  id: number;
-  name: string;
-  email: string;
-}
-
-export interface BooksListResponse {
-  books: BookListItem[];
-  total: number;
-  page: number;
-  hasMore: boolean;
-}
-
-export interface BooksFilter {
-  includedGenres?: number[];
-  excludedGenres?: number[];
-  page?: number;
-  limit?: number;
-}
-
-export interface LoginData {
-  email: string;
-  password: string;
-}
-
-export interface RegisterData {
-  name: string;
-  email: string;
-  password: string;
-}
-
-export interface AuthResponse {
-  user: User;
-  token: string;
-}
-
 export interface ApiError {
   message: string;
   code: number;
 }
-
-export interface Genre {
-  id: number;
-  name: string;
-  genres?: Genre[];
-}
-
-// export interface FileResponse {
-//   data: Blob;
-//   status: number;
-//   fileName?: string;
-//   headers?: { [name: string]: any };
-// }
 
 export interface AddBookmarkCommand {
   bookId?: number;
@@ -481,36 +381,6 @@ export interface AddBookmarkCommand {
 export interface RemoveBookmarkCommand {
   bookmarkId?: number;
 }
-
-// export class ApiException extends Error {
-//   override message: string;
-//   status: number;
-//   response: string;
-//   headers: { [key: string]: any };
-//   result: any;
-
-//   constructor(
-//     message: string,
-//     status: number,
-//     response: string,
-//     headers: { [key: string]: any },
-//     result: any
-//   ) {
-//     super();
-
-//     this.message = message;
-//     this.status = status;
-//     this.response = response;
-//     this.headers = headers;
-//     this.result = result;
-//   }
-
-//   protected isApiException = true;
-
-//   static isApiException(obj: any): obj is ApiException {
-//     return obj.isApiException === true;
-//   }
-// }
 
 export interface RateReviewCommand {
   reviewId?: number;
@@ -529,29 +399,12 @@ export interface UpdateReviewRequest {
   score: number;
 }
 
-export interface RegisterUserCommand {
-  name?: string;
-  familyName?: string;
-  email?: string;
-  password?: string;
-}
-
-export interface LoginUserCommand {
-  email?: string;
-  password?: string;
-}
-
 export interface SelectionDetails {
-  // id: number;
-  // name: string;
-  // description: string;
-  // selectionTypeId: number;
   id: number;
   name: string;
   description: string;
   createdAt: string;
   updatedAt?: string;
-  // selectionTypeId: number;
   booksCount: number;
   isActive?: boolean;
 }
@@ -633,9 +486,7 @@ export interface ChangePasswordRequest {
 }
 
 export interface ShelfDetails {
-  /** Уникальный идентификатор полки. */
   id: number;
-  /** Название полки (например, "Избранное", "Хочу прочитать"). */
   name: string;
   shelfType: number;
 }

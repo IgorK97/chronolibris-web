@@ -57,24 +57,9 @@ export const usersApi = {
 };
 
 interface RegistrationResult {
-  /// <summary>
-  /// Флаг, указывающий, была ли регистрация учетной записи успешной.
-  /// </summary>
   success: boolean;
-
-  /// <summary>
-  /// Токен доступа (например, JWT), который может быть возвращен сразу после успешной регистрации
-  /// (<see cref="Success"/> = <c>true</c>) для автоматического входа пользователя.
-  /// </summary>
   token: string;
   refresh_token: string;
-
-  /// <summary>
-  /// Список сообщений об ошибках, возникших в процессе регистрации
-  /// (например, "Пользователь с таким Email уже существует" или "Пароль слишком слабый").
-  /// Если регистрация успешна, это свойство будет <c>null</c> или пустым.
-  /// </summary>
-  //public IEnumerable<string>? Errors { get; set; }
   message: string;
   userId: number;
 }

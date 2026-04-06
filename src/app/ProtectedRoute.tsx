@@ -20,19 +20,3 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
 
   return <Outlet />;
 };
-
-// export const ModeratorRoute = () => {
-//   const { user, isInitialized } = useStore();
-
-//   if (!isInitialized) return null;
-
-//   if (!user) {
-//     return <Navigate to="/auth" replace />;
-//   }
-
-//   if (user.role !== USER_ROLES.MODERATOR) {
-//     return <Navigate to="/library" replace />;
-//   }
-
-//   return <Outlet />;
-// };

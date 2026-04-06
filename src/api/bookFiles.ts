@@ -1,7 +1,7 @@
 // File: src/api/bookFiles.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient, axiosInstance } from './apiClient';
-import type { BookFileDto, FormatDto } from '../types/types';
+import type { BookFileDto } from '../types/types';
 
 export interface UploadBookFileRequest {
   bookId: number;
@@ -80,13 +80,6 @@ export const bookFilesApi = {
 
   download: (bookFileId: number) =>
     apiClient.download(`/bookFiles/${bookFileId}/download`),
-
-  // downloadBookFile: async (id: number): Promise<Blob> => {
-  //   const response = await axiosInstance.get(`/BookFiles/${id}/download`, {
-  //     responseType: 'blob',
-  //   });
-  //   return response.data;
-  // },
 };
 
 export const useBookFiles = (bookId: number | null) => {
@@ -144,6 +137,7 @@ export const useDeleteBookFile = () => {
 
   return useMutation({
     mutationFn: bookFilesApi.deleteBookFile,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onSuccess: (data, variables) => {
       // variables - это id файла, но нам нужен bookId для инвалидации
       queryClient.invalidateQueries({ queryKey: ['bookFiles'] });

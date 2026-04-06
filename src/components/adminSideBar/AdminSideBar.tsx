@@ -13,7 +13,7 @@ import {
   X,
   BookMarked,
   Building2,
-  Scroll,
+  // Scroll,
   User,
   Palette,
 } from 'lucide-react';
@@ -39,7 +39,6 @@ const SECTIONS = [
       { label: 'Страны', path: '/country', icon: Globe },
       { label: 'Форматы', path: '/format', icon: List },
       { label: 'Издатели', path: '/publisher', icon: Building2 },
-      { label: 'Серии', path: '/series', icon: Scroll },
       { label: 'Персоны', path: '/person', icon: User },
       { label: 'Темы', path: '/themes', icon: Palette },
       { label: 'Теги', path: '/tags', icon: Tag },

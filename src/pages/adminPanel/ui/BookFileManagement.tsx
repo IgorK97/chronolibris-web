@@ -29,13 +29,6 @@ const FORMAT_EXTENSIONS: Record<number, string> = {
   4: 'txt',
 };
 
-// const FORMAT_EXTENSIONS: Record<number, string> = [
-//   'fb2', // 1
-//   'epub', // 2
-//   'pdf', // 3
-//   'txt', // 4
-// ];
-
 export const BookFileManagement: React.FC<BookFileManagementProps> = ({
   bookId,
   bookTitle,

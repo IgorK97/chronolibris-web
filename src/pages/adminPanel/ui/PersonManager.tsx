@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // File: src/components/PersonManager.tsx
-import React, { useState, useRef } from 'react';
+import React, {
+  useState,
+  // useRef
+} from 'react';
 import {
   usePersons,
   useCreatePerson,
@@ -8,11 +11,11 @@ import {
   useDeletePerson,
 } from '@/api/persons';
 import type { CreatePersonRequest, UpdatePersonRequest } from '@/api/persons';
-import {
-  fileToBase64,
-  validateFileSize,
-  validateFileType,
-} from '@/utils/imageUtils';
+// import {
+//   fileToBase64,
+//   validateFileSize,
+//   validateFileType,
+// } from '@/utils/imageUtils';
 import styles from './PersonManager.module.css';
 import type { PersonDto } from '@/types/types';
 
@@ -25,79 +28,79 @@ export const PersonManager: React.FC = () => {
   const [formData, setFormData] = useState<CreatePersonRequest>({
     name: '',
     description: '',
-    imageBase64: undefined,
-    fileName: undefined,
+    // imageBase64: undefined,
+    // fileName: undefined,
   });
 
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  // const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editFormData, setEditFormData] = useState<UpdatePersonRequest | null>(
     null
   );
-  const [editPreviewImage, setEditPreviewImage] = useState<string | null>(null);
+  // const [editPreviewImage, setEditPreviewImage] = useState<string | null>(null);
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const editFileInputRef = useRef<HTMLInputElement>(null);
+  // const fileInputRef = useRef<HTMLInputElement>(null);
+  // const editFileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  // const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (!file) return;
 
-    if (!validateFileType(file)) {
-      alert('Недопустимый формат файла. Разрешены: JPEG, PNG, GIF, WebP');
-      return;
-    }
+  //   if (!validateFileType(file)) {
+  //     alert('Недопустимый формат файла. Разрешены: JPEG, PNG, GIF, WebP');
+  //     return;
+  //   }
 
-    if (!validateFileSize(file, 5)) {
-      alert('Размер файла не должен превышать 5MB');
-      return;
-    }
+  //   if (!validateFileSize(file, 5)) {
+  //     alert('Размер файла не должен превышать 5MB');
+  //     return;
+  //   }
 
-    try {
-      const base64 = await fileToBase64(file);
-      setFormData({
-        ...formData,
-        imageBase64: base64,
-        fileName: file.name,
-      });
-      setPreviewImage(base64);
-    } catch (err) {
-      console.error('Ошибка чтения файла:', err);
-      alert('Ошибка загрузки изображения');
-    }
-  };
+  //   try {
+  //     const base64 = await fileToBase64(file);
+  //     setFormData({
+  //       ...formData,
+  //       imageBase64: base64,
+  //       fileName: file.name,
+  //     });
+  //     setPreviewImage(base64);
+  //   } catch (err) {
+  //     console.error('Ошибка чтения файла:', err);
+  //     alert('Ошибка загрузки изображения');
+  //   }
+  // };
 
-  const handleEditFileSelect = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  // const handleEditFileSelect = async (
+  //   e: React.ChangeEvent<HTMLInputElement>
+  // ) => {
+  //   const file = e.target.files?.[0];
+  //   if (!file) return;
 
-    if (!validateFileType(file)) {
-      alert('Недопустимый формат файла. Разрешены: JPEG, PNG, GIF, WebP');
-      return;
-    }
+  //   if (!validateFileType(file)) {
+  //     alert('Недопустимый формат файла. Разрешены: JPEG, PNG, GIF, WebP');
+  //     return;
+  //   }
 
-    if (!validateFileSize(file, 5)) {
-      alert('Размер файла не должен превышать 5MB');
-      return;
-    }
+  //   if (!validateFileSize(file, 5)) {
+  //     alert('Размер файла не должен превышать 5MB');
+  //     return;
+  //   }
 
-    try {
-      const base64 = await fileToBase64(file);
-      if (editFormData) {
-        setEditFormData({
-          ...editFormData,
-          imageBase64: base64,
-          fileName: file.name,
-        });
-      }
-      setEditPreviewImage(base64);
-    } catch (err) {
-      console.error('Ошибка чтения файла:', err);
-      alert('Ошибка загрузки изображения');
-    }
-  };
+  //   try {
+  //     const base64 = await fileToBase64(file);
+  //     if (editFormData) {
+  //       setEditFormData({
+  //         ...editFormData,
+  //         imageBase64: base64,
+  //         fileName: file.name,
+  //       });
+  //     }
+  //     setEditPreviewImage(base64);
+  //   } catch (err) {
+  //     console.error('Ошибка чтения файла:', err);
+  //     alert('Ошибка загрузки изображения');
+  //   }
+  // };
 
   const handleCreate = async () => {
     if (!formData.name.trim()) {
@@ -115,13 +118,13 @@ export const PersonManager: React.FC = () => {
       setFormData({
         name: '',
         description: '',
-        imageBase64: undefined,
-        fileName: undefined,
+        // imageBase64: undefined,
+        // fileName: undefined,
       });
-      setPreviewImage(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+      // setPreviewImage(null);
+      // if (fileInputRef.current) {
+      //   fileInputRef.current.value = '';
+      // }
     } catch (err: any) {
       console.error('Ошибка создания персоны:', err);
       alert(err.response?.data?.message || 'Ошибка создания персоны');
@@ -131,9 +134,9 @@ export const PersonManager: React.FC = () => {
   const handleUpdate = async (
     id: number,
     name: string,
-    description: string,
-    imageBase64?: string,
-    fileName?: string
+    description: string
+    // imageBase64?: string,
+    // fileName?: string
   ) => {
     if (!name.trim()) {
       alert('Имя персоны обязательно');
@@ -152,16 +155,16 @@ export const PersonManager: React.FC = () => {
           id,
           name,
           description,
-          imageBase64,
-          fileName,
+          // imageBase64,
+          // fileName,
         } as UpdatePersonRequest,
       });
       setEditingId(null);
       setEditFormData(null);
-      setEditPreviewImage(null);
-      if (editFileInputRef.current) {
-        editFileInputRef.current.value = '';
-      }
+      // setEditPreviewImage(null);
+      // if (editFileInputRef.current) {
+      //   editFileInputRef.current.value = '';
+      // }
     } catch (err: any) {
       console.error('Ошибка обновления персоны:', err);
       alert(err.response?.data?.message || 'Ошибка обновления персоны');
@@ -185,42 +188,42 @@ export const PersonManager: React.FC = () => {
       id: person.id,
       name: person.name,
       description: person.description,
-      imageBase64: undefined,
-      fileName: undefined,
+      // imageBase64: undefined,
+      // fileName: undefined,
     });
-    setEditPreviewImage(person.imageUrl || null);
+    // setEditPreviewImage(person.imageUrl || null);
   };
 
   const cancelEditing = () => {
     setEditingId(null);
     setEditFormData(null);
-    setEditPreviewImage(null);
-    if (editFileInputRef.current) {
-      editFileInputRef.current.value = '';
-    }
+    // setEditPreviewImage(null);
+    // if (editFileInputRef.current) {
+    //   editFileInputRef.current.value = '';
+    // }
   };
 
-  const clearImage = () => {
-    setFormData({ ...formData, imageBase64: undefined, fileName: undefined });
-    setPreviewImage(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
+  // const clearImage = () => {
+  //   setFormData({ ...formData, imageBase64: undefined, fileName: undefined });
+  //   // setPreviewImage(null);
+  //   // if (fileInputRef.current) {
+  //   //   fileInputRef.current.value = '';
+  //   // }
+  // };
 
-  const clearEditImage = () => {
-    if (editFormData) {
-      setEditFormData({
-        ...editFormData,
-        imageBase64: undefined,
-        fileName: undefined,
-      });
-    }
-    setEditPreviewImage(null);
-    if (editFileInputRef.current) {
-      editFileInputRef.current.value = '';
-    }
-  };
+  // const clearEditImage = () => {
+  //   if (editFormData) {
+  //     setEditFormData({
+  //       ...editFormData,
+  //       imageBase64: undefined,
+  //       fileName: undefined,
+  //     });
+  //   }
+  //   // setEditPreviewImage(null);
+  //   // if (editFileInputRef.current) {
+  //   //   editFileInputRef.current.value = '';
+  //   // }
+  // };
 
   //   const formatDate = (dateString?: string) => {
   //     if (!dateString) return '—';
@@ -284,7 +287,7 @@ export const PersonManager: React.FC = () => {
             />
           </div>
 
-          <div className={styles['form-group full-width']}>
+          {/* <div className={styles['form-group full-width']}>
             <label>Изображение</label>
             <div className={styles['image-upload-area']}>
               <input
@@ -318,7 +321,7 @@ export const PersonManager: React.FC = () => {
                 </div>
               )}
             </div>
-          </div>
+          </div> */}
 
           <div className={styles['form-actions']}>
             <button
@@ -343,7 +346,7 @@ export const PersonManager: React.FC = () => {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Изображение</th>
+              {/* <th>Изображение</th> */}
               <th>Имя</th>
               <th>Описание</th>
               <th>Действия</th>
@@ -355,7 +358,7 @@ export const PersonManager: React.FC = () => {
                 {editingId === person.id ? (
                   <>
                     <td>{person.id}</td>
-                    <td>
+                    {/* <td>
                       <div className={styles['image-upload-area']}>
                         <input
                           ref={editFileInputRef}
@@ -385,7 +388,7 @@ export const PersonManager: React.FC = () => {
                           </div>
                         )}
                       </div>
-                    </td>
+                    </td> */}
                     <td>
                       <input
                         type="text"
@@ -419,9 +422,9 @@ export const PersonManager: React.FC = () => {
                           handleUpdate(
                             person.id,
                             editFormData?.name || '',
-                            editFormData?.description || '',
-                            editFormData?.imageBase64,
-                            editFormData?.fileName
+                            editFormData?.description || ''
+                            // editFormData?.imageBase64,
+                            // editFormData?.fileName
                           )
                         }
                         className={styles['btn btn-success']}
@@ -443,7 +446,7 @@ export const PersonManager: React.FC = () => {
                 ) : (
                   <>
                     <td>{person.id}</td>
-                    <td>
+                    {/* <td>
                       {person.imageUrl ? (
                         <div className={styles['person-image-cell']}>
                           <img src={person.imageUrl} alt={person.name} />
@@ -453,7 +456,7 @@ export const PersonManager: React.FC = () => {
                           Нет изображения
                         </span>
                       )}
-                    </td>
+                    </td> */}
                     <td className={styles['name-cell']}>{person.name}</td>
                     <td className={styles['description-cell']}>
                       {person.description}

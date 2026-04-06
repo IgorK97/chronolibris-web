@@ -7,16 +7,12 @@ import type { PersonDto } from '@/types/types';
 export interface CreatePersonRequest {
   name: string;
   description: string;
-  imageBase64?: string;
-  fileName?: string;
 }
 
 export interface UpdatePersonRequest {
   id: number;
   name: string;
   description: string;
-  imageBase64?: string;
-  fileName?: string;
 }
 
 // --- API методы ---
