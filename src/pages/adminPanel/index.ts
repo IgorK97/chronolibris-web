@@ -3,7 +3,7 @@ import { CountryManager } from './ui/CountryManager';
 import { FormatManager } from './ui/FormatManager';
 import { PublisherManager } from './ui/PublisherManager';
 import { PersonManager } from './ui/PersonManager';
-import { ThemeManager } from './ui/ThemeManager';
+import { ThemeManager } from './Themes/ThemeManager';
 import { ContentManagement } from './ui/ContentManagement';
 
 export {
