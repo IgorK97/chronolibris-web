@@ -49,11 +49,8 @@ export const collectionsApi = {
       `/Selections/${selectionId}/books?lastId=${lastId || ''}&limit=${limit}`
     ),
 
-  createSelection: (data: {
-    name: string;
-    description: string;
-    selectionTypeId: number;
-  }) => apiClient.post<number>(`/Selections`, data),
+  createSelection: (data: { name: string; description: string }) =>
+    apiClient.post<number>(`/Selections`, data),
 
   updateSelection: (
     selectionId: number,

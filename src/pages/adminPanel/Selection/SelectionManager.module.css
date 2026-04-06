@@ -13,8 +13,6 @@
 .book-card-wrapper {
   display: flex;
   flex-direction: column;
-
-  /* align-items: stretch; */
   width: fit-content;
 }
 
@@ -151,6 +149,29 @@
   resize: vertical;
 }
 
+/* ── Строка чекбокса видимости в форме создания ────────────────────────────── */
+.visibility-row {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #444;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #3498db;
+}
+
 .buttons {
   display: flex;
   gap: 10px;
@@ -168,6 +189,11 @@
 .save-button {
   background: #27ae60;
   color: #fff;
+}
+
+.save-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .cancel-button {
