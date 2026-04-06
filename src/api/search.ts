@@ -45,11 +45,14 @@ export interface AdvancedSearchBody {
 }
 
 export const searchApi = {
-  simple: (params: SimpleSearchParams) =>
-    apiClient.get<SearchPagedResult, SimpleSearchParams>('/search', params),
+  simple: (params: SimpleSearchParams, mode: boolean = false) =>
+    apiClient.get<SearchPagedResult, SimpleSearchParams>(
+      `/search${mode ? '?hiddenIsAvailableMode=true' : ''}`,
+      params
+    ),
   advanced: (body: AdvancedSearchBody, mode: boolean = false) =>
     apiClient.post<SearchPagedResult, AdvancedSearchBody>(
-      `/search/advanced${mode ? '?mode=true' : ''}`,
+      `/search/advanced${mode ? '?hiddenIsAvailableMode=true' : ''}`,
       body
     ), //Почему в одном случае гет, а в дргуом пост?
 };
@@ -65,18 +68,22 @@ type SearchCursor =
 export const useInfiniteSimpleSearch = (
   query: string,
   pageSize = 20,
-  enabled = true
+  enabled = true,
+  mode: boolean = false
 ) => {
   //Внутри каждого компонента будет свой инстанс функции или общий?
   return useInfiniteQuery({
-    queryKey: ['search', 'simple', query, pageSize],
+    queryKey: ['search', 'simple', query, pageSize, mode],
     queryFn: ({ pageParam }) =>
-      searchApi.simple({
-        query,
-        pageSize,
-        lastBestSimilarity: pageParam?.lastBestSimilarity,
-        lastId: pageParam?.lastId,
-      }),
+      searchApi.simple(
+        {
+          query,
+          pageSize,
+          lastBestSimilarity: pageParam?.lastBestSimilarity,
+          lastId: pageParam?.lastId,
+        },
+        mode
+      ),
     initialPageParam: undefined as SearchCursor,
     getNextPageParam: (lastPage): SearchCursor => {
       if (
@@ -105,7 +112,7 @@ export const useInfiniteAdvancedSearch = (
   mode = false
 ) => {
   return useInfiniteQuery({
-    queryKey: ['search', 'advanced', query, pageSize, filters],
+    queryKey: ['search', 'advanced', query, pageSize, filters, mode],
     queryFn: ({ pageParam }) =>
       searchApi.advanced(
         {

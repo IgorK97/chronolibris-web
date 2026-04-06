@@ -80,6 +80,13 @@ export const bookFilesApi = {
 
   download: (bookFileId: number) =>
     apiClient.download(`/bookFiles/${bookFileId}/download`),
+
+  downloadBookFile: async (id: number): Promise<Blob> => {
+    const response = await axiosInstance.get(`/BookFiles/${id}/download`, {
+      responseType: 'blob',
+    });
+    return response.data;
+  },
 };
 
 export const useBookFiles = (bookId: number | null) => {

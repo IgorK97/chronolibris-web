@@ -78,12 +78,12 @@ export const SelectionsList: React.FC<SelectionsListProps> = ({
               >
                 Скрытые
               </button>
-              <button
+              {/* <button
                 className={`${styles['filter-btn']} ${filter === 'all' ? styles['filter-btn--active'] : ''}`}
                 onClick={() => handleFilterChange('all')}
               >
                 Все
-              </button>
+              </button> */}
             </>
           )}
         </div>

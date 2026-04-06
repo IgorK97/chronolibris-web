@@ -119,7 +119,7 @@ export const useShelves = (userId: number) => {
 
 export const useSelectionsInfinite = (
   limit: number = 20,
-  onlyActive?: boolean
+  onlyActive: boolean = true
 ) => {
   return useInfiniteQuery({
     queryKey: ['selections', 'infinite', limit, onlyActive],
@@ -139,7 +139,7 @@ export const useSelectionsInfinite = (
 export const useSelections = (
   lastId?: number | null,
   limit: number = 20,
-  onlyActive?: boolean
+  onlyActive: boolean = true
 ) => {
   return useQuery({
     queryKey: ['selections', 'paged', lastId, limit, onlyActive],

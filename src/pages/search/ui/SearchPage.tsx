@@ -124,7 +124,8 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
   const simpleSearch = useInfiniteSimpleSearch(
     urlQuery,
     20,
-    !hasFilters && queryReady
+    !hasFilters && queryReady,
+    mode
   );
 
   const advancedSearch = useInfiniteAdvancedSearch(
@@ -137,7 +138,8 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
       selectionId,
     },
     20,
-    hasFilters || queryReady
+    hasFilters || queryReady,
+    mode
   );
 
   const active = hasFilters ? advancedSearch : simpleSearch;
