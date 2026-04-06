@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   // React,
   useEffect,
@@ -20,7 +21,12 @@ import {
 } from './ProtectedRoute';
 // import { SelectionListView } from '../pages/library/ui/SectionList';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  MutationCache,
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query';
 import {
   ContentManagement,
   CountryManager,
@@ -43,8 +49,30 @@ import { ModerationPage } from '@/pages/moderation/ModerationPage';
 import SearchPage from '@/pages/search/ui/SearchPage';
 import { RegisterStaffPage } from '@/pages/RegisterStaffPage/RegisterStuffPage';
 import { PublicOnlyRoute } from './PublicOnlyRoute';
+import toast from 'react-hot-toast';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  // Обработка ошибок для всех useQuery (чтение данных)
+  queryCache: new QueryCache({
+    onError: (error: any) => {
+      if (error.response?.status >= 500) {
+        toast.error(
+          `Ошибка сервера: ${error.response.data?.message || 'Попробуйте позже'}`
+        );
+      }
+    },
+  }),
+  // Обработка ошибок для всех useMutation (создание, удаление, изменение)
+  mutationCache: new MutationCache({
+    onError: (error: any) => {
+      if (error.response?.status >= 500) {
+        toast.error(
+          `Не удалось выполнить действие: ${error.response.data?.message || 'Ошибка сервера'}`
+        );
+      }
+    },
+  }),
+});
 
 export default function App() {
   const { setUser, isInitialized, setInitialized } = useStore();
