@@ -1,7 +1,12 @@
 // api/tags.ts
 import { apiClient } from './apiClient';
 import type { TagType, TagDetails, PagedResult } from '../types/types';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+} from '@tanstack/react-query';
 
 // Фиксированные типы тегов (клиентская часть)
 export const TAG_TYPES = [
@@ -16,7 +21,7 @@ export const tagsApi = {
   getTags: (
     tagTypeId?: number | null,
     searchTerm?: string | null,
-    page: number = 1,
+    page: number = 0,
     pageSize: number = 20
   ) => {
     const params = new URLSearchParams();
@@ -40,6 +45,21 @@ export const useTagTypes = () => {
     queryKey: ['tagTypes'],
     queryFn: () => tagsApi.getTagTypes(),
     staleTime: Infinity, // Типы тегов неизменны
+  });
+};
+
+export const useInfiniteTags = (
+  tagTypeId?: number | null,
+  searchTerm?: string | null,
+  pageSize: number = 20
+) => {
+  return useInfiniteQuery({
+    queryKey: ['tags', 'infinite', tagTypeId, searchTerm, pageSize],
+    queryFn: ({ pageParam = 1 }) =>
+      tagsApi.getTags(tagTypeId, searchTerm, pageParam, pageSize),
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.hasNext ? allPages.length + 1 : undefined,
+    initialPageParam: 1,
   });
 };
 

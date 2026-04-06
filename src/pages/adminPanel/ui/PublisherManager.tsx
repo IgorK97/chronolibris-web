@@ -229,7 +229,6 @@ export const PublisherManager: React.FC = () => {
               <th>Описание</th>
               <th>Страна</th>
               <th>Создано</th>
-              <th>Обновлено</th>
               <th>Действия</th>
             </tr>
           </thead>
@@ -287,11 +286,6 @@ export const PublisherManager: React.FC = () => {
                     </td>
                     <td>{formatDate(publisher.createdAt)}</td>
                     <td>
-                      {publisher.updatedAt
-                        ? formatDate(publisher.updatedAt)
-                        : '—'}
-                    </td>
-                    <td>
                       <button
                         onClick={() =>
                           handleUpdate(
@@ -326,11 +320,6 @@ export const PublisherManager: React.FC = () => {
                     </td>
                     <td>{publisher.countryName || '—'}</td>
                     <td>{formatDate(publisher.createdAt)}</td>
-                    <td>
-                      {publisher.updatedAt
-                        ? formatDate(publisher.updatedAt)
-                        : '—'}
-                    </td>
                     <td>
                       <button
                         onClick={() => startEditing(publisher)}
