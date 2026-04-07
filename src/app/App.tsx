@@ -47,7 +47,7 @@ import { ReaderPage } from '@/pages/reader/ReaderPage';
 import ReaderLayout from './layouts/ReaderLayout';
 import { ModerationPage } from '@/pages/moderation/ModerationPage';
 import SearchPage from '@/pages/search/ui/SearchPage';
-import { RegisterStaffPage } from '@/pages/RegisterStaffPage/RegisterStuffPage';
+import { RegisterStaffPage } from '@/pages/adminPanel/RegisterStaffPage/RegisterStuffPage';
 import { PublicOnlyRoute } from './PublicOnlyRoute';
 import toast from 'react-hot-toast';
 

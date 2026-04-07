@@ -47,8 +47,6 @@ const EMPTY_ERRORS: FormErrors = {
   firstName: null,
 };
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
 export function RegisterStaffPage() {
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [errors, setErrors] = useState<FormErrors>(EMPTY_ERRORS);
@@ -61,7 +59,6 @@ export function RegisterStaffPage() {
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
       setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
-  // ── Валидация ─────────────────────────────────────────────────────────────
   const validate = (): boolean => {
     const e = { ...EMPTY_ERRORS };
     let ok = true;
@@ -106,7 +103,6 @@ export function RegisterStaffPage() {
     return ok;
   };
 
-  // ── Отправка ──────────────────────────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setServerError(null);
@@ -153,7 +149,6 @@ export function RegisterStaffPage() {
     }
   };
 
-  // ── Render ────────────────────────────────────────────────────────────────
   return (
     <div className={styles.page}>
       <h1 className={styles.title}>Регистрация сотрудника</h1>
@@ -234,7 +229,11 @@ export function RegisterStaffPage() {
 
         {success && <p className={styles.successMsg}>{success}</p>}
 
-        <button type="submit" className={styles.submitBtn} disabled={loading}>
+        <button
+          type="submit"
+          className={styles['submit-btn']}
+          disabled={loading}
+        >
           {loading ? 'Регистрация...' : 'Зарегистрировать'}
         </button>
       </form>

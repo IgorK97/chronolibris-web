@@ -2,7 +2,7 @@
   max-width: 480px;
   margin: 40px auto;
   padding: 0 16px;
-  font-family: Georgia, serif;
+  font-family: arial, Georgia, serif;
 }
 
 .title {
@@ -74,7 +74,7 @@
   padding: 11px;
   border: none;
   border-radius: 8px;
-  background: #2563eb;
+  background: var(--color-dark-blue);
   color: #fff;
   font-size: 15px;
   font-weight: 600;
@@ -84,10 +84,10 @@
 }
 
 .submit-btn:hover:not(:disabled) {
-  background: #1d4ed8;
+  opacity: 0.6;
 }
 
 .submit-btn:disabled {
   background: #93b4f0;
-  cursor: not-allowed;
+  cursor: default;
 }
