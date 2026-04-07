@@ -7,6 +7,8 @@ import { useSelectionBooks } from '../../../api/books';
 import styles from './Library.module.css';
 import ErrorBoundary from '@/components/ErrorBoundary/ErrorBoundary';
 import { useSelectionsInfinite } from '@/api/collections';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { collectionsApi, useShelves } from '@api/collections';
 
 interface LibraryProps {
   onNavigateToBook: (id: number) => void;
@@ -18,19 +20,19 @@ const SelectionSection = ({
   title,
   onNavigateToBook,
   onNavigateToList,
+  onFavoriteToggle,
 }: {
   id: number;
   title: string;
   userId: number;
   onNavigateToBook: (book: BookListItem) => void;
   onNavigateToList: (id: number, title: string) => void;
+  onFavoriteToggle?: (bookId: number, currentIsFavorite: boolean) => void;
 }) => {
   const { data, isLoading } = useSelectionBooks(id);
 
-  // Безопасный доступ: data может быть undefined во время рефетча
   const displayBooks = (data?.items ?? []).slice(0, 6);
 
-  // Пока грузится первый раз — показываем заглушку
   if (isLoading && !data) {
     return <div className={styles['loading-wrapper']}>Загрузка {title}…</div>;
   }
@@ -52,6 +54,7 @@ const SelectionSection = ({
             key={book.id}
             bookInfo={book}
             onPress={() => onNavigateToBook(book)}
+            onFavoriteToggle={onFavoriteToggle}
           />
         ))}
       </div>
@@ -64,7 +67,29 @@ export const Library = ({
   onNavigateToList,
 }: LibraryProps) => {
   const { user, setCurrentBook } = useStore();
+  const { data: shelves } = useShelves(user?.userId || 0);
+  const favoritesShelfId = shelves?.find((s) => s.shelfType === 1)?.id;
+  const queryClient = useQueryClient();
 
+  const favoriteMutation = useMutation({
+    mutationFn: ({ bookId, add }: { bookId: number; add: boolean }) => {
+      if (!favoritesShelfId)
+        return Promise.reject('Не указана полка избранного');
+      return add
+        ? collectionsApi.addBookToShelf(favoritesShelfId, bookId)
+        : collectionsApi.removeBookFromShelf(favoritesShelfId, bookId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['selection'] });
+      queryClient.invalidateQueries({ queryKey: ['books'] });
+      // queryClient.invalidateQueries({ queryKey: ['shelfBooks'] });
+    },
+  });
+
+  const handleFavoriteToggle = (bookId: number, currentIsFavorite: boolean) => {
+    if (!favoritesShelfId) return;
+    favoriteMutation.mutate({ bookId, add: !currentIsFavorite });
+  };
   const {
     data,
     isLoading: selectionsIsLoading,
@@ -117,6 +142,7 @@ export const Library = ({
               userId={user?.userId ?? 0}
               onNavigateToBook={navigateToBookHandler}
               onNavigateToList={onNavigateToList}
+              onFavoriteToggle={handleFavoriteToggle}
             />
           </ErrorBoundary>
         ))}

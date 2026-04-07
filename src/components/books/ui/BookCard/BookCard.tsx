@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Heart } from 'lucide-react'; // Обычный lucide для веба
-import type { BookListItem } from '../../../../types/types';
+import React from 'react';
+import { Heart } from 'lucide-react';
+import type { BookListItem } from '@/types/types';
 import {
   favColor,
   fillFavColor,
@@ -16,48 +16,25 @@ import { useStore } from '@/stores/globalStore';
 interface BookCardProps {
   bookInfo: BookListItem;
   onPress: () => void;
+  onFavoriteToggle?: (bookId: number, currentIsFavorite: boolean) => void;
 }
 
-export const BookCard: React.FC<BookCardProps> = ({ bookInfo, onPress }) => {
-  const [isFavorite, setIsFavorite] = useState(bookInfo.isFavorite);
+export const BookCard: React.FC<BookCardProps> = ({
+  bookInfo,
+  onPress,
+  onFavoriteToggle,
+}) => {
+  // const [isFavorite, setIsFavorite] = useState(bookInfo.isFavorite);
   // const { shelves } = useStore();
   const { user } = useStore();
-  // В Vite используем import.meta.env
   // const BASE_URL = import.meta.env.VITE_PUBLIC_BASE_DEV_URL || '';
   const coverUrl = import.meta.env.VITE_STORAGE_URL;
-
-  // const FAVORITES_SHELF_ID = shelves?.find(
-  //   (shelf) => shelf.shelfType === 1,
-  // )?.id;
-
-  // const toggleFavorite = async (e: React.MouseEvent) => {
-  //   // Останавливаем всплытие, чтобы не срабатывал onPress карточки
-  //   e.stopPropagation();
-
-  //   if (!FAVORITES_SHELF_ID) return;
-
-  //   try {
-  //     let success = false;
-  //     if (!isFavorite) {
-  //       success = await collectionsApi.addBookToShelf(
-  //         FAVORITES_SHELF_ID,
-  //         bookInfo.id,
-  //       );
-  //     } else {
-  //       success = await collectionsApi.removeBookFromShelf(
-  //         FAVORITES_SHELF_ID,
-  //         bookInfo.id,
-  //       );
-  //     }
-
-  //     if (success) {
-  //       setIsFavorite(!isFavorite);
-  //     }
-  //   } catch (error) {
-  //     console.error("Failed to toggle favorite:", error);
-  //   }
-  // };
-
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onFavoriteToggle) {
+      onFavoriteToggle(bookInfo.id, bookInfo.isFavorite);
+    }
+  };
   return (
     <div className={styles['card']}>
       <div className={styles['image-wrapper']} onClick={onPress}>
@@ -72,24 +49,19 @@ export const BookCard: React.FC<BookCardProps> = ({ bookInfo, onPress }) => {
           <button
             type="button"
             className={styles['favorite-button']}
-            onClick={() => {
-              setIsFavorite(!isFavorite);
-            }}
+            onClick={handleFavoriteClick}
             aria-label="Toggle favorite"
           >
             <Heart
               size={16}
-              color={isFavorite ? favColor : unfavColor}
-              fill={isFavorite ? fillFavColor : fillUnfavColor}
+              color={bookInfo.isFavorite ? favColor : unfavColor}
+              fill={bookInfo.isFavorite ? fillFavColor : fillUnfavColor}
             />
           </button>
         )}
       </div>
 
       <h3 className={styles['book-title']}>{bookInfo.title}</h3>
-      {/* <p className={styles.bookAuthor}>{bookInfo.author}</p> */}
-
-      {/* Render authors only if the list is not empty */}
       {bookInfo.authors.length > 0 && (
         <div className={styles['authors']} title={bookInfo.authors.join(', ')}>
           {bookInfo.authors.join(', ')}
