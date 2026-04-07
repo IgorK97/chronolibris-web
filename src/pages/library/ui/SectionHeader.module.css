@@ -7,7 +7,7 @@
 }
 
 .title {
-  color: #d32f2f;
+  color: var(--color-black);
   font-size: 18px;
   font-weight: 600;
   margin: 0; /* Убираем дефолтные отступы тегов h2/span */
@@ -18,9 +18,9 @@
   border: none;
   padding: 0;
   cursor: pointer;
-  color: #d32f2f;
+  color: var(--color-black);
   font-size: 14px;
-  font-family: inherit; /* Чтобы шрифт наследовался от родителя */
+  font-family: inherit;
 }
 
 .button:hover {

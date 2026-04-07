@@ -9,7 +9,7 @@ import Header from '@/components/header/ui/Header';
 
 export default function MainLayout() {
   return (
-    <div className="app-container light">
+    <div className={styles['app-container']}>
       <Header />
       <main className={styles['main-content']}>
         <Outlet />

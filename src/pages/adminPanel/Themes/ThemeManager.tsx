@@ -12,6 +12,7 @@ import type { CreateThemeRequest, UpdateThemeRequest } from '@/api/themes';
 import type { ThemeDto } from '@/types/types';
 import styles from './ThemeManager.module.css';
 import { ExpandChildButton } from '@/components/buttons/ExpandChildButton';
+import { Pencil, Trash2, X } from 'lucide-react';
 
 export const ThemeManager: React.FC = () => {
   const { data: themes, isLoading, error, refetch } = useThemes();
@@ -180,7 +181,7 @@ export const ThemeManager: React.FC = () => {
                     setSelectedParentName(null);
                   }}
                 >
-                  Сбросить
+                  <X />
                 </button>
               )}
             </div>
@@ -189,21 +190,19 @@ export const ThemeManager: React.FC = () => {
             </small>
           </div>
 
-          <div className={styles['form-actions']}>
-            <button
-              onClick={handleCreate}
-              disabled={createMutation.isPending || !formData.name.trim()}
-              className={styles['btn btn-primary']}
-            >
-              {createMutation.isPending ? 'Создание...' : 'Создать тему'}
-            </button>
-          </div>
+          <button
+            onClick={handleCreate}
+            disabled={createMutation.isPending || !formData.name.trim()}
+            className={styles['btn']}
+          >
+            {createMutation.isPending ? 'Создание...' : 'Создать тему'}
+          </button>
         </div>
       </div>
 
       {/* Список тем с иерархией */}
       <div className={styles['list-section']}>
-        <h3>Список тем ({themes?.length || 0})</h3>
+        <h3>Список тем</h3>
 
         <div className={styles['themes-tree']}>
           {themes?.map((theme) => (
@@ -346,21 +345,6 @@ const ThemeTreeNode: React.FC<ThemeTreeNodeProps> = ({
       <div
         className={`${styles['theme-content']} ${isSelectedAsParent ? styles['selected-parent'] : ''}`}
       >
-        {/* <button
-          className={
-            styles[
-              `expand-btn ${hasSubThemes ? 'has-children' : 'no-children'}`
-            ]
-          }
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleExpand(theme.id);
-          }}
-          disabled={!hasSubThemes}
-        >
-          {hasSubThemes ? (isExpanded ? '▾' : '▸') : '-'}
-        </button> */}
-
         <ExpandChildButton
           hasChildren={hasSubThemes}
           handleExpandClick={handleExpandClick}
@@ -388,7 +372,7 @@ const ThemeTreeNode: React.FC<ThemeTreeNodeProps> = ({
             className={styles['btn btn-warning btn-sm']}
             disabled={deleteMutation.isPending || updateMutation.isPending}
           >
-            ✏️
+            <Pencil style={{ cursor: 'pointer' }} />
           </button>
           <button
             onClick={() => onDelete(theme.id)}
@@ -400,7 +384,7 @@ const ThemeTreeNode: React.FC<ThemeTreeNodeProps> = ({
             }
             title={hasSubThemes ? 'Сначала удалите дочерние темы' : 'Удалить'}
           >
-            🗑️
+            <Trash2 style={{ cursor: 'pointer' }} />
           </button>
         </div>
       </div>

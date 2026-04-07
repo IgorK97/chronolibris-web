@@ -1,7 +1,7 @@
 .header {
   position: sticky;
   top: 0;
-  background-color: #fff;
+  background-color: var(--mlib);
   border-bottom: 1px solid #e2e8f0;
   z-index: 1000;
   width: 100%;
@@ -54,7 +54,7 @@
 }
 
 .catalog-btn:hover {
-  background: #f7fafc;
+  background: var(--mlib-hovered);
 }
 
 .search-wrapper {

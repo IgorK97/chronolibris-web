@@ -92,17 +92,7 @@ export const TagRow: React.FC<TagRowProps> = ({
               handleExpandClick={handleExpandClick}
               isExpanded={isExpanded}
             />
-            {/* {tag.hasChildren ? (
-              <button
-                className={styles['expand-button']}
-                onClick={handleExpandClick}
-                aria-label={isExpanded ? 'Свернуть' : 'Развернуть'}
-              >
-                {isExpanded ? '▾' : '▸'}
-              </button>
-            ) : (
-              <span className={styles['expand-placeholder']} />
-            )} */}
+
             {tag.id}
           </span>
         </td>
@@ -170,8 +160,9 @@ export const TagRow: React.FC<TagRowProps> = ({
                   </td>
                 </tr>
               )}
+
               {allChildren.map((child) => (
-                // Рекурсия: дочерние TagRow тоже самостоятельно управляют раскрытием
+                // Рекурсия
                 <TagRow
                   key={child.id}
                   tag={child}

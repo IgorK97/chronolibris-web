@@ -1,36 +1,37 @@
 /* File: src/components/ThemeManager.css */
 .theme-manager {
   max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-.theme-manager h2 {
-  color: #333;
-  margin-bottom: 24px;
-  border-bottom: 2px solid #007bff;
-  padding-bottom: 10px;
-}
-
-.theme-manager h3 {
+  padding: 40px;
   color: #555;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
-.form-section,
+.form-section {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 .list-section {
+  /* background: #f8f9fa; */
+  border-radius: 8px;
+  margin-bottom: 24px;
+
+  /* margin-left: 50px; */
+  display: flex;
+  flex-direction: column;
+  max-width: 1500px;
+}
+
+.form-grid {
   background: #f8f9fa;
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 24px;
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  display: flex;
+  flex-direction: column;
+  max-width: 500px;
+  border: 1px solid #e0e0e0;
 }
 
 .form-group {
@@ -52,6 +53,7 @@
   font-size: 14px;
   transition: border-color 0.2s;
   font-family: inherit;
+  max-width: 400px;
 }
 
 .input-field:focus {
@@ -154,41 +156,25 @@
 
 /* Button Styles */
 .btn {
-  padding: 10px 20px;
+  width: 300px;
+  padding: 12px;
+  background: var(--color-blue);
+  color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: 4px;
+  cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
 }
 
 .btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+  background: #95a5a6;
+  cursor: default;
 }
 
 .btn-sm {
   padding: 6px 12px;
   font-size: 12px;
-}
-
-.btn-primary {
-  background: #007bff;
-  color: white;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: #0056b3;
-}
-
-.btn-success {
-  background: #28a745;
-  color: white;
-}
-
-.btn-success:hover:not(:disabled) {
-  background: #1e7e34;
 }
 
 .btn-warning {
@@ -230,13 +216,6 @@
   color: #dc3545;
   background: #f8d7da;
   border-radius: 8px;
-}
-
-/* Responsive Design */
-@media (width<= 1024px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (width<= 768px) {

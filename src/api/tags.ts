@@ -117,7 +117,6 @@ export const RELATION_TYPES = [
   {
     id: 1,
     name: 'Синоним',
-    description: 'Теги обозначают одно и то же понятие',
   },
 ] as const;
 
