@@ -13,8 +13,6 @@ interface LibraryProps {
   onNavigateToList: (selectionId: number, title: string) => void;
 }
 
-// ─── Секция одной подборки ────────────────────────────────────────────────────
-
 const SelectionSection = ({
   id,
   title,
@@ -61,8 +59,6 @@ const SelectionSection = ({
   );
 };
 
-// ─── Library ──────────────────────────────────────────────────────────────────
-
 export const Library = ({
   onNavigateToBook,
   onNavigateToList,
@@ -79,7 +75,6 @@ export const Library = ({
 
   const selections = data?.pages.flatMap((p) => p.items) ?? [];
 
-  // ─── Sentinel для IntersectionObserver ───────────────────────────────────
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   const handleIntersection = useCallback(
@@ -101,8 +96,6 @@ export const Library = ({
     observer.observe(el);
     return () => observer.disconnect();
   }, [handleIntersection]);
-
-  // ─────────────────────────────────────────────────────────────────────────
 
   const navigateToBookHandler = (book: BookListItem) => {
     setCurrentBook(book);

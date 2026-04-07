@@ -1,8 +1,7 @@
 /* BookCard.module.css */
 .card {
-  width: 300px;
-  margin-top: 8px;
-  margin-bottom: 8px;
+  width: 200px;
+  margin: 0;
   display: flex;
   flex-direction: column;
 }
@@ -180,12 +179,12 @@
 
 @media (width<=768px) {
   .card {
-    width: 250px;
+    width: 150px;
   }
 }
 
 @media (width<=480px) {
   .card {
-    width: 150px;
+    width: 100px;
   }
 }
