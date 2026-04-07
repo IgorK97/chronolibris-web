@@ -15,25 +15,23 @@
   background: #fef2f2;
 }
 
-/* ─── Form ─────────────────────────────────────────────────────────────────── */
-
-.formSection {
+.form-section {
   margin-bottom: 32px;
 }
 
-.formSection h3 {
+.form-section h3 {
   margin: 0 0 12px;
   font-size: 15px;
   font-weight: 600;
 }
 
-.formGroup {
+.form-group {
   display: flex;
   gap: 10px;
   align-items: center;
 }
 
-.inputField {
+.input-field {
   flex: 1;
   padding: 8px 12px;
   border: 1px solid #d1d5db;
@@ -43,14 +41,12 @@
   outline: none;
 }
 
-.inputField:focus {
+.input-field:focus {
   border-color: #6366f1;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+  box-shadow: 0 0 0 2px rgb(99 102 241 / 15%);
 }
 
-/* ─── Table ─────────────────────────────────────────────────────────────────── */
-
-.listSection h3 {
+.list-section h3 {
   margin: 0 0 12px;
   font-size: 15px;
   font-weight: 600;
@@ -79,7 +75,7 @@
   background: #f9fafb;
 }
 
-.table td .inputField {
+.table td .input-field {
   width: 100%;
   box-sizing: border-box;
 }
@@ -89,8 +85,6 @@
   gap: 8px;
   white-space: nowrap;
 }
-
-/* ─── Buttons ────────────────────────────────────────────────────────────────── */
 
 .btn {
   padding: 7px 14px;
@@ -113,27 +107,27 @@
   filter: brightness(0.92);
 }
 
-.btnPrimary {
+.btn-primary {
   background: #6366f1;
   color: #fff;
 }
 
-.btnSuccess {
+.btn-success {
   background: #16a34a;
   color: #fff;
 }
 
-.btnSecondary {
+.btn-secondary {
   background: #e5e7eb;
   color: #374151;
 }
 
-.btnWarning {
+.btn-warning {
   background: #f59e0b;
   color: #fff;
 }
 
-.btnDanger {
+.btn-danger {
   background: #dc2626;
   color: #fff;
 }

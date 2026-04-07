@@ -37,70 +37,6 @@ export const PersonManager: React.FC = () => {
   const [editFormData, setEditFormData] = useState<UpdatePersonRequest | null>(
     null
   );
-  // const [editPreviewImage, setEditPreviewImage] = useState<string | null>(null);
-
-  // const fileInputRef = useRef<HTMLInputElement>(null);
-  // const editFileInputRef = useRef<HTMLInputElement>(null);
-
-  // const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = e.target.files?.[0];
-  //   if (!file) return;
-
-  //   if (!validateFileType(file)) {
-  //     alert('Недопустимый формат файла. Разрешены: JPEG, PNG, GIF, WebP');
-  //     return;
-  //   }
-
-  //   if (!validateFileSize(file, 5)) {
-  //     alert('Размер файла не должен превышать 5MB');
-  //     return;
-  //   }
-
-  //   try {
-  //     const base64 = await fileToBase64(file);
-  //     setFormData({
-  //       ...formData,
-  //       imageBase64: base64,
-  //       fileName: file.name,
-  //     });
-  //     setPreviewImage(base64);
-  //   } catch (err) {
-  //     console.error('Ошибка чтения файла:', err);
-  //     alert('Ошибка загрузки изображения');
-  //   }
-  // };
-
-  // const handleEditFileSelect = async (
-  //   e: React.ChangeEvent<HTMLInputElement>
-  // ) => {
-  //   const file = e.target.files?.[0];
-  //   if (!file) return;
-
-  //   if (!validateFileType(file)) {
-  //     alert('Недопустимый формат файла. Разрешены: JPEG, PNG, GIF, WebP');
-  //     return;
-  //   }
-
-  //   if (!validateFileSize(file, 5)) {
-  //     alert('Размер файла не должен превышать 5MB');
-  //     return;
-  //   }
-
-  //   try {
-  //     const base64 = await fileToBase64(file);
-  //     if (editFormData) {
-  //       setEditFormData({
-  //         ...editFormData,
-  //         imageBase64: base64,
-  //         fileName: file.name,
-  //       });
-  //     }
-  //     setEditPreviewImage(base64);
-  //   } catch (err) {
-  //     console.error('Ошибка чтения файла:', err);
-  //     alert('Ошибка загрузки изображения');
-  //   }
-  // };
 
   const handleCreate = async () => {
     if (!formData.name.trim()) {
@@ -203,37 +139,6 @@ export const PersonManager: React.FC = () => {
     // }
   };
 
-  // const clearImage = () => {
-  //   setFormData({ ...formData, imageBase64: undefined, fileName: undefined });
-  //   // setPreviewImage(null);
-  //   // if (fileInputRef.current) {
-  //   //   fileInputRef.current.value = '';
-  //   // }
-  // };
-
-  // const clearEditImage = () => {
-  //   if (editFormData) {
-  //     setEditFormData({
-  //       ...editFormData,
-  //       imageBase64: undefined,
-  //       fileName: undefined,
-  //     });
-  //   }
-  //   // setEditPreviewImage(null);
-  //   // if (editFileInputRef.current) {
-  //   //   editFileInputRef.current.value = '';
-  //   // }
-  // };
-
-  //   const formatDate = (dateString?: string) => {
-  //     if (!dateString) return '—';
-  //     return new Date(dateString).toLocaleDateString('ru-RU', {
-  //       year: 'numeric',
-  //       month: 'long',
-  //       day: 'numeric',
-  //     });
-  //   };
-
   if (isLoading) {
     return (
       <div className={styles['person-manager']}>
@@ -274,7 +179,7 @@ export const PersonManager: React.FC = () => {
             />
           </div>
 
-          <div className={styles['form-group full-width']}>
+          <div className={styles['form-group']}>
             <label>Описание *</label>
             <textarea
               placeholder="Краткое описание персоны"
@@ -287,55 +192,17 @@ export const PersonManager: React.FC = () => {
             />
           </div>
 
-          {/* <div className={styles['form-group full-width']}>
-            <label>Изображение</label>
-            <div className={styles['image-upload-area']}>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/jpeg,image/png,image/gif,image/webp"
-                onChange={handleFileSelect}
-                className={styles['file-input']}
-                id="person-image-upload"
-              />
-              <label
-                htmlFor="person-image-upload"
-                className={styles['file-input-label']}
-              >
-                📁 Выбрать изображение
-              </label>
-              <span className={styles['file-input-hint']}>
-                Макс. 5MB (JPEG, PNG, GIF, WebP)
-              </span>
-
-              {previewImage && (
-                <div className={styles['image-preview']}>
-                  <img src={previewImage} alt="Preview" />
-                  <button
-                    type="button"
-                    onClick={clearImage}
-                    className={styles['btn btn-sm btn-danger']}
-                  >
-                    ✕ Удалить
-                  </button>
-                </div>
-              )}
-            </div>
-          </div> */}
-
-          <div className={styles['form-actions']}>
-            <button
-              onClick={handleCreate}
-              disabled={
-                createMutation.isPending ||
-                !formData.name.trim() ||
-                !formData.description.trim()
-              }
-              className={styles['btn btn-primary']}
-            >
-              {createMutation.isPending ? 'Создание...' : 'Создать персону'}
-            </button>
-          </div>
+          <button
+            onClick={handleCreate}
+            disabled={
+              createMutation.isPending ||
+              !formData.name.trim() ||
+              !formData.description.trim()
+            }
+            className={styles['btn']}
+          >
+            {createMutation.isPending ? 'Создание...' : 'Создать персону'}
+          </button>
         </div>
       </div>
 
@@ -345,7 +212,7 @@ export const PersonManager: React.FC = () => {
         <table className={styles['persons-table']}>
           <thead>
             <tr>
-              <th>ID</th>
+              {/* <th>ID</th> */}
               {/* <th>Изображение</th> */}
               <th>Имя</th>
               <th>Описание</th>
@@ -357,38 +224,6 @@ export const PersonManager: React.FC = () => {
               <tr key={person.id}>
                 {editingId === person.id ? (
                   <>
-                    <td>{person.id}</td>
-                    {/* <td>
-                      <div className={styles['image-upload-area']}>
-                        <input
-                          ref={editFileInputRef}
-                          type="file"
-                          accept="image/jpeg,image/png,image/gif,image/webp"
-                          onChange={handleEditFileSelect}
-                          className={styles['file-input']}
-                          id={`person-image-edit-${person.id}`}
-                        />
-                        <label
-                          htmlFor={`person-image-edit-${person.id}`}
-                          className={styles['file-input-label']}
-                        >
-                          📁 Загрузить
-                        </label>
-
-                        {editPreviewImage && (
-                          <div className={styles['image-preview small']}>
-                            <img src={editPreviewImage} alt="Preview" />
-                            <button
-                              type="button"
-                              onClick={clearEditImage}
-                              className={styles['btn btn-sm btn-danger']}
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </td> */}
                     <td>
                       <input
                         type="text"
@@ -427,7 +262,7 @@ export const PersonManager: React.FC = () => {
                             // editFormData?.fileName
                           )
                         }
-                        className={styles['btn btn-success']}
+                        className={`${styles['btn']} ${styles['btn-update']}`}
                         disabled={updateMutation.isPending}
                       >
                         {updateMutation.isPending
@@ -436,7 +271,7 @@ export const PersonManager: React.FC = () => {
                       </button>
                       <button
                         onClick={cancelEditing}
-                        className={styles['btn btn-secondary']}
+                        className={`${styles['btn']} ${styles['btn-danger']}`}
                         disabled={updateMutation.isPending}
                       >
                         Отмена
@@ -445,26 +280,17 @@ export const PersonManager: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <td>{person.id}</td>
-                    {/* <td>
-                      {person.imageUrl ? (
-                        <div className={styles['person-image-cell']}>
-                          <img src={person.imageUrl} alt={person.name} />
-                        </div>
-                      ) : (
-                        <span className={styles['no-image']}>
-                          Нет изображения
-                        </span>
-                      )}
-                    </td> */}
                     <td className={styles['name-cell']}>{person.name}</td>
-                    <td className={styles['description-cell']}>
+                    <td
+                      className={styles['description-cell']}
+                      title={person.description}
+                    >
                       {person.description}
                     </td>
                     <td>
                       <button
                         onClick={() => startEditing(person)}
-                        className={styles['btn btn-warning']}
+                        className={`${styles['btn']} ${styles['btn-update']}`}
                         disabled={
                           deleteMutation.isPending || updateMutation.isPending
                         }
@@ -473,7 +299,7 @@ export const PersonManager: React.FC = () => {
                       </button>
                       <button
                         onClick={() => handleDelete(person.id)}
-                        className={styles['btn btn-danger']}
+                        className={`${styles['btn']} ${styles['btn-danger']}`}
                         disabled={
                           deleteMutation.isPending || updateMutation.isPending
                         }

@@ -118,22 +118,22 @@ export const SimpleEntityManager: React.FC<SimpleEntityManagerProps> = ({
       <h2>{title}</h2>
 
       {/* Форма создания */}
-      <div className={styles.formSection}>
+      <div className={styles['form-section']}>
         <h3>Добавить новый элемент</h3>
-        <div className={styles.formGroup}>
+        <div className={styles['form-group']}>
           <input
             type="text"
             placeholder={createPlaceholder}
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
-            className={styles.inputField}
+            className={styles['input-field']}
             maxLength={maxLength}
           />
           <button
             onClick={handleCreate}
             disabled={isCreating || !newName.trim()}
-            className={`${styles.btn} ${styles.btnPrimary}`}
+            className={`${styles.btn} ${styles['btn-primary']}`}
           >
             {isCreating ? 'Создание...' : createLabel}
           </button>
@@ -141,7 +141,7 @@ export const SimpleEntityManager: React.FC<SimpleEntityManagerProps> = ({
       </div>
 
       {/* Список */}
-      <div className={styles.listSection}>
+      <div className={styles['list-section']}>
         <h3>Список ({items?.length ?? 0})</h3>
         <table className={styles.table}>
           <thead>
@@ -165,7 +165,7 @@ export const SimpleEntityManager: React.FC<SimpleEntityManagerProps> = ({
                         if (e.key === 'Enter') handleUpdate();
                         if (e.key === 'Escape') cancelEditing();
                       }}
-                      className={styles.inputField}
+                      className={styles['input-field']}
                       maxLength={maxLength}
                       autoFocus
                     />
@@ -174,14 +174,14 @@ export const SimpleEntityManager: React.FC<SimpleEntityManagerProps> = ({
                     <button
                       onClick={handleUpdate}
                       disabled={isUpdating}
-                      className={`${styles.btn} ${styles.btnSuccess}`}
+                      className={`${styles.btn} ${styles['btn-success']}`}
                     >
                       {isUpdating ? 'Сохранение...' : 'Сохранить'}
                     </button>
                     <button
                       onClick={cancelEditing}
                       disabled={isUpdating}
-                      className={`${styles.btn} ${styles.btnSecondary}`}
+                      className={`${styles.btn} ${styles['btn-secondary']}`}
                     >
                       Отмена
                     </button>
@@ -195,14 +195,14 @@ export const SimpleEntityManager: React.FC<SimpleEntityManagerProps> = ({
                     <button
                       onClick={() => startEditing(item)}
                       disabled={isDeleting || isUpdating}
-                      className={`${styles.btn} ${styles.btnWarning}`}
+                      className={`${styles.btn} ${styles['btn-warning']}`}
                     >
                       Редактировать
                     </button>
                     <button
                       onClick={() => handleDelete(item.id)}
                       disabled={isDeleting || isUpdating}
-                      className={`${styles.btn} ${styles.btnDanger}`}
+                      className={`${styles.btn} ${styles['btn-danger']}`}
                     >
                       {isDeleting ? 'Удаление...' : 'Удалить'}
                     </button>

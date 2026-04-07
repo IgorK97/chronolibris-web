@@ -150,8 +150,8 @@ export const ThemeManager: React.FC = () => {
 
       {/* Форма создания */}
       <div className={styles['form-section']}>
-        <h3>Добавить новую тему</h3>
         <div className={styles['form-grid']}>
+          <p style={{ marginBottom: '10px' }}>Добавить новую тему</p>
           <div className={styles['form-group']}>
             <label>Название темы *</label>
             <input
@@ -185,9 +185,9 @@ export const ThemeManager: React.FC = () => {
                 </button>
               )}
             </div>
-            <small className="hint">
+            <p style={{ marginBottom: '10px' }}>
               Кликните на тему в списке, чтобы сделать её родительской
-            </small>
+            </p>
           </div>
 
           <button
