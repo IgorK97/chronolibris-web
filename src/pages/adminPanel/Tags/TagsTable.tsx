@@ -385,7 +385,7 @@ export const TagsTable: React.FC<TagsTableProps> = ({ onParentTagSelect }) => {
 
       {isSearchMode && (
         <div className={styles['search-mode-notice']}>
-          🔍 Поиск по всем уровням: «{debouncedSearch}»
+          Поиск по всем уровням: «{debouncedSearch}»
           <span className={styles['search-mode-sub']}>
             {' '}
             — для тегов с родителем указан путь к родителю

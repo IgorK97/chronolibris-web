@@ -178,8 +178,7 @@
   flex-wrap: wrap;
 }
 
-/* ── Expand / collapse tree button ── */
-.expand-button {
+/* .expand-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -202,13 +201,12 @@
   color: #3498db;
 }
 
-/* Placeholder to keep alignment when there is no expand button */
 .expand-placeholder {
   display: inline-block;
   width: 20px;
   height: 20px;
   flex-shrink: 0;
-}
+} */
 
 /* ── Relation type badge ── */
 .relation-badge {

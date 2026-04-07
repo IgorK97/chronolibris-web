@@ -11,6 +11,7 @@ import {
 import type { CreateThemeRequest, UpdateThemeRequest } from '@/api/themes';
 import type { ThemeDto } from '@/types/types';
 import styles from './ThemeManager.module.css';
+import { ExpandChildButton } from '@/components/buttons/ExpandChildButton';
 
 export const ThemeManager: React.FC = () => {
   const { data: themes, isLoading, error, refetch } = useThemes();
@@ -335,12 +336,17 @@ const ThemeTreeNode: React.FC<ThemeTreeNodeProps> = ({
     );
   }
 
+  const handleExpandClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onToggleExpand(theme.id);
+  };
+
   return (
     <div className={styles['theme-node']}>
       <div
         className={`${styles['theme-content']} ${isSelectedAsParent ? styles['selected-parent'] : ''}`}
       >
-        <button
+        {/* <button
           className={
             styles[
               `expand-btn ${hasSubThemes ? 'has-children' : 'no-children'}`
@@ -352,8 +358,14 @@ const ThemeTreeNode: React.FC<ThemeTreeNodeProps> = ({
           }}
           disabled={!hasSubThemes}
         >
-          {hasSubThemes ? (isExpanded ? '▼' : '▶') : '•'}
-        </button>
+          {hasSubThemes ? (isExpanded ? '▾' : '▸') : '-'}
+        </button> */}
+
+        <ExpandChildButton
+          hasChildren={hasSubThemes}
+          handleExpandClick={handleExpandClick}
+          isExpanded={isExpanded}
+        />
 
         {/* Кликабельное название темы */}
         <span

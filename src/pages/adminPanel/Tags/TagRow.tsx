@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useInfiniteChildTags, useDeleteTag, TAG_TYPES } from '@/api/tags';
 import type { TagDetails } from '@/types/types';
 import styles from './TagsTable.module.css';
+import { ExpandChildButton } from '@/components/buttons/ExpandChildButton';
 
 interface TagRowProps {
   tag: TagDetails;
@@ -86,7 +87,12 @@ export const TagRow: React.FC<TagRowProps> = ({
           style={{ paddingLeft: `${indent + 12}px` }}
         >
           <span className={styles['id-cell']}>
-            {tag.hasChildren ? (
+            <ExpandChildButton
+              hasChildren={tag.hasChildren}
+              handleExpandClick={handleExpandClick}
+              isExpanded={isExpanded}
+            />
+            {/* {tag.hasChildren ? (
               <button
                 className={styles['expand-button']}
                 onClick={handleExpandClick}
@@ -96,7 +102,7 @@ export const TagRow: React.FC<TagRowProps> = ({
               </button>
             ) : (
               <span className={styles['expand-placeholder']} />
-            )}
+            )} */}
             {tag.id}
           </span>
         </td>
