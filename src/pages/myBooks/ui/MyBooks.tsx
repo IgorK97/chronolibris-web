@@ -9,6 +9,7 @@ import { useStore } from '../../../stores/globalStore';
 import { useShelves, collectionsApi } from '../../../api/collections';
 import { BookListByCategory } from './BookListByCategory';
 import styles from './MyBooks.module.css';
+import { ShelfRefiningModal } from './ShelfRefiningModal';
 
 export const MyBooks = ({
   onNavigateToBook,
@@ -25,12 +26,31 @@ export const MyBooks = ({
   const [selectedShelfId, setSelectedShelfId] = useState<number | null>(null);
   const [shelfMenuId, setShelfMenuId] = useState<number | null>(null);
   const activeShelfId = selectedShelfId ?? shelves?.[0]?.id;
-  const handleRename = async (id: number, currentName: string) => {
-    const name = prompt('Новое название:', currentName);
-    if (name && name !== currentName) {
-      await collectionsApi.updateShelf(id, name);
-      refetchShelves();
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [modalMode, setModalMode] = useState<'create' | 'rename'>('create');
+  const [renameTarget, setRenameTarget] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
+
+  const handleCreateShelf = async (name: string) => {
+    if (!name.trim()) return;
+    await collectionsApi.createShelf(name.trim());
+    await refetchShelves();
+    setModalOpen(false);
+  };
+
+  const handleRenameShelf = async (newName: string) => {
+    if (!renameTarget) return;
+    if (!newName.trim() || newName === renameTarget.name) {
+      setModalOpen(false);
+      setRenameTarget(null);
+      return;
     }
+    await collectionsApi.updateShelf(renameTarget.id, newName.trim());
+    await refetchShelves();
+    setModalOpen(false);
+    setRenameTarget(null);
     setShelfMenuId(null);
   };
 
@@ -79,7 +99,14 @@ export const MyBooks = ({
                 </button>
                 {shelfMenuId === shelf.id && (
                   <div className={styles['shelf-popup']}>
-                    <button onClick={() => handleRename(shelf.id, shelf.name)}>
+                    <button
+                      onClick={() => {
+                        setModalMode('rename');
+                        setRenameTarget({ id: shelf.id, name: shelf.name });
+                        setModalOpen(true);
+                        setShelfMenuId(null);
+                      }}
+                    >
                       <Edit3 size={14} /> Переименовать
                     </button>
                     {shelf.shelfType === 3 && (
@@ -97,7 +124,10 @@ export const MyBooks = ({
           ))}
           <button
             className={styles['add-shelf-btn']}
-            onClick={() => handleRename(0, '')}
+            onClick={() => {
+              setModalMode('create');
+              setModalOpen(true);
+            }}
           >
             <Plus size={18} /> Добавить полку
           </button>
@@ -112,6 +142,21 @@ export const MyBooks = ({
           />
         )}
       </main>
+      {modalOpen && (
+        <ShelfRefiningModal
+          onClose={() => {
+            setModalOpen(false);
+            setRenameTarget(null);
+          }}
+          onSubmit={
+            modalMode === 'create' ? handleCreateShelf : handleRenameShelf
+          }
+          initialName={modalMode === 'rename' ? renameTarget?.name : ''}
+          title={
+            modalMode === 'create' ? 'Создать полку' : 'Редактировать полку'
+          }
+        />
+      )}
     </div>
   );
 };

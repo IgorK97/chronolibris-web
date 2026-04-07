@@ -1,6 +1,6 @@
 // ShelfSelectionModal.tsx
 import React, { useState } from 'react';
-import { SquareCheckBig, Square, WandSparkles, X } from 'lucide-react';
+import { SquareCheckBig, Square, X } from 'lucide-react';
 import {
   collectionsApi,
   useSeekedShelves,
@@ -8,6 +8,7 @@ import {
 } from '../../../api/collections';
 import { useStore } from '../../../stores/globalStore';
 import styles from './ShelfSelectionModal.module.css'; // Перенесите стили из BookDetails.module.css
+import { BookShelfConstructing } from './BookshelfConstructing';
 
 interface Props {
   bookId: number;
@@ -23,7 +24,7 @@ export const ShelfSelectionModal = ({ bookId, onClose, onRefresh }: Props) => {
   const { data: seekedShelves, refetch: refetchSeeked } =
     useSeekedShelves(bookId);
   const [isCreating, setIsCreating] = useState(false);
-  const [newName, setNewName] = useState('');
+  // const [newName, setNewName] = useState('');
 
   const handleToggle = async (shelfId: number) => {
     const isOnShelf = seekedShelves?.includes(shelfId);
@@ -36,12 +37,12 @@ export const ShelfSelectionModal = ({ bookId, onClose, onRefresh }: Props) => {
     }
   };
 
-  const handleCreate = async () => {
+  const handleCreate = async (newName: string) => {
     if (!newName.trim()) return;
     const id = await collectionsApi.createShelf(newName.trim());
     if (id) {
       refetchShelves();
-      setNewName('');
+      // setNewName('');
       setIsCreating(false);
     }
   };
@@ -66,16 +67,7 @@ export const ShelfSelectionModal = ({ bookId, onClose, onRefresh }: Props) => {
           ))}
         </ul>
         {isCreating ? (
-          <div className={styles['create-row']}>
-            <input
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              autoFocus
-            />
-            <button onClick={handleCreate}>
-              <WandSparkles style={{ cursor: 'pointer' }} size={16} />
-            </button>
-          </div>
+          <BookShelfConstructing handleCreate={handleCreate} />
         ) : (
           <button
             className={styles['add-btn']}
