@@ -54,6 +54,7 @@ import { TARGET_TYPE } from '@/api/reports';
 import { Flag } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ShelfSelectionModal } from '@/pages/myBooks/ui/ShelfSelectionModal';
+import { GenreChip } from '@/components/GenreChip';
 interface BookDetailsProps {
   onNavigateToReviews: (id: number) => void;
   onNavigateToRead: (bookFileId?: number) => void;
@@ -364,81 +365,6 @@ export const BookDetailsComponent = ({
                 </button>
               </div>
             )}
-            {/* {isShelfPanelOpen && (
-              // <div className={styles['shelf-panel']}>
-              //   <button
-              //     className={styles['shelf-panel-close']}
-              //     onClick={() => {
-              //       setIsShelfPanelOpen(false);
-              //       setIsCreating(false);
-              //       setNewShelfName('');
-              //     }}
-              //   >
-              //     <X />
-              //   </button>
-
-              //   <ul className={styles['shelf-list']}>
-              //     {shelves?.map((shelf) => {
-              //       const isOnShelf = seekedShelves?.includes(shelf.id);
-              //       return (
-              //         <li key={shelf.id} className={styles['shelf-item']}>
-              //           <span className={styles['shelf-name']}>
-              //             {shelf.name}
-              //           </span>
-              //           <button
-              //             className={styles['shelf-toggle']}
-              //             onClick={() => handleToggleShelf(shelf)}
-              //           >
-              //             {isOnShelf ? (
-              //               <SquareCheckBig size={24} />
-              //             ) : (
-              //               <Square size={24} />
-              //             )}
-              //           </button>
-              //         </li>
-              //       );
-              //     })}
-              //   </ul>
-
-              //   {isCreating ? (
-              //     <div className={styles['shelf-create-row']}>
-              //       <input
-              //         className={styles['shelf-create-row']}
-              //         value={newShelfName}
-              //         onChange={(e) => setNewShelfName(e.target.value)}
-              //         onKeyDown={(e) =>
-              //           e.key === 'Enter' && handleCreateShelf()
-              //         }
-              //         placeholder="Название новой полки"
-              //         autoFocus
-              //       />
-              //       <button
-              //         className={styles['shelf-confirm']}
-              //         onClick={handleCreateShelf}
-              //       >
-              //         <WandSparkles size={20} />
-              //       </button>
-              //       <button
-              //         className={styles['shelf-cancel']}
-              //         onClick={() => {
-              //           setIsCreating(false);
-              //           setNewShelfName('');
-              //         }}
-              //       >
-              //         <X />
-              //       </button>
-              //     </div>
-              //   ) : (
-              //     <button
-              //       className={styles['shelf-create-btn']}
-              //       onClick={() => setIsCreating(true)}
-              //     >
-              //       <Plus /> {t('book.create_new_collection')}
-              //     </button>
-              //   )}
-              // </div>
-            )} */}
-            {/* <div className={styles['download-dropdown']}> */}
             {bookFiles && bookFiles.length > 0 && (
               <button
                 className={styles['icon-button']}
@@ -677,30 +603,17 @@ export const BookDetailsComponent = ({
               <h2 className={styles['section-title']}>{t('book.themes')}</h2>
               <div className={styles['genres-container']}>
                 {fullBookDetails.themes?.map((theme, index) => (
-                  <button
+                  <GenreChip
                     key={index}
-                    className={styles['genre-chip']}
                     onClick={() => {
                       navigate(`/search?themeId=${theme.id}`);
                     }}
-                  >
-                    {theme.name}
-                  </button>
+                    genreName={theme.name}
+                  />
                 ))}
               </div>
             </section>
 
-            {/* <button
-              className={styles['reviews-button']}
-              onClick={() => onNavigateToReviews(fullBookDetails.id)}
-            >
-              {t('book.view_all_reviews')}
-            </button> */}
-            {/* <CommentsSection
-              bookId={fullBookDetails.id}
-              canReview={true}
-              onNavigateToReviews={onNavigateToReviews}
-            /> */}
             <BookTabs
               canReview={fullBookDetails.isReviewable}
               isReviewable={fullBookDetails.isReviewable}
