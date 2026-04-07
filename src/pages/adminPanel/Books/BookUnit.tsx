@@ -1058,7 +1058,7 @@ export const BookUnit: React.FC = () => {
                 <th>Название</th>
                 <th>Тип</th>
                 <th>Авторы</th>
-                <th>Темы</th>
+                {/* <th>Темы</th> */}
                 <th>Действия</th>
               </tr>
             </thead>
@@ -1070,7 +1070,7 @@ export const BookUnit: React.FC = () => {
                   <td>{content.title}</td>
                   <td>{content.contentType}</td>
                   <td>{content.authors.join(', ')}</td>
-                  <td>{content.themes.map((t) => t.name).join(', ')}</td>
+                  {/* <td>{content.themes.map((t) => t.name).join(', ')}</td> */}
                   <td>
                     <button
                       onClick={() => handleUnlinkContent(content.id)}
@@ -1106,12 +1106,3 @@ export const BookUnit: React.FC = () => {
     </div>
   );
 };
-
-// function MetaRow({ label, value }: { label: string; value: React.ReactNode }) {
-//   return (
-//     <div className={styles['metadata-item']}>
-//       <label>{label}:</label>
-//       <span>{value ?? '—'}</span>
-//     </div>
-//   );
-// }

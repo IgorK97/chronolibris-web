@@ -613,31 +613,6 @@ export const BookDetailsComponent = ({
                 ))}
               </div>
             </section>
-
-            <BookTabs
-              canReview={fullBookDetails.isReviewable}
-              isReviewable={fullBookDetails.isReviewable}
-              discussionCount={fullBookDetails.commentsCount ?? 10}
-              reviewsCount={fullBookDetails.reviewsCount}
-              bookId={fullBookDetails.id}
-              isAuth={isAuth}
-              userReviewId={userReview ? userReview.id : null}
-              userCurrentScore={userReview ? userReview.score : 0}
-              userReviewText={userReview?.text}
-              userReviewStatus={userReview?.status}
-              onRatingChanged={() => {
-                refetchBook();
-                refetchReviews();
-              }}
-              // infoContent={<p>Дополнительная информация о книге...</p>}
-              infoContent={
-                <ParticipantsInfo
-                  bookInfo={fullBookDetails}
-                  participants={fullBookDetails.participants}
-                  roles={roles ?? []}
-                />
-              }
-            />
           </div>
           {user && (
             <button
@@ -649,6 +624,30 @@ export const BookDetailsComponent = ({
             </button>
           )}
         </div>
+        <BookTabs
+          canReview={fullBookDetails.isReviewable}
+          isReviewable={fullBookDetails.isReviewable}
+          discussionCount={fullBookDetails.commentsCount ?? 10}
+          reviewsCount={fullBookDetails.reviewsCount}
+          bookId={fullBookDetails.id}
+          isAuth={isAuth}
+          userReviewId={userReview ? userReview.id : null}
+          userCurrentScore={userReview ? userReview.score : 0}
+          userReviewText={userReview?.text}
+          userReviewStatus={userReview?.status}
+          onRatingChanged={() => {
+            refetchBook();
+            refetchReviews();
+          }}
+          // infoContent={<p>Дополнительная информация о книге...</p>}
+          infoContent={
+            <ParticipantsInfo
+              bookInfo={fullBookDetails}
+              participants={fullBookDetails.participants}
+              roles={roles ?? []}
+            />
+          }
+        />
       </div>
       {isReportOpen && (
         <ReportModal

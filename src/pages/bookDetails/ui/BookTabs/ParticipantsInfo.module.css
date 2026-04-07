@@ -1,3 +1,5 @@
+/* ParticipantsInfo.module.css */
+
 /* ─── Container ─────────────────────────────────────────── */
 .container {
   display: flex;
@@ -50,7 +52,7 @@
   background: rgb(0 0 0 / 4%);
 }
 
-/* ─── Avatar ──────────────────────────────────────────────── */
+/* ─── Avatar (commented in TSX, but styles kept for consistency) ── */
 .avatar {
   flex-shrink: 0;
   width: 2rem;
@@ -90,4 +92,49 @@
 .group + .group {
   padding-top: 1rem;
   border-top: 1px solid #f0ebe0;
+}
+
+/* ─── Book info section (unified cards) ───────────────────── */
+.book-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.info-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  transition: background 0.15s ease;
+}
+
+.info-card:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.info-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #8a8a8a;
+  margin-bottom: 0.25rem;
+}
+
+.info-value {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #1a1a1a;
+  line-height: 1.4;
+}
+
+.info-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.info-row + .info-row {
+  margin-top: 0.5rem;
 }

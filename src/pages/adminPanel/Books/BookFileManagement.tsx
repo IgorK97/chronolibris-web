@@ -24,9 +24,6 @@ interface BookFileManagementProps {
 
 const FORMAT_EXTENSIONS: Record<number, string> = {
   1: 'fb2',
-  2: 'epub',
-  3: 'pdf',
-  4: 'txt',
 };
 
 export const BookFileManagement: React.FC<BookFileManagementProps> = ({
@@ -293,7 +290,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
               <th>Размер</th>
               <th>Статус</th>
               <th>Главный</th>
-              <th>Версия</th>
+              {/* <th>Версия</th> */}
               <th>Загружен</th>
               <th>Действия</th>
             </tr>
@@ -308,7 +305,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
                     <td>{file.fileSizeDisplay}</td>
                     <td>{getStatusBadge(file.bookFileStatusId)}</td>
                     <td>{file.isReadable ? '✓' : '—'}</td>
-                    <td>{file.version}</td>
+                    {/* <td>{file.version}</td> */}
                     <td>
                       {new Date(file.createdAt).toLocaleDateString('ru-RU')}
                     </td>
@@ -341,7 +338,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
                     <td>{file.fileSizeDisplay}</td>
                     <td>{getStatusBadge(file.bookFileStatusId)}</td>
                     <td>{file.isReadable ? '✓' : '—'}</td>
-                    <td>{file.version}</td>
+                    {/* <td>{file.version}</td> */}
                     <td>
                       {new Date(file.createdAt).toLocaleDateString('ru-RU')}
                     </td>
@@ -355,7 +352,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
                       >
                         <Download />
                       </button>
-                      <button
+                      {/* <button
                         onClick={() => setEditingFile(file)}
                         className={`${styles['btn']} ${styles['btn-warning']} ${styles['btn-sm']}`}
                         disabled={
@@ -363,7 +360,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
                         }
                       >
                         <Pencil />
-                      </button>
+                      </button> */}
                       <button
                         onClick={() => handleDelete(file.id)}
                         className={`${styles['btn']} ${styles['btn-danger']} ${styles['btn-sm']}`}
