@@ -611,4 +611,8 @@ export interface TagDetails {
   name: string;
   tagTypeId: number;
   tagTypeName?: string;
+  parentTagId?: number;
+  parentTagName?: string;
+  relationTypeName?: string;
+  hasChildren: boolean;
 }

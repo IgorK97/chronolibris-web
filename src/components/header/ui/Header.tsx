@@ -98,12 +98,13 @@ export default function Header() {
                     aria-label="Открыть панель администратора"
                   />
                 )}
-                {user.role == 'moderator' && (
-                  <ShieldCheck
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => navigate('/moderation')}
-                  />
-                )}
+                {user.role == 'moderator' ||
+                  (user.role == 'admin' && (
+                    <ShieldCheck
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => navigate('/moderation')}
+                    />
+                  ))}
                 {user.role == 'reader' && (
                   <Link
                     to="/mybooks"

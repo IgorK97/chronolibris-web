@@ -160,9 +160,13 @@ export default function App() {
             element={<Reviews onNavigate={() => navigate(-1)} />}
           /> */}
 
-          {/* Только модераторы */}
+          {/* Только модераторы и администраторы */}
           <Route
-            element={<ProtectedRoute allowedRoles={[USER_ROLES.MODERATOR]} />}
+            element={
+              <ProtectedRoute
+                allowedRoles={[USER_ROLES.MODERATOR, USER_ROLES.ADMIN]}
+              />
+            }
           >
             <Route path="moderation" element={<ModerationPage />} />
           </Route>

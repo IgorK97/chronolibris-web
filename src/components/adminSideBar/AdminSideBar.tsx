@@ -9,7 +9,7 @@ import {
   List,
   Tag,
   Users,
-  // ShieldCheck,
+  ShieldCheck,
   X,
   BookMarked,
   Building2,
@@ -45,9 +45,9 @@ const SECTIONS = [
     ],
   },
   {
-    title: 'Управление сотрудниками',
+    title: 'Администрирование',
     items: [
-      // { label: 'Модерация', path: '/moderation', icon: ShieldCheck },
+      { label: 'Модерация', path: '/moderation', icon: ShieldCheck },
       {
         label: 'Регистрация сотрудников',
         path: '/register-staff',
