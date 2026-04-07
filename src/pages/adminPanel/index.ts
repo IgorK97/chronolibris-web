@@ -1,10 +1,10 @@
-import { LanguageManager } from './ui/LanguageManager';
-import { CountryManager } from './ui/CountryManager';
-import { FormatManager } from './ui/FormatManager';
-import { PublisherManager } from './ui/PublisherManager';
-import { PersonManager } from './ui/PersonManager';
+import { LanguageManager } from './References/LanguageManager';
+import { CountryManager } from './References/CountryManager';
+import { FormatManager } from './References/FormatManager';
+import { PublisherManager } from './Publishers/PublisherManager';
+import { PersonManager } from './Persons/PersonManager';
 import { ThemeManager } from './Themes/ThemeManager';
-import { ContentManagement } from './ui/ContentManagement';
+import { ContentManagement } from './Contents/ContentManagement';
 
 export {
   LanguageManager,

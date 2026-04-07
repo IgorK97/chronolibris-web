@@ -155,7 +155,7 @@ export const PublisherManager: React.FC = () => {
         <h3>Добавить новое издательство</h3>
         <div className={styles['form-grid']}>
           <div className="form-group">
-            <label>Название</label>
+            <p>Название</p>
             <input
               type="text"
               placeholder="Название издательства"
@@ -169,7 +169,7 @@ export const PublisherManager: React.FC = () => {
           </div>
 
           <div className="form-group">
-            <label>Страна</label>
+            <p>Страна</p>
             <select
               value={formData.countryId}
               onChange={(e) =>
@@ -186,7 +186,7 @@ export const PublisherManager: React.FC = () => {
             </select>
           </div>
 
-          <div className={styles['form-group full-width']}>
+          <div className={styles['form-group']}>
             <label>Описание</label>
             <textarea
               placeholder="Описание издательства"
@@ -199,22 +199,18 @@ export const PublisherManager: React.FC = () => {
             />
           </div>
 
-          <div className={styles['form-actions']}>
-            <button
-              onClick={handleCreate}
-              disabled={
-                createMutation.isPending ||
-                !formData.name.trim() ||
-                !formData.description.trim() ||
-                formData.countryId <= 0
-              }
-              className={styles['btn btn-primary']}
-            >
-              {createMutation.isPending
-                ? 'Создание...'
-                : 'Создать издательство'}
-            </button>
-          </div>
+          <button
+            onClick={handleCreate}
+            disabled={
+              createMutation.isPending ||
+              !formData.name.trim() ||
+              !formData.description.trim() ||
+              formData.countryId <= 0
+            }
+            className={styles['btn']}
+          >
+            {createMutation.isPending ? 'Создание...' : 'Создать издательство'}
+          </button>
         </div>
       </div>
 
@@ -224,7 +220,7 @@ export const PublisherManager: React.FC = () => {
         <table className={styles['publishers-table']}>
           <thead>
             <tr>
-              <th>ID</th>
+              {/* <th>ID</th> */}
               <th>Название</th>
               <th>Описание</th>
               <th>Страна</th>
@@ -237,7 +233,7 @@ export const PublisherManager: React.FC = () => {
               <tr key={publisher.id}>
                 {editingId === publisher.id ? (
                   <>
-                    <td>{publisher.id}</td>
+                    {/* <td>{publisher.id}</td> */}
                     <td>
                       <input
                         type="text"
@@ -295,7 +291,7 @@ export const PublisherManager: React.FC = () => {
                             editFormData?.countryId || 0
                           )
                         }
-                        className={styles['btn btn-success']}
+                        className={`${styles['btn']} ${styles['btn-update']}`}
                         disabled={updateMutation.isPending}
                       >
                         {updateMutation.isPending
@@ -304,7 +300,7 @@ export const PublisherManager: React.FC = () => {
                       </button>
                       <button
                         onClick={cancelEditing}
-                        className={styles['btn btn-secondary']}
+                        className={`${styles['btn']} ${styles['btn-danger']}`}
                         disabled={updateMutation.isPending}
                       >
                         Отмена
@@ -313,7 +309,7 @@ export const PublisherManager: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <td>{publisher.id}</td>
+                    {/* <td>{publisher.id}</td> */}
                     <td className={styles['name-cell']}>{publisher.name}</td>
                     <td className={styles['description-cell']}>
                       {publisher.description}
@@ -323,7 +319,7 @@ export const PublisherManager: React.FC = () => {
                     <td>
                       <button
                         onClick={() => startEditing(publisher)}
-                        className={styles['btn btn-warning']}
+                        className={`${styles['btn']} ${styles['btn-update']}`}
                         disabled={
                           deleteMutation.isPending || updateMutation.isPending
                         }
@@ -332,7 +328,7 @@ export const PublisherManager: React.FC = () => {
                       </button>
                       <button
                         onClick={() => handleDelete(publisher.id)}
-                        className={styles['btn btn-danger']}
+                        className={`${styles['btn']} ${styles['btn-danger']}`}
                         disabled={
                           deleteMutation.isPending || updateMutation.isPending
                         }

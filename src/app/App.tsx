@@ -37,10 +37,10 @@ import {
   // SeriesManager,
   ThemeManager,
 } from '@/pages/adminPanel';
-import { ContentForm } from '@/pages/adminPanel/ui/ContentUnit';
+import { ContentForm } from '@/pages/adminPanel/Contents/ContentUnit';
 // import { Reader } from '@/components/Reader';
-import { BookManagement } from '@/pages/adminPanel/ui/BookManagement';
-import { BookUnit } from '@/pages/adminPanel/ui/BookUnit';
+import { BookManagement } from '@/pages/adminPanel/Books/BookManagement';
+import { BookUnit } from '@/pages/adminPanel/Books/BookUnit';
 import { SelectionsPage } from '@/pages/adminPanel/Selection/SelectionsPage';
 import { TagsPage } from '@/pages/adminPanel/Tags/TagsPage';
 import { ReaderPage } from '@/pages/reader/ReaderPage';

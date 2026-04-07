@@ -27,7 +27,7 @@ import type {
   CreateBookRequest,
   UpdateBookRequest,
 } from '@/types/types';
-import { ContentSearchPopup } from './ContentSearchPopup';
+import { ContentSearchPopup } from '../Contents/ContentSearchPopup';
 import { BookFileManagement } from './BookFileManagement';
 import styles from './BookUnit.module.css';
 import { ArrowLeft, Book, X } from 'lucide-react';

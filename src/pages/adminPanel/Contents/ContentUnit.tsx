@@ -24,7 +24,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { ThemeSelector } from '../Themes/ThemeSelector';
 import { ContentTagsManager } from './ContentTagsManagement';
 import type { ThemeDto } from '@/types/types';
-import styles from './BookUnit.module.css';
+import styles from './ContentUnit.module.css';
 import { ArrowLeft, X } from 'lucide-react';
 import { storageUrl } from '@/utils';
 
