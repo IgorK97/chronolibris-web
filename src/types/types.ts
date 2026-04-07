@@ -348,6 +348,7 @@ export interface BookDetails {
   averageRating: number;
   ratingsCount: number;
   reviewsCount: number;
+  commentsCount: number;
   coverUri: string | null;
   isAvailable: boolean;
   isFavorite: boolean;

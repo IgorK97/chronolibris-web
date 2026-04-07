@@ -73,11 +73,14 @@ export const ShelfSelectionModal = ({ bookId, onClose, onRefresh }: Props) => {
               autoFocus
             />
             <button onClick={handleCreate}>
-              <WandSparkles size={16} />
+              <WandSparkles style={{ cursor: 'pointer' }} size={16} />
             </button>
           </div>
         ) : (
-          <button className={styles['add-btn']} onClick={() => setIsCreating(true)}>
+          <button
+            className={styles['add-btn']}
+            onClick={() => setIsCreating(true)}
+          >
             + Создать полку
           </button>
         )}

@@ -79,7 +79,8 @@
   padding: 20px 0;
   max-width: 1400px;
   margin: 0 auto;
-  background-color: var(--background, #fff);
+  background-color: #fff;
+  box-shadow: 0 0 10px 3px rgb(125 125 125 / 40%);
 }
 
 .header {

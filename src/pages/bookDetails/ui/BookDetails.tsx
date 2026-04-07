@@ -53,6 +53,7 @@ import { ReportModal } from '@/components/reports/ui/ReportModal';
 import { TARGET_TYPE } from '@/api/reports';
 import { Flag } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { ShelfSelectionModal } from '@/pages/myBooks/ui/ShelfSelectionModal';
 interface BookDetailsProps {
   onNavigateToReviews: (id: number) => void;
   onNavigateToRead: (bookFileId?: number) => void;
@@ -66,12 +67,7 @@ const formatFileSize = (bytes: number): string => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} МБ`;
 };
 
-const FORMAT_EXTENSIONS: Record<number, string> = [
-  'fb2', // 1
-  'epub', // 2
-  'pdf', // 3
-  'mobi', // 4
-];
+const FORMAT_EXTENSIONS: Record<number, string> = ['fb2'];
 
 function getAuthorsString(
   authorRoleId: number,
@@ -368,90 +364,92 @@ export const BookDetailsComponent = ({
                 </button>
               </div>
             )}
-            {isShelfPanelOpen && (
-              <div className={styles['shelf-panel']}>
-                <button
-                  className={styles['shelf-panel-close']}
-                  onClick={() => {
-                    setIsShelfPanelOpen(false);
-                    setIsCreating(false);
-                    setNewShelfName('');
-                  }}
-                >
-                  <X />
-                </button>
+            {/* {isShelfPanelOpen && (
+              // <div className={styles['shelf-panel']}>
+              //   <button
+              //     className={styles['shelf-panel-close']}
+              //     onClick={() => {
+              //       setIsShelfPanelOpen(false);
+              //       setIsCreating(false);
+              //       setNewShelfName('');
+              //     }}
+              //   >
+              //     <X />
+              //   </button>
 
-                <ul className={styles['shelf-list']}>
-                  {shelves?.map((shelf) => {
-                    const isOnShelf = seekedShelves?.includes(shelf.id);
-                    return (
-                      <li key={shelf.id} className={styles['shelf-item']}>
-                        <span className={styles['shelf-name']}>
-                          {shelf.name}
-                        </span>
-                        <button
-                          className={styles['shelf-toggle']}
-                          onClick={() => handleToggleShelf(shelf)}
-                        >
-                          {isOnShelf ? (
-                            <SquareCheckBig size={24} />
-                          ) : (
-                            <Square size={24} />
-                          )}
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
+              //   <ul className={styles['shelf-list']}>
+              //     {shelves?.map((shelf) => {
+              //       const isOnShelf = seekedShelves?.includes(shelf.id);
+              //       return (
+              //         <li key={shelf.id} className={styles['shelf-item']}>
+              //           <span className={styles['shelf-name']}>
+              //             {shelf.name}
+              //           </span>
+              //           <button
+              //             className={styles['shelf-toggle']}
+              //             onClick={() => handleToggleShelf(shelf)}
+              //           >
+              //             {isOnShelf ? (
+              //               <SquareCheckBig size={24} />
+              //             ) : (
+              //               <Square size={24} />
+              //             )}
+              //           </button>
+              //         </li>
+              //       );
+              //     })}
+              //   </ul>
 
-                {isCreating ? (
-                  <div className={styles['shelf-create-row']}>
-                    <input
-                      className={styles['shelf-create-row']}
-                      value={newShelfName}
-                      onChange={(e) => setNewShelfName(e.target.value)}
-                      onKeyDown={(e) =>
-                        e.key === 'Enter' && handleCreateShelf()
-                      }
-                      placeholder="Название новой полки"
-                      autoFocus
-                    />
-                    <button
-                      className={styles['shelf-confirm']}
-                      onClick={handleCreateShelf}
-                    >
-                      <WandSparkles size={20} />
-                    </button>
-                    <button
-                      className={styles['shelf-cancel']}
-                      onClick={() => {
-                        setIsCreating(false);
-                        setNewShelfName('');
-                      }}
-                    >
-                      <X />
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    className={styles['shelf-create-btn']}
-                    onClick={() => setIsCreating(true)}
-                  >
-                    <Plus /> {t('book.create_new_collection')}
-                  </button>
-                )}
-              </div>
-            )}
+              //   {isCreating ? (
+              //     <div className={styles['shelf-create-row']}>
+              //       <input
+              //         className={styles['shelf-create-row']}
+              //         value={newShelfName}
+              //         onChange={(e) => setNewShelfName(e.target.value)}
+              //         onKeyDown={(e) =>
+              //           e.key === 'Enter' && handleCreateShelf()
+              //         }
+              //         placeholder="Название новой полки"
+              //         autoFocus
+              //       />
+              //       <button
+              //         className={styles['shelf-confirm']}
+              //         onClick={handleCreateShelf}
+              //       >
+              //         <WandSparkles size={20} />
+              //       </button>
+              //       <button
+              //         className={styles['shelf-cancel']}
+              //         onClick={() => {
+              //           setIsCreating(false);
+              //           setNewShelfName('');
+              //         }}
+              //       >
+              //         <X />
+              //       </button>
+              //     </div>
+              //   ) : (
+              //     <button
+              //       className={styles['shelf-create-btn']}
+              //       onClick={() => setIsCreating(true)}
+              //     >
+              //       <Plus /> {t('book.create_new_collection')}
+              //     </button>
+              //   )}
+              // </div>
+            )} */}
             {/* <div className={styles['download-dropdown']}> */}
-            <button
-              className={styles['icon-button']}
-              onClick={() => setIsDownloadPanelOpen((prev) => !prev)}
-            >
-              <Download size={24} />
-              <span className={styles['button-label']}>
-                {t('book.download')}
-              </span>
-            </button>
+            {bookFiles && bookFiles.length > 0 && (
+              <button
+                className={styles['icon-button']}
+                onClick={() => setIsDownloadPanelOpen((prev) => !prev)}
+              >
+                <Download size={24} />
+                <span className={styles['button-label']}>
+                  {t('book.download')}
+                </span>
+              </button>
+            )}
             {isDownloadPanelOpen &&
               bookFiles &&
               bookFiles.length > 0 &&
@@ -744,6 +742,13 @@ export const BookDetailsComponent = ({
           targetId={fullBookDetails.id}
           targetTypeId={TARGET_TYPE.BOOK}
           onClose={() => setIsReportOpen(false)}
+        />
+      )}
+      {isShelfPanelOpen && (
+        <ShelfSelectionModal
+          bookId={fullBookDetails.id}
+          onClose={() => setIsShelfPanelOpen(false)}
+          onRefresh={refetchShelves}
         />
       )}
     </div>

@@ -75,7 +75,7 @@ export const MyBooks = ({
                     );
                   }}
                 >
-                  <Menu size={16} />
+                  <Menu style={{ cursor: 'pointer' }} size={16} />
                 </button>
                 {shelfMenuId === shelf.id && (
                   <div className={styles['shelf-popup']}>
