@@ -85,7 +85,7 @@ export default function Header() {
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
               />
-              <Search onClick={handleSearch} />
+              <Search style={{ cursor: 'pointer' }} onClick={handleSearch} />
             </div>
           </div>
           <div className={styles['right-section']}>

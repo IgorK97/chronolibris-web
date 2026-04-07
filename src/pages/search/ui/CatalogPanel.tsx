@@ -1,17 +1,8 @@
 import { useState } from 'react';
-import {
-  ChevronRight,
-  ChevronLeft,
-  //   ChevronDown,
-  //   ChevronUp,
-  X,
-} from 'lucide-react';
+import { ChevronRight, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useThemes } from '@/api/themes';
-import {
-  useAllSelections,
-  // useSelectionsInfinite
-} from '@/api/collections';
+import { useAllSelections } from '@/api/collections';
 import styles from './CatalogPanel.module.css';
 
 interface CatalogPanelProps {
@@ -34,68 +25,67 @@ export function CatalogPanel({ isOpen, onClose }: CatalogPanelProps) {
 
   return (
     <>
-      {/* Backdrop */}
       <div className={styles.backdrop} onClick={handleClose} />
-
-      {/* Panel */}
       <aside className={styles.panel}>
         <div className={styles['panel-header']}>
-          {view !== 'menu' && (
-            <button
-              className={styles['back-btn']}
-              onClick={() => setView('menu')}
-            >
-              <ChevronLeft size={16} />
-              Назад
-            </button>
-          )}
-          <span className={styles['panel-title']}>
-            {view === 'menu' && 'Каталог'}
-            {view === 'themes' && 'Темы'}
-            {view === 'selections' && 'Подборки'}
-          </span>
+          <span className={styles['panel-title']}>Каталог</span>
           <button className={styles['close-btn']} onClick={handleClose}>
             <X size={18} />
           </button>
         </div>
 
         <div className={styles['panel-content']}>
-          {view === 'menu' && (
+          {/* Левая колонка – всегда меню */}
+          <div className={styles['menu-column']}>
             <MenuView
               onSelectThemes={() => setView('themes')}
               onSelectSelections={() => setView('selections')}
+              activeView={view}
             />
-          )}
-          {view === 'themes' && (
-            <ThemesView onClose={handleClose} navigate={navigate} />
-          )}
-          {view === 'selections' && (
-            <SelectionsView onClose={handleClose} navigate={navigate} />
-          )}
+          </div>
+
+          {/* Правая колонка – контент (темы или подборки) */}
+          <div className={styles['content-column']}>
+            {view === 'themes' && (
+              <ThemesView onClose={handleClose} navigate={navigate} />
+            )}
+            {view === 'selections' && (
+              <SelectionsView onClose={handleClose} navigate={navigate} />
+            )}
+            {/* если view === 'menu' – правая колонка остаётся пустой */}
+          </div>
         </div>
       </aside>
     </>
   );
 }
 
-// --- Menu View ---
+// --- Menu View (левая колонка) ---
 function MenuView({
   onSelectThemes,
   onSelectSelections,
+  activeView,
 }: {
   onSelectThemes: () => void;
   onSelectSelections: () => void;
+  activeView: PanelView;
 }) {
   return (
     <ul className={styles['menu-list']}>
       <li>
-        <button className={styles['menu-item']} onClick={onSelectThemes}>
+        <button
+          className={`${styles['menu-item']} ${activeView === 'themes' ? styles['menu-item-active'] : ''}`}
+          onClick={onSelectThemes}
+        >
           <span>Темы</span>
           <ChevronRight size={16} />
         </button>
       </li>
       <li>
-        <button className={styles['menu-item']} onClick={onSelectSelections}>
+        <button
+          className={`${styles['menu-item']} ${activeView === 'selections' ? styles['menu-item-active'] : ''}`}
+          onClick={onSelectSelections}
+        >
           <span>Подборки</span>
           <ChevronRight size={16} />
         </button>
@@ -104,7 +94,7 @@ function MenuView({
   );
 }
 
-// --- Themes View ---
+// --- Themes View (правая колонка) ---
 function ThemesView({
   onClose,
   navigate,
@@ -154,7 +144,7 @@ function ThemesView({
   );
 }
 
-// --- Selections View ---
+// --- Selections View (правая колонка) ---
 function SelectionsView({
   onClose,
   navigate,
