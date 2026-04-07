@@ -135,7 +135,7 @@ export const BookDetailsComponent = ({
   } = useBookDetails(
     Number(bookId) || 0,
     String(user?.userId || 0),
-    true,
+    user?.role == 'admin' || user?.role == 'moderator' ? true : false,
     !!Number(bookId)
   );
 
