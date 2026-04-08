@@ -37,10 +37,10 @@ import {
   // SeriesManager,
   ThemeManager,
 } from '@/pages/adminPanel';
-import { ContentForm } from '@/pages/adminPanel/Contents/ContentUnit';
+import { ContentForm } from '@/pages/adminPanel/Contents/SingleContent/ContentUnit';
 // import { Reader } from '@/components/Reader';
-import { BookManagement } from '@/pages/adminPanel/Books/BookManagement';
-import { BookUnit } from '@/pages/adminPanel/Books/BookUnit';
+// import { BookManagement } from '@/pages/adminPanel/Books/SeveralBooks/BookManagement';
+import { BookUnit } from '@/pages/adminPanel/Books/SingleBook/BookUnit';
 import { SelectionsPage } from '@/pages/adminPanel/Selection/SelectionsPage';
 import { TagsPage } from '@/pages/adminPanel/Tags/TagsPage';
 import { ReaderPage } from '@/pages/reader/ReaderPage';
@@ -215,7 +215,7 @@ export default function App() {
             <Route path="/contents/new" element={<ContentForm />} />
             <Route path="/contents/:contentId/edit" element={<ContentForm />} />
 
-            <Route path="books" element={<BookManagement />} />
+            {/* <Route path="books" element={<BookManagement />} /> */}
             <Route path="books/:bookId" element={<BookUnit />} />
 
             <Route path="register-staff" element={<RegisterStaffPage />} />

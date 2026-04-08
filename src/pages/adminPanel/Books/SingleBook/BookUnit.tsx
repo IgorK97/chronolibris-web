@@ -27,12 +27,13 @@ import type {
   CreateBookRequest,
   UpdateBookRequest,
 } from '@/types/types';
-import { ContentSearchPopup } from '../Contents/ContentSearchPopup';
+import { ContentSearchPopup } from './ContentSearchPopup';
 import { BookFileManagement } from './BookFileManagement';
 import styles from './BookUnit.module.css';
 import { ArrowLeft, Book, X } from 'lucide-react';
 import { useStore } from '@/stores/globalStore';
 import { storageUrl } from '@/utils';
+// import { ContentList } from '@/components/contents/ContentList';
 
 interface SelectedPerson {
   id: number;
@@ -1038,7 +1039,7 @@ export const BookUnit: React.FC = () => {
         </div>
       </div>
 
-      {/* Contents – only for existing books */}
+      {/* Contents - only for existing books */}
       {!isNew && (
         <div className={styles['contents-section']}>
           <div className={styles['contents-header']}>
@@ -1058,19 +1059,17 @@ export const BookUnit: React.FC = () => {
                 <th>Название</th>
                 <th>Тип</th>
                 <th>Авторы</th>
-                {/* <th>Темы</th> */}
                 <th>Действия</th>
               </tr>
             </thead>
             <tbody>
               {contents?.map((content) => (
                 <tr key={content.id}>
-                  {/* <td>{index}</td> */}
                   <td>{content.id}</td>
                   <td>{content.title}</td>
                   <td>{content.contentType}</td>
                   <td>{content.authors.join(', ')}</td>
-                  {/* <td>{content.themes.map((t) => t.name).join(', ')}</td> */}
+
                   <td>
                     <button
                       onClick={() => handleUnlinkContent(content.id)}
