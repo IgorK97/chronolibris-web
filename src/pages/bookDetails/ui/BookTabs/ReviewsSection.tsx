@@ -19,7 +19,7 @@ import {
 } from '@/api/reviews';
 import type { ReviewDetails } from '@/types';
 import { useStore } from '@/stores/globalStore';
-import { TARGET_TYPE } from '@/api/reports';
+import { TARGET_TYPE } from '@/types';
 
 function StarRating({ rating }: { rating: number }) {
   return (

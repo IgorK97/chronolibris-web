@@ -89,7 +89,7 @@ export const useUploadBookFile = () => {
 
   return useMutation({
     mutationFn: bookFilesApi.uploadBookFile,
-    onSuccess: (data, variables) => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ['bookFiles', variables.bookId],
       });
@@ -102,7 +102,8 @@ export const useUpdateBookFile = () => {
 
   return useMutation({
     mutationFn: bookFilesApi.updateBookFile,
-    onSuccess: (data, variables) => {
+    //Почему, если поставить _, то ошибка исчезает?
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ['bookFiles', variables.bookId],
       });
@@ -116,8 +117,7 @@ export const useDeleteBookFile = () => {
   return useMutation({
     mutationFn: bookFilesApi.deleteBookFile,
     //какие здесь параметры?
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    onSuccess: (data, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bookFiles'] });
     },
   });

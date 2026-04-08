@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from 'react-router-dom';
-import { useStore } from '../stores/globalStore';
+import { useStore } from '@/stores/globalStore';
 
 interface ProtectedRouteProps {
   allowedRoles?: ('moderator' | 'admin' | 'reader')[];
@@ -14,7 +14,10 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
     return <Navigate to="/auth" replace />;
   }
 
-  if (allowedRoles && !allowedRoles.includes(user.role as 'moderator' | 'admin' | 'reader')) {
+  if (
+    allowedRoles &&
+    !allowedRoles.includes(user.role as 'moderator' | 'admin' | 'reader')
+  ) {
     return <Navigate to="/library" replace />;
   }
 

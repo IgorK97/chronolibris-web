@@ -13,7 +13,6 @@ import {
   X,
   BookMarked,
   Building2,
-  // Scroll,
   User,
   Palette,
 } from 'lucide-react';
@@ -75,14 +74,13 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
 
   return (
     <>
-      {/* Backdrop */}
       <div
         className={`${styles.backdrop} ${isOpen ? styles.backdropVisible : ''}`}
         onClick={onClose}
         aria-hidden="true"
       />
 
-      {/* Sidebar */}
+      {/* aside? */}
       <aside
         ref={sidebarRef}
         className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ''}`}
@@ -127,10 +125,6 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
             </div>
           ))}
         </nav>
-
-        <div className={styles.footer}>
-          <span className={styles.footerText}>Chronolibris Admin</span>
-        </div>
       </aside>
     </>
   );

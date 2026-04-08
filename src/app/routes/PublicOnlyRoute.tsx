@@ -1,9 +1,9 @@
+import { Navigate, Outlet } from 'react-router-dom';
+import { useStore } from '@/stores/globalStore';
+
 interface PublicOnlyRouteProps {
   redirectTo?: string;
 }
-
-import { Navigate, Outlet } from 'react-router-dom';
-import { useStore } from '../stores/globalStore';
 
 export const PublicOnlyRoute = ({
   redirectTo = '/library',

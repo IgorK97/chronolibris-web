@@ -1,6 +1,6 @@
 import styles from './ShelfRefiningModal.module.css';
 import { X } from 'lucide-react';
-import { BookShelfConstructing } from './BookshelfConstructing';
+import { BookShelfConstructing } from './BookShelfConstructing';
 // import { collectionsApi, useShelves } from '../../../api/collections';
 // import { useStore } from '@/stores/globalStore';
 

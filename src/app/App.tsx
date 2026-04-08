@@ -1,26 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  // React,
-  useEffect,
-} from 'react';
+import { useEffect } from 'react';
 import { useNavigate, Routes, Route, Navigate } from 'react-router-dom';
 import { USER_ROLES, useStore } from '../stores/globalStore';
-
 import MainLayout from './layouts/MainLayout';
-
 import { BookDetailsComponent } from '../pages/bookDetails';
 import { Profile } from '../pages/profile';
 import { Auth } from '../pages/auth';
-// import Reviews from '../pages/reviews';
 import Library from '@/pages/library';
 import MyBooks from '../pages/myBooks';
 import { usersApi } from '../api/user';
-import {
-  // ModeratorRoute,
-  ProtectedRoute,
-} from './routes/ProtectedRoute';
-// import { SelectionListView } from '../pages/library/ui/SectionList';
-
+import { ProtectedRoute } from './routes/ProtectedRoute';
 import {
   MutationCache,
   QueryCache,
@@ -34,12 +23,9 @@ import {
   LanguageManager,
   PersonManager,
   PublisherManager,
-  // SeriesManager,
   ThemeManager,
 } from '@/pages/adminPanel';
 import { ContentForm } from '@/pages/adminPanel/Contents/SingleContent/ContentUnit';
-// import { Reader } from '@/components/Reader';
-// import { BookManagement } from '@/pages/adminPanel/Books/SeveralBooks/BookManagement';
 import { BookUnit } from '@/pages/adminPanel/Books/SingleBook/BookUnit';
 import { SelectionsPage } from '@/pages/adminPanel/Selection/SelectionsPage';
 import { TagsPage } from '@/pages/adminPanel/Tags/TagsPage';
@@ -52,7 +38,7 @@ import { PublicOnlyRoute } from './routes/PublicOnlyRoute';
 import toast from 'react-hot-toast';
 
 const queryClient = new QueryClient({
-  // Обработка ошибок для всех useQuery (чтение данных)
+  // Обработка ошибок для всех useQuery
   queryCache: new QueryCache({
     onError: (error: any) => {
       if (error.response?.status >= 500) {
@@ -82,17 +68,13 @@ export default function App() {
   };
   useEffect(() => {
     const initApp = async () => {
-      // Если в localStorage нашли старого юзера, можно обновить его данные с сервера
-      // if (user?.userId) {
       try {
         const freshUser = await usersApi.getProfile();
         setUser(freshUser);
       } catch (e) {
         setUser(null);
         console.error('Session expired or server error', e);
-        // Если токен протух, можно разлогинить: setUser(null);
       } finally {
-        // }
         setInitialized(true);
       }
     };
@@ -154,11 +136,6 @@ export default function App() {
               />
             }
           />
-
-          {/* <Route
-            path="book/:id/reviews"
-            element={<Reviews onNavigate={() => navigate(-1)} />}
-          /> */}
 
           {/* Только модераторы и администраторы */}
           <Route

@@ -21,7 +21,7 @@ import { formatDate } from '@/utils';
 import type { CommentDto } from '@/types';
 import { useStore } from '@/stores/globalStore';
 import styles from './BookTabs.module.css';
-import { TARGET_TYPE } from '@/api/reports';
+import { TARGET_TYPE } from '@/types';
 
 const MAX_INDENT_DEPTH = 3; // После 3 уровня вправо больше не сдвигается
 

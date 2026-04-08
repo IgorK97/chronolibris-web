@@ -17,25 +17,13 @@
 
 .main-content {
   min-height: 100vh;
-
-  /* Эффект матового стекла */
   backdrop-filter: blur(8px) brightness(0.9);
-
-  /* Полупрозрачная подложка, чтобы текст читался */
-
   background-color: var(--color-grey);
   padding: 20px;
-  transition: all 0.3s ease;
+
+  /* transition: all 0.3s ease; */
 }
 
 .app-container {
   min-height: 100vh;
-
-  /* Путь к картинке. Если в public, то просто /981.jpg */
-
-  /* background-image: url('981.jpg');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  background-repeat: no-repeat; */
 }
