@@ -12,7 +12,7 @@
   gap: 16px;
   align-self: flex-start;
   position: sticky;
-  top: 80px; /* adjust to your header height */
+  top: 80px;
 }
 
 .content-layout {
@@ -25,8 +25,14 @@
 .results-area {
   flex: 1;
   overflow-y: auto;
-  padding: 0 16px;
   min-width: 0;
+}
+
+.results {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 50px;
+  max-width: 80vw;
 }
 
 .filter-bar {
@@ -121,7 +127,7 @@
 
 .advanced-toggle:hover {
   border-color: #1c255a;
-  background: #c0c0ff;
+  background: #f3ede5;
 }
 
 .advanced-toggle-active {
@@ -257,12 +263,6 @@
   padding: 48px 0;
   color: #c0392b;
   font-size: 15px;
-}
-
-.results {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
 }
 
 .loading-more {

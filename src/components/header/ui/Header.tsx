@@ -106,15 +106,12 @@ export default function Header() {
                     />
                   ))}
                 {user.role == 'reader' && (
-                  <Link
-                    to="/mybooks"
-                    className={styles['navigation-menu-link']}
-                  >
+                  <Link to="/mybooks" className={styles['catalog-btn']}>
                     Мои книги
                   </Link>
                 )}
                 <Link to="/profile" className={styles['profile-icon']}>
-                  {user.email?.charAt(0).toUpperCase() || 'U'}
+                  {user.userName?.charAt(0).toUpperCase() || 'U'}
                 </Link>
               </>
             ) : (

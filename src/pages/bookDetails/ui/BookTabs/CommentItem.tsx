@@ -23,7 +23,7 @@ import { useStore } from '@/stores/globalStore';
 import styles from './BookTabs.module.css';
 import { TARGET_TYPE } from '@/api/reports';
 
-const MAX_INDENT_DEPTH = 3; // После 3 уровня перестаем сдвигать вправо
+const MAX_INDENT_DEPTH = 3; // После 3 уровня вправо больше не сдвигается
 
 export function CommentItem({
   comment,
@@ -39,20 +39,6 @@ export function CommentItem({
   const qc = useQueryClient();
   const [isReplying, setIsReplying] = useState(false);
   const [showMore, setShowMore] = useState(false);
-  // const rateMutation = useRateComment(
-  //   bookId,
-  //   comment.parentCommentId || undefined
-  // );
-  // Загрузка дочерних комментариев по требованию
-  // const {
-  //   data: fetchedReplies,
-  //   // isLoading
-  // } = useQuery({
-  //   queryKey: ['comments', 'replies', comment.id],
-  //   queryFn: () => commentsApi.getReplies(comment.id),
-  //   enabled: showMore,
-  //   staleTime: 0,
-  // });
 
   const {
     data: infiniteReplies,
@@ -61,7 +47,6 @@ export function CommentItem({
     isFetchingNextPage,
   } = useInfiniteQuery({
     queryKey: ['comments', 'replies', comment.id],
-    // Используем pageParam как курсор (lastId)
     queryFn: ({ pageParam }) => commentsApi.getReplies(comment.id, pageParam),
     initialPageParam: undefined as number | undefined,
     getNextPageParam: (lastPage) =>
@@ -70,16 +55,6 @@ export function CommentItem({
     staleTime: 0,
   });
 
-  // const handleVote = (score: number) => {
-  //   if (!isAuth) {
-  //     alert('Нужно авторизоваться');
-  //     return;
-  //   }
-
-  //   // Если пользователь нажимает на ту же кнопку, мы обычно "снимаем" голос (score: 0)
-  //   // Но для простоты реализуем базовую логику:
-  //   rateMutation.mutate({ commentId: comment.id, score });
-  // };
   const allReplies = infiniteReplies?.pages.flat() || [];
   const repliesQueryKey = ['comments', 'replies', comment.id];
 
@@ -90,11 +65,9 @@ export function CommentItem({
 
   const handleHideReplies = () => {
     setShowMore(false);
-    // Полностью удаляем данные об ответах этого комментария из кеша React Query
     qc.removeQueries({ queryKey: repliesQueryKey });
   };
 
-  // Совмещаем превью-ответы с сервера и дозагруженные
   // const allReplies = fetchedReplies || [];
   const hasReplies = comment.repliesCount > 0;
 
@@ -110,7 +83,7 @@ export function CommentItem({
       ? '[Недоступно]'
       : comment.userLogin;
 
-  console.log(userName, 'Kukusiki');
+  // console.log(userName, 'Kukusiki');
   const [votes, setVotes] = useState({
     likes: comment.likesCount,
     dislikes: comment.dislikesCount,
@@ -130,7 +103,7 @@ export function CommentItem({
     if (!isAuth) return;
     const score = type === 'like' ? 1 : -1;
 
-    // Optimistic UI update
+    //Оптимистичное обновление
     setVotes((prev) => {
       if (prev.userVote === type) {
         return {
@@ -182,6 +155,7 @@ export function CommentItem({
             />
           ) : (
             <ThreeDotsMenu
+              canReport={comment.userLogin == null ? false : true}
               canDelete={false}
               onDelete={async () => {}}
               targetId={comment.id}

@@ -176,14 +176,14 @@ export function RegisterStaffPage() {
         />
 
         <Field
-          label="Имя пользователя"
+          label="Имя"
           value={form.firstName}
           onChange={set('firstName')}
           error={errors.firstName}
         />
 
         <Field
-          label="Имя пользователя"
+          label="Фамилия"
           value={form.lastName}
           onChange={set('lastName')}
           error={errors.lastName}
@@ -200,7 +200,7 @@ export function RegisterStaffPage() {
 
         {/* Телефон */}
         <Field
-          label="Телефон (необязательно)"
+          label="Телефон"
           type="tel"
           value={form.phoneNumber}
           onChange={set('phoneNumber')}
@@ -240,8 +240,6 @@ export function RegisterStaffPage() {
     </div>
   );
 }
-
-// ─── Field ────────────────────────────────────────────────────────────────────
 
 function Field({
   label,

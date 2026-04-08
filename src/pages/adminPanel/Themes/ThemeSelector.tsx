@@ -68,16 +68,6 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({
             readOnly={false}
             onDelete={() => onRemove(theme.id)}
           />
-          // <div key={theme.id} className={styles.chip}>
-          //   <span>{theme.name}</span>
-          //   <button
-          //     type="button"
-          //     onClick={() => onRemove(theme.id)}
-          //     className={styles.removeBtn}
-          //   >
-          //     &times;
-          //   </button>
-          // </div>
         ))}
       </div>
     </div>

@@ -77,19 +77,18 @@ export function ScoreDisplay({
 }
 
 export function ThreeDotsMenu({
-  // type,
   canDelete,
   onDelete,
+  canReport = true,
   targetId,
   targetTypeId,
-  // isAuth = false,
 }: {
   type?: 'comment' | 'review';
   canDelete: boolean;
+  canReport?: boolean;
   onDelete: () => Promise<void>;
   targetId: number;
   targetTypeId: number;
-  // isAuth?: boolean;
 }) {
   const { user, isReader } = useStore();
   const isAuth = !!user;
@@ -101,7 +100,7 @@ export function ThreeDotsMenu({
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [menuOpen]);
-  const showReport = isAuth && !canDelete && isReader();
+  const showReport = isAuth && !canDelete && isReader() && canReport;
   // const [reported, setReported] = useState(false);
   if (!canDelete && !showReport) return null;
   return (

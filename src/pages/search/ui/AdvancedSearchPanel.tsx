@@ -11,7 +11,7 @@ import {
 import type { PersonRoleFilterRequest } from '@/api/search';
 import styles from './AdvancedSearchPanel.module.css';
 import type { AdvancedFilters } from '../utils/filterParams';
-import { EMPTY_FILTERS } from '../utils/filterParams';
+// import { EMPTY_FILTERS } from '../utils/filterParams';
 import { X } from 'lucide-react';
 interface Props {
   filters: AdvancedFilters;
@@ -343,14 +343,14 @@ export function AdvancedSearchPanel({
 }: Props) {
   const { data: roles = [] } = usePersonRoles();
   const [draft, setDraft] = useState<AdvancedFilters>(filters);
-  const resetAll = () => onChange(EMPTY_FILTERS);
+  // const resetAll = () => onChange(EMPTY_FILTERS);
   const handleApply = () => {
     onChange(draft);
   };
-  const hasAnyFilter =
-    filters.personFilters.length > 0 ||
-    filters.requiredTagIds.length > 0 ||
-    filters.excludedTagIds.length > 0;
+  // const hasAnyFilter =
+  //   filters.personFilters.length > 0 ||
+  //   filters.requiredTagIds.length > 0 ||
+  //   filters.excludedTagIds.length > 0;
 
   const isDirty = JSON.stringify(draft) !== JSON.stringify(filters);
 
@@ -363,11 +363,11 @@ export function AdvancedSearchPanel({
       <div className={styles.header}>
         <span className={styles.title}>Расширенный поиск</span>
         <div className={styles['header-actions']}>
-          {hasAnyFilter && (
+          {/* {hasAnyFilter && (
             <button className={styles['reset-btn']} onClick={resetAll}>
               Сбросить всё
             </button>
-          )}
+          )} */}
           <button className={styles['close-btn']} onClick={onClose}>
             <X style={{ cursor: 'pointer' }} />
           </button>
@@ -411,7 +411,7 @@ export function AdvancedSearchPanel({
         />
         <div className={styles.footer}>
           <button
-            className={styles['apply-btn']}
+            className={styles['reset-btn']}
             onClick={handleApply}
             disabled={!isDirty}
           >

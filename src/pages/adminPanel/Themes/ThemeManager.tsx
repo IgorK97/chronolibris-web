@@ -185,9 +185,6 @@ export const ThemeManager: React.FC = () => {
                 </button>
               )}
             </div>
-            <p style={{ marginBottom: '10px' }}>
-              Кликните на тему в списке, чтобы сделать её родительской
-            </p>
           </div>
 
           <button

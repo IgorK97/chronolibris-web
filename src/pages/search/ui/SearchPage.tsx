@@ -222,13 +222,13 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
                   : `По вашему запросу ничего не найдено`}
               </div>
             )}
-            {!urlQuery && (
+            {/* {!urlQuery && (
               <div className={styles['empty-state']}>
                 <p className={styles['empty-text']}>
                   Введите название книги...
                 </p>
               </div>
-            )}
+            )} */}
             {isLoading && (
               <div className={styles['loading-state']}>
                 <div className={styles.spinner} />
@@ -242,7 +242,7 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
               </div>
             )}
             {allBooks.length > 0 && (
-              <div className={styles.results}>
+              <div className={styles['results']}>
                 {allBooks.map((book) => (
                   <BookCard
                     key={book.id}

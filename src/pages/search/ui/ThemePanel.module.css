@@ -1,6 +1,6 @@
 .panel {
-  width: 220px;
-  min-width: 180px;
+  width: 200px;
+  min-width: 200px;
   flex-shrink: 0;
   background: #fff;
   border-right: 1px solid #e8e8e8;
@@ -18,8 +18,8 @@
 }
 
 .panel-collapsed {
-  width: 48px;
-  min-width: 48px;
+  width: 200px;
+  min-width: 200px;
 }
 
 .header {
@@ -44,7 +44,7 @@
 .apply-btn {
   margin: 8px 10px 2px;
   padding: 6px 12px;
-  background: var(--color-primary, #4f46e5);
+  background: var(--color-dark-blue);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -58,22 +58,6 @@
 .apply-btn:hover {
   opacity: 0.88;
 }
-
-/* .apply-btn {
-  font-size: 12px;
-  padding: 3px 10px;
-  border-radius: 4px;
-  border: none;
-  background: #4a7fbf;
-  color: #fff;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background 0.15s;
-}
-
-.apply-btn:hover {
-  background: #3a6aaa;
-} */
 
 .toggle-btn {
   background: none;
@@ -129,30 +113,6 @@
   color: var(--color-text, #111);
 }
 
-/* .current-parent {
-  display: flex;
-  align-items: center;
-  padding: 7px 12px;
-  margin: 0 8px 4px;
-  border-radius: 6px;
-  cursor: pointer;
-  background: #f5f5f5;
-  border: 1px solid #e0e0e0;
-  transition: background 0.15s;
-}
-
-.current-parent:hover {
-  background: #eee;
-} */
-
-/* .current-parent-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: #333;
-  flex: 1;
-} */
-
-/* Theme list */
 .theme-list {
   list-style: none;
   margin: 0;

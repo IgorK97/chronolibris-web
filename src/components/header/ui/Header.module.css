@@ -72,6 +72,7 @@
   border: 1px solid #cbd5e0;
   outline: none;
   font-size: 0.95rem;
+  background-color: #fff;
 }
 
 .search-input:focus {
