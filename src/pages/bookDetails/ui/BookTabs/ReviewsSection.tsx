@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 // import type { Review } from './bookTabsData';
 import { formatDate } from '@/utils';
@@ -77,32 +77,6 @@ function StarPicker({
   );
 }
 
-function SubmitBanner({
-  status,
-  onDismiss,
-}: {
-  status: 'pending' | 'error' | null;
-  onDismiss: () => void;
-}) {
-  if (!status) return null;
-  return (
-    <div
-      className={`${styles['submit-banner']} ${
-        status === 'error'
-          ? styles['submit-banner-error']
-          : styles['submit-banner-pending']
-      }`}
-    >
-      {status === 'pending'
-        ? '✓ Отзыв отправлен и будет опубликован после проверки модератором.'
-        : '✗ Не удалось отправить отзыв. Попробуйте ещё раз.'}
-      <button className={styles['submit-banner-close']} onClick={onDismiss}>
-        ✕
-      </button>
-    </div>
-  );
-}
-
 const TRUNCATE_LINES = 5;
 
 function ReviewItem({
@@ -135,6 +109,22 @@ function ReviewItem({
     userVote: 'like' | 'dislike' | null;
   });
   const [expanded, setExpanded] = useState(false);
+  const [isOverflowing, setIsOverflowing] = useState(false);
+  const textRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const checkOverflow = () => {
+      if (textRef.current) {
+        const overflowing =
+          textRef.current.scrollHeight > textRef.current.clientHeight;
+        setIsOverflowing(overflowing);
+      }
+    };
+
+    checkOverflow();
+    window.addEventListener('resize', checkOverflow);
+    return () => window.removeEventListener('resize', checkOverflow);
+  }, [review.text]);
 
   const handleVote = async (type: 'like' | 'dislike') => {
     if (!isAuth) return; // guard: must be authenticated to vote
@@ -194,28 +184,29 @@ function ReviewItem({
             )}
           </div>
 
-          {/* Truncated text block */}
           <div
-            className={`${styles['review-text-wrap']} ${expanded ? styles['review-text-wrap--expanded'] : ''}`}
+            className={`${styles['review-text-wrap']} ${expanded ? styles['review-text-wrap-expanded'] : ''}`}
             style={{ ['--lines' as string]: TRUNCATE_LINES }}
           >
             <p className={styles['comment-text']}>{review.text}</p>
           </div>
 
-          <button
-            className={styles['review-toggle-btn']}
-            onClick={() => setExpanded((v) => !v)}
-          >
-            {expanded ? (
-              <>
-                <ChevronUp size={13} /> Свернуть
-              </>
-            ) : (
-              <>
-                <ChevronDown size={13} /> Читать полностью
-              </>
-            )}
-          </button>
+          {isOverflowing && (
+            <button
+              className={styles['review-toggle-btn']}
+              onClick={() => setExpanded((v) => !v)}
+            >
+              {expanded ? (
+                <>
+                  <ChevronUp size={13} /> Свернуть
+                </>
+              ) : (
+                <>
+                  <ChevronDown size={13} /> Читать полностью
+                </>
+              )}
+            </button>
+          )}
 
           <div className={styles['comment-footer']}>
             <div className={styles['vote-group']}>
@@ -269,9 +260,9 @@ export function ReviewsSection({
   // const [reviews, setReviews] = useState<Review[]>(MOCK_REVIEWS);
   // const [sort, setSort] = useState<SortMode>('popular');
   const [pickedRating, setPickedRating] = useState<number>(userCurrentScore);
-  const [submitStatus, setSubmitStatus] = useState<'pending' | 'error' | null>(
-    null
-  );
+  // const [submitStatus, setSubmitStatus] = useState<'pending' | 'error' | null>(
+  //   null
+  // );
 
   // Универсальная функция удаления
   const handleDeleteReview = async (reviewId: number) => {
@@ -364,10 +355,10 @@ export function ReviewsSection({
           reviewText: text,
         });
       }
-      setSubmitStatus('pending'); // show "will be moderated" message
+      // setSubmitStatus('pending'); // show "will be moderated" message
       onRatingChanged();
     } catch {
-      setSubmitStatus('error');
+      // setSubmitStatus('error');
     }
     // const newReview: Review = {
     //   id: Date.now(),
@@ -394,10 +385,10 @@ export function ReviewsSection({
           Ваш отзыв находится на модерации и будет опубликован после проверки.
         </div>
       )} */}
-      <SubmitBanner
+      {/* <SubmitBanner
         status={submitStatus}
         onDismiss={() => setSubmitStatus(null)}
-      />
+      /> */}
       {canReview && user?.role == 'reader' && (
         <ComposeBox
           placeholder="Поделитесь своим впечатлением о книге..."
