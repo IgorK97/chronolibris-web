@@ -658,12 +658,7 @@ export const ContentForm: React.FC = () => {
       </div>
 
       {/* ── Tags – only for existing content ── */}
-      {!isNew && id && (
-        <div className={styles['contents-section']}>
-          <h3>Управление тегами</h3>
-          <ContentTagsManager contentId={id} />
-        </div>
-      )}
+      {!isNew && id && <ContentTagsManager contentId={id} />}
       {!isNew && id && (
         <div className={styles['contents-section']}>
           <h3>Входит в состав книг</h3>

@@ -9,6 +9,7 @@ import {
 } from '@/api/contents';
 import type { TagDetails } from '@/types/types';
 import styles from './ContentTagsManagement.module.css';
+import { TagChip } from '@/components/TagChip';
 
 interface ContentTagsManagerProps {
   contentId: number;
@@ -87,18 +88,14 @@ export const ContentTagsManager: React.FC<ContentTagsManagerProps> = ({
       <div className={styles['tags-list']}>
         {tags && tags.length > 0 ? (
           tags.map((tag) => (
-            <div key={tag.id} className={styles['tag-item']}>
-              <span className={styles['tag-name']}>{tag.name}</span>
-              <span className={styles['tag-type']}>{tag.tagTypeName}</span>
-              <button
-                onClick={() => handleRemoveTag(tag.id)}
-                className={styles['tag-remove']}
-                disabled={removeMutation.isPending}
-                title="Удалить тег"
-              >
-                ×
-              </button>
-            </div>
+            <TagChip
+              key={tag.id}
+              disabled={removeMutation.isPending}
+              onClick={() => handleRemoveTag(tag.id)}
+              tagName={tag.name}
+              tagTypeName={tag.tagTypeName}
+              readOnly={false}
+            />
           ))
         ) : (
           <div className={styles['tags-empty']}>Теги не добавлены</div>
@@ -107,13 +104,13 @@ export const ContentTagsManager: React.FC<ContentTagsManagerProps> = ({
 
       <div className={styles['tags-add']} ref={searchRef}>
         <div className={styles['search-wrapper']}>
-          <button
+          {/* <button
             onClick={() => setShowSearch(!showSearch)}
             className={styles['add-button']}
             title="Добавить тег"
           >
             +
-          </button>
+          </button> */}
           <input
             type="text"
             value={searchTerm}

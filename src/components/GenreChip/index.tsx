@@ -8,7 +8,7 @@ export const GenreChip = ({
   genreName: string;
 }) => {
   return (
-    <button className={styles['genre-chip']} onClick={onClick}>
+    <button className={styles[`genre-chip`]} onClick={onClick}>
       {genreName}
     </button>
   );
