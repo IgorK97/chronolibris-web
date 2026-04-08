@@ -3,6 +3,7 @@ import React, { useState, useMemo } from 'react';
 import { useAllThemesFlat } from '@/api/themes';
 import type { ThemeDto } from '@/types/types';
 import styles from './ThemeSelector.module.css';
+import { GenreChip } from '@/components/GenreChip';
 
 interface ThemeSelectorProps {
   selectedThemes: ThemeDto[];
@@ -60,16 +61,23 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({
 
       <div className={styles.chipList}>
         {selectedThemes.map((theme) => (
-          <div key={theme.id} className={styles.chip}>
-            <span>{theme.name}</span>
-            <button
-              type="button"
-              onClick={() => onRemove(theme.id)}
-              className={styles.removeBtn}
-            >
-              &times;
-            </button>
-          </div>
+          <GenreChip
+            key={theme.id}
+            genreName={theme.name}
+            onClick={() => {}}
+            readOnly={false}
+            onDelete={() => onRemove(theme.id)}
+          />
+          // <div key={theme.id} className={styles.chip}>
+          //   <span>{theme.name}</span>
+          //   <button
+          //     type="button"
+          //     onClick={() => onRemove(theme.id)}
+          //     className={styles.removeBtn}
+          //   >
+          //     &times;
+          //   </button>
+          // </div>
         ))}
       </div>
     </div>

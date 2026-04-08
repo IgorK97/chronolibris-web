@@ -104,13 +104,6 @@ export const ContentTagsManager: React.FC<ContentTagsManagerProps> = ({
 
       <div className={styles['tags-add']} ref={searchRef}>
         <div className={styles['search-wrapper']}>
-          {/* <button
-            onClick={() => setShowSearch(!showSearch)}
-            className={styles['add-button']}
-            title="Добавить тег"
-          >
-            +
-          </button> */}
           <input
             type="text"
             value={searchTerm}

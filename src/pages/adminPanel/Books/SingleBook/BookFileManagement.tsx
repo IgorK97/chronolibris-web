@@ -14,7 +14,7 @@ import { useFormats } from '@/api/references';
 import type { BookFileDto, FormatDto } from '@/types/types';
 import { BookFileStatuses } from '@/types/types';
 import styles from './BookFileManagement.module.css';
-import { Download, Pencil, Trash } from 'lucide-react';
+import { Download, Pencil, Trash, Trash2 } from 'lucide-react';
 import { t } from 'i18next';
 
 interface BookFileManagementProps {
@@ -140,7 +140,6 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
   };
 
   const handleDownload = async (bookFileId: number, formatId: number) => {
-    // Сервер сам резолвит путь для скачивания
     if (!bookFileId) return;
     setIsDownloading(true);
     setDownloadError(null);
@@ -163,22 +162,6 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
       setIsDownloading(false);
     }
   };
-
-  // const handleDownload = async (file: BookFileDto) => {
-  //   try {
-  //     const blob = await downloadMutation.mutateAsync(file.id);
-  //     const url = window.URL.createObjectURL(blob);
-  //     const a = document.createElement('a');
-  //     a.href = url;
-  //     a.download = `book_file_${file.id}.${file.formatName?.toLowerCase() || 'file'}`;
-  //     document.body.appendChild(a);
-  //     a.click();
-  //     window.URL.revokeObjectURL(url);
-  //     document.body.removeChild(a);
-  //   } catch (err: any) {
-  //     alert('Ошибка скачивания файла');
-  //   }
-  // };
 
   const getStatusBadge = (statusId: number) => {
     const statusMap: Record<number, { label: string; color: string }> = {
@@ -212,71 +195,64 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
 
   return (
     <div className={styles['book-file-management']}>
-      <h3>Файлы книги</h3>
-
       {/* Форма загрузки */}
-      <div className={styles['upload-section']}>
-        <h4>Загрузить новый файл</h4>
-        <div className={styles['form-grid']}>
-          <div className={styles['form-group']}>
-            <label>Формат *</label>
-            <select
-              value={selectedFormat}
-              onChange={(e) => {
-                const formatId = Number(e.target.value);
-                setSelectedFormat(formatId);
-                // FB2 (предположим id=1) может быть is_readable
-                setIsReadable(formatId === 1);
-              }}
-              className={styles['input-field']}
-            >
-              <option value={0}>Выберите формат</option>
-              {formats?.map((format) => (
-                <option key={format.id} value={format.id}>
-                  {format.name}
-                </option>
-              ))}
-            </select>
-          </div>
 
-          <div className={styles['form-group']}>
-            <label>Главный файл (для чтения)</label>
-            <input
-              type="checkbox"
-              checked={isReadable}
-              onChange={(e) => setIsReadable(e.target.checked)}
-              disabled={selectedFormat !== 1} // Только FB2
-              className={styles['checkbox-field']}
-            />
-            <span className={styles['hint']}>(только для FB2)</span>
-          </div>
-
-          <div className={styles['form-group']}>
-            <label>Файл *</label>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept={
-                selectedFormat > 0
-                  ? `.${FORMAT_EXTENSIONS[selectedFormat]}`
-                  : '.fb2'
-              }
-              className={styles['file-input']}
-              disabled={selectedFormat < 1}
-            />
-            <span className={styles['hint']}>Макс. 100 MB</span>
-          </div>
-
-          <div className={styles['form-actions']}>
-            <button
-              onClick={handleUpload}
-              disabled={uploadMutation.isPending || selectedFormat <= 0}
-              className={`${styles['btn']} ${styles['btn-primary']}`}
-            >
-              {uploadMutation.isPending ? 'Загрузка...' : 'Загрузить'}
-            </button>
-          </div>
+      <h4>Загрузить новый файл</h4>
+      <div className={styles['form-grid']}>
+        <div className={styles['form-group']}>
+          <label>Формат *</label>
+          <select
+            value={selectedFormat}
+            onChange={(e) => {
+              const formatId = Number(e.target.value);
+              setSelectedFormat(formatId);
+              setIsReadable(formatId === 1);
+            }}
+            className={styles['input-field']}
+          >
+            <option value={0}>Выберите формат</option>
+            {formats?.map((format) => (
+              <option key={format.id} value={format.id}>
+                {format.name}
+              </option>
+            ))}
+          </select>
         </div>
+
+        <div className={styles['form-group']}>
+          <label>Основной файл</label>
+          <input
+            type="checkbox"
+            checked={isReadable}
+            onChange={(e) => setIsReadable(e.target.checked)}
+            disabled={selectedFormat !== 1} // Только FB2
+            className={styles['checkbox-field']}
+          />
+        </div>
+
+        <div className={styles['form-group']}>
+          <label>Файл *</label>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept={
+              selectedFormat > 0
+                ? `.${FORMAT_EXTENSIONS[selectedFormat]}`
+                : '.fb2'
+            }
+            className={styles['file-input']}
+            disabled={selectedFormat < 1}
+          />
+          <span className={styles['hint']}>Макс. 100 MB</span>
+        </div>
+
+        <button
+          onClick={handleUpload}
+          disabled={uploadMutation.isPending || selectedFormat <= 0}
+          className={`${styles['btn']}`}
+        >
+          {uploadMutation.isPending ? 'Загрузка...' : 'Загрузить'}
+        </button>
       </div>
 
       {/* Список файлов */}
@@ -289,8 +265,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
               <th>Формат</th>
               <th>Размер</th>
               <th>Статус</th>
-              <th>Главный</th>
-              {/* <th>Версия</th> */}
+              <th>Тип</th>
               <th>Загружен</th>
               <th>Действия</th>
             </tr>
@@ -298,81 +273,30 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
           <tbody>
             {bookFiles?.map((file) => (
               <tr key={file.id}>
-                {editingFile?.id === file.id ? (
-                  <>
-                    <td>{file.id}</td>
-                    <td>{file.formatName}</td>
-                    <td>{file.fileSizeDisplay}</td>
-                    <td>{getStatusBadge(file.bookFileStatusId)}</td>
-                    <td>{file.isReadable ? '✓' : '—'}</td>
-                    {/* <td>{file.version}</td> */}
-                    <td>
-                      {new Date(file.createdAt).toLocaleDateString('ru-RU')}
-                    </td>
-                    <td>
-                      <input
-                        ref={editFileInputRef}
-                        type="file"
-                        accept=".fb2,.epub,.pdf,.txt"
-                        className={styles['file-input']}
-                      />
-                      <button
-                        onClick={handleUpdate}
-                        disabled={updateMutation.isPending}
-                        className={`${styles['btn']} ${styles['btn-success']} ${styles['btn-sm']}`}
-                      >
-                        {updateMutation.isPending ? '...' : 'Сохранить'}
-                      </button>
-                      <button
-                        onClick={() => setEditingFile(null)}
-                        className={`${styles['btn']} ${styles['btn-secondary']} ${styles['btn-sm']}`}
-                      >
-                        Отмена
-                      </button>
-                    </td>
-                  </>
-                ) : (
-                  <>
-                    <td>{file.id}</td>
-                    <td>{file.formatName}</td>
-                    <td>{file.fileSizeDisplay}</td>
-                    <td>{getStatusBadge(file.bookFileStatusId)}</td>
-                    <td>{file.isReadable ? '✓' : '—'}</td>
-                    {/* <td>{file.version}</td> */}
-                    <td>
-                      {new Date(file.createdAt).toLocaleDateString('ru-RU')}
-                    </td>
-                    <td>
-                      <button
-                        onClick={() => handleDownload(file.id, file.formatId)}
-                        className={`${styles['btn']} ${styles['btn-info']} ${styles['btn-sm']}`}
-                        disabled={
-                          file.bookFileStatusId !== BookFileStatuses.COMPLETED
-                        }
-                      >
-                        <Download />
-                      </button>
-                      {/* <button
-                        onClick={() => setEditingFile(file)}
-                        className={`${styles['btn']} ${styles['btn-warning']} ${styles['btn-sm']}`}
-                        disabled={
-                          deleteMutation.isPending || updateMutation.isPending
-                        }
-                      >
-                        <Pencil />
-                      </button> */}
-                      <button
-                        onClick={() => handleDelete(file.id)}
-                        className={`${styles['btn']} ${styles['btn-danger']} ${styles['btn-sm']}`}
-                        disabled={
-                          deleteMutation.isPending || updateMutation.isPending
-                        }
-                      >
-                        <Trash />
-                      </button>
-                    </td>
-                  </>
-                )}
+                <td>{file.id}</td>
+                <td>{file.formatName}</td>
+                <td>{file.fileSizeDisplay}</td>
+                <td>{getStatusBadge(file.bookFileStatusId)}</td>
+                <td>{file.isReadable ? 'Основной' : 'Для скачивания'}</td>
+                <td>{new Date(file.createdAt).toLocaleDateString('ru-RU')}</td>
+                <td style={{ gap: '20px' }}>
+                  <button
+                    onClick={() => handleDownload(file.id, file.formatId)}
+                    disabled={
+                      file.bookFileStatusId !== BookFileStatuses.COMPLETED
+                    }
+                  >
+                    <Download style={{ cursor: 'pointer' }} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(file.id)}
+                    disabled={
+                      deleteMutation.isPending || updateMutation.isPending
+                    }
+                  >
+                    <Trash2 style={{ cursor: 'pointer' }} />
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

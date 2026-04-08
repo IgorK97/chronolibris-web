@@ -30,7 +30,7 @@ import type {
 import { ContentSearchPopup } from './ContentSearchPopup';
 import { BookFileManagement } from './BookFileManagement';
 import styles from './BookUnit.module.css';
-import { ArrowLeft, Book, X } from 'lucide-react';
+import { ArrowLeft, X } from 'lucide-react';
 import { useStore } from '@/stores/globalStore';
 import { storageUrl } from '@/utils';
 import { ContentList } from '@/components/contents/ContentList';
@@ -610,18 +610,24 @@ export const BookUnit: React.FC = () => {
     <div className={styles['book-unit']}>
       {/* Header */}
       <div className={styles['book-unit-header']}>
-        <button
-          onClick={() => navigate(-1)}
-          className={styles['btn btn-secondary']}
-        >
-          <ArrowLeft /> Назад
+        <button onClick={() => navigate(-1)}>
+          <ArrowLeft style={{ cursor: 'pointer' }} /> Назад
         </button>
         <h2>{isNew ? 'Новая книга' : book?.title}</h2>
-        {!isNew && <Book onClick={() => navigate(`/book/${book!.id}`)} />}
+        {!isNew && (
+          <div>
+            <button
+              className={`${styles['btn']} ${styles['btn-update']}`}
+              onClick={() => navigate(`/book/${book!.id}`)}
+            >
+              Перейти к странице книги
+            </button>
+          </div>
+        )}
         <div className={styles['header-actions']}>
           {!isNew && !isEditing && (
             <button
-              className={styles['btn btn-primary']}
+              className={`${styles['btn']} ${styles['btn-update']}`}
               onClick={() => setMode('edit')}
             >
               Редактировать
@@ -630,14 +636,14 @@ export const BookUnit: React.FC = () => {
           {isEditing && (
             <>
               <button
-                className={styles['btn btn-secondary']}
+                className={`${styles['btn']} ${styles['btn-danger']}`}
                 onClick={handleCancel}
                 disabled={isSaving}
               >
                 Отмена
               </button>
               <button
-                className={styles['btn btn-primary']}
+                className={`${styles['btn']} ${styles['btn-update']}`}
                 onClick={handleSave}
                 disabled={isSaving}
               >
@@ -805,7 +811,7 @@ export const BookUnit: React.FC = () => {
                     checked={form.isReviewable}
                     onChange={(e) => set('isReviewable', e.target.checked)}
                   />
-                  Рецензируется
+                  Можно оценивать
                 </label>
               </div>
 
@@ -965,7 +971,7 @@ export const BookUnit: React.FC = () => {
                     readOnly
                     onChange={() => {}}
                   />
-                  Рецензируется
+                  Можно оценивать
                 </label>
               </div>
 
@@ -1003,7 +1009,7 @@ export const BookUnit: React.FC = () => {
                 className={`${styles['btn']} ${styles['btn-danger']}`}
                 disabled={unlinkMutation.isPending}
               >
-                Удалить
+                Отвязать
               </button>
             )}
             onTitleClick={(content) => navigate(`/contents/${content.id}/edit`)}

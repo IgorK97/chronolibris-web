@@ -27,6 +27,7 @@ import type { ThemeDto } from '@/types/types';
 import styles from './ContentUnit.module.css';
 import { ArrowLeft, X } from 'lucide-react';
 import { storageUrl } from '@/utils';
+import { GenreChip } from '@/components/GenreChip';
 
 const DOCUMENT_TYPES = [
   { id: 1, name: 'Дневник', nature: 'Document' },
@@ -388,17 +389,14 @@ export const ContentForm: React.FC = () => {
     <div className={styles['book-unit']}>
       {/* ── Header ── */}
       <div className={styles['book-unit-header']}>
-        <button
-          onClick={() => navigate('/contents')}
-          className={styles['btn btn-secondary']}
-        >
-          <ArrowLeft /> Назад к списку
+        <button onClick={() => navigate('/contents')}>
+          <ArrowLeft style={{ cursor: 'pointer' }} /> Назад к списку
         </button>
         <h2>{isNew ? 'Новый контент' : content?.title}</h2>
         <div className={styles['header-actions']}>
           {!isNew && !isEditing && (
             <button
-              className={styles['btn btn-primary']}
+              className={`${styles['btn']} ${styles['btn-update']}`}
               onClick={() => setMode('edit')}
             >
               Редактировать
@@ -407,14 +405,14 @@ export const ContentForm: React.FC = () => {
           {isEditing && (
             <>
               <button
-                className={styles['btn btn-secondary']}
+                className={`${styles['btn']} ${styles['btn-danger']}`}
                 onClick={handleCancel}
                 disabled={isSaving}
               >
                 Отмена
               </button>
               <button
-                className={styles['btn btn-primary']}
+                className={`${styles['btn']} ${styles['btn-update']}`}
                 onClick={handleSave}
                 disabled={isSaving}
               >
@@ -425,7 +423,6 @@ export const ContentForm: React.FC = () => {
         </div>
       </div>
 
-      {/* ── Metadata ── */}
       <div className={styles['book-metadata']}>
         <div className={styles['metadata-section']}>
           <h3>Основная информация</h3>
@@ -635,17 +632,11 @@ export const ContentForm: React.FC = () => {
                 >
                   {selectedThemes.length > 0 ? (
                     selectedThemes.map((t) => (
-                      <span
+                      <GenreChip
                         key={t.id}
-                        style={{
-                          background: 'var(--color-bg-secondary, #f0f0f0)',
-                          borderRadius: 4,
-                          padding: '2px 8px',
-                          fontSize: 13,
-                        }}
-                      >
-                        {t.name}
-                      </span>
+                        genreName={t.name}
+                        onClick={() => {}}
+                      />
                     ))
                   ) : (
                     <span style={{ color: '#999' }}>—</span>
@@ -657,7 +648,6 @@ export const ContentForm: React.FC = () => {
         </div>
       </div>
 
-      {/* ── Tags – only for existing content ── */}
       {!isNew && id && <ContentTagsManager contentId={id} />}
       {!isNew && id && (
         <div className={styles['contents-section']}>
