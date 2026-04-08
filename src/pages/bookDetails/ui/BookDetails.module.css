@@ -90,7 +90,7 @@
   align-items: center;
   padding: 0 16px;
   margin-bottom: 20px;
-  position: relative; /* for absolute positioning of popups */
+  position: relative;
 }
 
 .header-icons {
@@ -162,7 +162,6 @@
 }
 
 .short-info-container {
-  /* text-align: center; */
   min-width: 200px;
   margin: 0 20px 16px;
   flex-direction: column;
@@ -211,12 +210,12 @@
 
 .stat-icon {
   font-size: 18px;
-  color: #f59e0b; /* amber for star */
+  color: #f59e0b;
   line-height: 1;
 }
 
 .stat-icon-reviews {
-  color: #6366f1; /* indigo for reviews, adjust to match your design */
+  color: #6366f1;
 }
 
 .stat-content {
@@ -265,8 +264,6 @@
 
 .rating-popup {
   position: absolute;
-
-  /* top: calc(100% + 8px); */
   left: 50%;
   transform: translateX(-50%);
   background: #fff;
@@ -280,10 +277,9 @@
   gap: 8px;
   z-index: 100;
   white-space: nowrap;
-  padding-top: 14px; /* covers the gap so mouse doesn't slip through */
-  top: calc(100% + 4px); /* reduce gap slightly too */
+  padding-top: 14px;
+  top: calc(100% + 4px);
 
-  /* Arrow */
   &::before {
     content: '';
     position: absolute;
@@ -315,12 +311,12 @@
 .delete-review-btn {
   background: none;
   border: none;
-  color: #ff4d4f; /* Красный цвет */
+  color: #ff4d4f;
   font-size: 13px;
   cursor: pointer;
   padding: 8px;
   transition: opacity 0.2s;
-  text-decoration: underline; /* Чтобы было похоже на ссылку-кнопку */
+  text-decoration: underline;
 }
 
 .delete-review-btn:hover {
@@ -334,8 +330,8 @@
 }
 
 .shelf-panel {
-  position: absolute; /* anchors to nearest positioned parent */
-  top: 100%; /* appears directly below the header */
+  position: absolute;
+  top: 100%;
   right: 0;
   z-index: 100;
   background: #fff;
@@ -612,8 +608,3 @@
   color: #dc2626;
   border-color: #fca5a5;
 }
-
-/* * {
-  outline: 1px solid rgb(255 0 0 / 30%) !important;
-  outline-offset: -1px;
-} */

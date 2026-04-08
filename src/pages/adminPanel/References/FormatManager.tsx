@@ -16,7 +16,7 @@ export const FormatManager = () => {
     <SimpleEntityManager
       title="Управление форматами книг"
       createLabel="Создать формат"
-      createPlaceholder="Название формата (например: Твёрдый переплёт)"
+      createPlaceholder="Название формата"
       maxLength={50}
       items={data}
       isLoading={isLoading}

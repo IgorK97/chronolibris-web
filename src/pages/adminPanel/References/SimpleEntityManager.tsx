@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// File: src/components/SimpleEntityManager.tsx
 import React, { useState } from 'react';
 import styles from './SimpleEntityManager.module.css';
 
@@ -9,13 +8,9 @@ export interface SimpleEntity {
 }
 
 export interface SimpleEntityManagerProps {
-  /** Заголовок раздела, например «Управление странами» */
   title: string;
-  /** Метка для кнопки создания, например «Создать страну» */
   createLabel: string;
-  /** Placeholder для поля ввода при создании */
   createPlaceholder?: string;
-  /** Максимальная длина поля name */
   maxLength?: number;
 
   items: SimpleEntity[] | undefined;
@@ -117,7 +112,6 @@ export const SimpleEntityManager: React.FC<SimpleEntityManagerProps> = ({
     <div className={styles.manager}>
       <h2>{title}</h2>
 
-      {/* Форма создания */}
       <div className={styles['form-section']}>
         <h3>Добавить новый элемент</h3>
         <div className={styles['form-group']}>
@@ -140,7 +134,6 @@ export const SimpleEntityManager: React.FC<SimpleEntityManagerProps> = ({
         </div>
       </div>
 
-      {/* Список */}
       <div className={styles['list-section']}>
         <h3>Список ({items?.length ?? 0})</h3>
         <table className={styles.table}>

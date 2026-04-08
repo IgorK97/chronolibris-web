@@ -9,7 +9,7 @@ import {
   useRemoveBookFromSelection,
   useCreateSelection,
 } from '@/api/collections';
-import { BookCard } from '@/components/books';
+import { BookCard } from '@/components/Books';
 import type { BookListItem } from '@/types';
 import styles from './SelectionManager.module.css';
 import { useNavigate } from 'react-router-dom';
@@ -24,7 +24,6 @@ interface SelectionManagerEditProps {
 interface SelectionManagerCreateProps {
   mode: 'create';
   onBack: () => void;
-  /** Вызывается после успешного создания, передаёт id новой подборки */
   onCreate?: (selectionId: number) => void;
 }
 

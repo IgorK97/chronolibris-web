@@ -60,6 +60,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const location = useLocation();
   const sidebarRef = useRef<HTMLDivElement>(null);
 
+  //Чтобы по нажатии на esc скрылась панель
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -68,14 +69,15 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
+  //Чтобы по переходу скрылась панель
   useEffect(() => {
     onClose();
-  }, [location.pathname]);
+  }, [location.pathname, onClose]);
 
   return (
     <>
       <div
-        className={`${styles.backdrop} ${isOpen ? styles.backdropVisible : ''}`}
+        className={`${styles.backdrop} ${isOpen ? styles['backdrop-visible'] : ''}`}
         onClick={onClose}
         aria-hidden="true"
       />
@@ -83,17 +85,17 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       {/* aside? */}
       <aside
         ref={sidebarRef}
-        className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ''}`}
+        className={`${styles.sidebar} ${isOpen ? styles['sidebar-open'] : ''}`}
         aria-label="Панель администратора"
         role="navigation"
       >
         <div className={styles.header}>
-          <div className={styles.headerTitle}>
+          <div className={styles['header-title']}>
             <BookMarked size={18} />
             <span>Администрирование</span>
           </div>
           <button
-            className={styles.closeBtn}
+            className={styles['close-btn']}
             onClick={onClose}
             aria-label="Закрыть панель"
           >
@@ -104,7 +106,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         <nav className={styles.nav}>
           {SECTIONS.map((section) => (
             <div key={section.title} className={styles.section}>
-              <p className={styles.sectionTitle}>{section.title}</p>
+              <p className={styles['section-title']}>{section.title}</p>
               <ul className={styles.list}>
                 {section.items.map(({ label, path, icon: Icon }) => {
                   const isActive = location.pathname === path;
@@ -112,11 +114,11 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                     <li key={path}>
                       <Link
                         to={path}
-                        className={`${styles.link} ${isActive ? styles.linkActive : ''}`}
+                        className={`${styles.link} ${isActive ? styles['link-active'] : ''}`}
                       >
-                        <Icon size={15} className={styles.linkIcon} />
+                        <Icon size={15} className={styles['link-icon']} />
                         <span>{label}</span>
-                        {isActive && <span className={styles.activeDot} />}
+                        {isActive && <span className={styles['active-dot']} />}
                       </Link>
                     </li>
                   );

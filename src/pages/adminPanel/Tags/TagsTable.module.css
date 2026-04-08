@@ -145,7 +145,6 @@
   margin-top: 20px;
 }
 
-/* ── Loader trigger (infinite scroll sentinel) ── */
 .loader-trigger {
   text-align: center;
   padding: 12px;
@@ -153,14 +152,12 @@
   color: #999;
 }
 
-/* ── Selected row highlight ── */
 .tr-selected {
   background: #ebf5fb !important;
   outline: 2px solid #3498db;
   outline-offset: -2px;
 }
 
-/* ── ID cell: flex container for expand button + id number ── */
 .id-cell {
   display: inline-flex;
   align-items: center;
@@ -168,7 +165,6 @@
   white-space: nowrap;
 }
 
-/* ── Name cell: flex container for name + badges ── */
 .name-cell {
   display: inline-flex;
   align-items: center;
@@ -188,7 +184,6 @@
   white-space: nowrap;
 }
 
-/* ── Parent breadcrumb shown in search mode ── */
 .parent-breadcrumb {
   font-size: 12px;
   color: #999;
@@ -196,7 +191,6 @@
   white-space: nowrap;
 }
 
-/* ── Inline loading indicator inside tree rows ── */
 .loading-inline {
   font-size: 13px;
   color: #999;

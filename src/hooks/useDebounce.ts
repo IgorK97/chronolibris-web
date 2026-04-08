@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
 export function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
@@ -8,7 +8,8 @@ export function useDebounce<T>(value: T, delay: number): T {
       setDebouncedValue(value);
     }, delay);
 
-    // Очищаем таймер, если значение изменилось до истечения delay
+    //Если значение изменилось до истечения задержки, то нужно
+    //очистить прошлый таймер - это сделате функция очистки
     return () => clearTimeout(handler);
   }, [value, delay]);
 

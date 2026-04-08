@@ -9,8 +9,6 @@
 
 .title {
   margin: 0 0 20px;
-
-  /* font-size: 18px; */
   color: #2c3e50;
 }
 
@@ -21,8 +19,6 @@
 .label {
   display: block;
   margin-bottom: 5px;
-
-  /* font-size: 14px; */
   color: #666;
   font-weight: 500;
 }

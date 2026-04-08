@@ -2,7 +2,7 @@
   margin-bottom: 1rem;
 }
 
-.inputWrapper {
+.input-wrapper {
   position: relative;
   width: 100%;
 }
@@ -25,7 +25,7 @@
   list-style: none;
   padding: 0;
   margin: 0;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
 }
 
 .suggestions li {
@@ -37,7 +37,7 @@
   background: #f0f0f0;
 }
 
-.chipList {
+.chip-list {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -53,7 +53,7 @@
   font-size: 14px;
 }
 
-.removeBtn {
+.remove-btn {
   background: none;
   border: none;
   margin-left: 6px;
@@ -62,6 +62,6 @@
   color: #888;
 }
 
-.removeBtn:hover {
+.remove-btn:hover {
   color: #f44336;
 }

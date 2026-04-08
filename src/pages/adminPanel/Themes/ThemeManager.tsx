@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// File: src/components/ThemeManager.tsx
 import React, { useState } from 'react';
 import {
   useThemes,
@@ -25,7 +24,6 @@ export const ThemeManager: React.FC = () => {
     parentThemeId: null,
   });
 
-  // Храним имя выбранного родителя для отображения в форме
   const [selectedParentName, setSelectedParentName] = useState<string | null>(
     null
   );
@@ -115,7 +113,6 @@ export const ThemeManager: React.FC = () => {
     });
   };
 
-  // Метод для выбора родительской темы кликом в списке
   const handleSelectParent = (theme: ThemeDto) => {
     if (formData.parentThemeId === theme.id) {
       setFormData({ ...formData, parentThemeId: null });
@@ -148,7 +145,6 @@ export const ThemeManager: React.FC = () => {
     <div className={styles['theme-manager']}>
       <h2>Управление темами</h2>
 
-      {/* Форма создания */}
       <div className={styles['form-section']}>
         <div className={styles['form-grid']}>
           <p style={{ marginBottom: '10px' }}>Добавить новую тему</p>
@@ -197,7 +193,6 @@ export const ThemeManager: React.FC = () => {
         </div>
       </div>
 
-      {/* Список тем с иерархией */}
       <div className={styles['list-section']}>
         <h3>Список тем</h3>
 
@@ -219,9 +214,12 @@ export const ThemeManager: React.FC = () => {
               expandedThemes={expandedThemes}
               updateMutation={updateMutation}
               deleteMutation={deleteMutation}
-              // Передаем новые пропсы для выбора
               onSelectParent={handleSelectParent}
-              selectedParentId={formData.parentThemeId}
+              selectedParentId={
+                formData.parentThemeId === undefined
+                  ? null
+                  : formData.parentThemeId
+              }
             />
           ))}
         </div>
@@ -230,7 +228,6 @@ export const ThemeManager: React.FC = () => {
   );
 };
 
-// Компонент узла дерева тем
 interface ThemeTreeNodeProps {
   theme: ThemeDto;
   editingId: number | null;
@@ -348,7 +345,6 @@ const ThemeTreeNode: React.FC<ThemeTreeNodeProps> = ({
           isExpanded={isExpanded}
         />
 
-        {/* Кликабельное название темы */}
         <span
           className={styles['theme-name-clickable']}
           onClick={() => onSelectParent(theme)}

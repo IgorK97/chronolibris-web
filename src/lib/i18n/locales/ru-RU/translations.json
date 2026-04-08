@@ -1,10 +1,6 @@
 {
   "profile": {
     "reader": "Читатель",
-    "choose_avatar": "Выберите аватар",
-    "descr_avatar": "Вы можете выбрать изображение из галереи или сделать фото",
-    "from_gallery": "Из галереи",
-    "via_camera": "Сделать фото",
     "button_text": "Отмена",
     "label_settings": "Настройки",
     "label_profile_settings": "Настройки профиля",

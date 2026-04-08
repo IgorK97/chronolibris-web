@@ -41,7 +41,7 @@ import { useStore } from '@/stores/globalStore';
 import { formatDate } from '@/utils';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useReaderSettings } from './UseReaderSettings';
-import { Badge } from '../ui/badge';
+import { Badge } from '../../../components/ui/badge';
 
 export interface PageNumberNode {
   pn: number;

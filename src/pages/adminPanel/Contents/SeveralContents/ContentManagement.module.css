@@ -1,4 +1,3 @@
-/* File: src/components/ContentManagement.css */
 .content-management {
   max-width: 1400px;
   margin: 0 auto;
@@ -11,15 +10,13 @@
   padding-bottom: 10px;
 }
 
-/* Обрезка авторов */
 .authors-cell {
-  max-width: 250px; /* Укажите подходящую ширину */
+  max-width: 250px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* Стили для триггера загрузки */
 .loader-trigger {
   padding: 20px;
   text-align: center;

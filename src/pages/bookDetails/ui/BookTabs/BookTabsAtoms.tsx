@@ -4,11 +4,11 @@ import {
   ThumbsDown,
   MoreHorizontal,
   CornerDownRight,
+  X,
 } from 'lucide-react';
-// import type { ItemAuthor } from './bookTabsData';
 import styles from './BookTabs.module.css';
 import { getInitials, getAvatarColor } from './BookTabsData';
-import { ReportModal } from '@/components/reports/ui/ReportModal';
+import { ReportModal } from '@/components/reports/ReportModal';
 import { useStore } from '@stores/globalStore';
 export function Avatar({ userName }: { userName: string }) {
   return (
@@ -101,7 +101,6 @@ export function ThreeDotsMenu({
     return () => document.removeEventListener('mousedown', handler);
   }, [menuOpen]);
   const showReport = isAuth && !canDelete && isReader() && canReport;
-  // const [reported, setReported] = useState(false);
   if (!canDelete && !showReport) return null;
   return (
     <>
@@ -122,7 +121,6 @@ export function ThreeDotsMenu({
               <button
                 className={styles['comment-menu-item']}
                 onClick={() => {
-                  // setReported(true);
                   setMenuOpen(false);
                   setReportOpen(true);
                 }}
@@ -171,7 +169,7 @@ export function ComposeBox({
   replyingTo?: { parentId: number; authorName: string } | null;
   onCancelReply?: () => void;
   onSubmit: (text: string) => void;
-  children?: React.ReactNode; // slot for extra fields (e.g. star picker)
+  children?: React.ReactNode;
   type: 'review' | 'comment';
   onDelete?: () => void;
   initialText?: string;
@@ -204,7 +202,7 @@ export function ComposeBox({
             className={styles['compose-reply-cancel']}
             onClick={onCancelReply}
           >
-            ✕
+            <X />
           </button>
         </div>
       )}
@@ -242,13 +240,6 @@ export function ComposeBox({
             Отправить
           </button>
         )}
-        {/* <button
-          className={styles['compose-submit']}
-          disabled={!text.trim()}
-          onClick={handleSubmit}
-        >
-          Отправить
-        </button> */}
       </div>
     </div>
   );

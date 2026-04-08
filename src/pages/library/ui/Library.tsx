@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { SectionHeader } from './SectionHeader';
-import { BookCard } from '../../../components/books';
+import { BookCard } from '../../../components/Books';
 import { type BookListItem } from '../../../types';
 import { useStore } from '../../../stores/globalStore';
 import { useSelectionBooks } from '../../../api/books';
@@ -37,11 +37,7 @@ const SelectionSection = ({
     return <div className={styles['loading-wrapper']}>Загрузка {title}…</div>;
   }
 
-  // Если книг нет (и это не промежуточное состояние рефетча) — не рендерим секцию
   if (!isLoading && displayBooks.length === 0) return null;
-
-  // Во время рефетча показываем старые данные (stale-while-revalidate),
-  // не скрываем секцию — это предотвращает мигание при возврате со страниц
   return (
     <section>
       <SectionHeader

@@ -22,7 +22,6 @@ export const SelectionsPage: React.FC = () => {
     setView({ kind: 'create' });
   };
 
-  // После успешного создания — сразу открываем редактирование новой подборки
   const handleCreated = (newSelectionId: number) => {
     setView({ kind: 'edit', selectionId: newSelectionId });
   };

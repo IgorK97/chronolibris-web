@@ -1,4 +1,3 @@
-// components/Tags/TagRow.tsx
 import React, { useState, useRef, useEffect } from 'react';
 import { useInfiniteChildTags, useDeleteTag } from '@/api/tags';
 import { TAG_TYPES, type TagDetails } from '@/types';
@@ -10,7 +9,6 @@ interface TagRowProps {
   depth: number;
   isSelected: boolean;
   onSelectParent: (tag: TagDetails) => void;
-  /** Принудительно закрыть при смене фильтров. Передаём ключ сброса. */
   resetKey?: string;
 }
 
@@ -25,7 +23,6 @@ export const TagRow: React.FC<TagRowProps> = ({
   const deleteMutation = useDeleteTag();
   const loaderRef = useRef<HTMLTableRowElement | null>(null);
 
-  // Сброс раскрытия при смене фильтров
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsExpanded(false);
@@ -41,7 +38,6 @@ export const TagRow: React.FC<TagRowProps> = ({
 
   const allChildren = childData?.pages.flatMap((p) => p.items) ?? [];
 
-  // Infinite scroll для дочерних тегов этой строки
   useEffect(() => {
     if (!isExpanded || !loaderRef.current) return;
     const observer = new IntersectionObserver(
@@ -81,7 +77,6 @@ export const TagRow: React.FC<TagRowProps> = ({
         onClick={handleRowClick}
         title="Нажмите, чтобы выбрать как родительский тег"
       >
-        {/* ID + кнопка раскрытия */}
         <td
           className={styles['td']}
           style={{ paddingLeft: `${indent + 12}px` }}
@@ -97,7 +92,6 @@ export const TagRow: React.FC<TagRowProps> = ({
           </span>
         </td>
 
-        {/* Название + бейдж типа отношения */}
         <td className={styles['td']}>
           <span className={styles['name-cell']}>
             {tag.name}
@@ -106,7 +100,6 @@ export const TagRow: React.FC<TagRowProps> = ({
                 {tag.relationTypeName}
               </span>
             )}
-            {/* В режиме поиска показываем breadcrumb */}
             {tag.parentTagName && (
               <span className={styles['parent-breadcrumb']}>
                 ← {tag.parentTagName}
@@ -132,7 +125,6 @@ export const TagRow: React.FC<TagRowProps> = ({
         </td>
       </tr>
 
-      {/* Дочерние строки */}
       {isExpanded && (
         <>
           {childrenLoading ? (
@@ -162,7 +154,6 @@ export const TagRow: React.FC<TagRowProps> = ({
               )}
 
               {allChildren.map((child) => (
-                // Рекурсия
                 <TagRow
                   key={child.id}
                   tag={child}

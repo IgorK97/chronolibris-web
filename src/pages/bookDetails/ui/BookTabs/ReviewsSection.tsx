@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-// import type { Review } from './bookTabsData';
 import { formatDate } from '@/utils';
 import {
   Avatar,
@@ -87,8 +86,8 @@ function ReviewItem({
 }: {
   review: ReviewDetails;
   isAuth: boolean;
-  canDelete: boolean; // Получаем снаружи
-  onDelete: () => Promise<void>; // Получаем снаружи
+  canDelete: boolean;
+  onDelete: () => Promise<void>;
 }) {
   const { user } = useStore();
   // console.log(canDelete, isAuth, review.userName, 'TRUTATA');
@@ -127,10 +126,10 @@ function ReviewItem({
   }, [review.text]);
 
   const handleVote = async (type: 'like' | 'dislike') => {
-    if (!isAuth) return; // guard: must be authenticated to vote
+    if (!isAuth) return;
     const score = type === 'like' ? 1 : -1;
 
-    // Optimistic UI update
+    //Оптимистичное обновление
     setVotes((prev) => {
       if (prev.userVote === type) {
         return {
@@ -179,7 +178,6 @@ function ReviewItem({
                 onDelete={onDelete}
                 targetId={review.id}
                 targetTypeId={TARGET_TYPE.REVIEW}
-                // isAuth={isAuth}
               />
             )}
           </div>
@@ -231,17 +229,12 @@ function ReviewItem({
   );
 }
 
-// type SortMode = 'popular' | 'recent';
-
 interface ReviewsSectionProps {
   canReview: boolean;
   bookId: number;
   isAuth: boolean;
-  /** Existing review id, or null when the user hasn't reviewed yet */
   userReviewId: number | null;
-  /** Score currently stored on the server (0 = none) */
   userCurrentScore: number;
-  /** Callback so parent can refetch book stats after a rating change */
   onRatingChanged: () => void;
   userReviewText?: string | null;
   userReviewStatus?: string | null;
@@ -254,41 +247,23 @@ export function ReviewsSection({
   userReviewId,
   userCurrentScore,
   userReviewText,
-  // userReviewStatus,
   onRatingChanged,
 }: ReviewsSectionProps) {
-  // const [reviews, setReviews] = useState<Review[]>(MOCK_REVIEWS);
-  // const [sort, setSort] = useState<SortMode>('popular');
   const [pickedRating, setPickedRating] = useState<number>(userCurrentScore);
-  // const [submitStatus, setSubmitStatus] = useState<'pending' | 'error' | null>(
-  //   null
-  // );
-
-  // Универсальная функция удаления
   const handleDeleteReview = async (reviewId: number) => {
     if (!window.confirm('Вы уверены, что хотите удалить этот отзыв?')) return;
 
     try {
       await deleteReview.mutateAsync(reviewId);
-      onRatingChanged(); // Обновляем общий рейтинг книги
+      onRatingChanged();
     } catch (error) {
       console.error('Ошибка при удалении:', error);
     }
   };
 
-  // const isPending = userReviewStatus === 'На проверке';
-
   useEffect(() => {
     setPickedRating(userCurrentScore);
   }, [userCurrentScore]);
-
-  // const handleDelete = async () => {
-  //   if (!userReviewId) return;
-  //   if (window.confirm('Вы уверены, что хотите удалить свой отзыв?')) {
-  //     await deleteReview.mutateAsync(userReviewId);
-  //     onRatingChanged();
-  //   }
-  // };
 
   const {
     data,
@@ -304,11 +279,6 @@ export function ReviewsSection({
   const createReview = useCreateReview(bookId);
   const updateReview = useUpdateReview(bookId);
   const deleteReview = useDeleteReview(bookId);
-  // const sorted = [...reviews].sort((a, b) =>
-  //   sort === 'popular'
-  //     ? b.likes - b.dislikes - (a.likes - a.dislikes)
-  //     : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  // );
 
   const handlePickRating = async (rating: number) => {
     if (!isAuth) return;
@@ -316,79 +286,46 @@ export function ReviewsSection({
     setPickedRating(rating);
 
     if (userReviewId) {
-      // if (rating === userCurrentScore) {
-      //   await deleteReview.mutateAsync(userReviewId);
-      //   return;
-      // }
       await updateReview.mutateAsync({
         reviewId: userReviewId,
         score: rating,
-        // keep existing text if present
         reviewText:
           allReviews.find((r) => r.id === userReviewId)?.text || undefined,
       });
     } else {
       await createReview.mutateAsync({ bookId, score: rating });
     }
-    // Tell parent to refresh averageRating in the header
     onRatingChanged();
   };
 
   const handleSubmit = async (text: string) => {
-    if (!isAuth) return; // guard: must be authenticated to submit
-    if (pickedRating === 0) return; // guard: need a rating
+    if (!isAuth) return;
+    if (pickedRating === 0) return;
 
     try {
       if (userReviewId) {
-        // User already has a review (possibly score-only) → update with text
-        // Server will move status to Pending because text is being added/changed
         await updateReview.mutateAsync({
           reviewId: userReviewId,
           score: pickedRating,
           reviewText: text,
         });
       } else {
-        // No review yet → create with text → server sets status to Pending
         await createReview.mutateAsync({
           bookId,
           score: pickedRating,
           reviewText: text,
         });
       }
-      // setSubmitStatus('pending'); // show "will be moderated" message
       onRatingChanged();
     } catch {
       // setSubmitStatus('error');
     }
-    // const newReview: Review = {
-    //   id: Date.now(),
-    //   author: { id: 0, name: 'Вы' },
-    //   text,
-    //   rating: pickedRating,
-    //   createdAt: new Date().toISOString(),
-    //   likes: 0,
-    //   dislikes: 0,
-    //   userVote: null,
-    // };
-    // setReviews((prev) => [newReview, ...prev]);
-    // setPickedRating(0);
   };
 
   const isMutating = createReview.isPending || updateReview.isPending;
 
   return (
     <div className={styles['tab-content']}>
-      {/* {isPending && (
-        <div
-          className={`${styles['submit-banner']} ${styles['submit-banner-pending']}`}
-        >
-          Ваш отзыв находится на модерации и будет опубликован после проверки.
-        </div>
-      )} */}
-      {/* <SubmitBanner
-        status={submitStatus}
-        onDismiss={() => setSubmitStatus(null)}
-      /> */}
       {canReview && user?.role == 'reader' && (
         <ComposeBox
           placeholder="Поделитесь своим впечатлением о книге..."
@@ -410,25 +347,6 @@ export function ReviewsSection({
           Рецензии для этой книги недоступны
         </div>
       )}
-      {/* <div className={styles['sort-row']}>
-        <div className={styles['sort-tabs']}>
-          <button
-            className={`${styles['sort-tab']} ${sort === 'popular' ? styles['sort-tab--active'] : ''}`}
-            onClick={() => setSort('popular')}
-          >
-            Популярные
-          </button>
-          <button
-            className={`${styles['sort-tab']} ${sort === 'recent' ? styles['sort-tab--active'] : ''}`}
-            onClick={() => setSort('recent')}
-          >
-            Новые
-          </button>
-        </div>
-        <span className={styles['sort-count']}>
-          {allReviews.length} рецензий
-        </span>
-      </div> */}
 
       {isLoading && <p className={styles['tab-empty']}>Загрузка отзывов...</p>}
       {isError && (

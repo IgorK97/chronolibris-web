@@ -5,7 +5,7 @@ import type { ContentDto, ContentFilterRequest } from '@/types';
 import styles from './ContentSearchPopup.module.css';
 import { useDebounce } from '@/hooks/useDebounce';
 import { X } from 'lucide-react';
-import { ContentList } from '@/components/contents/ContentList';
+import { ContentList } from '@/components/Contents/ContentList';
 
 interface ContentSearchPopupProps {
   onClose: () => void;

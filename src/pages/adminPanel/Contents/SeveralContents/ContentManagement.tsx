@@ -3,9 +3,9 @@ import { useDeleteContent } from '@/api/contents';
 import { useDebounce } from '@/hooks/useDebounce';
 import styles from './ContentManagement.module.css';
 import { useNavigate } from 'react-router-dom';
-import { ContentList } from '@/components/contents/ContentList';
+import { ContentList } from '@/components/Contents/ContentList';
 
-export const ContentManagement: React.FC = () => {
+export const ContentManagement = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const deleteMutation = useDeleteContent();

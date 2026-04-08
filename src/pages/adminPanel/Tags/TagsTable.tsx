@@ -13,7 +13,6 @@ export const TagsTable: React.FC<TagsTableProps> = ({ onParentTagSelect }) => {
   const [selectedType, setSelectedType] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedParentId, setSelectedParentId] = useState<number | null>(null);
-  // resetKey передаётся в TagRow для сброса раскрытия при смене фильтров
   const [resetKey, setResetKey] = useState('initial');
 
   const pageSize = 20;
@@ -26,13 +25,11 @@ export const TagsTable: React.FC<TagsTableProps> = ({ onParentTagSelect }) => {
 
   const allRootTags = data?.pages.flatMap((page) => page.items) ?? [];
 
-  // Сбросить раскрытие при смене фильтров
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setResetKey(`${selectedType ?? 'all'}-${debouncedSearch}`);
   }, [debouncedSearch, selectedType]);
 
-  // Infinite scroll корневого уровня
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {

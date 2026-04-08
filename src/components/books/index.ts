@@ -1,3 +1,3 @@
-import { BookCard } from "./ui/BookCard/BookCard";
+import { BookCard } from './BookCard';
 
 export { BookCard };

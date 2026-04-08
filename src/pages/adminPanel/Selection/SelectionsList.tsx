@@ -6,9 +6,7 @@ type ActiveFilter = 'active' | 'hidden' | 'all';
 
 interface SelectionsListProps {
   onSelectSelection: (selectionId: number) => void;
-  /** Показывать фильтр скрытых/всех подборок — только для администратора */
   isAdmin?: boolean;
-  /** Колбэк для кнопки «Создать подборку» */
   onCreateSelection?: () => void;
 }
 
@@ -55,8 +53,6 @@ export const SelectionsList: React.FC<SelectionsListProps> = ({
   }, [handleIntersection]);
 
   const handleFilterChange = (next: ActiveFilter) => setFilter(next);
-
-  // ─── Render ───────────────────────────────────────────────────────────────
 
   return (
     <div className={styles['container']}>

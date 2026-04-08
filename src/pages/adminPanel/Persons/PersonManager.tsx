@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// File: src/components/PersonManager.tsx
 import React, {
   useState,
   // useRef
@@ -11,11 +10,6 @@ import {
   useDeletePerson,
 } from '@/api/persons';
 import type { CreatePersonRequest, UpdatePersonRequest } from '@/types';
-// import {
-//   fileToBase64,
-//   validateFileSize,
-//   validateFileType,
-// } from '@/utils/imageUtils';
 import styles from './PersonManager.module.css';
 import type { PersonDto } from '@/types';
 
@@ -28,11 +22,8 @@ export const PersonManager: React.FC = () => {
   const [formData, setFormData] = useState<CreatePersonRequest>({
     name: '',
     description: '',
-    // imageBase64: undefined,
-    // fileName: undefined,
   });
 
-  // const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editFormData, setEditFormData] = useState<UpdatePersonRequest | null>(
     null
@@ -54,13 +45,7 @@ export const PersonManager: React.FC = () => {
       setFormData({
         name: '',
         description: '',
-        // imageBase64: undefined,
-        // fileName: undefined,
       });
-      // setPreviewImage(null);
-      // if (fileInputRef.current) {
-      //   fileInputRef.current.value = '';
-      // }
     } catch (err: any) {
       console.error('Ошибка создания персоны:', err);
       alert(err.response?.data?.message || 'Ошибка создания персоны');
@@ -71,8 +56,6 @@ export const PersonManager: React.FC = () => {
     id: number,
     name: string,
     description: string
-    // imageBase64?: string,
-    // fileName?: string
   ) => {
     if (!name.trim()) {
       alert('Имя персоны обязательно');
@@ -91,16 +74,10 @@ export const PersonManager: React.FC = () => {
           id,
           name,
           description,
-          // imageBase64,
-          // fileName,
         } as UpdatePersonRequest,
       });
       setEditingId(null);
       setEditFormData(null);
-      // setEditPreviewImage(null);
-      // if (editFileInputRef.current) {
-      //   editFileInputRef.current.value = '';
-      // }
     } catch (err: any) {
       console.error('Ошибка обновления персоны:', err);
       alert(err.response?.data?.message || 'Ошибка обновления персоны');
@@ -124,19 +101,12 @@ export const PersonManager: React.FC = () => {
       id: person.id,
       name: person.name,
       description: person.description,
-      // imageBase64: undefined,
-      // fileName: undefined,
     });
-    // setEditPreviewImage(person.imageUrl || null);
   };
 
   const cancelEditing = () => {
     setEditingId(null);
     setEditFormData(null);
-    // setEditPreviewImage(null);
-    // if (editFileInputRef.current) {
-    //   editFileInputRef.current.value = '';
-    // }
   };
 
   if (isLoading) {
@@ -161,7 +131,6 @@ export const PersonManager: React.FC = () => {
     <div className={styles['person-manager']}>
       <h2>Управление персонами</h2>
 
-      {/* Форма создания */}
       <div className={styles['form-section']}>
         <h3>Добавить новую персону</h3>
         <div className={styles['form-grid']}>
@@ -206,14 +175,11 @@ export const PersonManager: React.FC = () => {
         </div>
       </div>
 
-      {/* Список персон */}
       <div className={styles['list-section']}>
         <h3>Список персон ({persons?.length || 0})</h3>
         <table className={styles['persons-table']}>
           <thead>
             <tr>
-              {/* <th>ID</th> */}
-              {/* <th>Изображение</th> */}
               <th>Имя</th>
               <th>Описание</th>
               <th>Действия</th>
@@ -258,8 +224,6 @@ export const PersonManager: React.FC = () => {
                             person.id,
                             editFormData?.name || '',
                             editFormData?.description || ''
-                            // editFormData?.imageBase64,
-                            // editFormData?.fileName
                           )
                         }
                         className={`${styles['btn']} ${styles['btn-update']}`}

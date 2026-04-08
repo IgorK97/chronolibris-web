@@ -1,4 +1,3 @@
-// src/components/ThemeSelector/ThemeSelector.tsx
 import React, { useState, useMemo } from 'react';
 import { useAllThemesFlat } from '@/api/themes';
 import type { ThemeDto } from '@/types';
@@ -19,7 +18,6 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({
   const [query, setQuery] = useState('');
   const { data: allThemes } = useAllThemesFlat(query);
 
-  // Фильтрация подсказок (исключаем уже выбранные)
   const suggestions = useMemo(() => {
     if (!query.trim() || !allThemes) return [];
     const lowerQuery = query.toLowerCase();
@@ -29,12 +27,12 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({
           t.name.toLowerCase().includes(lowerQuery) &&
           !selectedThemes.some((st) => st.id === t.id)
       )
-      .slice(0, 5); // Ограничим 5 вариантами
+      .slice(0, 5);
   }, [query, allThemes, selectedThemes]);
 
   return (
     <div className={styles.container}>
-      <div className={styles.inputWrapper}>
+      <div className={styles['input-wrapper']}>
         <input
           type="text"
           value={query}
@@ -59,7 +57,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({
         )}
       </div>
 
-      <div className={styles.chipList}>
+      <div className={styles['chip-list']}>
         {selectedThemes.map((theme) => (
           <GenreChip
             key={theme.id}

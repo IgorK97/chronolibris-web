@@ -1,28 +1,25 @@
-// import React from 'react';
-// import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useStore } from '@/stores/globalStore';
-// import { usersApi } from '@/api/user';
 import styles from './Header.module.css';
 import { useEffect, useRef, useState } from 'react';
 import { Search, ShieldCheck, UserStar } from 'lucide-react';
 import { CatalogPanel } from '@/pages/search/ui/CatalogPanel';
-import { AdminSidebar } from '@/components/adminSideBar/AdminSideBar';
+import { AdminSidebar } from '@/components/AdminSideBar/AdminSideBar';
 
-const FILTER_PARAMS = [
-  'themeId',
-  'selectionId',
-  'personFilters',
-  'requiredTagIds',
-  'excludedTagIds',
-];
+// const FILTER_PARAMS = [
+//   'themeId',
+//   'selectionId',
+//   'personFilters',
+//   'requiredTagIds',
+//   'excludedTagIds',
+// ];
 
 export default function Header() {
   const { user } = useStore();
   const navigate = useNavigate();
   const location = useLocation();
   const [adminOpen, setAdminOpen] = useState(false);
-  const searchParams = new URLSearchParams(location.search);
+  // const searchParams = new URLSearchParams(location.search);
   const currentQuery = new URLSearchParams(location.search).get('q') ?? '';
   const [inputValue, setInputValue] = useState(currentQuery);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -31,13 +28,20 @@ export default function Header() {
     setInputValue(currentQuery);
   }, [currentQuery]);
 
-  const hasActiveFilters = FILTER_PARAMS.some((key) => searchParams.has(key));
+  // const hasActiveFilters = FILTER_PARAMS.some((key) => searchParams.has(key));
 
   const handleSearch = () => {
     const trimmed = inputValue.trim();
-    if (!trimmed && !hasActiveFilters) return;
 
-    // Если мы уже на /search — сохраняем фильтры, меняем только q
+    const hasOtherFilters = (() => {
+      const params = new URLSearchParams(location.search);
+      params.delete('q');
+      return params.toString().length > 0;
+    })();
+
+    if (!trimmed && !hasOtherFilters) return;
+
+    //Если уже на /search, нужно поменять только q, остальные фильтры сохранить
     if (location.pathname === '/search') {
       const updated = new URLSearchParams(location.search);
       if (trimmed) {
@@ -47,7 +51,7 @@ export default function Header() {
       }
       navigate(`/search?${updated.toString()}`, { replace: false });
     } else {
-      // С других страниц — просто переходим с новым q, без фильтров
+      //С других страниц - переход с новым запросом, там фильтров нет никаких
       const params = new URLSearchParams();
       if (trimmed) params.set('q', trimmed);
       navigate(`/search?${params.toString()}`);

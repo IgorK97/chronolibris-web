@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// File: src/components/PublisherManager.tsx
 import React, { useState } from 'react';
 import {
   usePublishers,
-  //   useCountries,
   useCreatePublisher,
   useUpdatePublisher,
   useDeletePublisher,
@@ -150,7 +148,6 @@ export const PublisherManager: React.FC = () => {
     <div className={styles['publisher-manager']}>
       <h2>Управление издательствами</h2>
 
-      {/* Форма создания */}
       <div className={styles['form-section']}>
         <h3>Добавить новое издательство</h3>
         <div className={styles['form-grid']}>
@@ -214,13 +211,11 @@ export const PublisherManager: React.FC = () => {
         </div>
       </div>
 
-      {/* Список издательств */}
       <div className={styles['list-section']}>
         <h3>Список издательств ({publishers?.length || 0})</h3>
         <table className={styles['publishers-table']}>
           <thead>
             <tr>
-              {/* <th>ID</th> */}
               <th>Название</th>
               <th>Описание</th>
               <th>Страна</th>
@@ -233,7 +228,6 @@ export const PublisherManager: React.FC = () => {
               <tr key={publisher.id}>
                 {editingId === publisher.id ? (
                   <>
-                    {/* <td>{publisher.id}</td> */}
                     <td>
                       <input
                         type="text"
@@ -309,7 +303,6 @@ export const PublisherManager: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    {/* <td>{publisher.id}</td> */}
                     <td className={styles['name-cell']}>{publisher.name}</td>
                     <td className={styles['description-cell']}>
                       {publisher.description}

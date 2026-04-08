@@ -1,30 +1,23 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-// import React from // useEffect,
-// useState,
-// "react";
 import {
   ArrowLeft,
   Bookmark,
   Heart,
   Download,
   ListPlus,
-  SquareCheckBig,
-  Square,
-  WandSparkles,
   X,
-  Plus,
   Cog,
-  // XCircle,
-  // ArrowUpCircle,
 } from 'lucide-react';
 import styles from './BookDetails.module.css';
 import { useStore } from '../../../stores/globalStore';
-import { booksApi, useBookDetails } from '../../../api/books';
+import { useBookDetails } from '../../../api/books';
 import { useRoles } from '../../../api/references';
-import type { BookDetails, ShelfDetails } from '../../../types';
+import type {
+  BookDetails,
+  // ShelfDetails
+} from '../../../types';
 import {
   collectionsApi,
-  useSeekedShelves,
+  // useSeekedShelves,
   useShelves,
 } from '../../../api/collections';
 import {
@@ -36,11 +29,9 @@ import {
 import { t } from 'i18next';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-// import { CommentsSection } from './CommentSection/CommentsSection';
 import { BookTabs } from './BookTabs/BookTabs';
 import { ParticipantsInfo } from './BookTabs/ParticipantsInfo';
 import {
-  reviewsApi,
   useCreateReview,
   useDeleteReview,
   useInfiniteReviews,
@@ -49,7 +40,7 @@ import {
 } from '@/api/reviews';
 import { bookFilesApi, useBookFiles } from '@/api/bookFiles';
 import Circles from 'react-loading-icons/dist/esm/components/circles';
-import { ReportModal } from '@/components/reports/ui/ReportModal';
+import { ReportModal } from '@/components/reports/ReportModal';
 import { TARGET_TYPE } from '@/types';
 import { Flag } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -83,8 +74,8 @@ function getAuthorsString(
 }
 
 export const BookDetailsComponent = ({
-  onNavigateToReviews,
-  onNavigateToRead,
+  // onNavigateToReviews,
+  // onNavigateToRead,
   onNavigateToBack,
   onReadClick,
 }: BookDetailsProps) => {
@@ -100,12 +91,13 @@ export const BookDetailsComponent = ({
   const { data: roles } = useRoles();
   const [isReportOpen, setIsReportOpen] = useState(false);
   const { id: bookId } = useParams();
-  const { data: seekedShelves, refetch: refetchSeekedShelves } =
-    useSeekedShelves(Number(bookId) || 0);
+  // const { data: seekedShelves, refetch: refetchSeekedShelves } =
+  //   useSeekedShelves(Number(bookId) || 0);
   const { data: shelves, refetch: refetchShelves } = useShelves(
     user?.userId || 0
   );
-  const [isAuth, setIsAuth] = useState(!!user);
+  // const [isAuth, setIsAuth] = useState(!!user);
+  const isAuth = !!user;
 
   const FAVORITES_SHELF_ID = shelves?.find((s) => s.shelfType === 1)?.id;
   const READ_SHELF_ID = shelves?.find((s) => s.shelfType === 2)?.id;
@@ -116,8 +108,8 @@ export const BookDetailsComponent = ({
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [isShelfPanelOpen, setIsShelfPanelOpen] = useState(false);
-  const [isCreating, setIsCreating] = useState(false);
-  const [newShelfName, setNewShelfName] = useState('');
+  // const [isCreating, setIsCreating] = useState(false);
+  // const [newShelfName, setNewShelfName] = useState('');
 
   const handleMouseEnter = () => {
     if (user?.role !== 'reader') return;
@@ -136,9 +128,7 @@ export const BookDetailsComponent = ({
     !!Number(bookId)
   );
 
-  const { data: bookFiles, isLoading: filesLoading } = useBookFiles(
-    Number(bookId) || 0
-  );
+  const { data: bookFiles } = useBookFiles(Number(bookId) || 0);
   const navigate = useNavigate();
 
   const [isDownloadPanelOpen, setIsDownloadPanelOpen] =
@@ -147,26 +137,26 @@ export const BookDetailsComponent = ({
   const defaultBookFileId =
     bookFiles?.find((f) => f.isReadable)?.id ?? bookFiles?.[0]?.id;
   // console.log(defaultBookFileId, bookFiles![0]);
-  const handleToggleShelf = async (shelf: ShelfDetails) => {
-    const isOnShelf = seekedShelves?.includes(shelf.id);
-    if (!bookId) return;
-    const success = !isOnShelf
-      ? await collectionsApi.addBookToShelf(shelf.id, Number(bookId) || 0)
-      : await collectionsApi.removeBookFromShelf(shelf.id, Number(bookId) || 0);
+  // const handleToggleShelf = async (shelf: ShelfDetails) => {
+  //   const isOnShelf = seekedShelves?.includes(shelf.id);
+  //   if (!bookId) return;
+  //   const success = !isOnShelf
+  //     ? await collectionsApi.addBookToShelf(shelf.id, Number(bookId) || 0)
+  //     : await collectionsApi.removeBookFromShelf(shelf.id, Number(bookId) || 0);
 
-    if (success) {
-      refetchSeekedShelves();
-    }
-  };
+  //   if (success) {
+  //     refetchSeekedShelves();
+  //   }
+  // };
 
-  const { data: reviewsData, refetch: refetchReviews } = useInfiniteReviews(
+  const { refetch: refetchReviews } = useInfiniteReviews(
     Number(bookId) || 0,
     isAuth
   );
 
   const { data: userReview } = useMyReview(Number(bookId) || 0, isAuth);
 
-  const allReviews = reviewsData?.pages.flatMap((p) => p.items) ?? [];
+  // const allReviews = reviewsData?.pages.flatMap((p) => p.items) ?? [];
   // const userReview =
   //   allReviews.find((r) => r.userName === user?.userName) ?? null;
 
@@ -179,14 +169,9 @@ export const BookDetailsComponent = ({
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
 
     closeTimerRef.current = setTimeout(() => {
-      // Проверяем, существует ли еще компонент, можно через ref
       setIsRatingPopupOpen(false);
       setHoverRating(0);
     }, 300);
-    // closeTimerRef.current = setTimeout(() => {
-    //   setIsRatingPopupOpen(false);
-    //   setHoverRating(0);
-    // }, 300);
   };
   useEffect(() => {
     return () => {
@@ -195,58 +180,36 @@ export const BookDetailsComponent = ({
         closeTimerRef.current = null;
       }
     };
-    // return () => {
-    //   if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
-    // };
   }, []);
   const handleRateBook = async (rating: number) => {
     if (!user || !bookId) return;
 
     if (userReview) {
-      // User already has a review — update score only, keep existing text
-      // if (rating === userReview.score) {
-      //   await deleteReview.mutateAsync(userReview.id);
-      //   return;
-      // }
       await updateReview.mutateAsync({
         reviewId: userReview.id,
         score: rating,
         reviewText: userReview.text || undefined,
       });
     } else {
-      // No review yet — create a score-only one (server sets status = Published)
-
       await createReview.mutateAsync({
         bookId: Number(bookId) || 0,
         score: rating,
       });
     }
-
-    // Refetch book so averageRating / ratingsCount update in the header
-    // refetchBook();
     setIsRatingPopupOpen(false);
-
-    //   if (!user) return;
-    //   const success = await reviewsApi.rateBook(
-    //     fullBookDetails.id,
-    //     // user.userId,
-    //     rating
-    //   );
-    //   if (success) refetch();
-    //   setIsRatingPopupOpen(false);
   };
-  const handleCreateShelf = async () => {
-    const trimmedName = newShelfName.trim();
-    if (!trimmedName || !user) return;
-    const newShelf = await collectionsApi.createShelf(trimmedName);
-    if (newShelf != 0) {
-      console.log('Created new shelf with ID:', newShelf);
-      // await refetchSeekedShelves();
-      await refetchShelves();
-      setNewShelfName('');
-      setIsCreating(false);
-    }
-  };
+  // const handleCreateShelf = async () => {
+  //   const trimmedName = newShelfName.trim();
+  //   if (!trimmedName || !user) return;
+  //   const newShelf = await collectionsApi.createShelf(trimmedName);
+  //   if (newShelf != 0) {
+  //     console.log('Created new shelf with ID:', newShelf);
+  //     // await refetchSeekedShelves();
+  //     await refetchShelves();
+  //     setNewShelfName('');
+  //     setIsCreating(false);
+  //   }
+  // };
 
   if (isLoading) return <div className={styles.loader}>Загрузка...</div>;
   if (isError || !fullBookDetails)
@@ -290,6 +253,7 @@ export const BookDetailsComponent = ({
       window.URL.revokeObjectURL(url);
 
       setIsDownloadPanelOpen(false);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setDownloadError(t('book.download_error'));
     } finally {

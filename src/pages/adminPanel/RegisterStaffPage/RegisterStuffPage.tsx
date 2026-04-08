@@ -131,7 +131,6 @@ export function RegisterStaffPage() {
       if (axios.isAxiosError(err)) {
         const msg = err.response?.data?.message ?? 'Ошибка при регистрации.';
 
-        // Показываем серверные ошибки уникальности под нужным полем
         if (msg.toLowerCase().includes('имя пользователя')) {
           setErrors((prev) => ({ ...prev, username: msg }));
         } else if (msg.toLowerCase().includes('email')) {
@@ -154,7 +153,6 @@ export function RegisterStaffPage() {
       <h1 className={styles.title}>Регистрация сотрудника</h1>
 
       <form className={styles.form} onSubmit={handleSubmit}>
-        {/* Роль */}
         <div className={styles.field}>
           <label className={styles.label}>Роль</label>
           <select
@@ -167,7 +165,6 @@ export function RegisterStaffPage() {
           </select>
         </div>
 
-        {/* Username */}
         <Field
           label="Имя пользователя"
           value={form.userName}
@@ -189,7 +186,6 @@ export function RegisterStaffPage() {
           error={errors.lastName}
         />
 
-        {/* Email */}
         <Field
           label="Email"
           type="email"
@@ -198,7 +194,6 @@ export function RegisterStaffPage() {
           error={errors.email}
         />
 
-        {/* Телефон */}
         <Field
           label="Телефон"
           type="tel"
@@ -207,7 +202,6 @@ export function RegisterStaffPage() {
           error={errors.phoneNumber}
         />
 
-        {/* Пароль */}
         <Field
           label="Пароль"
           type="password"
@@ -216,7 +210,6 @@ export function RegisterStaffPage() {
           error={errors.password}
         />
 
-        {/* Подтверждение */}
         <Field
           label="Подтвердите пароль"
           type="password"

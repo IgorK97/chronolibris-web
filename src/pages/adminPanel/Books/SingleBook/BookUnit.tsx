@@ -1,10 +1,9 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// File: src/components/BookUnit.tsx
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  // useBookById,
   useBookContents,
   useUnlinkContentFromBook,
   useLinkContentToBook,
@@ -22,13 +21,12 @@ import type {
 import { useDebounce } from '@/hooks/useDebounce';
 import type { ContentDto, CreateBookRequest, UpdateBookRequest } from '@/types';
 import { ContentSearchPopup } from './ContentSearchPopup';
-import { BookFileManagement } from './BookFileManagement';
 import styles from './BookUnit.module.css';
 import { ArrowLeft, X } from 'lucide-react';
 import { useStore } from '@/stores/globalStore';
 import { fileToBase64, storageUrl } from '@/utils';
-import { ContentList } from '@/components/contents/ContentList';
-// import { ContentList } from '@/components/contents/ContentList';
+import { ContentList } from '@/components/Contents/ContentList';
+import { BookFileManagement } from './BookFileManagement';
 
 interface SelectedPerson {
   id: number;
@@ -66,10 +64,8 @@ function PersonFilter({
   const { data: suggestions = [] } = usePersonSuggestions(debouncedInput);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  // Sync when initialPersons changes (e.g. after book data loads)
   useEffect(() => {
     if (initialPersons && initialPersons.length > 0) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelected(initialPersons);
     }
   }, [initialPersons]);
@@ -399,7 +395,6 @@ export const BookUnit: React.FC = () => {
 
   useEffect(() => {
     if (isNew) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMode('edit');
       setForm(emptyForm());
     }
@@ -407,7 +402,6 @@ export const BookUnit: React.FC = () => {
 
   useEffect(() => {
     if (book) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setForm({
         title: book.title ?? '',
         description: book.description ?? '',
@@ -467,17 +461,14 @@ export const BookUnit: React.FC = () => {
           languageId: form.languageId!,
           countryId: form.countryId!,
           publisherId: form.publisherId,
-          // seriesId: null,
           coverBase64,
           coverContentType: form.coverFile.type,
-          // coverFileName: form.coverFile.name,
           personFilters: form.personFilters,
         };
 
         const newId = await createMutation.mutateAsync(payload);
         navigate(`/books/${newId}`);
       } else {
-        // Если новый файл выбран — конвертируем, иначе не передаём обложку
         const coverBase64 = form.coverFile
           ? await fileToBase64(form.coverFile)
           : null;
@@ -502,11 +493,8 @@ export const BookUnit: React.FC = () => {
           countryId: form.countryId,
           publisherId: form.publisherId,
           publisherIdProvided: true,
-          // seriesId: null,
-          // seriesIdProvided: true,
           coverBase64,
           coverContentType: form.coverFile?.type ?? null,
-          // coverFileName: form.coverFile?.name ?? null,
           personFilters: form.personFilters,
         };
 
@@ -522,7 +510,6 @@ export const BookUnit: React.FC = () => {
     if (isNew) {
       navigate('/books');
     } else {
-      // reset form to current book data
       if (book) {
         setForm({
           title: book.title ?? '',
@@ -590,7 +577,6 @@ export const BookUnit: React.FC = () => {
 
   const isEditing = mode === 'edit';
 
-  // Build initialPersons with names from book.participants for PersonFilter
   const initialPersons: SelectedPerson[] = (book?.participants ?? []).flatMap(
     (group) =>
       group.persons.map((p) => ({
@@ -602,7 +588,6 @@ export const BookUnit: React.FC = () => {
 
   return (
     <div className={styles['book-unit']}>
-      {/* Header */}
       <div className={styles['book-unit-header']}>
         <button onClick={() => navigate(-1)}>
           <ArrowLeft style={{ cursor: 'pointer' }} /> Назад
@@ -648,20 +633,17 @@ export const BookUnit: React.FC = () => {
         </div>
       </div>
 
-      {/* Metadata */}
       <div className={styles['book-metadata']}>
         <div className={styles['metadata-section']}>
           <h3>Основная информация о книге {book?.id}</h3>
 
           {isEditing ? (
             <div className={styles['edit-form']}>
-              {/* Cover */}
               <CoverUpload
                 currentCoverPath={book?.coverUri ?? null}
                 onFileChange={(file) => set('coverFile', file)}
               />
 
-              {/* Title */}
               <div className={styles['field-group']}>
                 <label className={styles['field-label']}>Название *</label>
                 <input
@@ -672,7 +654,6 @@ export const BookUnit: React.FC = () => {
                 />
               </div>
 
-              {/* Description */}
               <div className={styles['field-group']}>
                 <label className={styles['field-label']}>Описание</label>
                 <textarea
@@ -684,7 +665,6 @@ export const BookUnit: React.FC = () => {
                 />
               </div>
 
-              {/* ISBN / BBK / UDK / Source / Year */}
               <div className={styles['fields-row']}>
                 <div className={styles['field-group']}>
                   <label className={styles['field-label']}>ISBN</label>
@@ -738,7 +718,6 @@ export const BookUnit: React.FC = () => {
                 />
               </div>
 
-              {/* Language autocomplete */}
               <AutocompleteField
                 label="Язык"
                 selectedId={form.languageId}
@@ -755,7 +734,6 @@ export const BookUnit: React.FC = () => {
                 }}
               />
 
-              {/* Country autocomplete */}
               <AutocompleteField
                 label="Страна"
                 selectedId={form.countryId}
@@ -772,7 +750,6 @@ export const BookUnit: React.FC = () => {
                 }}
               />
 
-              {/* Publisher autocomplete */}
               <AutocompleteField
                 label="Издательство"
                 selectedId={form.publisherId}
@@ -789,7 +766,6 @@ export const BookUnit: React.FC = () => {
                 }}
               />
 
-              {/* Flags */}
               <div className={styles['fields-row']}>
                 <label className={styles['checkbox-label']}>
                   <input
@@ -809,7 +785,6 @@ export const BookUnit: React.FC = () => {
                 </label>
               </div>
 
-              {/* Persons */}
               <PersonFilter
                 value={form.personFilters}
                 roles={roles}
@@ -819,7 +794,6 @@ export const BookUnit: React.FC = () => {
             </div>
           ) : (
             <div className={styles['edit-form']}>
-              {/* Cover */}
               {book?.coverUri && (
                 <div className={styles['field-group']}>
                   <label className={styles['field-label']}>Обложка</label>
@@ -836,7 +810,6 @@ export const BookUnit: React.FC = () => {
                 </div>
               )}
 
-              {/* Title */}
               <div className={styles['field-group']}>
                 <label className={styles['field-label']}>Название *</label>
                 <input
@@ -847,7 +820,6 @@ export const BookUnit: React.FC = () => {
                 />
               </div>
 
-              {/* Description */}
               <div className={styles['field-group']}>
                 <label className={styles['field-label']}>Описание</label>
                 <textarea
@@ -859,7 +831,6 @@ export const BookUnit: React.FC = () => {
                 />
               </div>
 
-              {/* ISBN / Year */}
               <div className={styles['fields-row']}>
                 <div className={styles['field-group']}>
                   <label className={styles['field-label']}>ISBN</label>
@@ -881,7 +852,6 @@ export const BookUnit: React.FC = () => {
                 </div>
               </div>
 
-              {/* BBK / UDK */}
               <div className={styles['fields-row']}>
                 <div className={styles['field-group']}>
                   <label className={styles['field-label']}>ББК</label>
@@ -903,7 +873,6 @@ export const BookUnit: React.FC = () => {
                 </div>
               </div>
 
-              {/* Source */}
               <div className={styles['field-group']}>
                 <label className={styles['field-label']}>Источник</label>
                 <input
@@ -914,7 +883,6 @@ export const BookUnit: React.FC = () => {
                 />
               </div>
 
-              {/* Language */}
               <div className={styles['field-group']}>
                 <label className={styles['field-label']}>Язык</label>
                 <input
@@ -925,7 +893,6 @@ export const BookUnit: React.FC = () => {
                 />
               </div>
 
-              {/* Country */}
               <div className={styles['field-group']}>
                 <label className={styles['field-label']}>Страна</label>
                 <input
@@ -936,7 +903,6 @@ export const BookUnit: React.FC = () => {
                 />
               </div>
 
-              {/* Publisher */}
               <div className={styles['field-group']}>
                 <label className={styles['field-label']}>Издательство</label>
                 <input
@@ -947,7 +913,6 @@ export const BookUnit: React.FC = () => {
                 />
               </div>
 
-              {/* Flags */}
               <div className={styles['fields-row']}>
                 <label className={styles['checkbox-label']}>
                   <input
@@ -969,7 +934,6 @@ export const BookUnit: React.FC = () => {
                 </label>
               </div>
 
-              {/* Persons – read-only */}
               <PersonFilter
                 value={form.personFilters}
                 roles={roles}
@@ -982,7 +946,6 @@ export const BookUnit: React.FC = () => {
         </div>
       </div>
 
-      {/* Contents - only for existing books */}
       {!isNew && (
         <div className={styles['contents-section']}>
           <div className={styles['contents-header']}>
@@ -1021,7 +984,6 @@ export const BookUnit: React.FC = () => {
         </div>
       )}
 
-      {/* Content search popup */}
       {showContentSearch && (
         <ContentSearchPopup
           onClose={() => setShowContentSearch(false)}

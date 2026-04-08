@@ -1,4 +1,3 @@
-// src/components/Filters/PersonFilter.tsx
 import React, { useState, useRef, useEffect } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
 import { usePersonSuggestions } from '@api/searchReference';
@@ -36,16 +35,16 @@ export const PersonFilter: React.FC<PersonFilterProps> = ({
   const { data: suggestions = [] } = usePersonSuggestions(debouncedInput);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  // Синхронизация только при внешней очистке (например, кнопка "Сбросить всё")
   useEffect(() => {
     if (value.length === 0 && selected.some((p) => p.roleId !== null)) {
+      //И как их избегать?
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelected([]);
     }
   }, [value]);
 
   const handleUpdateParent = (currentSelected: SelectedPerson[]) => {
-    // Группируем только тех, у кого ЕСТЬ роль
+    //Группировка тех, у кого есть роль
     const grouped = new Map<number, number[]>();
     currentSelected.forEach((p) => {
       if (p.roleId !== null) {
@@ -75,7 +74,6 @@ export const PersonFilter: React.FC<PersonFilterProps> = ({
     setSelected(next);
     setInput('');
     setShowDropDown(false);
-    // На этом этапе onChange не вызываем, так как роль еще не выбрана
   };
 
   const handleRoleChange = (personId: number, roleId: number) => {
@@ -83,13 +81,13 @@ export const PersonFilter: React.FC<PersonFilterProps> = ({
       p.id === personId ? { ...p, roleId } : p
     );
     setSelected(next);
-    handleUpdateParent(next); // Теперь вызываем поиск
+    handleUpdateParent(next);
   };
 
   const handleRemove = (personId: number) => {
     const next = selected.filter((p) => p.id !== personId);
     setSelected(next);
-    handleUpdateParent(next); // Обновляем поиск после удаления
+    handleUpdateParent(next);
   };
 
   return (

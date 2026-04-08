@@ -1,14 +1,4 @@
-// import { useState, useRef } from 'react';
-// import { ChevronDown, ChevronUp, CornerDownRight } from 'lucide-react';
-// import type { Comment } from './BookTabsData';
-// import { MOCK_COMMENTS, formatDate } from './BookTabsData';
-import {
-  // Avatar,
-  // VoteButton,
-  // ScoreDisplay,
-  // ThreeDotsMenu,
-  ComposeBox,
-} from './BookTabsAtoms';
+import { ComposeBox } from './BookTabsAtoms';
 import styles from './BookTabs.module.css';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { commentsApi } from '@/api/comments';

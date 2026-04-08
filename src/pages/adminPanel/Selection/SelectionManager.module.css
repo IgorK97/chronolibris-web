@@ -1,22 +1,9 @@
-/*
-  Враппер
-  вокруг
-  BookCard
-  —
-  выравнивает
-  карточку
-  и
-  кнопку
-  в
-  колонку
-  */
 .book-card-wrapper {
   display: flex;
   flex-direction: column;
   width: fit-content;
 }
 
-/* Кнопка «Удалить из подборки» под карточкой */
 .remove-book-button {
   margin-top: 6px;
   padding: 6px 0;

@@ -24,16 +24,16 @@ import {
   PersonManager,
   PublisherManager,
   ThemeManager,
-} from '@/pages/adminPanel';
-import { ContentForm } from '@/pages/adminPanel/Contents/SingleContent/ContentUnit';
-import { BookUnit } from '@/pages/adminPanel/Books/SingleBook/BookUnit';
-import { SelectionsPage } from '@/pages/adminPanel/Selection/SelectionsPage';
-import { TagsPage } from '@/pages/adminPanel/Tags/TagsPage';
+} from '@/pages/AdminPanel';
+import { ContentUnit } from '@/pages/AdminPanel/Contents/SingleContent/ContentUnit';
+import { BookUnit } from '@/pages/AdminPanel/Books/SingleBook/BookUnit';
+import { SelectionsPage } from '@/pages/AdminPanel/Selection/SelectionsPage';
+import { TagsPage } from '@/pages/AdminPanel/Tags/TagsPage';
 import { ReaderPage } from '@/pages/reader/ReaderPage';
 import ReaderLayout from './layouts/ReaderLayout';
 import { ModerationPage } from '@/pages/moderation/ModerationPage';
 import SearchPage from '@/pages/search/ui/SearchPage';
-import { RegisterStaffPage } from '@/pages/adminPanel/RegisterStaffPage/RegisterStuffPage';
+import { RegisterStaffPage } from '@/pages/AdminPanel/RegisterStaffPage/RegisterStuffPage';
 import { PublicOnlyRoute } from './routes/PublicOnlyRoute';
 import toast from 'react-hot-toast';
 
@@ -189,8 +189,8 @@ export default function App() {
             <Route path="tags" element={<TagsPage />} />
 
             <Route path="contents" element={<ContentManagement />} />
-            <Route path="/contents/new" element={<ContentForm />} />
-            <Route path="/contents/:contentId/edit" element={<ContentForm />} />
+            <Route path="/contents/new" element={<ContentUnit />} />
+            <Route path="/contents/:contentId/edit" element={<ContentUnit />} />
 
             {/* <Route path="books" element={<BookManagement />} /> */}
             <Route path="books/:bookId" element={<BookUnit />} />

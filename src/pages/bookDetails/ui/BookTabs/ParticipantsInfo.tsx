@@ -7,10 +7,6 @@ interface ParticipantsInfoProps {
   roles: RoleDetails[];
 }
 
-/**
- * Resolves a role name by its numeric ID.
- * Falls back to "Участник" if the role is not found in the dictionary.
- */
 function getRoleName(roleId: number, roles: RoleDetails[]): string {
   return roles.find((r) => r.id === roleId)?.name ?? 'Участник';
 }
@@ -20,7 +16,6 @@ export const ParticipantsInfo = ({
   bookInfo,
   roles,
 }: ParticipantsInfoProps) => {
-  // Filter out groups that have no persons to avoid rendering empty sections
   const nonEmptyGroups = participants.filter((g) => g.persons.length > 0);
 
   return (
@@ -50,7 +45,6 @@ export const ParticipantsInfo = ({
       )}
 
       <div className={styles['book-info']}>
-        {/* Источник данных */}
         <div className={styles['info-card']}>
           <div className={styles['info-label']}>Источник данных</div>
           <div className={styles['info-value']}>
@@ -58,7 +52,6 @@ export const ParticipantsInfo = ({
           </div>
         </div>
 
-        {/* ISBN */}
         <div className={styles['info-card']}>
           <div className={styles['info-label']}>ISBN</div>
           <div className={styles['info-value']}>
@@ -66,7 +59,6 @@ export const ParticipantsInfo = ({
           </div>
         </div>
 
-        {/* ББК и УДК */}
         <div className={styles['info-card']}>
           <div className={styles['info-row']}>
             <div className={styles['info-label']}>ББК</div>
@@ -82,7 +74,6 @@ export const ParticipantsInfo = ({
           </div>
         </div>
 
-        {/* Язык */}
         <div className={styles['info-card']}>
           <div className={styles['info-label']}>Язык</div>
           <div className={styles['info-value']}>
@@ -90,7 +81,6 @@ export const ParticipantsInfo = ({
           </div>
         </div>
 
-        {/* Страна */}
         <div className={styles['info-card']}>
           <div className={styles['info-label']}>Страна</div>
           <div className={styles['info-value']}>
@@ -98,7 +88,6 @@ export const ParticipantsInfo = ({
           </div>
         </div>
 
-        {/* Год публикации */}
         <div className={styles['info-card']}>
           <div className={styles['info-label']}>Год публикации</div>
           <div className={styles['info-value']}>
@@ -106,7 +95,6 @@ export const ParticipantsInfo = ({
           </div>
         </div>
 
-        {/* Издательство */}
         <div className={styles['info-card']}>
           <div className={styles['info-label']}>Издательство</div>
           <div className={styles['info-value']}>

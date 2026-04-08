@@ -24,7 +24,7 @@ export const TagChip = ({
           disabled={disabled}
           title="Удалить тег"
         >
-          ×
+          &times;
         </button>
       )}
     </div>

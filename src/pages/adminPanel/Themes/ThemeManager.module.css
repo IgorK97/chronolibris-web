@@ -66,7 +66,6 @@
   margin-top: 8px;
 }
 
-/* Tree View Styles */
 .themes-tree {
   background: white;
   border-radius: 8px;
@@ -151,7 +150,6 @@
   padding-left: 12px;
 }
 
-/* Button Styles */
 .btn {
   width: 300px;
   padding: 12px;
@@ -201,7 +199,6 @@
   background: #545b62;
 }
 
-/* Loading & Error States */
 .loading,
 .error {
   text-align: center;

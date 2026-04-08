@@ -58,7 +58,6 @@
   color: #333;
 }
 
-/* Правая часть шапки: фильтры + кнопка создания */
 .header-actions {
   display: flex;
   align-items: center;
@@ -66,7 +65,6 @@
   flex-wrap: wrap;
 }
 
-/* ── Фильтр-бар ─────────────────────────────────────────────────────────── */
 .filter-bar {
   display: flex;
   gap: 8px;
@@ -103,7 +101,6 @@
   color: #fff;
 }
 
-/* ── Кнопка создания подборки ───────────────────────────────────────────── */
 .create-btn {
   padding: 8px 18px;
   background: #27ae60;
@@ -121,7 +118,6 @@
   background: #219a52;
 }
 
-/* ── Сетка карточек ─────────────────────────────────────────────────────── */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -145,13 +141,11 @@
   box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
 }
 
-/* Скрытая подборка — слегка приглушённая */
 .card-hidden {
   opacity: 0.75;
   border-style: dashed;
 }
 
-/* Бейдж «Скрыта» */
 .badge-hidden {
   display: inline-block;
   margin-bottom: 8px;

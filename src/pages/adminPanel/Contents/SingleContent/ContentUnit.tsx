@@ -1,5 +1,5 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// File: src/components/ContentUnit.tsx
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
@@ -8,11 +8,7 @@ import {
   usePatchContent,
   useContentBooks,
 } from '@/api/contents';
-import {
-  useLanguages,
-  useCountries,
-  // useFormats
-} from '@/api/references';
+import { useLanguages, useCountries } from '@/api/references';
 import { usePersonRoles, usePersonSuggestions } from '@api/searchReference';
 import type {
   PersonRoleDto,
@@ -21,7 +17,7 @@ import type {
 } from '@/types';
 import { useDebounce } from '@/hooks/useDebounce';
 import { ThemeSelector } from '../../Themes/ThemeSelector';
-import { ContentTagsManager } from './ContentTagsManagement';
+import { ContentTagsManagement } from './ContentTagsManagement';
 import type { ThemeDto } from '@/types';
 import styles from './ContentUnit.module.css';
 import { ArrowLeft, X } from 'lucide-react';
@@ -78,10 +74,6 @@ const emptyForm = (): FormState => ({
   year: '',
   personFilters: [],
 });
-
-// ---------------------------------------------------------------------------
-// PersonFilter (identical to BookUnit's version)
-// ---------------------------------------------------------------------------
 
 function PersonFilter({
   value,
@@ -245,11 +237,7 @@ function PersonFilter({
   );
 }
 
-// ---------------------------------------------------------------------------
-// Main component
-// ---------------------------------------------------------------------------
-
-export const ContentForm: React.FC = () => {
+export const ContentUnit: React.FC = () => {
   const { contentId } = useParams<{ contentId: string }>();
   const navigate = useNavigate();
   const isNew = !contentId || contentId === 'new';
@@ -271,19 +259,15 @@ export const ContentForm: React.FC = () => {
   const [selectedThemes, setSelectedThemes] = useState<ThemeDto[]>([]);
   const [initialPersons, setInitialPersons] = useState<SelectedPerson[]>([]);
 
-  // New content → start in edit mode
   useEffect(() => {
     if (isNew) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMode('edit');
       setForm(emptyForm());
     }
   }, [isNew]);
 
-  // Populate form when content loads
   useEffect(() => {
     if (content) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setForm({
         title: content.title ?? '',
         description: content.description ?? '',
@@ -372,7 +356,6 @@ export const ContentForm: React.FC = () => {
   const isSaving = createMutation.isPending || patchMutation.isPending;
   const isEditing = mode === 'edit';
 
-  // Lookup helpers
   const langName =
     languages.find((l: any) => l.id === form.languageId)?.name ?? '';
   const countryName =
@@ -386,7 +369,6 @@ export const ContentForm: React.FC = () => {
 
   return (
     <div className={styles['book-unit']}>
-      {/* ── Header ── */}
       <div className={styles['book-unit-header']}>
         <button onClick={() => navigate('/contents')}>
           <ArrowLeft style={{ cursor: 'pointer' }} /> Назад к списку
@@ -427,9 +409,7 @@ export const ContentForm: React.FC = () => {
           <h3>Основная информация</h3>
 
           {isEditing ? (
-            /* ── EDIT FORM ── */
             <div className={styles['edit-form']}>
-              {/* Название */}
               <div className={styles['field-group']}>
                 <label className={styles['field-label']}>Название *</label>
                 <input
@@ -440,7 +420,6 @@ export const ContentForm: React.FC = () => {
                 />
               </div>
 
-              {/* Описание */}
               <div className={styles['field-group']}>
                 <label className={styles['field-label']}>Описание</label>
                 <textarea
@@ -452,7 +431,6 @@ export const ContentForm: React.FC = () => {
                 />
               </div>
 
-              {/* Вид документа */}
               <div className={styles['field-group']}>
                 <label className={styles['field-label']}>Вид документа</label>
                 <select
@@ -469,7 +447,6 @@ export const ContentForm: React.FC = () => {
                 </select>
               </div>
 
-              {/* Год */}
               <div className={styles['field-group']}>
                 <label className={styles['field-label']}>Год</label>
                 <input
@@ -481,7 +458,6 @@ export const ContentForm: React.FC = () => {
                 />
               </div>
 
-              {/* Язык */}
               <div className={styles['field-group']}>
                 <label className={styles['field-label']}>Язык</label>
                 <select
@@ -498,7 +474,6 @@ export const ContentForm: React.FC = () => {
                 </select>
               </div>
 
-              {/* Страна */}
               <div className={styles['field-group']}>
                 <label className={styles['field-label']}>Страна</label>
                 <select
@@ -515,7 +490,6 @@ export const ContentForm: React.FC = () => {
                 </select>
               </div>
 
-              {/* Персоналии */}
               <PersonFilter
                 value={form.personFilters}
                 roles={roles}
@@ -523,7 +497,6 @@ export const ContentForm: React.FC = () => {
                 initialPersons={initialPersons}
               />
 
-              {/* Темы */}
               <div className={styles['field-group']}>
                 <label className={styles['field-label']}>Темы</label>
                 <ThemeSelector
@@ -538,9 +511,7 @@ export const ContentForm: React.FC = () => {
               </div>
             </div>
           ) : (
-            /* ── VIEW MODE ── */
             <div className={styles['edit-form']}>
-              {/* Название */}
               <div className={styles['field-group']}>
                 <label className={styles['field-label']}>Название *</label>
                 <input
@@ -551,7 +522,6 @@ export const ContentForm: React.FC = () => {
                 />
               </div>
 
-              {/* Описание */}
               <div className={styles['field-group']}>
                 <label className={styles['field-label']}>Описание</label>
                 <textarea
@@ -563,7 +533,6 @@ export const ContentForm: React.FC = () => {
                 />
               </div>
 
-              {/* Вид документа */}
               <div className={styles['field-group']}>
                 <label className={styles['field-label']}>Вид документа</label>
                 <input
@@ -573,8 +542,6 @@ export const ContentForm: React.FC = () => {
                   placeholder="Вид документа"
                 />
               </div>
-
-              {/* Год */}
               <div className={styles['field-group']}>
                 <label className={styles['field-label']}>Год</label>
                 <input
@@ -585,7 +552,6 @@ export const ContentForm: React.FC = () => {
                 />
               </div>
 
-              {/* Язык */}
               <div className={styles['field-group']}>
                 <label className={styles['field-label']}>Язык</label>
                 <input
@@ -596,7 +562,6 @@ export const ContentForm: React.FC = () => {
                 />
               </div>
 
-              {/* Страна */}
               <div className={styles['field-group']}>
                 <label className={styles['field-label']}>Страна</label>
                 <input
@@ -607,7 +572,6 @@ export const ContentForm: React.FC = () => {
                 />
               </div>
 
-              {/* Персоналии – только просмотр */}
               <PersonFilter
                 value={form.personFilters}
                 roles={roles}
@@ -616,7 +580,6 @@ export const ContentForm: React.FC = () => {
                 readOnly
               />
 
-              {/* Темы – только просмотр */}
               <div className={styles['field-group']}>
                 <label className={styles['field-label']}>Темы</label>
                 <div
@@ -647,7 +610,7 @@ export const ContentForm: React.FC = () => {
         </div>
       </div>
 
-      {!isNew && id && <ContentTagsManager contentId={id} />}
+      {!isNew && id && <ContentTagsManagement contentId={id} />}
       {!isNew && id && (
         <div className={styles['contents-section']}>
           <h3>Входит в состав книг</h3>

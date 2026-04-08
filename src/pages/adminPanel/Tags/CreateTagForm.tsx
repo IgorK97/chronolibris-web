@@ -1,4 +1,3 @@
-// components/Tags/CreateTagForm.tsx
 import React, { useState } from 'react';
 import { useCreateTag } from '@/api/tags';
 import { RELATION_TYPES, TAG_TYPES, type TagDetails } from '@/types';
@@ -23,7 +22,6 @@ export const CreateTagForm: React.FC<CreateTagFormProps> = ({
   );
 
   const createMutation = useCreateTag();
-  // const { data: relationTypes } = useRelationTypes();
   const effectiveRelationTypes = RELATION_TYPES;
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -77,7 +75,6 @@ export const CreateTagForm: React.FC<CreateTagFormProps> = ({
         </select>
       </div>
 
-      {/* Родительский тег */}
       <div className={styles['form-group']}>
         <label className={styles['label']}>Родительский тег:</label>
         {selectedParentTag ? (
@@ -109,7 +106,6 @@ export const CreateTagForm: React.FC<CreateTagFormProps> = ({
         )}
       </div>
 
-      {/* Тип отношения — только если выбран родитель */}
       {selectedParentTag && (
         <div className={styles['form-group']}>
           <label className={styles['label']}>Тип отношения:</label>

@@ -2,16 +2,11 @@ import { useState } from 'react';
 import {
   useInfiniteQuery,
   useMutation,
-  // useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import {
-  commentsApi,
-  // useRateComment
-} from '@/api/comments';
+import { commentsApi } from '@/api/comments';
 import {
   Avatar,
-  // VoteButton,
   ComposeBox,
   ScoreDisplay,
   ThreeDotsMenu,
@@ -68,10 +63,8 @@ export function CommentItem({
     qc.removeQueries({ queryKey: repliesQueryKey });
   };
 
-  // const allReplies = fetchedReplies || [];
   const hasReplies = comment.repliesCount > 0;
 
-  // Решение проблемы вложенности: сдвиг только до предела, линии всегда
   const indentStyle = {
     marginLeft: depth > 0 && depth <= MAX_INDENT_DEPTH ? '24px' : '0px',
     borderLeft: depth > 0 ? '2px solid var(--border-color, #e5e7eb)' : 'none',
@@ -151,7 +144,6 @@ export function CommentItem({
               onDelete={async () => deleteMutation.mutate()}
               targetId={comment.id}
               targetTypeId={TARGET_TYPE.COMMENT}
-              // isAuth={isAuth}
             />
           ) : (
             <ThreeDotsMenu
@@ -169,7 +161,6 @@ export function CommentItem({
         </div>
 
         <div className={styles['comment-footer']}>
-          {/* Группа кнопок голосования */}
           <div className={styles['vote-group']}>
             <VoteButton
               type="like"
@@ -207,7 +198,7 @@ export function CommentItem({
                   parentCommentId: comment.id,
                 });
                 setIsReplying(false);
-                setShowMore(true); // Показываем ветку после ответа
+                setShowMore(true);
                 qc.invalidateQueries({
                   queryKey: ['comments', 'replies', comment.id],
                 });
@@ -229,24 +220,6 @@ export function CommentItem({
           </span>
         </button>
       )}
-      {/* {hasReplies && !showMore && (
-        <button
-          className={styles['show-more-btn']}
-          onClick={() => setShowMore(true)}
-        >
-          <span>+ Показать ответы ({comment.repliesCount})</span>
-        </button>
-      )}
-
- 
-      {hasReplies && showMore && (
-        <button
-          className={styles['show-more-btn']}
-          onClick={() => setShowMore(false)}
-        >
-          <span>- Скрыть ответы ({comment.repliesCount})</span>
-        </button>
-      )} */}
 
       {showMore && hasReplies && (
         <div className={styles['replies-container']}>

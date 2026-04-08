@@ -1,20 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// File: src/components/BookFileManagement.tsx
 import React, { useState, useRef } from 'react';
 import {
   useBookFiles,
   useUploadBookFile,
   useUpdateBookFile,
   useDeleteBookFile,
-  useDownloadBookFile,
+  // useDownloadBookFile,
   bookFilesApi,
 } from '@/api/bookFiles';
 import { useFormats } from '@/api/references';
-import type { BookFileDto, FormatDto } from '@/types';
+import type { BookFileDto } from '@/types';
 import { BookFileStatuses } from '@/types';
 import styles from './BookFileManagement.module.css';
-import { Download, Pencil, Trash, Trash2 } from 'lucide-react';
+import { Download, Trash2 } from 'lucide-react';
 import { t } from 'i18next';
 
 interface BookFileManagementProps {
@@ -35,7 +34,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
   const uploadMutation = useUploadBookFile();
   const updateMutation = useUpdateBookFile();
   const deleteMutation = useDeleteBookFile();
-  const downloadMutation = useDownloadBookFile();
+  // const downloadMutation = useDownloadBookFile();
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
 
@@ -66,7 +65,6 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
       );
       return;
     }
-    // Проверка размера (100 MB)
     const MAX_SIZE = 100 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
       alert('Размер файла не должен превышать 100 MB');
@@ -81,7 +79,6 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
         file,
       });
 
-      // Сброс формы
       setSelectedFormat(0);
       setIsReadable(false);
       if (fileInputRef.current) {
@@ -91,40 +88,6 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
       refetch();
     } catch (err: any) {
       alert(err.response?.data?.message || 'Ошибка загрузки файла');
-    }
-  };
-
-  const handleUpdate = async () => {
-    if (!editFileInputRef.current?.files?.[0] || !editingFile) {
-      alert('Выберите файл для обновления');
-      return;
-    }
-
-    const file = editFileInputRef.current.files[0];
-
-    // Проверка размера (100 MB)
-    const MAX_SIZE = 100 * 1024 * 1024;
-    if (file.size > MAX_SIZE) {
-      alert('Размер файла не должен превышать 100 MB');
-      return;
-    }
-
-    try {
-      await updateMutation.mutateAsync({
-        bookId,
-        formatId: editingFile.formatId,
-        isReadable: editingFile.isReadable,
-        file,
-      });
-
-      setEditingFile(null);
-      if (editFileInputRef.current) {
-        editFileInputRef.current.value = '';
-      }
-
-      refetch();
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Ошибка обновления файла');
     }
   };
 
@@ -195,8 +158,6 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
 
   return (
     <div className={styles['book-file-management']}>
-      {/* Форма загрузки */}
-
       <h4>Загрузить новый файл</h4>
       <div className={styles['form-grid']}>
         <div className={styles['form-group']}>
@@ -225,7 +186,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
             type="checkbox"
             checked={isReadable}
             onChange={(e) => setIsReadable(e.target.checked)}
-            disabled={selectedFormat !== 1} // Только FB2
+            disabled={selectedFormat !== 1}
             className={styles['checkbox-field']}
           />
         </div>
@@ -255,7 +216,6 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
         </button>
       </div>
 
-      {/* Список файлов */}
       <div className={styles['files-list']}>
         <h4>Существующие файлы ({bookFiles?.length || 0})</h4>
         <table className={styles['files-table']}>

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// components/Contents/ContentTagsManager.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import {
   useContentTags,
@@ -15,7 +14,7 @@ interface ContentTagsManagerProps {
   contentId: number;
 }
 
-export const ContentTagsManager: React.FC<ContentTagsManagerProps> = ({
+export const ContentTagsManagement: React.FC<ContentTagsManagerProps> = ({
   contentId,
 }) => {
   const [showSearch, setShowSearch] = useState(false);
@@ -62,7 +61,6 @@ export const ContentTagsManager: React.FC<ContentTagsManagerProps> = ({
     setTimeout(() => setShowSearch(false), 200);
   };
 
-  // Закрытие по клику вне
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (

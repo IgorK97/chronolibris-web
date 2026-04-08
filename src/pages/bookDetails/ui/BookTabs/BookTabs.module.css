@@ -33,7 +33,7 @@
   transition:
     color 0.15s,
     border-color 0.15s;
-  margin-bottom: -1px; /* overlap the container border */
+  margin-bottom: -1px;
 }
 
 .tab-btn:hover:not(:disabled) {
@@ -145,7 +145,6 @@
   border-bottom: none;
 }
 
-/* Depth indentation */
 .comment-depth-0 {
   padding-left: 0;
 }
@@ -162,7 +161,6 @@
   padding-left: 52px;
 }
 
-/* Thread line */
 .thread-line {
   position: absolute;
   left: 10px;
@@ -210,7 +208,6 @@
   color: #9ca3af;
 }
 
-/* Three dots */
 .comment-menu-wrapper {
   position: relative;
   margin-left: auto;
@@ -274,7 +271,6 @@
   word-break: break-all;
 }
 
-/* Footer actions */
 .comment-footer {
   display: flex;
   align-items: center;
@@ -282,7 +278,6 @@
   flex-wrap: wrap;
 }
 
-/* Replies */
 .replies {
   margin-top: 4px;
 }
@@ -383,7 +378,6 @@
   background: #f3f4f6;
 }
 
-/* Star display */
 .review-stars {
   display: flex;
   gap: 1px;
@@ -415,7 +409,6 @@
   margin-bottom: 8px;
 }
 
-/* Locked state */
 .reviews-locked {
   font-size: 14px;
   color: #9ca3af;
@@ -427,7 +420,6 @@
   margin-bottom: 16px;
 }
 
-/* Star picker (compose) */
 .star-picker {
   display: flex;
   align-items: center;

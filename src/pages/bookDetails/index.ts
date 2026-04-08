@@ -1,3 +1,1 @@
-import { BookDetailsComponent } from "./ui/BookDetails";
-
-export { BookDetailsComponent };
+export * from './ui';

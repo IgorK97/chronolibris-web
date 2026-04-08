@@ -6,7 +6,7 @@ import {
   fillFavColor,
   fillUnfavColor,
   unfavColor,
-} from '../../../../utils';
+} from '../../../utils';
 // import { collectionsApi } from "../../../../api/collections";
 // import { useStore } from "../../../../stores/globalStore";
 
@@ -27,7 +27,6 @@ export const BookCard: React.FC<BookCardProps> = ({
   // const [isFavorite, setIsFavorite] = useState(bookInfo.isFavorite);
   // const { shelves } = useStore();
   const { user } = useStore();
-  // const BASE_URL = import.meta.env.VITE_PUBLIC_BASE_DEV_URL || '';
   const coverUrl = import.meta.env.VITE_STORAGE_URL;
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
