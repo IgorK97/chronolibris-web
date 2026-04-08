@@ -124,7 +124,15 @@ export const useContents = (filter: ContentFilterRequest) => {
   });
 };
 
-export const useInfiniteContents = (filter: ContentFilterRequest) => {
+interface UseOptions {
+  enabled?: boolean;
+}
+
+export const useInfiniteContents = (
+  filter: ContentFilterRequest,
+  options?: UseOptions
+) => {
+  const enabled = options?.enabled !== undefined ? options.enabled : !!filter;
   return useInfiniteQuery({
     queryKey: ['contents', 'infinite', filter],
 
@@ -142,6 +150,7 @@ export const useInfiniteContents = (filter: ContentFilterRequest) => {
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
 
     staleTime: 2 * 60 * 1000,
+    enabled: enabled && !!filter,
   });
 };
 

@@ -4,7 +4,8 @@ import type { ContentDto, ContentFilterRequest } from '@/types/types';
 import styles from './ContentList.module.css';
 
 interface ContentListProps {
-  filter: ContentFilterRequest;
+  items?: ContentDto[];
+  filter?: ContentFilterRequest;
   renderActions: (content: ContentDto) => React.ReactNode;
   onTitleClick?: (content: ContentDto) => void;
   additionalColumns?: Array<{
@@ -14,17 +15,27 @@ interface ContentListProps {
 }
 
 export const ContentList: React.FC<ContentListProps> = ({
+  items: staticItems,
   filter,
   renderActions,
   onTitleClick,
   additionalColumns = [],
 }) => {
-  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteContents(filter);
+  const isStatic = !!staticItems;
+  const {
+    data: dynamicData,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteContents(filter ?? { limit: 20 }, {
+    enabled: !isStatic && !!filter,
+  });
 
   const observerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    if (isStatic) return;
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
@@ -35,11 +46,13 @@ export const ContentList: React.FC<ContentListProps> = ({
     );
     if (observerRef.current) observer.observe(observerRef.current);
     return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, isStatic]);
 
-  const allContents = data?.pages.flatMap((page) => page.items) || [];
+  const allContents = isStatic
+    ? staticItems
+    : dynamicData?.pages.flatMap((page) => page.items) || [];
 
-  if (isLoading) {
+  if (!isStatic && isLoading) {
     return <div className={styles['loading']}>Загрузка...</div>;
   }
 
@@ -78,13 +91,15 @@ export const ContentList: React.FC<ContentListProps> = ({
           ))}
         </tbody>
       </table>
-      <div ref={observerRef} className={styles['loader-trigger']}>
-        {isFetchingNextPage
-          ? 'Загрузка...'
-          : hasNextPage
-            ? 'Загрузить еще'
-            : 'Конец списка'}
-      </div>
+      {!isStatic && (
+        <div ref={observerRef} className={styles['loader-trigger']}>
+          {isFetchingNextPage
+            ? 'Загрузка...'
+            : hasNextPage
+              ? 'Загрузить еще'
+              : 'Конец списка'}
+        </div>
+      )}
     </>
   );
 };

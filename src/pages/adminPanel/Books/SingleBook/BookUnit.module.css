@@ -31,6 +31,48 @@
   margin-bottom: 16px;
 }
 
+.btn {
+  width: 300px;
+  padding: 12px;
+  background: var(--color-dark-blue);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.btn:disabled {
+  background: #95a5a6;
+  cursor: default;
+}
+
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.btn-update {
+  background: var(--color-dark-blue);
+  color: #fff;
+  width: 160px;
+  height: 50px;
+  border-radius: 10px;
+  font-size: 12px;
+  margin-left: 5px;
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: #fff;
+  width: 80px;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 12px;
+  margin-left: 5px;
+}
+
 .metadata-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -113,12 +155,6 @@
   margin-top: 8px;
 }
 
-/*
-  BookUnit.module.css — дополнения для режимов создания/редактирования.
-  Добавьте эти классы к уже существующему BookUnit.module.css.
-*/
-
-/* ── Header actions ──────────────────────────────────────────────────────── */
 .header-actions {
   display: flex;
   gap: 8px;
@@ -126,7 +162,6 @@
   margin-left: auto;
 }
 
-/* ── Edit form layout ────────────────────────────────────────────────────── */
 .edit-form {
   display: flex;
   flex-direction: column;

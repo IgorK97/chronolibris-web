@@ -33,6 +33,7 @@ import styles from './BookUnit.module.css';
 import { ArrowLeft, Book, X } from 'lucide-react';
 import { useStore } from '@/stores/globalStore';
 import { storageUrl } from '@/utils';
+import { ContentList } from '@/components/contents/ContentList';
 // import { ContentList } from '@/components/contents/ContentList';
 
 interface SelectedPerson {
@@ -297,60 +298,6 @@ function AutocompleteField({
   );
 }
 
-// function CoverUpload({
-//   currentCoverPath,
-//   onFileChange,
-// }: {
-//   currentCoverPath?: string | null;
-//   onFileChange: (file: File | null) => void;
-// }) {
-//   const [preview, setPreview] = useState<string | null>(
-//     currentCoverPath ?? null
-//   );
-//   const inputRef = useRef<HTMLInputElement>(null);
-
-//   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const file = e.target.files?.[0] ?? null;
-//     onFileChange(file);
-//     if (file) {
-//       const reader = new FileReader();
-//       reader.onload = () => setPreview(reader.result as string);
-//       reader.readAsDataURL(file);
-//     } else {
-//       setPreview(currentCoverPath ?? null);
-//     }
-//   };
-
-//   return (
-//     <div className={styles['field-group']}>
-//       <label className={styles['field-label']}>Обложка</label>
-//       <div
-//         className={styles['cover-upload']}
-//         onClick={() => inputRef.current?.click()}
-//       >
-//         {preview ? (
-//           <img
-//             src={preview}
-//             alt="Обложка"
-//             className={styles['cover-preview']}
-//           />
-//         ) : (
-//           <div className={styles['cover-placeholder']}>
-//             <span>Нажмите для загрузки</span>
-//           </div>
-//         )}
-//       </div>
-//       <input
-//         ref={inputRef}
-//         type="file"
-//         accept="image/*"
-//         style={{ display: 'none' }}
-//         onChange={handleChange}
-//       />
-//     </div>
-//   );
-// }
-
 function CoverUpload({
   currentCoverPath,
   onFileChange,
@@ -450,16 +397,12 @@ export const BookUnit: React.FC = () => {
   const { data: countries = [] } = useCountries();
   const { data: roles = [] } = usePersonRoles();
 
-  // Publishers - если у вас есть хук usePublishers, замените заглушку
-  // const { data: publishers = [] } = usePublishers();
-  // Для примера используем пустой массив; подключите реальный хук при необходимости
   const publishers: AutocompleteItem[] = [];
 
   const [mode, setMode] = useState<'view' | 'edit'>('view');
   const [showContentSearch, setShowContentSearch] = useState(false);
   const [form, setForm] = useState<FormState>(emptyForm);
 
-  // When book loads, initialise view mode
   useEffect(() => {
     if (isNew) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -1046,47 +989,31 @@ export const BookUnit: React.FC = () => {
             <h3>Контенты в книге ({contents?.length || 0})</h3>
             <button
               onClick={() => setShowContentSearch(true)}
-              className={styles['btn btn-primary']}
+              className={`${styles['btn']} ${styles['btn-update']}`}
             >
               + Добавить контент
             </button>
           </div>
 
-          <table className={styles['contents-table']}>
-            <thead>
-              <tr>
-                <th>Id</th>
-                <th>Название</th>
-                <th>Тип</th>
-                <th>Авторы</th>
-                <th>Действия</th>
-              </tr>
-            </thead>
-            <tbody>
-              {contents?.map((content) => (
-                <tr key={content.id}>
-                  <td>{content.id}</td>
-                  <td>{content.title}</td>
-                  <td>{content.contentType}</td>
-                  <td>{content.authors.join(', ')}</td>
-
-                  <td>
-                    <button
-                      onClick={() => handleUnlinkContent(content.id)}
-                      className={styles['btn btn-danger btn-sm']}
-                      disabled={unlinkMutation.isPending}
-                    >
-                      Удалить
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <ContentList
+            items={contents}
+            renderActions={(content) => (
+              <button
+                onClick={() => handleUnlinkContent(content.id)}
+                className={`${styles['btn']} ${styles['btn-danger']}`}
+                disabled={unlinkMutation.isPending}
+              >
+                Удалить
+              </button>
+            )}
+            onTitleClick={(content) => navigate(`/contents/${content.id}/edit`)}
+            additionalColumns={[
+              { header: 'Тип', render: (c) => c.contentType },
+            ]}
+          />
         </div>
       )}
 
-      {/* Files – only for existing books */}
       {!isNew && (
         <div className={styles['files-section']}>
           <h3>Файлы книги</h3>
