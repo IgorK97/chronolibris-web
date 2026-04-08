@@ -1,4 +1,3 @@
-// File: src/api/themes.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from './apiClient';
 import type {
@@ -8,48 +7,27 @@ import type {
 } from '../types';
 
 export const themesApi = {
-  /**
-   * Получает список всех тем верхнего уровня
-   */
   getThemes: (): Promise<ThemeDto[]> =>
     apiClient.get<ThemeDto[]>('/Themes/all'),
 
   getThemesByName: (name: string): Promise<ThemeDto[]> =>
     apiClient.get<ThemeDto[]>(`/Themes/?q=${name}`),
 
-  /**
-   * Получает список дочерних тем для указанной родительской темы
-   */
   getThemesByParentId: (parentThemeId: number): Promise<ThemeDto[]> =>
     apiClient.get<ThemeDto[]>(`/Themes/parent/${parentThemeId}`),
 
-  /**
-   * Получает тему по идентификатору
-   */
   getThemeById: (id: number): Promise<ThemeDto> =>
     apiClient.get<ThemeDto>(`/Themes/${id}`),
 
-  /**
-   * Создает новую запись темы
-   */
   createTheme: (data: CreateThemeRequest): Promise<number> =>
     apiClient.post<number, CreateThemeRequest>('/Themes', data),
 
-  /**
-   * Обновляет существующую запись темы
-   */
   updateTheme: (id: number, data: UpdateThemeRequest): Promise<void> =>
     apiClient.put<void, UpdateThemeRequest>(`/Themes/${id}`, data),
 
-  /**
-   * Удаляет запись темы
-   */
   deleteTheme: (id: number): Promise<void> => apiClient.delete(`/Themes/${id}`),
 };
 
-/**
- * Хук для получения списка всех тем верхнего уровня
- */
 export const useThemes = () => {
   return useQuery({
     queryKey: ['themes'],
@@ -59,9 +37,6 @@ export const useThemes = () => {
   });
 };
 
-/**
- * Хук для получения списка дочерних тем для указанной родительской темы
- */
 export const useThemesByParentId = (parentThemeId: number | null) => {
   return useQuery({
     queryKey: ['themes', 'parent', parentThemeId],
@@ -75,9 +50,6 @@ export const useThemesByParentId = (parentThemeId: number | null) => {
   });
 };
 
-/**
- * Хук для получения темы по ID
- */
 export const useThemeById = (id: number | null) => {
   return useQuery({
     queryKey: ['themes', id],
@@ -90,9 +62,6 @@ export const useThemeById = (id: number | null) => {
   });
 };
 
-/**
- * Хук для создания темы
- */
 export const useCreateTheme = () => {
   const queryClient = useQueryClient();
 
@@ -104,9 +73,6 @@ export const useCreateTheme = () => {
   });
 };
 
-/**
- * Хук для обновления темы
- */
 export const useUpdateTheme = () => {
   const queryClient = useQueryClient();
 
@@ -119,9 +85,6 @@ export const useUpdateTheme = () => {
   });
 };
 
-/**
- * Хук для удаления темы
- */
 export const useDeleteTheme = () => {
   const queryClient = useQueryClient();
 
@@ -133,9 +96,6 @@ export const useDeleteTheme = () => {
   });
 };
 
-/**
- * Хук для получения всех тем (плоский список для селекта)
- */
 export const useAllThemesFlat = (name: string) => {
   return useQuery({
     queryKey: ['themes', 'flat'],

@@ -1,4 +1,3 @@
-// File: src/api/persons.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from './apiClient';
 import type {
@@ -7,44 +6,23 @@ import type {
   UpdatePersonRequest,
 } from '@/types';
 
-// --- API методы ---
 export const personsApi = {
-  /**
-   * Получает список всех персон
-   */
   getPersons: (): Promise<PersonDto[]> =>
     apiClient.get<PersonDto[]>('/Persons'),
 
-  /**
-   * Получает персону по идентификатору
-   */
   getPersonById: (id: number): Promise<PersonDto> =>
     apiClient.get<PersonDto>(`/Persons/${id}`),
 
-  /**
-   * Создает новую запись персоны с изображением
-   */
   createPerson: (data: CreatePersonRequest): Promise<number> =>
     apiClient.post<number, CreatePersonRequest>('/Persons', data),
 
-  /**
-   * Обновляет существующую запись персоны с изображением
-   */
   updatePerson: (id: number, data: UpdatePersonRequest): Promise<void> =>
     apiClient.put<void, UpdatePersonRequest>(`/Persons/${id}`, data),
 
-  /**
-   * Удаляет запись персоны
-   */
   deletePerson: (id: number): Promise<void> =>
     apiClient.delete(`/Persons/${id}`),
 };
 
-// --- Hooks ---
-
-/**
- * Хук для получения списка всех персон
- */
 export const usePersons = () => {
   return useQuery({
     queryKey: ['persons'],
@@ -54,9 +32,6 @@ export const usePersons = () => {
   });
 };
 
-/**
- * Хук для получения персоны по ID
- */
 export const usePersonById = (id: number | null) => {
   return useQuery({
     queryKey: ['persons', id],
@@ -69,9 +44,6 @@ export const usePersonById = (id: number | null) => {
   });
 };
 
-/**
- * Хук для создания персоны
- */
 export const useCreatePerson = () => {
   const queryClient = useQueryClient();
 
@@ -83,9 +55,6 @@ export const useCreatePerson = () => {
   });
 };
 
-/**
- * Хук для обновления персоны
- */
 export const useUpdatePerson = () => {
   const queryClient = useQueryClient();
 
@@ -98,9 +67,6 @@ export const useUpdatePerson = () => {
   });
 };
 
-/**
- * Хук для удаления персоны
- */
 export const useDeletePerson = () => {
   const queryClient = useQueryClient();
 

@@ -50,7 +50,7 @@ import {
 import { bookFilesApi, useBookFiles } from '@/api/bookFiles';
 import Circles from 'react-loading-icons/dist/esm/components/circles';
 import { ReportModal } from '@/components/reports/ui/ReportModal';
-import { TARGET_TYPE } from '@/api/reports';
+import { TARGET_TYPE } from '@/types';
 import { Flag } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ShelfSelectionModal } from '@/pages/myBooks/ui/ShelfSelectionModal';

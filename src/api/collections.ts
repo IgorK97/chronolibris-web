@@ -14,13 +14,7 @@ import {
 } from '@tanstack/react-query';
 
 export const collectionsApi = {
-  // Selections
   getAllSelections: () => apiClient.get<SelectionDetails[]>('/Selections'),
-
-  // getSelections: (page = 1, pageSize = 20) =>
-  //   apiClient.get<PagedResult<SelectionDetails>>(
-  //     `/Selections/paged?page=${page}&pageSize=${pageSize}`
-  //   ),
 
   getSelections: (
     lastId?: number | null,
@@ -66,7 +60,6 @@ export const collectionsApi = {
   removeBookFromSelection: (selectionId: number, bookId: number) =>
     apiClient.delete(`/Selections/${selectionId}/books/${bookId}`),
 
-  // Shelves
   getUserShelves: () => apiClient.get<ShelfDetails[]>(`/Shelves/user`),
 
   addBookToShelf: (shelfId: number, bookId: number) =>
@@ -81,7 +74,6 @@ export const collectionsApi = {
     apiClient.get<PagedResult<BookListItem>>(
       `/Shelves/${shelfId}/books?userId=${userId}&lastId=${lastId || ''}&limit=${limit}`
     ),
-  // -------------------
 
   removeBookFromShelf: (shelfId: number, bookId: number) =>
     apiClient.delete<boolean>(`/Shelves/${shelfId}/books/${bookId}`),
@@ -105,7 +97,6 @@ export const useSeekedShelves = (bookId: number) => {
   });
 };
 
-// hooks/useShelves.ts
 export const useShelves = (userId: number) => {
   return useQuery({
     queryKey: ['shelves', userId],
@@ -167,8 +158,7 @@ export const useSelectionBooks = (
     queryKey: ['selectionBooks', selectionId, lastId, limit],
     queryFn: () => collectionsApi.getSelectionBooks(selectionId, lastId, limit),
     enabled: !!selectionId,
-    // Пока идёт рефетч после инвалидации — возвращаем старые данные вместо undefined.
-    // Это предотвращает crash в Library.tsx при data?.items.slice()
+    //На всякий случай, пока идет рефетч после инвалидации, вернуть старые данные вместо undefined
     placeholderData: keepPreviousData,
   });
 };

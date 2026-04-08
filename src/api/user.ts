@@ -1,10 +1,8 @@
-// import Cookies from "js-cookie";
 import { apiClient } from './apiClient';
 import type {
   UserProfile,
   LoginResult,
   RegisterRequest,
-  // RegistrationResult,
   LoginRequest,
   ChangePasswordRequest,
   UpdateProfileRequest,
@@ -31,7 +29,7 @@ export const usersApi = {
 
   getProfile: async () => {
     const profile = await apiClient.get<UserProfile>('/users/me');
-    // localStorage.setItem("profile", JSON.stringify(profile)); // Профиль можно в localStorage
+    // localStorage.setItem("profile", JSON.stringify(profile));
     return profile;
   },
 

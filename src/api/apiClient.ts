@@ -10,33 +10,6 @@ export const axiosInstance = axios.create({
   },
 });
 
-axiosInstance.interceptors.request.use((config) => {
-  console.group(`➡️ REQUEST: ${config.method?.toUpperCase()} ${config.url}`);
-  console.log('Params:', config.params);
-  console.log('Body:', config.data);
-  console.log('Headers:', config.headers);
-  console.groupEnd();
-  return config;
-});
-
-axiosInstance.interceptors.response.use(
-  (response) => {
-    console.group(`✅ RESPONSE: ${response.status} ${response.config.url}`);
-    console.log('Status:', response.status);
-    console.log('Data:', response.data);
-    console.groupEnd();
-    return response;
-  },
-  (error) => {
-    console.group(`❌ ERROR: ${error.response?.status} ${error.config?.url}`);
-    console.log('Status:', error.response?.status);
-    console.log('Data:', error.response?.data);
-    console.log('Error Message:', error.message);
-    console.groupEnd();
-    return Promise.reject(error);
-  }
-);
-
 export const apiClient = {
   // P - тип параметров запроса (Query Params)
   get: <T, P extends object = object>(url: string, params?: P) =>

@@ -90,11 +90,11 @@ export interface UpdateContentRequest {
   themeIds?: number[];
 }
 
-export interface BookContentLinkRequest {
-  contentId: number;
-  bookId: number;
-  order: number;
-}
+// export interface BookContentLinkRequest {
+//   contentId: number;
+//   bookId: number;
+//   order: number;
+// }
 
 export type PatchContentRequest = Partial<UpdateContentRequest> & {
   id: number;

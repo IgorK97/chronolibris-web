@@ -3,8 +3,6 @@ import {
   useMutation,
   useQuery,
   useQueryClient,
-  // useMutation,
-  // useQueryClient,
 } from '@tanstack/react-query';
 import { apiClient } from './apiClient';
 import type {
@@ -48,13 +46,6 @@ export const useInfiniteReviews = (bookId: number, isAuth: boolean) => {
   });
 };
 
-// export const reviewKeys = {
-//   all: ['reviews'] as const,
-//   list: (bookId: number, isAuth: boolean) =>
-//     ['reviews', bookId, isAuth] as const,
-//   my: (bookId: number) => [...reviewKeys.all, 'my', bookId] as const,
-// };
-
 export const reviewKeys = {
   all: ['reviews'] as const,
   lists: (bookId: number) => [...reviewKeys.all, 'list', bookId] as const,
@@ -66,12 +57,10 @@ export const useCreateReview = (bookId: number) => {
   return useMutation({
     mutationFn: (req: CreateReviewRequest) => reviewsApi.create(req),
     onSuccess: () => {
-      // Сбрасываем все связанные данные
+      //все связанные данные
       qc.invalidateQueries({ queryKey: reviewKeys.all });
-      // Также полезно обновить данные самой книги (рейтинг)
+      //Обновляются данные самой книги (из-за рейтинга)
       qc.invalidateQueries({ queryKey: ['books', bookId] });
-      // Invalidate so the list refetches and includes the new (pending) review
-      // qc.invalidateQueries({ queryKey: reviewKeys.list(bookId, isAuth) });
     },
   });
 };
@@ -85,12 +74,8 @@ export const useUpdateReview = (bookId: number) => {
     }: UpdateReviewRequest & { reviewId: number }) =>
       reviewsApi.update(reviewId, req),
     onSuccess: () => {
-      // qc.invalidateQueries({ queryKey: reviewKeys.list(bookId, isAuth) });
       qc.invalidateQueries({ queryKey: ['books', bookId] });
-      // 1. Помечаем список отзывов как устаревший (чтобы он перекачался)
       qc.invalidateQueries({ queryKey: reviewKeys.lists(bookId) });
-
-      // 2. Помечаем конкретно "мой" отзыв как устаревший
       qc.invalidateQueries({ queryKey: reviewKeys.my(bookId) });
     },
   });
@@ -101,12 +86,8 @@ export const useDeleteReview = (bookId: number) => {
   return useMutation({
     mutationFn: (reviewId: number) => reviewsApi.delete(reviewId),
     onSuccess: () => {
-      // qc.invalidateQueries({ queryKey: reviewKeys.list(bookId, isAuth) });
       qc.invalidateQueries({ queryKey: ['books', bookId] });
-      // 1. Помечаем список отзывов как устаревший (чтобы он перекачался)
       qc.invalidateQueries({ queryKey: reviewKeys.lists(bookId) });
-
-      // 2. Помечаем конкретно "мой" отзыв как устаревший
       qc.invalidateQueries({ queryKey: reviewKeys.my(bookId) });
     },
   });

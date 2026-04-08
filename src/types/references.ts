@@ -173,3 +173,66 @@ export interface TagDetails {
   relationTypeName?: string;
   hasChildren: boolean;
 }
+
+export interface CreatePersonRequest {
+  name: string;
+  description: string;
+}
+
+export interface UpdatePersonRequest {
+  id: number;
+  name: string;
+  description: string;
+}
+
+export interface LanguageDto {
+  id: number;
+  name: string;
+}
+export interface CountryDto {
+  id: number;
+  name: string;
+}
+export interface PersonRoleDto {
+  id: number;
+  name: string;
+}
+
+export interface PersonSuggestionDto {
+  id: number;
+  name: string;
+  imagePath: string | null;
+}
+
+export interface TagSuggestionDto {
+  id: number;
+  name: string;
+  matchedName: string | null;
+}
+
+export const TAG_TYPES = [
+  { id: 1, name: 'Время' },
+  { id: 2, name: 'Место' },
+  { id: 3, name: 'Социум' },
+] as const;
+
+// Типы отношений (синонимия — единственный тип сейчас, но структура расширяема)
+export const RELATION_TYPES = [
+  {
+    id: 1,
+    name: 'Синоним',
+  },
+] as const;
+
+export type RelationType = (typeof RELATION_TYPES)[number];
+
+export interface CreateThemeRequest {
+  name: string;
+  parentThemeId?: number | null;
+}
+
+export interface UpdateThemeRequest {
+  id: number;
+  name: string;
+  parentThemeId?: number | null;
+}

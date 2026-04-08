@@ -1,31 +1,18 @@
-// File: src/api/bookFiles.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient, axiosInstance } from './apiClient';
-import type { BookFileDto } from '../types';
-
-export interface UpdateBookFileRequest {
-  bookId: number;
-  formatId: number;
-  isReadable: boolean;
-  file: File;
-}
+import type {
+  BookFileDto,
+  UpdateBookFileRequest,
+  UploadBookFileRequest,
+} from '../types';
 
 export const bookFilesApi = {
-  /**
-   * Получает список всех файлов для книги
-   */
   getBookFiles: (bookId: number): Promise<BookFileDto[]> =>
     apiClient.get<BookFileDto[]>(`/BookFiles/book/${bookId}`),
 
-  /**
-   * Получает файл по идентификатору
-   */
   getBookFile: (id: number): Promise<BookFileDto> =>
     apiClient.get<BookFileDto>(`/BookFiles/${id}`),
 
-  /**
-   * Загружает новый файл для книги
-   */
   uploadBookFile: async (data: UploadBookFileRequest): Promise<number> => {
     const formData = new FormData();
     formData.append('bookId', data.bookId.toString());
@@ -41,9 +28,7 @@ export const bookFilesApi = {
     return response.data;
   },
 
-  /**
-   * Обновляет (перезаписывает) файл книги
-   */
+  //Нельзя это упростить?
   updateBookFile: async (data: UpdateBookFileRequest): Promise<number> => {
     const formData = new FormData();
     formData.append('isReadable', data.isReadable.toString());
@@ -61,15 +46,8 @@ export const bookFilesApi = {
     return response.data;
   },
 
-  /**
-   * Удаляет файл книги
-   */
   deleteBookFile: (id: number): Promise<void> =>
     apiClient.delete(`/BookFiles/${id}`),
-
-  /**
-   * Скачивает файл книги
-   */
 
   download: (bookFileId: number) =>
     apiClient.download(`/bookFiles/${bookFileId}/download`),
@@ -137,9 +115,9 @@ export const useDeleteBookFile = () => {
 
   return useMutation({
     mutationFn: bookFilesApi.deleteBookFile,
+    //какие здесь параметры?
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onSuccess: (data, variables) => {
-      // variables - это id файла, но нам нужен bookId для инвалидации
       queryClient.invalidateQueries({ queryKey: ['bookFiles'] });
     },
   });

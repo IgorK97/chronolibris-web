@@ -48,3 +48,11 @@ export interface LoginResult {
 //   refreshToken: string;
 //   message?: string;
 // }
+
+export interface RegistrationResult {
+  success: boolean;
+  token: string;
+  refresh_token: string;
+  message: string;
+  userId: number;
+}

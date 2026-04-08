@@ -1,4 +1,3 @@
-// File: src/api/bookmarks.ts
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from './apiClient';
 import type {
@@ -8,27 +7,15 @@ import type {
 } from '@/types';
 
 export const bookmarksApi = {
-  /**
-   * Получает список закладок для файла книги и пользователя
-   */
   getBookmarks: (bookFileId: number): Promise<Bookmark[]> =>
     apiClient.get<Bookmark[]>(`/Bookmarks/${bookFileId}`),
 
-  /**
-   * Создаёт новую закладку
-   */
   createBookmark: (data: CreateBookmarkRequest): Promise<Bookmark> =>
     apiClient.post<Bookmark>('/Bookmarks', data),
 
-  /**
-   * Обновляет заметку к закладке
-   */
   updateBookmark: (id: number, data: UpdateBookmarkRequest): Promise<boolean> =>
     apiClient.put<boolean>(`/Bookmarks/${id}`, data),
 
-  /**
-   * Удаляет закладку
-   */
   deleteBookmark: (id: number): Promise<boolean> =>
     apiClient.delete<boolean>(`/Bookmarks/${id}`),
 };
@@ -76,11 +63,7 @@ export const useCreateBookmark = (userName: string) => {
     },
   });
 };
-//Оптимизировать потом (этот и то, что ниже)
-// - вместо полной перезагрузки данных после изменения,
-// можно локально обновлять кэш, добавляя/изменяя/удаляя конкретную закладку в массиве.
-// Это будет быстрее и снизит нагрузку на сервер.
-// Но нужно аккуратно реализовать, чтобы не нарушить консистентность данных
+
 export const useUpdateBookmark = () => {
   const queryClient = useQueryClient();
 

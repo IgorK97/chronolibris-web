@@ -290,3 +290,46 @@ export interface BookContentLinkRequest {
   contentId: number;
   order: number;
 }
+
+export interface BookSearchResult {
+  id: number;
+  title: string;
+  description: string;
+  coverPath: string;
+  year: number | null;
+  averageRating: number | null;
+  isFavorite: boolean;
+  isAvailable: boolean;
+  isReviewable: boolean;
+}
+
+export interface SearchPagedResult {
+  items: BookSearchResult[];
+  hasNext: boolean;
+  lastId: number | null;
+  lastBestSimilarity: number | null;
+}
+
+export interface SimpleSearchParams {
+  query: string;
+  pageSize?: number;
+  lastBestSimilarity?: number;
+  lastId?: number;
+}
+
+export interface PersonRoleFilterRequest {
+  roleId: number;
+  personIds: number[];
+}
+
+export interface AdvancedSearchBody {
+  query: string;
+  pageSize?: number;
+  lastBestSimilarity?: number | null;
+  lastId?: number | null;
+  personFilters?: PersonRoleFilterRequest[];
+  requiredTagIds?: number[];
+  excludedTagIds?: number[];
+  themeId: number;
+  selectionId: number;
+}

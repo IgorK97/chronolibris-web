@@ -10,10 +10,6 @@ import {
 export const tagsApi = {
   getTagTypes: () => apiClient.get<TagType[]>('/Tags/types'),
 
-  // getRelationTypes: () =>
-  //   apiClient.get<RelationType[]>('/Tags/relation-types'),
-
-  /** Корневые теги с курсорной пагинацией. При searchTerm — плоский поиск. */
   getRootTags: (
     tagTypeId?: number | null,
     searchTerm?: string | null,
@@ -27,7 +23,6 @@ export const tagsApi = {
     return apiClient.get<PagedResult<TagDetails>>('/Tags', params);
   },
 
-  /** Дочерние теги конкретного родителя с курсорной пагинацией. */
   getChildTags: (
     parentId: number,
     lastId?: number | null,
@@ -51,8 +46,6 @@ export const tagsApi = {
   deleteTag: (tagId: number) => apiClient.delete(`/Tags/${tagId}`),
 };
 
-// ─── Hooks ───────────────────────────────────────────────────────────────────
-
 export const useTagTypes = () =>
   useQuery({
     queryKey: ['tagTypes'],
@@ -60,16 +53,6 @@ export const useTagTypes = () =>
     staleTime: Infinity,
   });
 
-// export const useRelationTypes = () =>
-//   useQuery({
-//     queryKey: ['relationTypes'],
-//     queryFn: () => tagsApi.getRelationTypes(),
-//     staleTime: Infinity,
-//     // Фолбэк на клиентские данные если эндпоинт ещё не готов
-//     placeholderData: RELATION_TYPES as unknown as RelationType[],
-//   });
-
-/** Бесконечный список корневых тегов (или плоский поиск при наличии searchTerm). */
 export const useInfiniteRootTags = (
   tagTypeId?: number | null,
   searchTerm?: string | null,
@@ -89,7 +72,6 @@ export const useInfiniteRootTags = (
     initialPageParam: null as number | null,
   });
 
-/** Бесконечный список дочерних тегов конкретного родителя. */
 export const useInfiniteChildTags = (
   parentId: number,
   pageSize: number = 20,

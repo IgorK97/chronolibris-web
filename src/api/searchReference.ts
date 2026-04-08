@@ -1,30 +1,12 @@
+import type {
+  CountryDto,
+  LanguageDto,
+  PersonRoleDto,
+  PersonSuggestionDto,
+  TagSuggestionDto,
+} from '@/types';
 import { apiClient } from './apiClient';
 import { useQuery } from '@tanstack/react-query';
-
-export interface LanguageDto {
-  id: number;
-  name: string;
-}
-export interface CountryDto {
-  id: number;
-  name: string;
-}
-export interface PersonRoleDto {
-  id: number;
-  name: string;
-}
-
-export interface PersonSuggestionDto {
-  id: number;
-  name: string;
-  imagePath: string | null;
-}
-
-export interface TagSuggestionDto {
-  id: number;
-  name: string;
-  matchedName: string | null;
-}
 
 export const searchReferenceApi = {
   getLanguages: () =>

@@ -1,4 +1,3 @@
-// File: src/api/contents.ts
 import {
   useQuery,
   useMutation,
@@ -14,7 +13,6 @@ import type {
   CreateContentRequest,
   PatchContentRequest,
   BookContentLinkRequest,
-  // PersonRoleFilter,
 } from '../types';
 import type { BookDto } from '../types';
 
@@ -30,9 +28,6 @@ export const contentsApi = {
 
   createContent: (data: CreateContentRequest): Promise<number> =>
     apiClient.post<number, CreateContentRequest>('/Contents', data),
-
-  // updateContent: (id: number, data: UpdateContentRequest): Promise<void> =>
-  //   apiClient.put<void, UpdateContentRequest>(`/Contents/${id}`, data),
 
   deleteContent: (id: number): Promise<void> =>
     apiClient.delete(`/Contents/${id}`),
@@ -97,17 +92,17 @@ export const useInfiniteContents = (
   return useInfiniteQuery({
     queryKey: ['contents', 'infinite', filter],
 
-    // Теперь pageParam будет автоматически распознан как string | undefined
+    //pageParam будет распознан как string | undefined
     queryFn: ({ pageParam }) =>
       contentsApi.getContents({
         ...filter,
         cursor: pageParam,
       }),
 
-    // Явно указываем тип для начального значения параметра страницы
+    //тип для начального значения параметра страницы
     initialPageParam: undefined as string | undefined,
 
-    // Гарантируем возврат undefined, если следующей страницы нет
+    //возврат undefined, если следующей страницы нет
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
 
     staleTime: 2 * 60 * 1000,
@@ -159,17 +154,6 @@ export const usePatchContent = () => {
     },
   });
 };
-
-// export const useUpdateContent = () => {
-//   const queryClient = useQueryClient();
-//   return useMutation({
-//     mutationFn: ({ id, data }: { id: number; data: UpdateContentRequest }) =>
-//       contentsApi.updateContent(id, data),
-//     onSuccess: () => {
-//       queryClient.invalidateQueries({ queryKey: ['contents'] });
-//     },
-//   });
-// };
 
 export const useDeleteContent = () => {
   const queryClient = useQueryClient();

@@ -10,7 +10,6 @@ import {
   useLinkContentToBook,
   useCreateBook,
   useUpdateBook,
-  fileToBase64,
   useBookDetails,
 } from '@/api/books';
 import { useLanguages, useCountries } from '@/api/references';
@@ -27,7 +26,7 @@ import { BookFileManagement } from './BookFileManagement';
 import styles from './BookUnit.module.css';
 import { ArrowLeft, X } from 'lucide-react';
 import { useStore } from '@/stores/globalStore';
-import { storageUrl } from '@/utils';
+import { fileToBase64, storageUrl } from '@/utils';
 import { ContentList } from '@/components/contents/ContentList';
 // import { ContentList } from '@/components/contents/ContentList';
 

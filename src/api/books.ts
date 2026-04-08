@@ -1,7 +1,6 @@
 import {
   useQuery,
   useInfiniteQuery,
-  // type UseQueryOptions,
   useQueryClient,
   useMutation,
 } from '@tanstack/react-query';
@@ -23,30 +22,6 @@ import type {
 } from '../types';
 import { useDebounce } from '../hooks/useDebounce';
 import { collectionsApi } from './collections';
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-/**
- * Читает File и возвращает Base64-строку без префикса data URI.
- */
-export function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      // Убираем префикс "data:image/jpeg;base64,"
-      resolve(result.includes(',') ? result.split(',')[1] : result);
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-// ---------------------------------------------------------------------------
-// API
-// ---------------------------------------------------------------------------
 
 export const booksApi = {
   getMetadata: (bookId: number, administration: boolean) =>
@@ -94,27 +69,16 @@ export const booksApi = {
     apiClient.delete(`/Books/${bookId}/contents/${contentId}`),
 };
 
-// ---------------------------------------------------------------------------
-// Hooks
-// ---------------------------------------------------------------------------
-
-// type UseBookDetailsOptions = Omit<
-//   UseQueryOptions<BookDetails, Error>,
-//   'queryKey' | 'queryFn'
-// >;
-
 export const useBookDetails = (
   bookId: number,
   userName: string,
   administration: boolean = false,
   enabled: boolean
-  // options?: UseBookDetailsOptions
 ) =>
   useQuery({
     queryKey: ['books', bookId, userName],
     queryFn: () => booksApi.getMetadata(bookId, administration),
     enabled: enabled,
-    // ...options,
   });
 
 export const useInfiniteReadBooks = (userId: number) =>

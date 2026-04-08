@@ -16,11 +16,9 @@ import {
 } from '@tanstack/react-query';
 
 export const reportsApi = {
-  // POST /api/reports
   createReport: (data: CreateReportRequest) =>
     apiClient.post<void, CreateReportRequest>('/reports', data),
 
-  // GET /api/reports/reports
   getReports: (params: GetReportsRequest) =>
     apiClient.get<GetReportsResponse, GetReportsRequest>(
       '/reports/reports',
@@ -44,7 +42,6 @@ export const reportsApi = {
       params
     ),
 
-  // POST /api/reports/tasks
   createModerationTask: (data: {
     targetId: number;
     targetTypeId: number;
@@ -55,7 +52,6 @@ export const reportsApi = {
       data
     ),
 
-  // PATCH /api/reports/tasks/{id}/resolution
   resolveTask: (taskId: number, resolution: boolean, reportText: string) =>
     apiClient.put<
       TaskResolutionResponse,

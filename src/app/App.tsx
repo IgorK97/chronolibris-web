@@ -18,7 +18,7 @@ import { usersApi } from '../api/user';
 import {
   // ModeratorRoute,
   ProtectedRoute,
-} from './ProtectedRoute';
+} from './routes/ProtectedRoute';
 // import { SelectionListView } from '../pages/library/ui/SectionList';
 
 import {
@@ -48,7 +48,7 @@ import ReaderLayout from './layouts/ReaderLayout';
 import { ModerationPage } from '@/pages/moderation/ModerationPage';
 import SearchPage from '@/pages/search/ui/SearchPage';
 import { RegisterStaffPage } from '@/pages/adminPanel/RegisterStaffPage/RegisterStuffPage';
-import { PublicOnlyRoute } from './PublicOnlyRoute';
+import { PublicOnlyRoute } from './routes/PublicOnlyRoute';
 import toast from 'react-hot-toast';
 
 const queryClient = new QueryClient({

@@ -3,6 +3,19 @@ export const unfavColor = '#666';
 export const fillFavColor = '#D32F2F';
 export const fillUnfavColor = 'none';
 
+export function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      // Убираем префикс "data:image/jpeg;base64,"
+      resolve(result.includes(',') ? result.split(',')[1] : result);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 export const getImageUrl = (path: string | null | undefined) => {
   if (!path) return '/placeholder.png';
   if (path.startsWith('http')) return path;
