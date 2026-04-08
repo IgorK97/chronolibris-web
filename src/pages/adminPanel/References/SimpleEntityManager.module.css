@@ -87,47 +87,40 @@
 }
 
 .btn {
-  padding: 7px 14px;
+  width: 200px;
+  padding: 12px;
+  background: var(--color-dark-blue);
+  color: #fff;
   border: none;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 500;
+  border-radius: 8px;
   cursor: pointer;
-  transition:
-    opacity 0.15s,
-    filter 0.15s;
+  font-size: 14px;
+  font-weight: 500;
+  margin-left: 100px;
+  height: 50px;
 }
 
 .btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  background: #95a5a6;
+  cursor: default;
 }
 
-.btn:not(:disabled):hover {
-  filter: brightness(0.92);
-}
-
-.btn-primary {
-  background: #6366f1;
+.btn-update {
+  background: var(--color-dark-blue);
   color: #fff;
-}
-
-.btn-success {
-  background: #16a34a;
-  color: #fff;
-}
-
-.btn-secondary {
-  background: #e5e7eb;
-  color: #374151;
-}
-
-.btn-warning {
-  background: #f59e0b;
-  color: #fff;
+  width: 120px;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 12px;
+  margin-left: 5px;
 }
 
 .btn-danger {
   background: #dc2626;
   color: #fff;
+  width: 80px;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 12px;
+  margin-left: 5px;
 }

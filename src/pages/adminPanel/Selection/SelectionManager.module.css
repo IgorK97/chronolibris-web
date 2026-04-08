@@ -103,31 +103,6 @@
   flex-wrap: wrap;
 }
 
-.action-button {
-  padding: 10px 20px;
-  border: 1px solid #3498db;
-  background: #fff;
-  color: #3498db;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.action-button:hover {
-  background: #3498db;
-  color: #fff;
-}
-
-.delete-button {
-  border-color: #e74c3c;
-  color: #e74c3c;
-}
-
-.delete-button:hover {
-  background: #e74c3c;
-  color: #fff;
-}
-
 .edit-form {
   display: flex;
   flex-direction: column;
@@ -149,7 +124,6 @@
   resize: vertical;
 }
 
-/* ── Строка чекбокса видимости в форме создания ────────────────────────────── */
 .visibility-row {
   display: flex;
   align-items: center;
@@ -172,33 +146,43 @@
   accent-color: #3498db;
 }
 
-.buttons {
-  display: flex;
-  gap: 10px;
-}
-
-.save-button,
-.cancel-button {
-  padding: 10px 20px;
+.btn {
+  width: 200px;
+  padding: 12px;
+  background: var(--color-dark-blue);
+  color: #fff;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 500;
+  margin-left: 10px;
+  height: 50px;
 }
 
-.save-button {
-  background: #27ae60;
-  color: #fff;
-}
-
-.save-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.cancel-button {
+.btn:disabled {
   background: #95a5a6;
+  cursor: default;
+}
+
+.btn-update {
+  background: var(--color-dark-blue);
   color: #fff;
+  width: 120px;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 12px;
+  margin-left: 5px;
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: #fff;
+  width: 80px;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 12px;
+  margin-left: 5px;
 }
 
 .books-section {

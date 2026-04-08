@@ -133,7 +133,7 @@ export const SimpleEntityManager: React.FC<SimpleEntityManagerProps> = ({
           <button
             onClick={handleCreate}
             disabled={isCreating || !newName.trim()}
-            className={`${styles.btn} ${styles['btn-primary']}`}
+            className={`${styles.btn}`}
           >
             {isCreating ? 'Создание...' : createLabel}
           </button>
@@ -174,14 +174,14 @@ export const SimpleEntityManager: React.FC<SimpleEntityManagerProps> = ({
                     <button
                       onClick={handleUpdate}
                       disabled={isUpdating}
-                      className={`${styles.btn} ${styles['btn-success']}`}
+                      className={`${styles.btn}`}
                     >
                       {isUpdating ? 'Сохранение...' : 'Сохранить'}
                     </button>
                     <button
                       onClick={cancelEditing}
                       disabled={isUpdating}
-                      className={`${styles.btn} ${styles['btn-secondary']}`}
+                      className={`${styles.btn}`}
                     >
                       Отмена
                     </button>
@@ -195,7 +195,7 @@ export const SimpleEntityManager: React.FC<SimpleEntityManagerProps> = ({
                     <button
                       onClick={() => startEditing(item)}
                       disabled={isDeleting || isUpdating}
-                      className={`${styles.btn} ${styles['btn-warning']}`}
+                      className={`${styles.btn} ${styles['btn-update']}`}
                     >
                       Редактировать
                     </button>

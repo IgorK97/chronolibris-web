@@ -8,7 +8,7 @@
 .title {
   font-size: 22px;
   font-weight: 700;
-  color: #2a2218;
+  color: var(--color-dark-blue);
   margin-bottom: 24px;
 }
 
@@ -27,7 +27,7 @@
 .label {
   font-size: 13px;
   font-weight: 600;
-  color: #5a4a3a;
+  color: var(--color-dark-blue);
 }
 
 .input,
@@ -38,14 +38,14 @@
   font-size: 14px;
   font-family: inherit;
   background: #fff;
-  color: #2a2218;
+  color: var(--color-dark-blue);
   outline: none;
   transition: border-color 0.15s;
 }
 
 .input:focus,
 .select:focus {
-  border-color: #8b6f47;
+  border-color: var(--color-dark-blue);
 }
 
 .input-error {
@@ -65,7 +65,7 @@
 
 .success-msg {
   font-size: 13px;
-  color: #16a34a;
+  color: var(--color-dark-blue);
   margin: 0;
 }
 

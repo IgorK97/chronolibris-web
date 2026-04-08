@@ -328,6 +328,7 @@ import { BookCard } from '@/components/books';
 import type { BookListItem } from '@/types/types';
 import styles from './SelectionManager.module.css';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 
 // ─── Режим просмотра/редактирования существующей подборки ────────────────────
 
@@ -425,8 +426,8 @@ const CreateForm: React.FC<CreateFormProps> = ({ onBack, onCreate }) => {
 
   return (
     <div className={styles['container']}>
-      <button className={styles['back-button']} onClick={onBack}>
-        ← Назад
+      <button onClick={onBack}>
+        <ArrowLeft style={{ cursor: 'pointer' }} /> Назад
       </button>
 
       <div className={styles['header']}>
@@ -459,19 +460,22 @@ const CreateForm: React.FC<CreateFormProps> = ({ onBack, onCreate }) => {
                 }
                 className={styles['checkbox']}
               />
-              Активна (видна пользователям)
+              Активна
             </label>
           </div>
 
           <div className={styles['buttons']}>
             <button
               onClick={handleCreate}
-              className={styles['save-button']}
+              className={styles['btn']}
               disabled={!formData.name.trim() || createMutation.isPending}
             >
               {createMutation.isPending ? 'Создание…' : 'Создать подборку'}
             </button>
-            <button onClick={onBack} className={styles['cancel-button']}>
+            <button
+              onClick={onBack}
+              className={`${styles['btn']} ${styles['btn-danger']}`}
+            >
               Отмена
             </button>
           </div>
@@ -485,21 +489,15 @@ const CreateForm: React.FC<CreateFormProps> = ({ onBack, onCreate }) => {
   );
 };
 
-// ─── SelectionManager ─────────────────────────────────────────────────────────
-
 export const SelectionManager: React.FC<SelectionManagerProps> = (props) => {
-  // ── Режим создания ────────────────────────────────────────────────────────
   if (props.mode === 'create') {
     return <CreateForm onBack={props.onBack} onCreate={props.onCreate} />;
   }
 
-  // ── Режим просмотра/редактирования ────────────────────────────────────────
   return (
     <SelectionEditView selectionId={props.selectionId} onBack={props.onBack} />
   );
 };
-
-// ─── Вью редактирования / просмотра ──────────────────────────────────────────
 
 interface SelectionEditViewProps {
   selectionId: number;
@@ -612,11 +610,10 @@ const SelectionEditView: React.FC<SelectionEditViewProps> = ({
 
   return (
     <div className={styles['container']}>
-      <button className={styles['back-button']} onClick={onBack}>
-        ← Назад
+      <button onClick={onBack}>
+        <ArrowLeft style={{ cursor: 'pointer' }} /> Назад
       </button>
 
-      {/* ── Шапка подборки ─────────────────────────────────────────────── */}
       <div className={styles['header']}>
         {isEditing ? (
           <div className={styles['edit-form']}>
@@ -638,12 +635,12 @@ const SelectionEditView: React.FC<SelectionEditViewProps> = ({
               placeholder="Описание"
             />
             <div className={styles['buttons']}>
-              <button onClick={handleSave} className={styles['save-button']}>
+              <button onClick={handleSave} className={styles['btn']}>
                 Сохранить
               </button>
               <button
                 onClick={() => setIsEditing(false)}
-                className={styles['cancel-button']}
+                className={`${styles['btn']} ${styles['btn-danger']}`}
               >
                 Отмена
               </button>
@@ -663,18 +660,21 @@ const SelectionEditView: React.FC<SelectionEditViewProps> = ({
               </span>
             </div>
             <div className={styles['actions']}>
-              <button onClick={handleEdit} className={styles['action-button']}>
+              <button
+                onClick={handleEdit}
+                className={`${styles['btn']} ${styles['btn-update']}`}
+              >
                 Редактировать
               </button>
               <button
                 onClick={handleToggleActive}
-                className={styles['action-button']}
+                className={`${styles['btn']} ${styles['btn-update']}`}
               >
                 {selection.isActive ? 'Скрыть' : 'Показать'}
               </button>
               <button
                 onClick={handleDelete}
-                className={`${styles['action-button']} ${styles['delete-button']}`}
+                className={`${styles['btn']} ${styles['btn-danger']}`}
               >
                 Удалить
               </button>
@@ -683,7 +683,6 @@ const SelectionEditView: React.FC<SelectionEditViewProps> = ({
         )}
       </div>
 
-      {/* ── Книги ──────────────────────────────────────────────────────── */}
       <div className={styles['books-section']}>
         <h2 className={styles['section-title']}>Книги в подборке</h2>
 
@@ -695,7 +694,10 @@ const SelectionEditView: React.FC<SelectionEditViewProps> = ({
             className={styles['input']}
             placeholder="ID книги"
           />
-          <button onClick={handleAddBook} className={styles['add-button']}>
+          <button
+            onClick={handleAddBook}
+            className={`${styles['btn']} ${styles['btn-update']}`}
+          >
             Добавить
           </button>
         </div>
@@ -714,11 +716,11 @@ const SelectionEditView: React.FC<SelectionEditViewProps> = ({
                     }}
                   />
                   <button
-                    className={styles['remove-book-button']}
+                    className={`${styles['btn']} ${styles['btn-danger']}`}
                     onClick={() => handleRemoveBook(book.id)}
                     disabled={removeBookMutation.isPending}
                   >
-                    Удалить из подборки
+                    Удалить
                   </button>
                 </div>
               ))}
