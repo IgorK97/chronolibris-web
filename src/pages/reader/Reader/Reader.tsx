@@ -1,11 +1,4 @@
-// ============================================================
-// Reader.tsx — компонент чтения книги на CSS columns
-// ============================================================
 import { createPortal } from 'react-dom';
-// import {
-//   useReadingProgress,
-//   useUpsertReadingProgress,
-// } from '@/api/readingProgress';
 import { Puff } from 'react-loading-icons';
 import React, {
   useState,
@@ -242,7 +235,7 @@ export const Reader: React.FC<ReaderProps> = ({
       const pLeft = p.offsetLeft;
       // const pRight = pLeft + p.offsetWidth;
 
-      // Проверяем, что параграф полностью внутри видимой области
+      //параграф полностью внутри видимой области
       // (можно ослабить условие до pLeft >= viewportLeft, если нужно начало параграфа)
       if (pLeft >= contentLeft) {
         return parseInt(p.getAttribute('data-para-index') || '0', 10);
@@ -270,35 +263,9 @@ export const Reader: React.FC<ReaderProps> = ({
 
   const readPercentRef = useRef(readPercent);
 
-  // Обновляем ref при каждом изменении — без перезапуска интервала
   useEffect(() => {
     readPercentRef.current = readPercent;
   }, [readPercent]);
-
-  // Интервал создаётся один раз
-  // useEffect(() => {
-  //   if (!user) return;
-
-  //   const interval = setInterval(
-  //     () => {
-  //       if (!progressLoaded.current) return;
-  //       const paraIndex = captureVisibleParaIndex() ?? 0;
-  //       const current = readPercentRef.current;
-
-  //       if (current > savedPercentRef.current) {
-  //         savedPercentRef.current = current;
-  //         upsertProgress.mutate({
-  //           bookFileId,
-  //           percentage: current,
-  //           paraIndex,
-  //         });
-  //       }
-  //     },
-  //     3 * 60 * 1000
-  //   );
-
-  //   return () => clearInterval(interval);
-  // }, [user, bookFileId]);
 
   useEffect(() => {
     if (!user) return;
@@ -333,16 +300,13 @@ export const Reader: React.FC<ReaderProps> = ({
   const contentRef = useRef<HTMLDivElement>(null);
 
   const [twoPageMode, setTwoPageMode] = useState(false);
-  // useEffect(() => {
-  //   setCurrentCol(0);
-  // }, [currentPartIndex]);
 
   const { data: segments, isLoading } = useQuery({
     queryKey: ['chunk', bookFileId, currentPartIndex],
     // queryFn: () =>
     //   fetchChunk(bookFileId, fetchedTocData?.Parts[currentPartIndex].url),
     queryFn: () => {
-      // Проверяем, что URL существует (fetchedTocData гарантирован enabled, но url может отсутствовать)
+      //URL существует (fetchedTocData гарантирован enabled, но url может отсутствовать)
       const url = fetchedTocData?.Parts[currentPartIndex]?.url;
       if (!url) {
         // Если URL нет, отклоняем промис с ошибкой
@@ -356,29 +320,6 @@ export const Reader: React.FC<ReaderProps> = ({
     gcTime: 10 * 60 * 1000,
   });
   const queryClient = useQueryClient();
-
-  // useEffect(() => {
-  //   if (!fetchedTocData || currentPartIndex >= fetchedTocData.Parts.length)
-  //     return;
-
-  //   const load = async () => {
-  //     setIsLoading(true);
-  //     setNextSegments(null);
-  //     setCurrentCol(0);
-
-  //     fetchChunk(bookFileId, currentPartIndex)
-  //       .then((data: TextSegment[]) => {
-  //         setSegments(data);
-  //         setIsLoading(false);
-  //       })
-  //       .catch((err) => {
-  //         console.error('Failed to load chunk: ', err);
-  //         setIsLoading(false);
-  //       });
-  //   };
-
-  //   load();
-  // }, [bookFileId, currentPartIndex, fetchedTocData]);
 
   const recalcCols = () => {
     const vp = viewportRef.current;
@@ -408,7 +349,7 @@ export const Reader: React.FC<ReaderProps> = ({
       ) as HTMLElement;
 
       if (targetEl) {
-        // Вычисляем новую страницу на основе позиции элемента
+        //новую страницу на основе позиции элемента
         const newCol = Math.floor(targetEl.offsetLeft / pageWidth);
         let target = Math.min(newCol, newTotal - 1);
 
@@ -418,7 +359,6 @@ export const Reader: React.FC<ReaderProps> = ({
         ct.scrollTo({ left: target * pageWidth, behavior: 'auto' });
       }
 
-      // Сбрасываем флаги
       restoreByElementRef.current = false;
       visibleParaIndexRef.current = null;
       return; //позиция восстановлена
@@ -472,14 +412,6 @@ export const Reader: React.FC<ReaderProps> = ({
       queryKey: ['chunk', bookFileId, nextIdx],
       queryFn: () => fetchChunk(bookFileId, fetchedTocData.Parts[nextIdx].url),
     });
-
-    // setIsPrefetching(true);
-    // fetchChunk(bookFileId, nextIdx)
-    //   .then((data: TextSegment[]) => {
-    //     setNextSegments(data);
-    //     setIsPrefetching(false);
-    //   })
-    //   .catch(() => setIsPrefetching(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     bookFileId,
@@ -505,17 +437,6 @@ export const Reader: React.FC<ReaderProps> = ({
         setCurrentCol(0);
         pendingColRef.current = 0;
         setCurrentPartIndex(nextIdx);
-        // return;
-        // if (nextSegments !== null) {
-        //   setSegments(nextSegments);
-        //   setNextSegments(null);
-        //   setCurrentCol(0);
-        //   pendingColRef.current = 0;
-        // } else {
-        //   pendingColRef.current = 0;
-        // }
-        // setCurrentPartIndex(nextIdx);
-        // return;
       }
       return; // -
     }
@@ -541,27 +462,19 @@ export const Reader: React.FC<ReaderProps> = ({
   };
 
   useEffect(() => {
-    // Если recalcCols требует актуальных размеров DOM, можно использовать
-    // requestAnimationFrame или setTimeout 0, чтобы дать браузеру отрисовать.
-    // Но чаще всего эффект срабатывает уже после обновления макета.
     const timeoutId = setTimeout(() => {
       recalcCols();
     }, 0); // микро-задержка для гарантии отрисовки
 
     return () => clearTimeout(timeoutId);
-  }, [twoPageMode]); // добавьте сюда другие зависимости, если recalcCols их использует
-
-  // useEffect(() => {
-  //   // setCurrentCol(0);
-  //   // contentRef.current?.scrollTo({ left: 0, behavior: 'auto' });
-  // }, [twoPageMode]);
+  }, [twoPageMode]);
 
   const nextCol = () => goToCol(currentCol + (twoPageMode ? 2 : 1));
   const prevCol = () => goToCol(currentCol - (twoPageMode ? 2 : 1));
 
   const changeFontSize = useCallback(
     (delta: number) => {
-      // 1. Запоминаем, какой элемент сейчас видит пользователь
+      //какой элемент сейчас видит пользователь
       const visiblePara = captureVisibleParaIndex();
       if (visiblePara !== null) {
         visibleParaIndexRef.current = visiblePara;
@@ -570,20 +483,12 @@ export const Reader: React.FC<ReaderProps> = ({
       setFontSize(
         Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, fontSize + delta))
       );
-      // setFontSize((p) =>
-      //   Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, p + delta))
-      // );
-      // setFontSize((p) =>
-      //   Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, p + delta))
-      // );
-      // setCurrentCol(0);
-      // viewportRef.current?.scrollTo({ left: 0, behavior: 'auto' });
     },
     [fontSize]
   );
 
   const changeFontFamily = useCallback((value: string) => {
-    // 1. Запоминаем, какой элемент сейчас видит пользователь
+    //какой элемент сейчас видит пользователь
     const visiblePara = captureVisibleParaIndex();
     if (visiblePara !== null) {
       visibleParaIndexRef.current = visiblePara;
@@ -591,9 +496,6 @@ export const Reader: React.FC<ReaderProps> = ({
     }
 
     setFontFamily(value);
-    // setFontFamily(value);
-    // setCurrentCol(0);
-    // viewportRef.current?.scrollTo({ left: 0, behavior: 'auto' });
   }, []);
 
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -800,12 +702,6 @@ export const Reader: React.FC<ReaderProps> = ({
             {seg.c as unknown as number}
           </Badge>
         </div>
-
-        // <div key={index} className={styles['page-num-block']}>
-        //   <span className={styles['page-num']}>
-        //     {seg.c as unknown as number}
-        //   </span>
-        // </div>
       );
     }
     if (seg.t === 'img') {
@@ -815,9 +711,6 @@ export const Reader: React.FC<ReaderProps> = ({
       ) as ImgNode | undefined;
       if (!firstImg) return null;
       const fullUrl = `${import.meta.env.VITE_STORAGE_URL}/images/${bookFileId}/${firstImg.src}`;
-      // const fullUrl = imagePath
-      //   ? `${imagePath.replace(/\/$/, '')}/${firstImg.src}`
-      //   : firstImg.src;
       return (
         <div key={index} className={styles['img-block']}>
           <img
@@ -909,8 +802,6 @@ export const Reader: React.FC<ReaderProps> = ({
   if (isLoading || !fetchedTocData || !segments || segments.length === 0) {
     return (
       <div className={styles['loading']}>
-        {/* <div className={styles['spinner']} />
-         */}
         <Puff stroke="#f55a42" strokeOpacity={0.5} speed={0.75} />
         <p>Загрузка книги...</p>
       </div>
@@ -988,7 +879,6 @@ export const Reader: React.FC<ReaderProps> = ({
               <ChevronLeft /> Назад
             </button>
             <span className={styles['page-info']}>
-              {/* {`Стр. ${currentCol + 1} / ${totalCols}`} */}
               {twoPageMode
                 ? `Стр. ${Math.min(currentCol + 2, totalCols)} / ${totalCols}`
                 : `Стр. ${currentCol + 1} / ${totalCols}`}
@@ -1064,13 +954,11 @@ export const Reader: React.FC<ReaderProps> = ({
             twoPageMode ? styles['reading-area-two'] : styles['reading-area']
           }
         >
-          {/* Строка 1 */}
           <div
             className={styles['pad-top']}
             style={{ background: pageColor }}
           />
 
-          {/* Строка 2 */}
           <div
             className={[styles['pad-left'], styles['nav-pad']].join(' ')}
             style={{ background: pageColor }}
@@ -1098,7 +986,6 @@ export const Reader: React.FC<ReaderProps> = ({
             onClick={nextCol}
           />
 
-          {/* Строка 3 */}
           <div
             className={styles['pad-bottom']}
             style={{ background: pageColor }}
@@ -1461,7 +1348,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     if (phase === 'add') setTimeout(() => textareaRef.current?.focus(), 30);
   }, [phase]);
 
-  // Позиционирование — не вылезать за правый/нижний край
+  //Позиционирование — не вылезать за правый/нижний край
   const style: React.CSSProperties = {
     position: 'fixed',
     left: Math.min(x, window.innerWidth - 260),
@@ -1547,7 +1434,8 @@ const BookmarkEditModal: React.FC<BookmarkEditModalProps> = ({
   onClose,
 }) => {
   const [note, setNote] = useState(bookmark.note);
-  useEffect(() => setNote(bookmark.note), [bookmark.id]); // eslint-disable-line
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => setNote(bookmark.note), [bookmark.id]);
 
   return createPortal(
     <div className={styles['footnote-overlay']} onClick={onClose}>
@@ -1644,7 +1532,7 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
             onClick={onClose}
             aria-label="Закрыть"
           >
-            ✕
+            <X style={{ cursor: 'pointer' }} />
           </button>
         </div>
 
@@ -1678,20 +1566,8 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
                     {bm.note && (
                       <div className={styles['bm-item-note']}>{bm.note}</div>
                     )}
-                    {/* {(() => {
-                      console.log('bm keys:', Object.keys(bm));
-                      console.log('bm full:', bm);
-                      console.log(bm.createdAt);
-                      return null;
-                    })()} */}
                     <div className={styles['bm-item-meta']}>
                       {formatDate(bm.createdAt)}
-
-                      {/* {new Date(bm['createdAt']).toLocaleDateString('ru-RU', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                      })} */}
                     </div>
                     <div className={styles['bm-item-actions']}>
                       <button

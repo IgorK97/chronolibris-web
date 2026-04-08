@@ -53,11 +53,10 @@ function buildFiltersRequest(filters: Filters) {
   let reportStatusId: number | null = null;
 
   if (filters.statusFilter === 'free') {
-    reportStatusId = null; // сервер фильтрует ModerationTaskId == null
+    reportStatusId = null;
   } else if (filters.statusFilter === 'inProgress') {
     reportStatusId = TASK_STATUS.IN_PROGRESS;
   } else if (filters.statusFilter === 'resolved') {
-    // Сервер вернёт записи с любым закрытым таском — логика на стороне фильтра
     reportStatusId = TASK_STATUS.ACCEPTED;
   }
 
@@ -90,23 +89,23 @@ function ReportsModal({
   const allReports = data?.pages.flatMap((p) => p.reports) ?? [];
 
   return (
-    <div className={styles.modalOverlay} onClick={onClose}>
+    <div className={styles['modal-overlay']} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <div className={styles.modalHeader}>
-          <span className={styles.modalTitle}>
+        <div className={styles['modal-header']}>
+          <span className={styles['modal-title']}>
             Жалобы на {TARGET_TYPE_LABEL[targetTypeId]} #{targetId}
           </span>
-          <button className={styles.closeBtn} onClick={onClose}>
+          <button className={styles['close-btn']} onClick={onClose}>
             <X />
           </button>
         </div>
 
-        <div className={styles.modalBody}>
+        <div className={styles['modal-body']}>
           {isLoading && <div className={styles.hint}>Загрузка...</div>}
 
           {allReports.map((report) => (
-            <div key={report.id} className={styles.reportItem}>
-              <div className={styles.reportMeta}>
+            <div key={report.id} className={styles['report-item']}>
+              <div className={styles['report-meta']}>
                 <span className={styles.chip}>#{report.id}</span>
                 <span className={styles.muted}>
                   Пользователь {report.reporterId}
@@ -115,7 +114,7 @@ function ReportsModal({
                   {formatDate(report.createdAt)}
                 </span>
               </div>
-              <p className={styles.reportText}>
+              <p className={styles['report-text']}>
                 {report.text || <em className={styles.muted}>Без текста</em>}
               </p>
             </div>
@@ -127,7 +126,7 @@ function ReportsModal({
 
           {hasNextPage && (
             <button
-              className={styles.loadMoreBtn}
+              className={styles['load-more-btn']}
               onClick={() => fetchNextPage()}
               disabled={isFetchingNextPage}
             >
@@ -155,22 +154,24 @@ function TargetInfoPanel({ targetId, targetTypeId }: TargetInfoPanelProps) {
   if (isLoading)
     return <div className={styles.hint}>Загрузка информации...</div>;
   if (isError || !data)
-    return <div className={styles.errorHint}>Не удалось загрузить данные</div>;
+    return (
+      <div className={styles['error-hint']}>Не удалось загрузить данные</div>
+    );
 
   const isBook = targetTypeId === TARGET_TYPE.BOOK;
 
   return (
-    <div className={styles.targetPanel}>
+    <div className={styles['target-panel']}>
       {isBook ? (
         <>
-          <div className={styles.targetField}>
-            <span className={styles.fieldLabel}>Книга:</span>
+          <div className={styles['target-field']}>
+            <span className={styles['field-label']}>Книга:</span>
             <span>{data.bookTitle ?? '—'}</span>
           </div>
           {data.bookDescription && (
-            <div className={styles.targetField}>
-              <span className={styles.fieldLabel}>Описание:</span>
-              <span className={styles.targetDescription}>
+            <div className={styles['target-field']}>
+              <span className={styles['field-label']}>Описание:</span>
+              <span className={styles['target-description']}>
                 {data.bookDescription}
               </span>
             </div>
@@ -186,22 +187,22 @@ function TargetInfoPanel({ targetId, targetTypeId }: TargetInfoPanelProps) {
         </>
       ) : (
         <>
-          <div className={styles.targetField}>
-            <span className={styles.fieldLabel}>Автор:</span>
+          <div className={styles['target-field']}>
+            <span className={styles['field-label']}>Автор:</span>
             <span>Пользователь {data.readerId ?? '—'}</span>
           </div>
           {data.text && (
-            <div className={styles.targetField}>
-              <span className={styles.fieldLabel}>Текст:</span>
-              <span className={styles.targetDescription}>{data.text}</span>
+            <div className={styles['target-field']}>
+              <span className={styles['field-label']}>Текст:</span>
+              <span className={styles['target-description']}>{data.text}</span>
             </div>
           )}
           {targetTypeId === TARGET_TYPE.COMMENT && data.parentCommentText && (
-            <div className={styles.targetField}>
-              <span className={styles.fieldLabel}>
+            <div className={styles['target-field']}>
+              <span className={styles['field-label']}>
                 Родительский комментарий:
               </span>
-              <span className={styles.targetDescription}>
+              <span className={styles['target-description']}>
                 {data.parentCommentText}
               </span>
             </div>
@@ -271,25 +272,24 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
   return (
     <>
       <div className={styles.row}>
-        {/* Заголовок строки */}
-        <div className={styles.rowHeader}>
-          <div className={styles.rowTitle}>
-            <span className={styles.targetLabel}>
+        <div className={styles['row-header']}>
+          <div className={styles['row-title']}>
+            <span className={styles['target-label']}>
               Жалоба на {TARGET_TYPE_LABEL[report.targetTypeId]} #
               {report.targetId}
             </span>
-            <span className={styles.reasonChip}>{reasonLabel}</span>
+            <span className={styles['reason-chip']}>{reasonLabel}</span>
             {report.taskStatusId !== null && (
               <span
-                className={`${styles.statusChip} ${
-                  isInProgress ? styles.statusInProgress : {}
+                className={`${styles['status-chip']} ${
+                  isInProgress ? styles['status-in-progress'] : {}
                 } ${
                   report.taskStatusId === TASK_STATUS.ACCEPTED
-                    ? styles.statusAccepted
+                    ? styles['status-accepted']
                     : {}
                 }${
                   report.taskStatusId === TASK_STATUS.REJECTED
-                    ? styles.statusRejected
+                    ? styles['status-rejected']
                     : {}
                 }`}
               >
@@ -298,7 +298,7 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
             )}
           </div>
 
-          <div className={styles.rowMeta}>
+          <div className={styles['row-meta']}>
             <span className={styles.muted}>
               {report.count} жал. · первая {formatDate(report.firstReportDate)}{' '}
               · последняя {formatDate(report.lastReportDate)}
@@ -306,17 +306,16 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
           </div>
         </div>
 
-        {/* Кнопки действий */}
-        <div className={styles.rowActions}>
+        <div className={styles['row-actions']}>
           <button
-            className={styles.actionBtn}
+            className={styles['action-btn']}
             onClick={() => setExpanded((v) => !v)}
           >
             {expanded ? 'Скрыть инфо' : 'Показать инфо'}
           </button>
 
           <button
-            className={styles.actionBtn}
+            className={styles['action-btn']}
             onClick={() => setModalOpen(true)}
           >
             Жалобы
@@ -324,7 +323,7 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
 
           {isFree && (
             <button
-              className={`${styles.actionBtn} ${styles.primaryBtn}`}
+              className={`${styles['action-btn']} ${styles['primary-btn']}`}
               onClick={handleTakeTask}
               disabled={isActionLoading}
             >
@@ -341,14 +340,14 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
                 minLength={50}
               />
               <button
-                className={`${styles.actionBtn} ${styles.acceptBtn}`}
+                className={`${styles['action-btn']} ${styles['accept-btn']}`}
                 onClick={() => handleResolve(true)}
                 disabled={isActionLoading}
               >
                 {resolveTask.isPending ? '...' : 'Принять'}
               </button>
               <button
-                className={`${styles.actionBtn} ${styles.rejectBtn}`}
+                className={`${styles['action-btn']} ${styles['reject-btn']}`}
                 onClick={() => handleResolve(false)}
                 disabled={isActionLoading}
               >
@@ -359,7 +358,7 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
 
           {isResolved && (
             <>
-              <span className={styles.resolvedInfo}>
+              <span className={styles['resolved-info']}>
                 Решено: {formatDate(report.taskResolvedAt)}
               </span>
               <textarea placeholder="Комментарий" value={reportText} readOnly />
@@ -367,7 +366,6 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
           )}
         </div>
 
-        {/* Раскрывающаяся панель с инфо о таргете */}
         {expanded && (
           <TargetInfoPanel
             targetId={report.targetId}
@@ -407,8 +405,6 @@ export function ModerationPage() {
 
   const allReports = data?.pages.flatMap((p) => p.reports) ?? [];
 
-  // Sentinel для IntersectionObserver (автоподгрузка при скролле)
-  // const sentinelRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   const setSentinel = useCallback(
@@ -434,13 +430,11 @@ export function ModerationPage() {
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.pageTitle}>Панель модерации</h1>
+      <h1 className={styles['page-title']}>Панель модерации</h1>
 
-      {/* ── Фильтры ── */}
-      <div className={styles.filtersBar}>
-        {/* Статус */}
-        <div className={styles.filterGroup}>
-          <label className={styles.filterLabel}>Статус</label>
+      <div className={styles['filters-bar']}>
+        <div className={styles['filter-group']}>
+          <label className={styles['filter-label']}>Статус</label>
           <select
             className={styles.select}
             value={filters.statusFilter}
@@ -457,9 +451,8 @@ export function ModerationPage() {
           </select>
         </div>
 
-        {/* Тип контента */}
-        <div className={styles.filterGroup}>
-          <label className={styles.filterLabel}>Тип контента</label>
+        <div className={styles['filter-group']}>
+          <label className={styles['filter-label']}>Тип контента</label>
           <select
             className={styles.select}
             value={filters.targetTypeId ?? ''}
@@ -477,9 +470,8 @@ export function ModerationPage() {
           </select>
         </div>
 
-        {/* Тип жалобы */}
-        <div className={styles.filterGroup}>
-          <label className={styles.filterLabel}>Тип жалобы</label>
+        <div className={styles['filter-group']}>
+          <label className={styles['filter-label']}>Тип жалобы</label>
           <select
             className={styles.select}
             value={filters.reasonTypeId ?? ''}
@@ -500,22 +492,21 @@ export function ModerationPage() {
         </div>
 
         <button
-          className={`${styles.actionBtn} ${styles.primaryBtn}`}
+          className={`${styles['action-btn']} ${styles['primary-btn']}`}
           onClick={applyFilters}
         >
           Применить
         </button>
-        <button className={styles.actionBtn} onClick={resetFilters}>
+        <button className={styles['action-btn']} onClick={resetFilters}>
           Сбросить
         </button>
       </div>
 
-      {/* ── Список ── */}
       <div className={styles.list}>
         {isLoading && <div className={styles.hint}>Загрузка...</div>}
         {isError && (
-          <div className={styles.errorHint}>
-            Ошибка загрузки.{' '}
+          <div className={styles['error-hint']}>
+            Ошибка загрузки{' '}
             <button className={styles.linkBtn} onClick={() => refetch()}>
               Повторить
             </button>
@@ -534,7 +525,6 @@ export function ModerationPage() {
           />
         ))}
 
-        {/* Sentinel для автоподгрузки */}
         <div ref={setSentinel} style={{ height: 1 }} />
 
         {isFetchingNextPage && (

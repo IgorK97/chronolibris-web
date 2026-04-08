@@ -5,7 +5,7 @@ import type { BookListItem, UserProfile } from '../types';
 interface AppState {
   user: UserProfile | null;
   currentBook: BookListItem | null;
-  isInitialized: boolean; // Новый флаг
+  isInitialized: boolean;
   setUser: (user: UserProfile | null) => void;
   setCurrentBook: (book: BookListItem | null) => void;
   setInitialized: (val: boolean) => void;
@@ -42,7 +42,6 @@ export const useStore = create<AppState>()(
     }),
     {
       name: 'elibrary-app-storage',
-      // В вебе persist сам выгрузит данные из localStorage в стейт при загрузке страницы
     }
   )
 );

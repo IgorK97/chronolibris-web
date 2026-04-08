@@ -8,7 +8,7 @@ export function fileToBase64(file: File): Promise<string> {
     const reader = new FileReader();
     reader.onload = () => {
       const result = reader.result as string;
-      // Убираем префикс "data:image/jpeg;base64,"
+      //префикс "data:image/jpeg;base64,"
       resolve(result.includes(',') ? result.split(',')[1] : result);
     };
     reader.onerror = reject;
@@ -42,7 +42,7 @@ export function formatDate(iso: string): string {
 
 export const storageUrl = (path: string | null | undefined): string | null => {
   if (!path) return null;
-  if (path.startsWith('http')) return path; // уже полный URL
+  if (path.startsWith('http')) return path;
   const base = import.meta.env.VITE_STORAGE_URL ?? '';
   return `${base}/${path.replace(/^\//, '')}`;
 };

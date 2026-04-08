@@ -2,8 +2,6 @@
   border: 1.5px solid #1c255a;
   border-radius: 10px;
   background: #fff;
-
-  /* #c0c0ff; */
   margin-bottom: 20px;
   overflow: hidden;
 }
@@ -175,14 +173,6 @@
   border: 1px solid #1c255a;
 }
 
-/* .person-avatar {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  object-fit: cover;
-  flex-shrink: 0;
-} */
-
 .person-name {
   font-size: 13px;
   color: #1c255a;
@@ -277,7 +267,6 @@
   font-style: italic;
 }
 
-/* Переключатель режима администратора */
 .mode-toggle {
   display: flex;
   gap: 8px;

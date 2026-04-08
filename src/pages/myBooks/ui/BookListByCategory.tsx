@@ -1,5 +1,4 @@
-// BookCategoryList.tsx
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useStore } from '../../../stores/globalStore';
 import { useInfiniteShelfBooks } from '../../../api/books';
 import { collectionsApi } from '../../../api/collections';

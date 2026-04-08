@@ -80,7 +80,6 @@ export const MyBooks = ({
             >
               <div className={styles['shelf-main']}>
                 <span className={styles['shelf-name']}>{shelf.name}</span>
-                {/* <span className={styles.count}>{shelf.bookCount || 0}</span> */}
               </div>
 
               <div className={styles['shelf-action-btn']}>
@@ -89,7 +88,6 @@ export const MyBooks = ({
                     // e.stopPropagation();
                     // setShelfMenuId(shelf.id);
                     e.stopPropagation();
-                    // Если меню этой полки уже открыто — закрываем (null), иначе открываем
                     setShelfMenuId((prev) =>
                       prev === shelf.id ? null : shelf.id
                     );

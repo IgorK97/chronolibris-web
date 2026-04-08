@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import tailwindcss from '@tailwindcss/vite';
-// import basicSsl from '@vitejs/plugin-basic-ssl';
 import fs from 'fs';
 import path from 'path';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -30,7 +29,6 @@ export default defineConfig({
     }),
 
     tailwindcss(),
-    // basicSsl()
   ],
   resolve: {
     alias: {
@@ -50,7 +48,6 @@ export default defineConfig({
   server: {
     port: 5173,
     https: {
-      // Указываем пути к созданным файлам
       key: fs.readFileSync(
         path.resolve(__dirname, './certs/localhost+2-key.pem')
       ),

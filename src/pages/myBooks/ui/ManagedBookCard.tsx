@@ -1,4 +1,3 @@
-// ManagedBookCard.tsx
 import React, { useState } from 'react';
 import { MoreVertical, Trash2, Edit3 } from 'lucide-react';
 import { getImageUrl } from '../../../utils';

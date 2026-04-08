@@ -216,7 +216,6 @@ export const TAG_TYPES = [
   { id: 3, name: 'Социум' },
 ] as const;
 
-// Типы отношений (синонимия — единственный тип сейчас, но структура расширяема)
 export const RELATION_TYPES = [
   {
     id: 1,

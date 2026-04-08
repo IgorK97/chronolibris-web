@@ -20,8 +20,6 @@
   backdrop-filter: blur(8px) brightness(0.9);
   background-color: var(--color-grey);
   padding: 20px;
-
-  /* transition: all 0.3s ease; */
 }
 
 .app-container {

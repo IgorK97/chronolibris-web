@@ -6,8 +6,9 @@ import MainLayout from './layouts/MainLayout';
 import { BookDetailsComponent } from '../pages/bookDetails';
 import { Profile } from '../pages/profile';
 import { Auth } from '../pages/auth';
-import Library from '@/pages/library';
-import MyBooks from '../pages/myBooks';
+//default vs non default exports?
+import { Library } from '@/pages/library';
+import { MyBooks } from '../pages/myBooks';
 import { usersApi } from '../api/user';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import {

@@ -345,14 +345,9 @@ export function AdvancedSearchPanel({
 }: Props) {
   const { data: roles = [] } = usePersonRoles();
   const [draft, setDraft] = useState<AdvancedFilters>(filters);
-  // const resetAll = () => onChange(EMPTY_FILTERS);
   const handleApply = () => {
     onChange(draft);
   };
-  // const hasAnyFilter =
-  //   filters.personFilters.length > 0 ||
-  //   filters.requiredTagIds.length > 0 ||
-  //   filters.excludedTagIds.length > 0;
 
   const isDirty = JSON.stringify(draft) !== JSON.stringify(filters);
 
@@ -365,11 +360,6 @@ export function AdvancedSearchPanel({
       <div className={styles.header}>
         <span className={styles.title}>Расширенный поиск</span>
         <div className={styles['header-actions']}>
-          {/* {hasAnyFilter && (
-            <button className={styles['reset-btn']} onClick={resetAll}>
-              Сбросить всё
-            </button>
-          )} */}
           <button className={styles['close-btn']} onClick={onClose}>
             <X style={{ cursor: 'pointer' }} />
           </button>
@@ -396,14 +386,12 @@ export function AdvancedSearchPanel({
             </div>
           </div>
         )}
-        {/* Персоналии */}
         <PersonFilter
           value={filters.personFilters}
           roles={roles}
           onChange={(pf) => setDraft({ ...draft, personFilters: pf })}
         />
 
-        {/* Теги */}
         <TagFilter
           requiredTagIds={filters.requiredTagIds}
           excludedTagIds={filters.excludedTagIds}

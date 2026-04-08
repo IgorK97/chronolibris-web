@@ -97,7 +97,6 @@ export function ThemePanel({ selectedThemeId, onSelect }: ThemePanelProps) {
     <aside
       className={`${styles.panel} ${collapsed ? styles['panel-collapsed'] : ''}`}
     >
-      {/* Collapsible header */}
       <div className={styles.header} onClick={() => setCollapsed((v) => !v)}>
         <span className={styles.title}>ТЕМЫ</span>
         <button

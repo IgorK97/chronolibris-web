@@ -58,7 +58,6 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
 
   const urlQuery = searchParams.get('q') ?? '';
   const { setCurrentBook } = useStore();
-  //to save for f5
   const filters: AdvancedFilters = useMemo(
     () => filtersFromParams(searchParams),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -111,13 +110,8 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
     themeId > 0 ||
     selectionId > 0;
 
-  // const navigate = useNavigate();
   const { user } = useStore();
   const isAdmin = user?.role === 'admin';
-  // const [inputValue, setInputValue] = useState(urlQuery);
-  // useEffect(() => {
-  //   setInputValue(urlQuery);
-  // }, [urlQuery]);
 
   const queryReady = urlQuery.trim().length > 0;
 
@@ -199,7 +193,7 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
                 className={styles['reset-filters']}
                 onClick={() => setFilters(EMPTY_FILTERS)}
               >
-                <X size={14} /> Сбросить фильтры
+                <X style={{ cursor: 'pointer' }} size={14} /> Сбросить фильтры
               </button>
             )}
           </div>
@@ -211,7 +205,6 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
               mode={mode}
               onModeChange={isAdmin ? setMode : undefined}
             />
-            // <AdvancedSearchStub onClose={() => setShowAdvanced(false)} />
           )}
 
           <div className={styles['results-area']}>
@@ -222,13 +215,6 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
                   : `По вашему запросу ничего не найдено`}
               </div>
             )}
-            {/* {!urlQuery && (
-              <div className={styles['empty-state']}>
-                <p className={styles['empty-text']}>
-                  Введите название книги...
-                </p>
-              </div>
-            )} */}
             {isLoading && (
               <div className={styles['loading-state']}>
                 <div className={styles.spinner} />
@@ -253,8 +239,6 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
                     }}
                   />
                 ))}
-
-                {/* Sentinel для IntersectionObserver */}
                 <div ref={setSentinel} className={styles.sentinel} />
 
                 {isFetchingNext && (

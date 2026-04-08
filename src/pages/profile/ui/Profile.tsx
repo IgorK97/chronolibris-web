@@ -7,7 +7,6 @@ import { User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import styles from './Profile.module.css';
 
-// Shared imports - adjust paths to your web project structure
 import { useStore } from '../../../stores/globalStore';
 import {
   usersApi,
@@ -66,7 +65,7 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
         setProfileForm(initial);
         setProfileSnapshot(initial);
       } catch (e) {
-        console.error('Failed to load profile', e);
+        console.error('Ошибка загрузки данных профиля', e);
       }
     };
     loadProfile();

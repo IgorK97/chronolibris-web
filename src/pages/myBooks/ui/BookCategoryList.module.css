@@ -7,14 +7,14 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2 колонки */
+  grid-template-columns: repeat(2, 1fr);
   gap: 16px;
   width: 100%;
 }
 
 @media (width >= 1024px) {
   .grid {
-    grid-template-columns: repeat(4, 1fr); /* 4 колонки на десктопе */
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 

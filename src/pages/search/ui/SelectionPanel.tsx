@@ -65,7 +65,7 @@ export function SelectionPanel({
                         }}
                         aria-label="Снять выбор"
                       >
-                        <X size={12} />
+                        <X style={{ cursor: 'pointer' }} size={12} />
                       </button>
                     )}
                   </li>

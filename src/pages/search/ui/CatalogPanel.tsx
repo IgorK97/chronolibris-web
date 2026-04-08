@@ -30,12 +30,11 @@ export function CatalogPanel({ isOpen, onClose }: CatalogPanelProps) {
         <div className={styles['panel-header']}>
           <span className={styles['panel-title']}>Каталог</span>
           <button className={styles['close-btn']} onClick={handleClose}>
-            <X size={18} />
+            <X style={{ cursor: 'pointer' }} size={18} />
           </button>
         </div>
 
         <div className={styles['panel-content']}>
-          {/* Левая колонка – всегда меню */}
           <div className={styles['menu-column']}>
             <MenuView
               onSelectThemes={() => setView('themes')}
@@ -44,7 +43,6 @@ export function CatalogPanel({ isOpen, onClose }: CatalogPanelProps) {
             />
           </div>
 
-          {/* Правая колонка – контент (темы или подборки) */}
           <div className={styles['content-column']}>
             {view === 'themes' && (
               <ThemesView onClose={handleClose} navigate={navigate} />
@@ -52,7 +50,6 @@ export function CatalogPanel({ isOpen, onClose }: CatalogPanelProps) {
             {view === 'selections' && (
               <SelectionsView onClose={handleClose} navigate={navigate} />
             )}
-            {/* если view === 'menu' – правая колонка остаётся пустой */}
           </div>
         </div>
       </aside>
@@ -60,7 +57,6 @@ export function CatalogPanel({ isOpen, onClose }: CatalogPanelProps) {
   );
 }
 
-// --- Menu View (левая колонка) ---
 function MenuView({
   onSelectThemes,
   onSelectSelections,
@@ -94,7 +90,6 @@ function MenuView({
   );
 }
 
-// --- Themes View (правая колонка) ---
 function ThemesView({
   onClose,
   navigate,
@@ -144,7 +139,6 @@ function ThemesView({
   );
 }
 
-// --- Selections View (правая колонка) ---
 function SelectionsView({
   onClose,
   navigate,

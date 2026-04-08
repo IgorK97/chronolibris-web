@@ -1,8 +1,3 @@
-// ============================================================
-// useReaderSettings.ts — хук настроек читалки с персистентностью
-// Компонент не знает о способе хранения — только использует хук.
-// ============================================================
-
 import { useState, useEffect } from 'react';
 
 const STORAGE_KEY = 'reader_settings';
@@ -62,7 +57,7 @@ function saveSettings(settings: ReaderSettings): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
   } catch {
-    // localStorage недоступен — молча игнорируем
+    //
   }
 }
 
@@ -71,12 +66,10 @@ export function useReaderSettings({
 }: UseReaderSettingsOptions): UseReaderSettingsReturn {
   const [settings, setSettings] = useState<ReaderSettings>(() => {
     const loaded = loadSettings(defaults);
-    // Если в хранилище ничего не было — сразу сохраняем дефолты
     saveSettings(loaded);
     return loaded;
   });
 
-  // Сохраняем при каждом изменении
   useEffect(() => {
     saveSettings(settings);
   }, [settings]);

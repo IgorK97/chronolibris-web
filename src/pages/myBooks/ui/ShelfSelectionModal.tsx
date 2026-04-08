@@ -1,4 +1,3 @@
-// ShelfSelectionModal.tsx
 import React, { useState } from 'react';
 import { SquareCheckBig, Square, X } from 'lucide-react';
 import {

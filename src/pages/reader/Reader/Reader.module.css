@@ -1,8 +1,3 @@
-/* ============================================================
-   Reader.module.css — стили для читалки
-   ============================================================ */
-
-/* Корневой контейнер */
 .reader {
   display: flex;
   flex-direction: column;
@@ -13,7 +8,6 @@
   font-family: Georgia, 'Times New Roman', serif;
 }
 
-/* Экран загрузки */
 .loading {
   display: flex;
   flex-direction: column;
@@ -23,7 +17,6 @@
   background: #f5f1e8;
 }
 
-/* Спиннер */
 .spinner {
   width: 50px;
   height: 50px;
@@ -104,7 +97,6 @@
   background: #fdf6f0;
 }
 
-/* Свёрнутый тулбар — минимальная высота под кнопку */
 .toolbar-collapsed {
   box-shadow: none;
   border-bottom-color: transparent;
@@ -271,28 +263,25 @@
   padding-right: 28px;
 }
 
-/* Абзацы */
 .paragraph {
   margin-bottom: 1em;
   text-indent: 2em;
-  break-inside: avoid; /* Если есть возможность, пусть не обрывает абзацы */
+  break-inside: avoid;
 }
 
 .paragraph:first-child {
   text-indent: 0;
 }
 
-/* Заголовок */
 .title {
   text-align: center;
   margin: 1.5em 0 1em;
   font-weight: bold;
   text-indent: 0;
-  break-after: avoid; /* заголовок не отрывается от следующего абзаца */
+  break-after: avoid;
   break-inside: avoid;
 }
 
-/* Сноска в тексте */
 .note-ref {
   color: #5a7fa8;
   cursor: pointer;
@@ -311,7 +300,6 @@
   outline: none;
 }
 
-/* Изображение в тексте */
 .img-block {
   display: block;
   width: 100%;
@@ -337,13 +325,12 @@
   transform: scale(1.03);
 }
 
-/* Зоны клика */
 .prev-zone,
 .next-zone {
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 15%; /* С каждого края */
+  width: 15%;
   cursor: pointer;
   z-index: 10;
   transition: background 0.2s;
@@ -362,7 +349,6 @@
   background: rgb(0 0 0 / 4%);
 }
 
-/* Модальное окно сноски */
 .footnote-overlay {
   position: fixed;
   inset: 0;
@@ -454,7 +440,6 @@
   color: #222;
 }
 
-/* Лайтбокс для картинки */
 .lightbox-overlay {
   position: fixed;
   inset: 0;
@@ -526,7 +511,6 @@
   }
 }
 
-/* Кнопка цвета */
 .color-button {
   padding: 7px 10px;
   border: 1px solid #ccc;
@@ -543,7 +527,6 @@
   border-color: #8b4513;
 }
 
-/* Модальное окно цветов */
 .color-overlay {
   position: fixed;
   inset: 0;
@@ -582,12 +565,6 @@
   font-size: 1em;
   line-height: 1;
   padding: 2px 6px;
-
-  /* border-radius: 4px;
-  border: 1px solid currentcolor; */
-
-  /* currentColor — берёт цвет текста родителя,
-     поэтому рамка всегда совпадает с цветом шрифта читалки */
   opacity: 0.35;
   vertical-align: middle;
   white-space: nowrap;
@@ -609,37 +586,6 @@
   vertical-align: baseline;
 }
 
-/* Что такое каррент колор? */
-
-/* .page-num {
-  display: inline-block;
-  font-size: 0.72em;
-  line-height: 1;
-  padding: 1px 5px;
-  border-radius: 4px;
-  border: 1px solid currentcolor; 
-  opacity: 0.35;
-  vertical-align: middle;
-  white-space: nowrap;
-  user-select: none;
-  font-variant-numeric: tabular-nums;
-  margin: 0 2px;
-}
-
-.page-num-block {
-  display: block;
-  margin: 0.15em 0;
-  break-inside: avoid;
-}
-
-.page-num-block .page-num {
-  vertical-align: baseline;
-  margin-bottom: 1em;
-  text-indent: 2em;
-  break-inside: avoid;
-} */
-
-/* Поярдок важен стилей? */
 .color-modal-title {
   font-size: 15px;
   font-weight: 600;
@@ -672,7 +618,6 @@
   align-items: center;
 }
 
-/* Компонент с содержанием */
 .toc-overlay {
   position: fixed;
   inset: 0;
@@ -789,7 +734,6 @@
   pointer-events: none;
 }
 
-/* Индикатор предзагрузки */
 .prefetch-indicator {
   position: fixed;
   bottom: 10px;
@@ -834,8 +778,6 @@
 .paragraph-bookmarked {
   border-left: 3px solid #8b4513;
   padding-left: 8px;
-
-  /* margin-left: -11px; */
 }
 
 .ctx-menu {
