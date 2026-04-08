@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MoreVertical, Trash2, Edit3 } from 'lucide-react';
 import { getImageUrl } from '../../../utils';
-import styles from '@/components/books/ui/BookCard/BookCard.module.css';
+import styles from '@/components/Books/BookCard/index.module.css';
 import type { BookListItem } from '@/types';
 
 interface Props {

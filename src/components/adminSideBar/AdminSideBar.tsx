@@ -72,7 +72,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   //Чтобы по переходу скрылась панель
   useEffect(() => {
     onClose();
-  }, [location.pathname, onClose]);
+  }, [location.pathname]);
 
   return (
     <>

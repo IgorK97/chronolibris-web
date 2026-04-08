@@ -10,7 +10,7 @@ import {
 // import { collectionsApi } from "../../../../api/collections";
 // import { useStore } from "../../../../stores/globalStore";
 
-import styles from './BookCard.module.css';
+import styles from './index.module.css';
 import { useStore } from '@/stores/globalStore';
 
 interface BookCardProps {
