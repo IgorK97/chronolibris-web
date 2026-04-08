@@ -5,7 +5,7 @@ import {
   // useSelectionsInfinite
 } from '@/api/collections';
 import styles from './SelectionPanel.module.css';
-import type { SelectionDetails } from '@/types/types';
+import type { SelectionDetails } from '@/types';
 
 interface SelectionPanelProps {
   selectedSelectionId: number | null;

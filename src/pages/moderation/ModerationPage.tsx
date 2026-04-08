@@ -1,18 +1,20 @@
 import { useState, useCallback, useRef } from 'react';
 import {
-  TARGET_TYPE,
-  TARGET_TYPE_LABEL,
-  TASK_STATUS,
-  TASK_STATUS_LABEL,
   useInfiniteReports,
   useTargetInfo,
   useInfiniteTargetReports,
   useCreateModerationTask,
   useResolveTask,
-  type ReportShortDto,
 } from '../../api/reports';
 import { ArrowBigRight, X } from 'lucide-react';
 import styles from './ModerationPage.module.css';
+import {
+  TARGET_TYPE,
+  TARGET_TYPE_LABEL,
+  TASK_STATUS,
+  TASK_STATUS_LABEL,
+  type ReportShortDto,
+} from '@/types';
 
 type StatusFilter = 'free' | 'inProgress' | 'resolved';
 

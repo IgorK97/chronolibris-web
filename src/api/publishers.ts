@@ -5,7 +5,7 @@ import type {
   CreatePublisherRequest,
   PublisherDto,
   UpdatePublisherRequest,
-} from '../types/types';
+} from '../types';
 // import type { CountryDto } from '../types/types';
 
 // --- API методы ---

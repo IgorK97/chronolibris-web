@@ -11,51 +11,12 @@ import type {
   ContentListResponse,
   ContentFilterRequest,
   TagDetails,
-} from '../types/types';
-import type { BookDto } from '../types/types';
-
-export interface CreateContentRequest {
-  title: string;
-  description: string;
-  countryId: number;
-  contentTypeId: number;
-  languageId: number;
-  year?: number | null;
-  parentContentId?: number | null;
-  position?: number | null;
-  personIds?: number[];
-  themeIds?: number[];
-}
-
-export interface PersonRoleFilter {
-  roleId: number;
-  personIds: number[];
-}
-
-export interface UpdateContentRequest {
-  id: number;
-  title: string;
-  description: string;
-  countryId: number;
-  contentTypeId: number;
-  languageId: number;
-  year?: number | null;
-  yearProvided: boolean; // Флаг для указания, что год был явно предоставлен (даже если null)
-  parentContentId?: number | null;
-  position?: number | null;
-  personFilters?: PersonRoleFilter[];
-  themeIds?: number[];
-}
-
-export interface BookContentLinkRequest {
-  contentId: number;
-  bookId: number;
-  order: number;
-}
-
-export type PatchContentRequest = Partial<UpdateContentRequest> & {
-  id: number;
-};
+  CreateContentRequest,
+  PatchContentRequest,
+  BookContentLinkRequest,
+  // PersonRoleFilter,
+} from '../types';
+import type { BookDto } from '../types';
 
 export const contentsApi = {
   getContents: (filter: ContentFilterRequest): Promise<ContentListResponse> =>

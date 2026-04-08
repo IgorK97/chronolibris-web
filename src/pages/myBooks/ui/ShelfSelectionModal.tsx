@@ -7,8 +7,8 @@ import {
   useShelves,
 } from '../../../api/collections';
 import { useStore } from '../../../stores/globalStore';
-import styles from './ShelfSelectionModal.module.css'; // Перенесите стили из BookDetails.module.css
-import { BookShelfConstructing } from './BookshelfConstructing';
+import styles from './ShelfSelectionModal.module.css';
+import { BookShelfConstructing } from './BookShelfConstructing';
 
 interface Props {
   bookId: number;

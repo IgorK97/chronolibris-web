@@ -21,7 +21,7 @@ import styles from './BookDetails.module.css';
 import { useStore } from '../../../stores/globalStore';
 import { booksApi, useBookDetails } from '../../../api/books';
 import { useRoles } from '../../../api/references';
-import type { BookDetails, ShelfDetails } from '../../../types/types';
+import type { BookDetails, ShelfDetails } from '../../../types';
 import {
   collectionsApi,
   useSeekedShelves,

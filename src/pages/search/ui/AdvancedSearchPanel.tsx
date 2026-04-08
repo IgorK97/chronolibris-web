@@ -4,11 +4,13 @@ import {
   usePersonRoles,
   usePersonSuggestions,
   useTagSuggestions,
-  type PersonSuggestionDto,
-  type TagSuggestionDto,
-  type PersonRoleDto,
 } from '@api/searchReference';
-import type { PersonRoleFilterRequest } from '@/api/search';
+import type {
+  PersonRoleDto,
+  PersonRoleFilterRequest,
+  PersonSuggestionDto,
+  TagSuggestionDto,
+} from '@/types';
 import styles from './AdvancedSearchPanel.module.css';
 import type { AdvancedFilters } from '../utils/filterParams';
 // import { EMPTY_FILTERS } from '../utils/filterParams';

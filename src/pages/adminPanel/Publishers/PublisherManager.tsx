@@ -13,7 +13,7 @@ import type {
   CreatePublisherRequest,
   PublisherDto,
   UpdatePublisherRequest,
-} from '@/types/types';
+} from '@/types';
 import styles from './PublisherManager.module.css';
 
 export const PublisherManager: React.FC = () => {

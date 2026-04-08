@@ -18,7 +18,7 @@ import {
   VoteButton,
 } from './BookTabsAtoms';
 import { formatDate } from '@/utils';
-import type { CommentDto } from '@/types/types';
+import type { CommentDto } from '@/types';
 import { useStore } from '@/stores/globalStore';
 import styles from './BookTabs.module.css';
 import { TARGET_TYPE } from '@/api/reports';

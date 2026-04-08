@@ -1,5 +1,3 @@
-
-
 // BookCategoryList.tsx
 import React, { useEffect, useRef, useState } from 'react';
 import { useStore } from '../../../stores/globalStore';
@@ -8,7 +6,7 @@ import { collectionsApi } from '../../../api/collections';
 import { ManagedBookCard } from './ManagedBookCard';
 import { ShelfSelectionModal } from './ShelfSelectionModal';
 import styles from './BookCategoryList.module.css';
-import type { BookListItem } from '@/types/types';
+import type { BookListItem } from '@/types';
 
 interface Props {
   shelfId: number;

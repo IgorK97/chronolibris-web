@@ -1,13 +1,10 @@
 // src/components/Filters/PersonFilter.tsx
 import React, { useState, useRef, useEffect } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
-import {
-  usePersonSuggestions,
-  type PersonRoleDto,
-  type PersonSuggestionDto,
-} from '@api/searchReference';
+import { usePersonSuggestions } from '@api/searchReference';
 import { X } from 'lucide-react';
 import styles from './PersonFilter.module.css';
+import type { PersonRoleDto, PersonSuggestionDto } from '@/types';
 
 export interface PersonRoleFilterRequest {
   roleId: number;

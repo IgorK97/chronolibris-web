@@ -17,7 +17,7 @@ import {
   reviewsApi,
   useDeleteReview,
 } from '@/api/reviews';
-import type { ReviewDetails } from '@/types/types';
+import type { ReviewDetails } from '@/types';
 import { useStore } from '@/stores/globalStore';
 import { TARGET_TYPE } from '@/api/reports';
 

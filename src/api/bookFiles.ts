@@ -1,14 +1,7 @@
 // File: src/api/bookFiles.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient, axiosInstance } from './apiClient';
-import type { BookFileDto } from '../types/types';
-
-export interface UploadBookFileRequest {
-  bookId: number;
-  formatId: number;
-  isReadable: boolean;
-  file: File;
-}
+import type { BookFileDto } from '../types';
 
 export interface UpdateBookFileRequest {
   bookId: number;

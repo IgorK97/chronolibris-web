@@ -11,8 +11,8 @@ import {
   bookFilesApi,
 } from '@/api/bookFiles';
 import { useFormats } from '@/api/references';
-import type { BookFileDto, FormatDto } from '@/types/types';
-import { BookFileStatuses } from '@/types/types';
+import type { BookFileDto, FormatDto } from '@/types';
+import { BookFileStatuses } from '@/types';
 import styles from './BookFileManagement.module.css';
 import { Download, Pencil, Trash, Trash2 } from 'lucide-react';
 import { t } from 'i18next';

@@ -1,9 +1,5 @@
 import styles from './ParticipantsInfo.module.css';
-import type {
-  BookDetails,
-  BookPersonGroupDetails,
-  RoleDetails,
-} from '@/types/types';
+import type { BookDetails, BookPersonGroupDetails, RoleDetails } from '@/types';
 
 interface ParticipantsInfoProps {
   bookInfo: BookDetails;

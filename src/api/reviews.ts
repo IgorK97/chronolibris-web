@@ -14,7 +14,7 @@ import type {
   RateReviewCommand,
   UpdateReviewRequest,
   MyReviewDetails,
-} from '../types/types';
+} from '../types';
 
 export const reviewsApi = {
   getByBookId: (bookId: number, lastId?: number, limit = 20) =>

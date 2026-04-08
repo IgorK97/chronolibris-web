@@ -14,7 +14,7 @@ import {
   useInfiniteAdvancedSearch,
   useInfiniteSimpleSearch,
 } from '@/api/search';
-import type { BookSearchResult } from '@/api/search';
+import type { BookSearchResult } from '@/types';
 import { BookCard } from '@/components';
 import styles from './SearchPage.module.css';
 import {
@@ -23,7 +23,7 @@ import {
   // Wrench,
   X,
 } from 'lucide-react';
-import type { BookListItem } from '@/types/types';
+import type { BookListItem } from '@/types';
 import {
   EMPTY_FILTERS,
   filtersFromParams,

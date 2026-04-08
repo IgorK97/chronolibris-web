@@ -8,7 +8,8 @@ import type {
   LoginRequest,
   ChangePasswordRequest,
   UpdateProfileRequest,
-} from '../types/types';
+  RegistrationResult,
+} from '../types';
 
 export const usersApi = {
   register: async (request: RegisterRequest) => {
@@ -55,11 +56,3 @@ export const usersApi = {
     await apiClient.post<RegistrationResult, typeof data>('/users/staff', data);
   },
 };
-
-interface RegistrationResult {
-  success: boolean;
-  token: string;
-  refresh_token: string;
-  message: string;
-  userId: number;
-}

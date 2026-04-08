@@ -1,7 +1,7 @@
 // components/Tags/TagRow.tsx
 import React, { useState, useRef, useEffect } from 'react';
-import { useInfiniteChildTags, useDeleteTag, TAG_TYPES } from '@/api/tags';
-import type { TagDetails } from '@/types/types';
+import { useInfiniteChildTags, useDeleteTag } from '@/api/tags';
+import { TAG_TYPES, type TagDetails } from '@/types';
 import styles from './TagsTable.module.css';
 import { ExpandChildButton } from '@/components/buttons/ExpandChildButton';
 

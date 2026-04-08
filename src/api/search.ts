@@ -1,48 +1,10 @@
+import type {
+  AdvancedSearchBody,
+  SearchPagedResult,
+  SimpleSearchParams,
+} from '@/types';
 import { apiClient } from './apiClient';
 import { useInfiniteQuery } from '@tanstack/react-query';
-
-export interface BookSearchResult {
-  id: number;
-  title: string;
-  description: string;
-  coverPath: string;
-  year: number | null;
-  averageRating: number | null;
-  isFavorite: boolean;
-  isAvailable: boolean;
-  isReviewable: boolean;
-}
-
-export interface SearchPagedResult {
-  items: BookSearchResult[];
-  hasNext: boolean;
-  lastId: number | null;
-  lastBestSimilarity: number | null;
-}
-
-interface SimpleSearchParams {
-  query: string;
-  pageSize?: number;
-  lastBestSimilarity?: number;
-  lastId?: number;
-}
-
-export interface PersonRoleFilterRequest {
-  roleId: number;
-  personIds: number[];
-}
-
-export interface AdvancedSearchBody {
-  query: string;
-  pageSize?: number;
-  lastBestSimilarity?: number | null;
-  lastId?: number | null;
-  personFilters?: PersonRoleFilterRequest[];
-  requiredTagIds?: number[];
-  excludedTagIds?: number[];
-  themeId: number;
-  selectionId: number;
-}
 
 export const searchApi = {
   simple: (params: SimpleSearchParams, mode: boolean = false) =>

@@ -10,14 +10,14 @@ import {
   useUpdatePerson,
   useDeletePerson,
 } from '@/api/persons';
-import type { CreatePersonRequest, UpdatePersonRequest } from '@/api/persons';
+import type { CreatePersonRequest, UpdatePersonRequest } from '@/types';
 // import {
 //   fileToBase64,
 //   validateFileSize,
 //   validateFileType,
 // } from '@/utils/imageUtils';
 import styles from './PersonManager.module.css';
-import type { PersonDto } from '@/types/types';
+import type { PersonDto } from '@/types';
 
 export const PersonManager: React.FC = () => {
   const { data: persons, isLoading, error } = usePersons();

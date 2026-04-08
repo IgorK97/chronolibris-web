@@ -13,17 +13,16 @@ import {
   useCountries,
   // useFormats
 } from '@/api/references';
-import {
-  usePersonRoles,
-  usePersonSuggestions,
-  type PersonSuggestionDto,
-  type PersonRoleDto,
-} from '@api/searchReference';
-import type { PersonRoleFilterRequest } from '@/api/search';
+import { usePersonRoles, usePersonSuggestions } from '@api/searchReference';
+import type {
+  PersonRoleDto,
+  PersonRoleFilterRequest,
+  PersonSuggestionDto,
+} from '@/types';
 import { useDebounce } from '@/hooks/useDebounce';
 import { ThemeSelector } from '../../Themes/ThemeSelector';
 import { ContentTagsManager } from './ContentTagsManagement';
-import type { ThemeDto } from '@/types/types';
+import type { ThemeDto } from '@/types';
 import styles from './ContentUnit.module.css';
 import { ArrowLeft, X } from 'lucide-react';
 import { storageUrl } from '@/utils';

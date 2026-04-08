@@ -7,7 +7,7 @@ import {
   useAddTagToContent,
   useRemoveTagFromContent,
 } from '@/api/contents';
-import type { TagDetails } from '@/types/types';
+import type { TagDetails } from '@/types';
 import styles from './ContentTagsManagement.module.css';
 import { TagChip } from '@/components/TagChip';
 

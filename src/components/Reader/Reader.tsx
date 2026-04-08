@@ -2,10 +2,10 @@
 // Reader.tsx — компонент чтения книги на CSS columns
 // ============================================================
 import { createPortal } from 'react-dom';
-import {
-  useReadingProgress,
-  useUpsertReadingProgress,
-} from '@/api/readingProgress';
+// import {
+//   useReadingProgress,
+//   useUpsertReadingProgress,
+// } from '@/api/readingProgress';
 import { Puff } from 'react-loading-icons';
 import React, {
   useState,
@@ -27,9 +27,9 @@ import {
   Trash2,
   X,
 } from 'lucide-react';
-import type { Bookmark as BookmarkDetails } from '@/types/types';
+import type { Bookmark as BookmarkDetails } from '@/types';
 
-import type { CreateBookmarkRequest } from '@/api/bookmarks';
+import type { CreateBookmarkRequest } from '@/types';
 import {
   // bookmarksApi,
   useBookmarks,
@@ -184,17 +184,17 @@ export const Reader: React.FC<ReaderProps> = ({
     bookFileId ?? null,
     user?.userName ?? null
   );
-  const upsertProgress = useUpsertReadingProgress();
+  // const upsertProgress = useUpsertReadingProgress();
   const progressLoaded = useRef(false);
   console.log(bookmarks);
   const savedPercentRef = useRef<number>(0);
-  const { data: savedProgress } = useReadingProgress(bookFileId);
-  useEffect(() => {
-    if (savedProgress !== undefined) {
-      savedPercentRef.current = savedProgress?.percentage ?? 0;
-      progressLoaded.current = true;
-    }
-  }, [savedProgress]);
+  // const { data: savedProgress } = useReadingProgress(bookFileId);
+  // useEffect(() => {
+  //   if (savedProgress !== undefined) {
+  //     savedPercentRef.current = savedProgress?.percentage ?? 0;
+  //     progressLoaded.current = true;
+  //   }
+  // }, [savedProgress]);
 
   const createBookmarkMutation = useCreateBookmark(user?.userName ?? '');
   const updateBookmarkMutation = useUpdateBookmark();
@@ -276,29 +276,29 @@ export const Reader: React.FC<ReaderProps> = ({
   }, [readPercent]);
 
   // Интервал создаётся один раз
-  useEffect(() => {
-    if (!user) return;
+  // useEffect(() => {
+  //   if (!user) return;
 
-    const interval = setInterval(
-      () => {
-        if (!progressLoaded.current) return;
-        const paraIndex = captureVisibleParaIndex() ?? 0;
-        const current = readPercentRef.current;
+  //   const interval = setInterval(
+  //     () => {
+  //       if (!progressLoaded.current) return;
+  //       const paraIndex = captureVisibleParaIndex() ?? 0;
+  //       const current = readPercentRef.current;
 
-        if (current > savedPercentRef.current) {
-          savedPercentRef.current = current;
-          upsertProgress.mutate({
-            bookFileId,
-            percentage: current,
-            paraIndex,
-          });
-        }
-      },
-      3 * 60 * 1000
-    );
+  //       if (current > savedPercentRef.current) {
+  //         savedPercentRef.current = current;
+  //         upsertProgress.mutate({
+  //           bookFileId,
+  //           percentage: current,
+  //           paraIndex,
+  //         });
+  //       }
+  //     },
+  //     3 * 60 * 1000
+  //   );
 
-    return () => clearInterval(interval);
-  }, [user, bookFileId]);
+  //   return () => clearInterval(interval);
+  // }, [user, bookFileId]);
 
   useEffect(() => {
     if (!user) return;

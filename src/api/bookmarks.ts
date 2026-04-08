@@ -1,17 +1,11 @@
 // File: src/api/bookmarks.ts
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from './apiClient';
-import type { Bookmark, UserProfile } from '@/types/types';
-
-export interface CreateBookmarkRequest {
-  bookFileId: number;
-  paraIndex: number;
-  noteText?: string;
-}
-
-export interface UpdateBookmarkRequest {
-  note?: string;
-}
+import type {
+  Bookmark,
+  CreateBookmarkRequest,
+  UpdateBookmarkRequest,
+} from '@/types';
 
 export const bookmarksApi = {
   /**
@@ -94,6 +88,7 @@ export const useUpdateBookmark = () => {
     mutationFn: ({
       id,
       data,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       bookFileId,
     }: {
       id: number;
@@ -112,6 +107,7 @@ export const useDeleteBookmark = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     mutationFn: ({ id, bookFileId }: { id: number; bookFileId: number }) =>
       bookmarksApi.deleteBookmark(id),
     onSuccess: (_, variables) => {

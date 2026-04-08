@@ -4,7 +4,7 @@ import type {
   ShelfDetails,
   BookListItem,
   PagedResult,
-} from '../types/types';
+} from '../types';
 import {
   keepPreviousData,
   useInfiniteQuery,

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { BookListItem, UserProfile } from '../types/types';
+import type { BookListItem, UserProfile } from '../types';
 
 interface AppState {
   user: UserProfile | null;

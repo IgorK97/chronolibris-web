@@ -1,19 +1,11 @@
 // File: src/api/persons.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from './apiClient';
-import type { PersonDto } from '@/types/types';
-
-// --- Типы запросов ---
-export interface CreatePersonRequest {
-  name: string;
-  description: string;
-}
-
-export interface UpdatePersonRequest {
-  id: number;
-  name: string;
-  description: string;
-}
+import type {
+  CreatePersonRequest,
+  PersonDto,
+  UpdatePersonRequest,
+} from '@/types';
 
 // --- API методы ---
 export const personsApi = {

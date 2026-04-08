@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { SectionHeader } from './SectionHeader';
 import { BookCard } from '../../../components/books';
-import { type BookListItem } from '../../../types/types';
+import { type BookListItem } from '../../../types';
 import { useStore } from '../../../stores/globalStore';
 import { useSelectionBooks } from '../../../api/books';
 import styles from './Library.module.css';

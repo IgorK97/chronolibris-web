@@ -7,6 +7,7 @@ import {
 } from '@tanstack/react-query';
 import { apiClient } from './apiClient';
 import type {
+  BookContentLinkRequest,
   BookDetails,
   BookDto,
   BookFilterRequest,
@@ -14,86 +15,14 @@ import type {
   BookListItem,
   BookListResponse,
   ContentDto,
+  CreateBookRequest,
   PagedResult,
+  SearchParams,
+  UpdateBookRequest,
   UpdateReadingProgressCommand,
-} from '../types/types';
-import type { PersonRoleFilter } from './contents';
+} from '../types';
 import { useDebounce } from '../hooks/useDebounce';
 import { collectionsApi } from './collections';
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-interface SearchParams {
-  query: string;
-  userId: number;
-  lastId?: number;
-  limit: number;
-  genreIds?: number[];
-  languages?: string[];
-  rating?: number | null;
-  yearFrom?: string;
-  yearTo?: string;
-}
-
-export interface BookContentLinkRequest {
-  bookId: number;
-  contentId: number;
-  order: number;
-}
-
-export interface CreateBookRequest {
-  title: string;
-  description?: string | null;
-  countryId: number;
-  languageId: number;
-  year?: number | null;
-  isbn?: string | null;
-  bbk?: string | null;
-  udk?: string | null;
-  source?: string | null;
-  /** Base64-строка файла обложки (с префиксом data URI или без). */
-  coverBase64: string;
-  coverContentType: string;
-  // coverFileName: string;
-  isAvailable: boolean;
-  isReviewable: boolean;
-  publisherId?: number | null;
-  seriesId?: number | null;
-  personFilters?: PersonRoleFilter[];
-  themeIds?: number[];
-}
-
-export interface UpdateBookRequest {
-  id: number;
-  title: string;
-  description?: string | null;
-  countryId?: number | null;
-  languageId?: number | null;
-  year?: number | null;
-  yearProvided: boolean;
-  isbn?: string | null;
-  isbnProvided: boolean;
-  bbk?: string | null;
-  bbkProvided: boolean;
-  udk?: string | null;
-  udkProvided: boolean;
-  source?: string | null;
-  sourceProvided: boolean;
-  /** Новая обложка в Base64. Если не передаётся — обложка не меняется. */
-  coverBase64?: string | null;
-  coverContentType?: string | null;
-  coverFileName?: string | null;
-  isAvailable: boolean;
-  isReviewable: boolean;
-  publisherId?: number | null;
-  publisherIdProvided: boolean;
-  seriesId?: number | null;
-  seriesIdProvided: boolean;
-  personFilters?: PersonRoleFilter[];
-  themeIds?: number[];
-}
 
 // ---------------------------------------------------------------------------
 // Helpers

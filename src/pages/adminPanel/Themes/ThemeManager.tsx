@@ -8,8 +8,8 @@ import {
   useUpdateTheme,
   useDeleteTheme,
 } from '@/api/themes';
-import type { CreateThemeRequest, UpdateThemeRequest } from '@/api/themes';
-import type { ThemeDto } from '@/types/types';
+import type { CreateThemeRequest, UpdateThemeRequest } from '@/types';
+import type { ThemeDto } from '@/types';
 import styles from './ThemeManager.module.css';
 import { ExpandChildButton } from '@/components/buttons/ExpandChildButton';
 import { Pencil, Trash2, X } from 'lucide-react';

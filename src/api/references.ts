@@ -6,13 +6,12 @@ import type {
   CreateFormatRequest,
   CreateLanguageRequest,
   FormatDto,
-  FtsConfigurationDto,
   LanguageDto,
   RoleDetails,
   UpdateCountryRequest,
   UpdateFormatRequest,
   UpdateLanguageRequest,
-} from '../types/types';
+} from '../types';
 
 export const referencesApi = {
   /**
@@ -56,9 +55,6 @@ export const referencesApi = {
    */
   deleteLanguage: (id: number): Promise<void> =>
     apiClient.delete(`/References/languages/${id}`),
-
-  getFtsConfigurations: (): Promise<FtsConfigurationDto[]> =>
-    apiClient.get<FtsConfigurationDto[]>('/References/fts-configurations'),
 
   /**
    * Получает список всех стран
@@ -133,18 +129,6 @@ export const useRoles = () => {
     // Справочники обычно статичны, кэшируем на долгий срок (например, 24 часа)
     staleTime: 24 * 60 * 60 * 1000,
     // Данные не считаются устаревшими при потере фокуса окна
-    refetchOnWindowFocus: false,
-  });
-};
-
-/**
- * Хук для получения списка всех доступных FTS конфигураций
- */
-export const useFtsConfigurations = () => {
-  return useQuery({
-    queryKey: ['references', 'fts-configurations'],
-    queryFn: referencesApi.getFtsConfigurations,
-    staleTime: 24 * 60 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 };

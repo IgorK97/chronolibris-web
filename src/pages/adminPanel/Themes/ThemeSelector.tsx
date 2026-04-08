@@ -1,7 +1,7 @@
 // src/components/ThemeSelector/ThemeSelector.tsx
 import React, { useState, useMemo } from 'react';
 import { useAllThemesFlat } from '@/api/themes';
-import type { ThemeDto } from '@/types/types';
+import type { ThemeDto } from '@/types';
 import styles from './ThemeSelector.module.css';
 import { GenreChip } from '@/components/GenreChip';
 

@@ -1,4 +1,4 @@
-import type { PersonRoleFilterRequest } from '@/api/search';
+import type { PersonRoleFilterRequest } from '@/types';
 
 export interface AdvancedFilters {
   personFilters: PersonRoleFilterRequest[];

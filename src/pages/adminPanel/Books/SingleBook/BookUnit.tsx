@@ -14,19 +14,14 @@ import {
   useBookDetails,
 } from '@/api/books';
 import { useLanguages, useCountries } from '@/api/references';
-import {
-  usePersonRoles,
-  usePersonSuggestions,
-  type PersonSuggestionDto,
-  type PersonRoleDto,
-} from '@api/searchReference';
-import type { PersonRoleFilterRequest } from '@/api/search';
-import { useDebounce } from '@/hooks/useDebounce';
+import { usePersonRoles, usePersonSuggestions } from '@api/searchReference';
 import type {
-  ContentDto,
-  CreateBookRequest,
-  UpdateBookRequest,
-} from '@/types/types';
+  PersonRoleDto,
+  PersonRoleFilterRequest,
+  PersonSuggestionDto,
+} from '@/types';
+import { useDebounce } from '@/hooks/useDebounce';
+import type { ContentDto, CreateBookRequest, UpdateBookRequest } from '@/types';
 import { ContentSearchPopup } from './ContentSearchPopup';
 import { BookFileManagement } from './BookFileManagement';
 import styles from './BookUnit.module.css';
@@ -473,7 +468,7 @@ export const BookUnit: React.FC = () => {
           languageId: form.languageId!,
           countryId: form.countryId!,
           publisherId: form.publisherId,
-          seriesId: null,
+          // seriesId: null,
           coverBase64,
           coverContentType: form.coverFile.type,
           // coverFileName: form.coverFile.name,
@@ -508,8 +503,8 @@ export const BookUnit: React.FC = () => {
           countryId: form.countryId,
           publisherId: form.publisherId,
           publisherIdProvided: true,
-          seriesId: null,
-          seriesIdProvided: true,
+          // seriesId: null,
+          // seriesIdProvided: true,
           coverBase64,
           coverContentType: form.coverFile?.type ?? null,
           // coverFileName: form.coverFile?.name ?? null,

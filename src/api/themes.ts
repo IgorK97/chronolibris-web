@@ -1,18 +1,11 @@
 // File: src/api/themes.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from './apiClient';
-import type { ThemeDto } from '../types/types';
-
-export interface CreateThemeRequest {
-  name: string;
-  parentThemeId?: number | null;
-}
-
-export interface UpdateThemeRequest {
-  id: number;
-  name: string;
-  parentThemeId?: number | null;
-}
+import type {
+  CreateThemeRequest,
+  ThemeDto,
+  UpdateThemeRequest,
+} from '../types';
 
 export const themesApi = {
   /**

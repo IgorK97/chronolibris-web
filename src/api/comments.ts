@@ -1,5 +1,5 @@
 import { apiClient } from './apiClient';
-import type { CommentDto, CreateCommentRequest } from '../types/types';
+import type { CommentDto, CreateCommentRequest } from '../types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export const commentsApi = {

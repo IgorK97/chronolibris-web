@@ -1,7 +1,7 @@
 // components/Tags/CreateTagForm.tsx
 import React, { useState } from 'react';
-import { useCreateTag, TAG_TYPES, RELATION_TYPES } from '@/api/tags';
-import type { TagDetails } from '@/types/types';
+import { useCreateTag } from '@/api/tags';
+import { RELATION_TYPES, TAG_TYPES, type TagDetails } from '@/types';
 import styles from './CreateTagForm.module.css';
 import { X } from 'lucide-react';
 

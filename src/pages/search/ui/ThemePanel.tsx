@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useThemes, useThemesByParentId, useThemeById } from '@/api/themes';
-import type { ThemeDto } from '@/types/types';
+import type { ThemeDto } from '@/types';
 import styles from './ThemePanel.module.css';
 
 interface ThemePanelProps {

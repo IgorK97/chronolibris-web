@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useInfiniteContents } from '@/api/contents';
-import type { ContentDto, ContentFilterRequest } from '@/types/types';
+import type { ContentDto, ContentFilterRequest } from '@/types';
 import styles from './ContentList.module.css';
 
 interface ContentListProps {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Heart } from 'lucide-react';
-import type { BookListItem } from '@/types/types';
+import type { BookListItem } from '@/types';
 import {
   favColor,
   fillFavColor,

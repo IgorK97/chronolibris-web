@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBooks, useDeleteBook } from '@/api/books';
-import type { BookFilterRequest, BookDto } from '@/types/types';
+import type { BookFilterRequest, BookDto } from '@/types';
 import { useThemes } from '@/api/themes';
 import styles from './BookManagement.module.css';
 

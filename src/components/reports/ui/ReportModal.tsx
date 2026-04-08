@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 import { useCreateReport } from '@/api/reports';
-import { TARGET_TYPE } from '@/api/reports';
+import { TARGET_TYPE } from '@/types';
 import styles from './ReportModal.module.css';
 import { useStore } from '@stores/globalStore';
 
