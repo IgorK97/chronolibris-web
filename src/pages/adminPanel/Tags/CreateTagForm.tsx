@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
 import { useCreateTag } from '@/api/tags';
 import { RELATION_TYPES, TAG_TYPES, type TagDetails } from '@/types';
@@ -21,13 +22,18 @@ export const CreateTagForm: React.FC<CreateTagFormProps> = ({
     RELATION_TYPES[0].id
   );
 
+  const [error, setError] = useState<string | null>(null);
+
   const createMutation = useCreateTag();
   const effectiveRelationTypes = RELATION_TYPES;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-
+    if (tagTypeId != selectedParentTag?.tagTypeId) {
+      setError('Типы тегов в отношении должны совпадать');
+      return;
+    }
     createMutation.mutate(
       {
         name: name.trim(),
@@ -43,6 +49,12 @@ export const CreateTagForm: React.FC<CreateTagFormProps> = ({
       }
     );
   };
+
+  const serverErrorMessage = createMutation.error
+    ? (createMutation.error as any)?.response?.data?.message ||
+      (createMutation.error as Error).message ||
+      'Ошибка сервера'
+    : null;
 
   return (
     <form onSubmit={handleSubmit} className={styles['container']}>
@@ -131,8 +143,11 @@ export const CreateTagForm: React.FC<CreateTagFormProps> = ({
         {createMutation.isPending ? 'Создание...' : 'Создать'}
       </button>
 
-      {createMutation.isError && (
-        <div className={styles['error']}>Ошибка при создании тега</div>
+      {(error || serverErrorMessage) && (
+        <div className={styles['error']}>
+          {error && <div>{error}</div>}
+          {serverErrorMessage && <div>{serverErrorMessage}</div>}
+        </div>
       )}
     </form>
   );
