@@ -45,9 +45,9 @@ function toBookListItem(book: BookSearchResult): BookListItem {
     title: book.title,
     coverUri: book.coverPath || null,
     averageRating: book.averageRating ?? 0,
-    ratingsCount: 0, // не возвращается из поиска
+    ratingsCount: 0, //Пока не возвращаю из поиска, да и не нужно
     isFavorite: book.isFavorite,
-    authors: [], // не возвращается из поиска
+    authors: book.authors,
     isReviewable: book.isReviewable,
   };
 }

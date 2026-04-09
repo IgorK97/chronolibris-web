@@ -301,6 +301,7 @@ export interface BookSearchResult {
   isFavorite: boolean;
   isAvailable: boolean;
   isReviewable: boolean;
+  authors: string[];
 }
 
 export interface SearchPagedResult {
