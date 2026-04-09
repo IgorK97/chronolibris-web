@@ -12,9 +12,10 @@ import type {
   TagSuggestionDto,
 } from '@/types';
 import styles from './AdvancedSearchPanel.module.css';
-import type { AdvancedFilters } from '../utils/filterParams';
+import type { AdvancedFilters } from '../../../utils/filterParams';
 // import { EMPTY_FILTERS } from '../utils/filterParams';
 import { X } from 'lucide-react';
+import { useStore } from '@/stores/globalStore';
 interface Props {
   filters: AdvancedFilters;
   onChange: (filters: AdvancedFilters) => void;
@@ -29,6 +30,19 @@ interface SelectedPerson {
   roleId: number | null;
 }
 
+function buildSelectedPersons(
+  personFilters: PersonRoleFilterRequest[],
+  cache: Record<number, { id: number; name: string }>
+): SelectedPerson[] {
+  return personFilters.flatMap((pf) =>
+    pf.personIds.map((id) => ({
+      id,
+      name: cache[id]?.name ?? `#${id}`,
+      roleId: pf.roleId,
+    }))
+  );
+}
+
 function PersonFilter({
   value,
   roles,
@@ -38,17 +52,23 @@ function PersonFilter({
   roles: PersonRoleDto[];
   onChange: (v: PersonRoleFilterRequest[]) => void;
 }) {
+  const { filterNamesCache, cachePersons } = useStore();
   const [input, setInput] = useState('');
-  const [selected, setSelected] = useState<SelectedPerson[]>(() =>
-    value.flatMap((pf) =>
-      pf.personIds.map((id) => ({ id, name: `#${id}`, roleId: pf.roleId }))
-    )
-  );
+  // const [selected, setSelected] = useState<SelectedPerson[]>(() =>
+  //   value.flatMap((pf) =>
+  //     pf.personIds.map((id) => ({ id, name: `#${id}`, roleId: pf.roleId }))
+  //   )
+  // );
 
   const [showDropDown, setShowDropDown] = useState(false);
   const debouncedInput = useDebounce(input, 300);
   const { data: suggestions = [] } = usePersonSuggestions(debouncedInput);
   const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const selected: SelectedPerson[] = buildSelectedPersons(
+    value,
+    filterNamesCache.persons
+  );
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -59,26 +79,35 @@ function PersonFilter({
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  // useEffect(() => {
+  //   if (value.length === 0) {
+  //     // eslint-disable-next-line react-hooks/set-state-in-effect
+  //     setSelected([]);
+  //   }
+  // }, [value]);
+
   useEffect(() => {
-    if (value.length === 0) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSelected([]);
+    if (suggestions.length > 0) {
+      cachePersons(suggestions.map((s) => ({ id: s.id, name: s.name })));
     }
-  }, [value]);
+  }, [suggestions, cachePersons]);
 
   const emitChange = (next: SelectedPerson[]) => {
-    setSelected(next);
-    const grouped = new Map<number, number[]>();
+    // setSelected(next);
+    const grouped = new Map<number | null, number[]>();
     for (const p of next) {
-      if (p.roleId == null) continue;
-      if (!grouped.has(p.roleId)) grouped.set(p.roleId, []);
-      grouped.get(p.roleId)!.push(p.id);
+      // if (p.roleId == null) continue;
+      const rId = p.roleId;
+      if (!grouped.has(rId)) grouped.set(rId, []);
+      grouped.get(rId)!.push(p.id);
     }
     onChange(
-      Array.from(grouped.entries()).map(([roleId, personIds]) => ({
-        roleId,
-        personIds,
-      }))
+      Array.from(grouped.entries())
+        // .filter(([roleId]) => roleId !== null)
+        .map(([roleId, personIds]) => ({
+          roleId: roleId as number,
+          personIds,
+        }))
     );
   };
 
@@ -88,6 +117,8 @@ function PersonFilter({
       setShowDropDown(false);
       return;
     }
+
+    cachePersons([{ id: person.id, name: person.name }]);
 
     emitChange([
       ...selected,
@@ -155,13 +186,13 @@ function PersonFilter({
                 className={styles['dropdown-item']}
                 onMouseDown={() => handleSelect(s)}
               >
-                {s.imagePath && (
+                {/* {s.imagePath && (
                   <img
                     src={s.imagePath}
                     alt=""
                     className={styles['person-avatar']}
                   />
-                )}
+                )} */}
                 <span>{s.name}</span>
               </li>
             ))}
@@ -179,6 +210,29 @@ interface SelectedTag {
   mode: 'include' | 'exclude';
 }
 
+function buildSelectedTags(
+  requiredTagIds: number[],
+  excludedTagIds: number[],
+  cache: Record<
+    number,
+    { id: number; name: string; matchedName: string | null }
+  >
+): SelectedTag[] {
+  const req: SelectedTag[] = requiredTagIds.map((id) => ({
+    id,
+    name: cache[id]?.name ?? `#${id}`,
+    matchedName: cache[id]?.matchedName ?? null,
+    mode: 'include' as const,
+  }));
+  const exc: SelectedTag[] = excludedTagIds.map((id) => ({
+    id,
+    name: cache[id]?.name ?? `#${id}`,
+    matchedName: cache[id]?.matchedName ?? null,
+    mode: 'exclude' as const,
+  }));
+  return [...req, ...exc];
+}
+
 function TagFilter({
   requiredTagIds,
   excludedTagIds,
@@ -188,12 +242,18 @@ function TagFilter({
   excludedTagIds: number[];
   onChange: (required: number[], excluded: number[]) => void;
 }) {
+  const { filterNamesCache, cacheTags } = useStore();
   const [input, setInput] = useState('');
-  const [selected, setSelected] = useState<SelectedTag[]>([]);
+  // const [selected, setSelected] = useState<SelectedTag[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const debouncedInput = useDebounce(input, 300);
   const { data: suggestions = [] } = useTagSuggestions(debouncedInput);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const selected: SelectedTag[] = buildSelectedTags(
+    requiredTagIds,
+    excludedTagIds,
+    filterNamesCache.tags
+  );
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -204,15 +264,27 @@ function TagFilter({
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  // useEffect(() => {
+  //   if (requiredTagIds.length === 0 && excludedTagIds.length === 0) {
+  //     // eslint-disable-next-line react-hooks/set-state-in-effect
+  //     setSelected([]);
+  //   }
+  // }, [requiredTagIds, excludedTagIds]);
+
   useEffect(() => {
-    if (requiredTagIds.length === 0 && excludedTagIds.length === 0) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSelected([]);
+    if (suggestions.length > 0) {
+      cacheTags(
+        suggestions.map((s) => ({
+          id: s.id,
+          name: s.name,
+          matchedName: s.matchedName,
+        }))
+      );
     }
-  }, [requiredTagIds, excludedTagIds]);
+  }, [suggestions, cacheTags]);
 
   const emitChange = (next: SelectedTag[]) => {
-    setSelected(next);
+    // setSelected(next);
     onChange(
       next.filter((t) => t.mode === 'include').map((t) => t.id),
       next.filter((t) => t.mode === 'exclude').map((t) => t.id)
@@ -225,6 +297,9 @@ function TagFilter({
       setShowDropdown(false);
       return;
     }
+
+    cacheTags([{ id: tag.id, name: tag.name, matchedName: tag.matchedName }]);
+
     emitChange([
       ...selected,
       {
@@ -319,11 +394,11 @@ function TagFilter({
                 onMouseDown={() => handleSelect(s)}
               >
                 <span>{s.name}</span>
-                {s.matchedName && (
+                {/* {s.matchedName && (
                   <span className={styles['synonym-hint']}>
                     через «{s.matchedName}»
                   </span>
-                )}
+                )} */}
               </li>
             ))}
           </ul>
@@ -387,14 +462,17 @@ export function AdvancedSearchPanel({
           </div>
         )}
         <PersonFilter
-          value={filters.personFilters}
+          // value={filters.personFilters}
+          value={draft.personFilters}
           roles={roles}
           onChange={(pf) => setDraft({ ...draft, personFilters: pf })}
         />
 
         <TagFilter
-          requiredTagIds={filters.requiredTagIds}
-          excludedTagIds={filters.excludedTagIds}
+          // requiredTagIds={filters.requiredTagIds}
+          // excludedTagIds={filters.excludedTagIds}
+          requiredTagIds={draft.requiredTagIds}
+          excludedTagIds={draft.excludedTagIds}
           onChange={(req, exc) =>
             setDraft({ ...draft, requiredTagIds: req, excludedTagIds: exc })
           }

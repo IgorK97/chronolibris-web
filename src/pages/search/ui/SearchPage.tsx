@@ -29,11 +29,12 @@ import {
   filtersFromParams,
   filtersToParams,
   type AdvancedFilters,
-} from '../utils/filterParams';
+} from '../../../utils/filterParams';
 import { useStore } from '@/stores/globalStore';
 import { AdvancedSearchPanel } from './AdvancedSearchPanel';
 import { ThemePanel } from './ThemePanel';
 import { SelectionPanel } from './SelectionPanel';
+import { useResolveFilterNames } from '@/hooks/useResolveFilterNames';
 
 interface SearchPageProps {
   onNavigateToBook: (bookdId: number) => void;
@@ -66,13 +67,21 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
 
   const [mode, setMode] = useState(false);
 
-  const setFilters = (next: AdvancedFilters) => {
-    setSearchParams((prev) => {
-      const updated = new URLSearchParams(prev);
-      filtersToParams(next, updated);
-      return updated;
-    });
-  };
+  const setFilters = useCallback(
+    (next: AdvancedFilters) => {
+      setSearchParams((prev) => {
+        const updated = new URLSearchParams(prev);
+        filtersToParams(next, updated);
+        return updated;
+      });
+    },
+    [setSearchParams]
+  );
+
+  const { isResolving } = useResolveFilterNames({
+    filters,
+    onInvalidIds: setFilters,
+  });
 
   const themeId: number = Number(searchParams.get('themeId') ?? '0') || 0;
 
@@ -187,13 +196,20 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
             >
               <Funnel />
               Фильтры
+              {isResolving && (
+                <span
+                  className={styles['spinner-small']}
+                  style={{ marginLeft: 6 }}
+                />
+              )}
             </button>
             {hasNonThemeFilters && (
               <button
                 className={styles['reset-filters']}
                 onClick={() => setFilters(EMPTY_FILTERS)}
               >
-                <X style={{ cursor: 'pointer' }} size={14} /> Сбросить фильтры
+                <X style={{ cursor: 'pointer' }} size={14} /> Сбросить настройки
+                расширенного поиска
               </button>
             )}
           </div>
@@ -249,6 +265,12 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
                 )}
               </div>
             )}
+            {!allBooks ||
+              (allBooks.length == 0 && (
+                <div className={styles['results']}>
+                  По вашему запросу ничего не найдено
+                </div>
+              ))}
           </div>
         </div>
       </div>

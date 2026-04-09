@@ -29,6 +29,16 @@ export const searchReferenceApi = {
       '/search/reference/tags',
       { name, limit }
     ),
+
+  getPersonsByIds: (ids: number[]) =>
+    apiClient.get<PersonSuggestionDto[]>('/search/reference/persons-batch', {
+      ids: ids.join(','),
+    }),
+
+  getTagsByIds: (ids: number[]) =>
+    apiClient.get<TagSuggestionDto[]>('/search/reference/tags-batch', {
+      ids: ids.join(','),
+    }),
 };
 
 export const useLanguages = () =>
