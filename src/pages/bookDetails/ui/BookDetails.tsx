@@ -46,6 +46,7 @@ import { Flag } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ShelfSelectionModal } from '@/pages/myBooks/ui/ShelfSelectionModal';
 import { GenreChip } from '@/components/GenreChip';
+import { TagChip } from '@/components';
 interface BookDetailsProps {
   onNavigateToReviews: (id: number) => void;
   onNavigateToRead: (bookFileId?: number) => void;
@@ -74,42 +75,26 @@ function getAuthorsString(
 }
 
 export const BookDetailsComponent = ({
-  // onNavigateToReviews,
-  // onNavigateToRead,
   onNavigateToBack,
   onReadClick,
 }: BookDetailsProps) => {
-  // const [isDownloaded, setIsDownloaded] = useState<boolean>(false);
-  // const [isNewVersionAvailable] = useState<boolean>(false);
-
-  const {
-    // currentBook,
-    setCurrentBook,
-    user,
-    isReader,
-  } = useStore();
+  const { setCurrentBook, user, isReader } = useStore();
   const { data: roles } = useRoles();
   const [isReportOpen, setIsReportOpen] = useState(false);
   const { id: bookId } = useParams();
-  // const { data: seekedShelves, refetch: refetchSeekedShelves } =
-  //   useSeekedShelves(Number(bookId) || 0);
   const { data: shelves, refetch: refetchShelves } = useShelves(
     user?.userId || 0
   );
-  // const [isAuth, setIsAuth] = useState(!!user);
-  const isAuth = !!user;
 
+  const isAuth = !!user;
   const FAVORITES_SHELF_ID = shelves?.find((s) => s.shelfType === 1)?.id;
   const READ_SHELF_ID = shelves?.find((s) => s.shelfType === 2)?.id;
-  // const bookId = currentBook ? currentBook.id : null;
+
   const [hoverRating, setHoverRating] = useState<number>(0);
   const [isRatingPopupOpen, setIsRatingPopupOpen] = useState(false);
   const ratingRef = useRef<HTMLDivElement>(null);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   const [isShelfPanelOpen, setIsShelfPanelOpen] = useState(false);
-  // const [isCreating, setIsCreating] = useState(false);
-  // const [newShelfName, setNewShelfName] = useState('');
 
   const handleMouseEnter = () => {
     if (user?.role !== 'reader') return;
@@ -136,29 +121,12 @@ export const BookDetailsComponent = ({
 
   const defaultBookFileId =
     bookFiles?.find((f) => f.isReadable)?.id ?? bookFiles?.[0]?.id;
-  // console.log(defaultBookFileId, bookFiles![0]);
-  // const handleToggleShelf = async (shelf: ShelfDetails) => {
-  //   const isOnShelf = seekedShelves?.includes(shelf.id);
-  //   if (!bookId) return;
-  //   const success = !isOnShelf
-  //     ? await collectionsApi.addBookToShelf(shelf.id, Number(bookId) || 0)
-  //     : await collectionsApi.removeBookFromShelf(shelf.id, Number(bookId) || 0);
-
-  //   if (success) {
-  //     refetchSeekedShelves();
-  //   }
-  // };
 
   const { refetch: refetchReviews } = useInfiniteReviews(
     Number(bookId) || 0,
     isAuth
   );
-
   const { data: userReview } = useMyReview(Number(bookId) || 0, isAuth);
-
-  // const allReviews = reviewsData?.pages.flatMap((p) => p.items) ?? [];
-  // const userReview =
-  //   allReviews.find((r) => r.userName === user?.userName) ?? null;
 
   const createReview = useCreateReview(Number(bookId) || 0);
   const updateReview = useUpdateReview(Number(bookId) || 0);
@@ -198,18 +166,6 @@ export const BookDetailsComponent = ({
     }
     setIsRatingPopupOpen(false);
   };
-  // const handleCreateShelf = async () => {
-  //   const trimmedName = newShelfName.trim();
-  //   if (!trimmedName || !user) return;
-  //   const newShelf = await collectionsApi.createShelf(trimmedName);
-  //   if (newShelf != 0) {
-  //     console.log('Created new shelf with ID:', newShelf);
-  //     // await refetchSeekedShelves();
-  //     await refetchShelves();
-  //     setNewShelfName('');
-  //     setIsCreating(false);
-  //   }
-  // };
 
   if (isLoading) return <div className={styles.loader}>Загрузка...</div>;
   if (isError || !fullBookDetails)
@@ -221,7 +177,6 @@ export const BookDetailsComponent = ({
 
   const authorRoleId = roles?.find((role) => role.name === 'Автор')?.id ?? 1;
   const authors = getAuthorsString(authorRoleId, fullBookDetails);
-  // console.log('FULLBOOK', fullBookDetails.id);
   const toggleShelfAction = async (
     shelfId: number | undefined,
     isCurrentStatus: boolean
@@ -360,7 +315,7 @@ export const BookDetailsComponent = ({
                         className={styles['shelf-panel-close']}
                         onClick={() => setIsDownloadPanelOpen(false)}
                       >
-                        <X />
+                        <X style={{ cursor: 'pointer' }} />
                       </button>
                     </div>
 
@@ -407,7 +362,7 @@ export const BookDetailsComponent = ({
                   navigate(`/books/${fullBookDetails.id}`);
                 }}
               >
-                <Cog size={24} />
+                <Cog style={{ cursor: 'pointer' }} size={24} />
                 <span className={styles['button-label']}>
                   {t('book.settings')}
                 </span>
@@ -499,7 +454,6 @@ export const BookDetailsComponent = ({
                               </button>
                             ))}
                           </div>
-                          {/* Секция удаления оценки и отзыва */}
                           {userReview && (
                             <div className={styles['delete-section']}>
                               <hr className={styles['separator']} />
@@ -549,12 +503,6 @@ export const BookDetailsComponent = ({
                   </div>
                 </div>
               )}
-              {/* <span className={styles['review-text']}>
-                {fullBookDetails.reviewsCount} {t('book.review_count')}
-              </span>
-              <span className={styles['meta-text']}>
-                {fullBookDetails.ratingsCount} {t('book.ratings_count')}
-              </span> */}
             </div>
             <section className={styles['about-section']}>
               <h2 className={styles['about-title']}>{t('book.about')}</h2>
@@ -573,6 +521,21 @@ export const BookDetailsComponent = ({
                       navigate(`/search?themeId=${theme.id}`);
                     }}
                     genreName={theme.name}
+                  />
+                ))}
+              </div>
+            </section>
+
+            <section className={styles['genres-section']}>
+              <h2 className={styles['section-title']}>Теги</h2>
+              <div className={styles['genres-container']}>
+                {fullBookDetails.tags?.map((tag, index) => (
+                  <TagChip
+                    key={index}
+                    disabled={true}
+                    tagName={tag.name}
+                    tagTypeName={tag.tagTypeName}
+                    onClick={() => {}}
                   />
                 ))}
               </div>
@@ -603,7 +566,6 @@ export const BookDetailsComponent = ({
             refetchBook();
             refetchReviews();
           }}
-          // infoContent={<p>Дополнительная информация о книге...</p>}
           infoContent={
             <ParticipantsInfo
               bookInfo={fullBookDetails}

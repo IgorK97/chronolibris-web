@@ -4,6 +4,7 @@ import type {
   LanguageDetails,
   PersonRoleFilter,
   PublisherDetails,
+  TagShortDetails,
   ThemeDeatils,
   ThemeDto,
 } from './references';
@@ -99,37 +100,7 @@ export interface CreateBookRequest {
   isReviewable: boolean;
   publisherId?: number | null;
   personFilters?: PersonRoleFilter[];
-  //   themeIds?: number[];
 }
-
-// export interface UpdateBookRequest {
-//   id: number;
-//   title: string;
-//   description: string;
-//   countryId: number | null;
-//   languageId: number | null;
-//   year: number | null;
-//   yearProvided: boolean;
-//   isbn: string | null;
-//   isbnProvided: boolean;
-//   bbk: string | null;
-//   bbkProvided: boolean;
-//   udk: string | null;
-//   udkProvided: boolean;
-//   source: string | null;
-//   sourceProvided: boolean;
-//   // filePath?: string | null;
-//   // coverFile: File | null;
-//   coverBase64: string | null;
-//   coverContentType: string | null;
-//   isAvailable: boolean;
-//   isReviewable: boolean;
-//   publisherId: number | null;
-//   publisherIdProvided: boolean;
-//   seriesId: number | null;
-//   seriesIdProvided: boolean;
-//   personFilters?: PersonRoleFilter[];
-// }
 
 export interface UpdateBookRequest {
   id: number;
@@ -155,7 +126,6 @@ export interface UpdateBookRequest {
   publisherId?: number | null;
   publisherIdProvided: boolean;
   personFilters?: PersonRoleFilter[];
-  //   themeIds?: number[];
 }
 
 export interface BookDetails {
@@ -174,12 +144,11 @@ export interface BookDetails {
   isRead: boolean;
   isReviewable: boolean;
   publisher: PublisherDetails | null;
-  // country: string | null;
   country: CountryDetails | null;
-  // language: string;
   language: LanguageDetails | null;
   participants: BookPersonGroupDetails[];
   themes: ThemeDeatils[];
+  tags: TagShortDetails[];
   userRating: number;
   bbk?: string;
   udk?: string;

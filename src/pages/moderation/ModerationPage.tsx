@@ -258,7 +258,7 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
 
   const handleResolve = async (resolution: boolean) => {
     if (!report.moderationTaskId) return;
-    if (reportText.length < 50) return;
+    if (reportText.length < 20) return;
     await resolveTask.mutateAsync({
       taskId: report.moderationTaskId,
       resolution,

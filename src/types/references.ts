@@ -174,6 +174,13 @@ export interface TagDetails {
   hasChildren: boolean;
 }
 
+export interface TagShortDetails {
+  id: number;
+  name: string;
+  tagTypeId: number;
+  tagTypeName: string;
+}
+
 export interface CreatePersonRequest {
   name: string;
   description: string;
