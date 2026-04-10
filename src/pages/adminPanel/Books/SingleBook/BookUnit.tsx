@@ -54,9 +54,13 @@ function PersonFilter({
   initialPersons?: SelectedPerson[];
   readOnly?: boolean;
 }) {
+  console.log('ITEM_TYPE: ', itemType);
   const [input, setInput] = useState('');
   const [selected, setSelected] = useState<SelectedPerson[]>(() => {
-    if (initialPersons && initialPersons.length > 0) return initialPersons;
+    if (initialPersons && initialPersons.length > 0)
+      return initialPersons.filter(
+        (p) => roles.find((r) => r.id == p.roleId)?.kind == 2
+      );
     return value.flatMap((pf) =>
       pf.personIds.map((id) => ({ id, name: `#${id}`, roleId: pf.roleId }))
     );
@@ -68,7 +72,11 @@ function PersonFilter({
 
   useEffect(() => {
     if (initialPersons && initialPersons.length > 0) {
-      setSelected(initialPersons);
+      setSelected(
+        initialPersons.filter(
+          (p) => roles.find((r) => r.id == p.roleId)?.kind == 2
+        )
+      );
     }
   }, [initialPersons]);
 
@@ -399,6 +407,7 @@ export const BookUnit: React.FC = () => {
   const { data: roles = [] } = usePersonRoles();
 
   const publishers: AutocompleteItem[] = [];
+  const [initialPersons, setInitialPersons] = useState<SelectedPerson[]>([]);
 
   const [mode, setMode] = useState<'view' | 'edit'>('view');
   const [showContentSearch, setShowContentSearch] = useState(false);
@@ -413,6 +422,7 @@ export const BookUnit: React.FC = () => {
 
   useEffect(() => {
     if (book) {
+      console.log('BOOK_PARTS: ', book.participants);
       setForm({
         title: book.title ?? '',
         description: book.description ?? '',
@@ -435,6 +445,15 @@ export const BookUnit: React.FC = () => {
           personIds: group.persons.map((p) => p.id),
         })),
       });
+      const persons: SelectedPerson[] = (book?.participants ?? []).flatMap(
+        (group) =>
+          group.persons.map((p) => ({
+            id: p.id,
+            name: p.fullName,
+            roleId: group.role,
+          }))
+      );
+      setInitialPersons(persons);
     }
   }, [book]);
 
@@ -587,15 +606,6 @@ export const BookUnit: React.FC = () => {
     return <div className={styles['error']}>Книга не найдена</div>;
 
   const isEditing = mode === 'edit';
-
-  const initialPersons: SelectedPerson[] = (book?.participants ?? []).flatMap(
-    (group) =>
-      group.persons.map((p) => ({
-        id: p.id,
-        name: p.fullName,
-        roleId: group.role,
-      }))
-  );
 
   return (
     <div className={styles['book-unit']}>
