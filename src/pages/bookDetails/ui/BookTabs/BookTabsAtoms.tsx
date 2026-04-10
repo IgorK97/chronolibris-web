@@ -10,6 +10,8 @@ import styles from './BookTabs.module.css';
 import { getInitials, getAvatarColor } from './BookTabsData';
 import { ReportModal } from '@/components/reports/ReportModal';
 import { useStore } from '@stores/globalStore';
+import { AlertDialog } from '@/components/dialogs/AlertDialog';
+import { TARGET_TYPE } from '@/types';
 export function Avatar({ userName }: { userName: string }) {
   return (
     <div
@@ -93,6 +95,8 @@ export function ThreeDotsMenu({
   targetId: number;
   targetTypeId: number;
 }) {
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
   const { user, isReader } = useStore();
   const isAuth = !!user;
   const [menuOpen, setMenuOpen] = useState(false);
@@ -135,9 +139,8 @@ export function ThreeDotsMenu({
             {canDelete && (
               <button
                 className={styles['comment-menu-item']}
-                onClick={async () => {
-                  await onDelete();
-                  setMenuOpen(false);
+                onClick={() => {
+                  setDeleteModalOpen(true);
                 }}
               >
                 Удалить
@@ -153,100 +156,116 @@ export function ThreeDotsMenu({
           onClose={() => setReportOpen(false)}
         />
       )}
+      {
+        <AlertDialog
+          description={`Это действие нельзя будет отменить, но его можно написать заново`}
+          open={deleteModalOpen}
+          title={`Вы действительно хотите удалить ${targetTypeId === TARGET_TYPE.REVIEW ? 'отзыв' : 'комментарий'}?`}
+          handleAccept={() => {
+            if (onDelete) onDelete();
+            setDeleteModalOpen(false);
+            setMenuOpen(false);
+          }}
+          handleReject={() => {
+            setDeleteModalOpen(false);
+            setMenuOpen(false);
+          }}
+        />
+      }
     </>
   );
 }
 
-export function ComposeBox({
-  placeholder,
-  replyingTo,
-  onCancelReply,
-  onSubmit,
-  onDelete,
-  initialText = '',
-  children,
-  type,
-  isReadOnly = false,
-}: {
-  placeholder: string;
-  replyingTo?: { parentId: number; authorName: string } | null;
-  onCancelReply?: () => void;
-  onSubmit: (text: string) => void;
-  children?: React.ReactNode;
-  type: 'review' | 'comment';
-  onDelete?: () => void;
-  initialText?: string;
-  isReadOnly?: boolean;
-}) {
-  const [text, setText] = useState(initialText);
-  const MAX = 5000;
-  const MIN = 120;
+// export function ComposeBox({
+//   placeholder,
+//   replyingTo,
+//   onCancelReply,
+//   onSubmit,
+//   onDelete,
+//   initialText = '',
+//   children,
+//   type,
+//   isReadOnly = false,
+// }: {
+//   placeholder: string;
+//   replyingTo?: { parentId: number; authorName: string } | null;
+//   onCancelReply?: () => void;
+//   onSubmit: (text: string) => void;
+//   children?: React.ReactNode;
+//   type: 'review' | 'comment';
+//   onDelete?: () => void;
+//   initialText?: string;
+//   isReadOnly?: boolean;
+// }) {
+//   const [text, setText] = useState(initialText);
+//   const MAX = 5000;
+//   const MIN = 120;
 
-  useEffect(() => {
-    setText(initialText);
-  }, [initialText]);
+//   useEffect(() => {
+//     setText(initialText);
+//   }, [initialText]);
 
-  const handleSubmit = () => {
-    const trimmed = text.trim();
-    if (!trimmed) return;
-    onSubmit(trimmed);
-    if (!initialText) setText('');
-  };
+//   const handleSubmit = () => {
+//     const trimmed = text.trim();
+//     if (!trimmed) return;
+//     onSubmit(trimmed);
+//     if (!initialText) setText('');
+//   };
 
-  return (
-    <div className={styles['compose']}>
-      {replyingTo && (
-        <div className={styles['compose-reply-banner']}>
-          <CornerDownRight size={13} />
-          <span>
-            Ответ для <strong>{replyingTo.authorName}</strong>
-          </span>
-          <button
-            className={styles['compose-reply-cancel']}
-            onClick={onCancelReply}
-          >
-            <X style={{ cursor: 'pointer' }} />
-          </button>
-        </div>
-      )}
-      {children}
-      <textarea
-        className={styles['compose-textarea']}
-        placeholder={placeholder}
-        value={text}
-        maxLength={MAX}
-        onChange={(e) => setText(e.target.value)}
-        rows={3}
-        minLength={type === 'review' ? MIN : 1}
-        disabled={isReadOnly}
-      />
-      <div className={styles['compose-footer']}>
-        <span className={styles['compose-counter']}>
-          {text.length}/{MAX}
-        </span>
-        {initialText ? (
-          <button
-            className={`${styles['compose-submit']} ${styles['compose-delete']}`}
-            onClick={onDelete}
-            style={{ backgroundColor: '#dc2626' }}
-          >
-            Удалить отзыв
-          </button>
-        ) : (
-          <button
-            className={styles['compose-submit']}
-            disabled={
-              !text.trim() || text.length < (type === 'review' ? MIN : 1)
-            }
-            onClick={handleSubmit}
-          >
-            Отправить
-          </button>
-        )}
-      </div>
-    </div>
-  );
-}
+//   return (
+//     <div className={styles['compose']}>
+//       {replyingTo && (
+//         <div className={styles['compose-reply-banner']}>
+//           <CornerDownRight size={13} />
+//           <span>
+//             Ответ для <strong>{replyingTo.authorName}</strong>
+//           </span>
+//           <button
+//             className={styles['compose-reply-cancel']}
+//             onClick={onCancelReply}
+//           >
+//             <X style={{ cursor: 'pointer' }} />
+//           </button>
+//         </div>
+//       )}
+//       {children}
+//       <textarea
+//         className={styles['compose-textarea']}
+//         placeholder={placeholder}
+//         value={text}
+//         maxLength={MAX}
+//         onChange={(e) => setText(e.target.value)}
+//         rows={3}
+//         minLength={type === 'review' ? MIN : 1}
+//         disabled={isReadOnly}
+//       />
+//       <div className={styles['compose-footer']}>
+//         <span className={styles['compose-counter']}>
+//           {text.length}/{MAX}
+//         </span>
+//         {initialText ? (
+//           <button
+//             className={`${styles['compose-submit']} ${styles['compose-delete']}`}
+//             onClick={onDelete}
+//             style={{ backgroundColor: '#dc2626' }}
+//           >
+//             Удалить отзыв
+//           </button>
+//         ) : (
+//           <button
+//             className={styles['compose-submit']}
+//             disabled={
+//               !text.trim() || text.length < (type === 'review' ? MIN : 1)
+//             }
+//             onClick={handleSubmit}
+//           >
+//             Отправить
+//           </button>
+//         )}
+//       </div>
+//     </div>
+//   );
+// }
 
 export function SmartTextBox({
   placeholder,
@@ -270,6 +289,7 @@ export function SmartTextBox({
   isReadOnly?: boolean;
 }) {
   const [text, setText] = useState(initialText);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const MAX = 5000;
   const MIN = 120;
@@ -313,6 +333,18 @@ export function SmartTextBox({
           </button>
         </div>
       )}
+      {
+        <AlertDialog
+          description="Это действие нельзя будет отменить. После удаления можно написать новый отзыв"
+          open={deleteModalOpen}
+          title="Вы действительно хотите удалить отзыв?"
+          handleAccept={() => {
+            if (onDelete) onDelete();
+            setDeleteModalOpen(false);
+          }}
+          handleReject={() => setDeleteModalOpen(false)}
+        />
+      }
       {children}
       <div>
         <div className={styles['toolbar']}>
@@ -366,7 +398,7 @@ export function SmartTextBox({
           {initialText ? (
             <button
               className={`${styles['compose-submit']} ${styles['compose-delete']}`}
-              onClick={onDelete}
+              onClick={() => setDeleteModalOpen(true)}
               style={{ backgroundColor: '#dc2626' }}
             >
               Удалить отзыв
