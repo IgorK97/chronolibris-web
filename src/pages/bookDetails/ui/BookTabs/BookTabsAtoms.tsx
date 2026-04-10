@@ -176,97 +176,6 @@ export function ThreeDotsMenu({
   );
 }
 
-// export function ComposeBox({
-//   placeholder,
-//   replyingTo,
-//   onCancelReply,
-//   onSubmit,
-//   onDelete,
-//   initialText = '',
-//   children,
-//   type,
-//   isReadOnly = false,
-// }: {
-//   placeholder: string;
-//   replyingTo?: { parentId: number; authorName: string } | null;
-//   onCancelReply?: () => void;
-//   onSubmit: (text: string) => void;
-//   children?: React.ReactNode;
-//   type: 'review' | 'comment';
-//   onDelete?: () => void;
-//   initialText?: string;
-//   isReadOnly?: boolean;
-// }) {
-//   const [text, setText] = useState(initialText);
-//   const MAX = 5000;
-//   const MIN = 120;
-
-//   useEffect(() => {
-//     setText(initialText);
-//   }, [initialText]);
-
-//   const handleSubmit = () => {
-//     const trimmed = text.trim();
-//     if (!trimmed) return;
-//     onSubmit(trimmed);
-//     if (!initialText) setText('');
-//   };
-
-//   return (
-//     <div className={styles['compose']}>
-//       {replyingTo && (
-//         <div className={styles['compose-reply-banner']}>
-//           <CornerDownRight size={13} />
-//           <span>
-//             Ответ для <strong>{replyingTo.authorName}</strong>
-//           </span>
-//           <button
-//             className={styles['compose-reply-cancel']}
-//             onClick={onCancelReply}
-//           >
-//             <X style={{ cursor: 'pointer' }} />
-//           </button>
-//         </div>
-//       )}
-//       {children}
-//       <textarea
-//         className={styles['compose-textarea']}
-//         placeholder={placeholder}
-//         value={text}
-//         maxLength={MAX}
-//         onChange={(e) => setText(e.target.value)}
-//         rows={3}
-//         minLength={type === 'review' ? MIN : 1}
-//         disabled={isReadOnly}
-//       />
-//       <div className={styles['compose-footer']}>
-//         <span className={styles['compose-counter']}>
-//           {text.length}/{MAX}
-//         </span>
-//         {initialText ? (
-//           <button
-//             className={`${styles['compose-submit']} ${styles['compose-delete']}`}
-//             onClick={onDelete}
-//             style={{ backgroundColor: '#dc2626' }}
-//           >
-//             Удалить отзыв
-//           </button>
-//         ) : (
-//           <button
-//             className={styles['compose-submit']}
-//             disabled={
-//               !text.trim() || text.length < (type === 'review' ? MIN : 1)
-//             }
-//             onClick={handleSubmit}
-//           >
-//             Отправить
-//           </button>
-//         )}
-//       </div>
-//     </div>
-//   );
-// }
-
 export function SmartTextBox({
   placeholder,
   replyingTo,
@@ -395,6 +304,10 @@ export function SmartTextBox({
           <span className={styles['compose-counter']}>
             {text.length}/{MAX}
           </span>
+          <span
+            className={styles['compose-counter']}
+            style={{ color: 'red' }}
+          >{`${type === 'review' && text.length < MIN ? `Минимальное количество символов - ${MIN}` : ''}`}</span>
           {initialText ? (
             <button
               className={`${styles['compose-submit']} ${styles['compose-delete']}`}
@@ -409,6 +322,7 @@ export function SmartTextBox({
               disabled={
                 !text.trim() || text.length < (type === 'review' ? MIN : 1)
               }
+              title={`${type === 'review' && text.length < MIN ? `Минимальное количество символов - ${MIN}` : ''}`}
               onClick={handleSubmit}
             >
               Отправить
