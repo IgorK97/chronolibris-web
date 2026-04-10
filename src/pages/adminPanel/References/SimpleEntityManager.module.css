@@ -42,7 +42,7 @@
 }
 
 .input-field:focus {
-  border-color: #6366f1;
+  border-color: var(--color-dark-blue);
   box-shadow: 0 0 0 2px rgb(99 102 241 / 15%);
 }
 
@@ -101,7 +101,8 @@
 }
 
 .btn:disabled {
-  background: #95a5a6;
+  /* background: #95a5a6; */
+  opacity: 0.6;
   cursor: default;
 }
 

@@ -74,7 +74,7 @@ export function ReportModal({
             {targetTypeLable(targetTypeId)} - Пожаловаться
           </span>
           <button className={styles['close-btn']} onClick={onClose}>
-            <X size={18} />
+            <X style={{ cursor: 'pointer' }} size={18} />
           </button>
         </div>
         <div className={styles.body}>
@@ -88,7 +88,7 @@ export function ReportModal({
           )}
           {result === 'error' && (
             <div className={styles['result-error']}>
-              Не удалось отправить жалобу. Попробйуте позднее
+              Не удалось отправить жалобу. Попробуйте позднее
             </div>
           )}
           {result !== 'success' && (

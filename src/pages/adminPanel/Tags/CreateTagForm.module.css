@@ -36,13 +36,13 @@
 .input:focus,
 .select:focus {
   outline: none;
-  border-color: #3498db;
+  border-color: var(--color-dark-blue);
 }
 
 .submit-button {
   width: 100%;
   padding: 12px;
-  background: var(--color-blue);
+  background: var(--color-dark-blue);
   color: #fff;
   border: none;
   border-radius: 4px;
@@ -52,7 +52,8 @@
 }
 
 .submit-button:disabled {
-  background: #95a5a6;
+  /* background: #95a5a6; */
+  opacity: 0.6;
   cursor: default;
 }
 

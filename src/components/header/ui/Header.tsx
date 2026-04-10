@@ -3,7 +3,7 @@ import { useStore } from '@/stores/globalStore';
 import styles from './Header.module.css';
 import { useEffect, useRef, useState } from 'react';
 import { Search, ShieldCheck, UserStar } from 'lucide-react';
-import { CatalogPanel } from '@/pages/search/ui/CatalogPanel';
+import { CatalogPanel } from '@/pages/Search/';
 import { AdminSidebar } from '@/components/AdminSideBar/AdminSideBar';
 
 // const FILTER_PARAMS = [

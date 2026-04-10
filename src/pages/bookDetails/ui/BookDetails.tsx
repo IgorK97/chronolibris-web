@@ -29,7 +29,7 @@ import {
 import { t } from 'i18next';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { BookTabs } from './BookTabs/BookTabs';
+// import { BookTabs } from './BookTabs/BookTabs';
 import { ParticipantsInfo } from './BookTabs/ParticipantsInfo';
 import {
   useCreateReview,
@@ -44,9 +44,10 @@ import { ReportModal } from '@/components/reports/ReportModal';
 import { TARGET_TYPE } from '@/types';
 import { Flag } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ShelfSelectionModal } from '@/pages/myBooks/ui/ShelfSelectionModal';
+import { ShelfSelectionModal } from '@/pages/MyBooks/ui/ShelfSelectionModal';
 import { GenreChip } from '@/components/GenreChip';
 import { TagChip } from '@/components';
+import { BookTabs } from './BookTabs';
 interface BookDetailsProps {
   onNavigateToReviews: (id: number) => void;
   onNavigateToRead: (bookFileId?: number) => void;

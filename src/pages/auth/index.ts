@@ -1,3 +1,1 @@
-import { Auth } from "./ui/Auth";
-
-export { Auth };
+export * from './ui/Auth';

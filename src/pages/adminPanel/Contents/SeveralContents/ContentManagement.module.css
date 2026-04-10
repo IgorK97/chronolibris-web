@@ -57,7 +57,7 @@
 
 .input-field:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: var(--color-dark-blue);
   box-shadow: 0 0 0 3px rgb(0 123 255 / 10%);
 }
 
@@ -92,12 +92,12 @@
 
 .contents-table .clickable {
   cursor: pointer;
-  color: #007bff;
+  color: var(--color-dark-blue);
   text-decoration: underline;
 }
 
 .contents-table .clickable:hover {
-  color: #0056b3;
+  color: var(--color-dark-blue);
 }
 
 .pagination {

@@ -96,14 +96,15 @@
 }
 
 .reason-btn:hover {
-  border-color: #2563eb;
-  color: #2563eb;
+  /* border-color: #2563eb; */
+  border-color: var(--color-dark-blue);
+  color: var(--color-dark-blue);
 }
 
 .reason-btn-active {
-  border-color: #2563eb;
+  border-color: var(--color-dark-blue);
   background: #eff6ff;
-  color: #2563eb;
+  color: var(--color-dark-blue);
   font-weight: 600;
 }
 
@@ -120,7 +121,7 @@
 }
 
 .textarea:focus {
-  border-color: #2563eb;
+  border-color: var(--color-dark-blue);
 }
 
 .counter {
@@ -156,7 +157,7 @@
   padding: 8px 20px;
   border-radius: 8px;
   border: none;
-  background: #2563eb;
+  background: var(--color-dark-blue);
   color: #fff;
   font-size: 13px;
   font-weight: 600;
@@ -165,11 +166,12 @@
 }
 
 .submit-btn:hover:not(:disabled) {
-  background: #1d4ed8;
+  background: var(--color-dark-blue);
 }
 
 .submit-btn:disabled {
-  background: #93b4f0;
+  /* background: #93b4f0; */
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
@@ -187,7 +189,7 @@
   background: #f0fdf4;
   border: 1px solid #bbf7d0;
   border-radius: 8px;
-  color: #15803d;
+  color: var(--color-dark-blue);
   font-size: 14px;
 }
 

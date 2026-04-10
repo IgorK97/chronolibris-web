@@ -1,14 +1,15 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect } from 'react';
 import { useNavigate, Routes, Route, Navigate } from 'react-router-dom';
 import { USER_ROLES, useStore } from '../stores/globalStore';
 import MainLayout from './layouts/MainLayout';
-import { BookDetailsComponent } from '../pages/bookDetails';
-import { Profile } from '../pages/profile';
-import { Auth } from '../pages/auth';
+import { BookDetailsComponent } from '../pages/BookDetails';
+import { Profile } from '../pages/Profile';
+import { Auth } from '../pages/Auth';
 //default vs non default exports?
-import { Library } from '@/pages/library';
-import { MyBooks } from '../pages/myBooks';
+import { Library } from '@/pages/Library';
+import { MyBooks } from '../pages/MyBooks';
 import { usersApi } from '../api/user';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import {
@@ -20,7 +21,7 @@ import {
 import {
   ContentManagement,
   CountryManager,
-  FormatManager,
+  // FormatManager,
   LanguageManager,
   PersonManager,
   PublisherManager,
@@ -30,10 +31,10 @@ import { ContentUnit } from '@/pages/AdminPanel/Contents/SingleContent/ContentUn
 import { BookUnit } from '@/pages/AdminPanel/Books/SingleBook/BookUnit';
 import { SelectionsPage } from '@/pages/AdminPanel/Selection/SelectionsPage';
 import { TagsPage } from '@/pages/AdminPanel/Tags/TagsPage';
-import { ReaderPage } from '@/pages/reader/ReaderPage';
+import { ReaderPage } from '@/pages/Reader/ReaderPage';
 import ReaderLayout from './layouts/ReaderLayout';
-import { ModerationPage } from '@/pages/moderation/ModerationPage';
-import SearchPage from '@/pages/search/ui/SearchPage';
+import { ModerationPage } from '@/pages/Moderation/ModerationPage';
+import SearchPage from '@/pages/Search/ui/SearchPage';
 import { RegisterStaffPage } from '@/pages/AdminPanel/RegisterStaffPage/RegisterStuffPage';
 import { PublicOnlyRoute } from './routes/PublicOnlyRoute';
 import toast from 'react-hot-toast';
@@ -181,7 +182,7 @@ export default function App() {
           <Route element={<ProtectedRoute allowedRoles={[USER_ROLES.ADMIN]} />}>
             <Route path="lang" element={<LanguageManager />} />
             <Route path="country" element={<CountryManager />} />
-            <Route path="format" element={<FormatManager />} />
+            {/* <Route path="format" element={<FormatManager />} /> */}
             <Route path="publisher" element={<PublisherManager />} />
             <Route path="person" element={<PersonManager />} />
 

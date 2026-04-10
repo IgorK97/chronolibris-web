@@ -55,7 +55,7 @@
 
 .input-field:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: var(--color-dark-blue);
   box-shadow: 0 0 0 3px rgb(0 123 255 / 10%);
 }
 
@@ -153,7 +153,7 @@
 .btn {
   width: 300px;
   padding: 12px;
-  background: var(--color-blue);
+  background: var(--color-dark-blue);
   color: #fff;
   border: none;
   border-radius: 4px;
@@ -163,7 +163,8 @@
 }
 
 .btn:disabled {
-  background: #95a5a6;
+  /* background: #95a5a6; */
+  opacity: 0.6;
   cursor: default;
 }
 

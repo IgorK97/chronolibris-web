@@ -1,4 +1,4 @@
-import { Reader } from '@/pages/reader/Reader';
+import { Reader } from './Reader';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 
 export const ReaderPage: React.FC = () => {
