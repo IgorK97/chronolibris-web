@@ -9,6 +9,10 @@
   font-size: 14px;
 }
 
+.tag-item-clickable {
+  cursor: pointer;
+}
+
 .tag-name {
   font-weight: 500;
 }

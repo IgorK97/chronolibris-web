@@ -89,7 +89,7 @@ export const ContentTagsManagement: React.FC<ContentTagsManagerProps> = ({
             <TagChip
               key={tag.id}
               disabled={removeMutation.isPending}
-              onClick={() => handleRemoveTag(tag.id)}
+              onDelete={() => handleRemoveTag(tag.id)}
               tagName={tag.name}
               tagTypeName={tag.tagTypeName}
               readOnly={false}

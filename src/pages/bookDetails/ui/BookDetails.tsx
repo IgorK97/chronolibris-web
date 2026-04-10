@@ -549,7 +549,9 @@ export const BookDetailsComponent = ({
                     disabled={true}
                     tagName={tag.name}
                     tagTypeName={tag.tagTypeName}
-                    onClick={() => {}}
+                    onClick={() => {
+                      navigate(`/search?tagIncl=${tag.id}`);
+                    }}
                   />
                 ))}
               </div>
