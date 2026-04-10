@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { createPortal } from 'react-dom';
 import { Puff } from 'react-loading-icons';
 import React, {
@@ -412,7 +413,6 @@ export const Reader: React.FC<ReaderProps> = ({
       queryKey: ['chunk', bookFileId, nextIdx],
       queryFn: () => fetchChunk(bookFileId, fetchedTocData.Parts[nextIdx].url),
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     bookFileId,
     currentCol,
@@ -1434,7 +1434,6 @@ const BookmarkEditModal: React.FC<BookmarkEditModalProps> = ({
   onClose,
 }) => {
   const [note, setNote] = useState(bookmark.note);
-  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setNote(bookmark.note), [bookmark.id]);
 
   return createPortal(

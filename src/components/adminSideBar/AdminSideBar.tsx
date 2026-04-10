@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styles from './AdminSidebar.module.css';

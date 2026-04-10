@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { SquareCheckBig, Square, X } from 'lucide-react';
 import {
   collectionsApi,
