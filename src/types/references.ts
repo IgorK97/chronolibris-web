@@ -203,6 +203,7 @@ export interface CountryDto {
 export interface PersonRoleDto {
   id: number;
   name: string;
+  kind: number;
 }
 
 export interface PersonSuggestionDto {

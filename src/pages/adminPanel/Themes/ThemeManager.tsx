@@ -11,7 +11,7 @@ import type { CreateThemeRequest, UpdateThemeRequest } from '@/types';
 import type { ThemeDto } from '@/types';
 import styles from './ThemeManager.module.css';
 import { ExpandChildButton } from '@/components/buttons/ExpandChildButton';
-import { Pencil, Trash2, X } from 'lucide-react';
+import { Check, Pencil, Trash2, X } from 'lucide-react';
 
 export const ThemeManager: React.FC = () => {
   const { data: themes, isLoading, error, refetch } = useThemes();
@@ -177,7 +177,7 @@ export const ThemeManager: React.FC = () => {
                     setSelectedParentName(null);
                   }}
                 >
-                  <X />
+                  <X style={{ cursor: 'pointer' }} />
                 </button>
               )}
             </div>
@@ -315,14 +315,18 @@ const ThemeTreeNode: React.FC<ThemeTreeNodeProps> = ({
             className={styles['btn btn-success btn-sm']}
             disabled={updateMutation.isPending}
           >
-            {updateMutation.isPending ? '...' : '✓'}
+            {updateMutation.isPending ? (
+              '...'
+            ) : (
+              <Check style={{ cursor: 'pointer' }} />
+            )}
           </button>
           <button
             onClick={onCancelEditing}
             className={styles['btn btn-secondary btn-sm']}
             disabled={updateMutation.isPending}
           >
-            ✕
+            <X style={{ cursor: 'pointer' }} />
           </button>
         </div>
       </div>

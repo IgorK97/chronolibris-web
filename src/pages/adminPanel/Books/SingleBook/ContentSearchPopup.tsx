@@ -32,7 +32,7 @@ export const ContentSearchPopup: React.FC<ContentSearchPopupProps> = ({
         <div className={styles['modal-header']}>
           <h3>Поиск контента для добавления</h3>
           <button onClick={onClose} className={styles['btn-close']}>
-            <X />
+            <X style={{ cursor: 'pointer' }} />
           </button>
         </div>
 

@@ -42,12 +42,14 @@ interface AutocompleteItem {
 function PersonFilter({
   value,
   roles,
+  itemType,
   onChange,
   initialPersons,
   readOnly = false,
 }: {
   value: PersonRoleFilterRequest[];
   roles: PersonRoleDto[];
+  itemType?: 'book' | 'content';
   onChange: (v: PersonRoleFilterRequest[]) => void;
   initialPersons?: SelectedPerson[];
   readOnly?: boolean;
@@ -137,11 +139,20 @@ function PersonFilter({
                 <option value="" disabled>
                   Выберите роль
                 </option>
-                {roles.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {r.name}
-                  </option>
-                ))}
+                {roles
+                  .filter((pr) => {
+                    console.log(pr.kind);
+                    if (itemType === 'book')
+                      return pr.kind === 2 || pr.kind === 3;
+                    if (itemType === 'content')
+                      return pr.kind === 1 || pr.kind === 3;
+                    return true;
+                  })
+                  .map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.name}
+                    </option>
+                  ))}
               </select>
               {!readOnly && (
                 <button
@@ -258,7 +269,7 @@ function AutocompleteField({
                 setInput('');
               }}
             >
-              <X />
+              <X style={{ cursor: 'pointer' }} />
             </button>
           )}
         </div>
@@ -788,6 +799,7 @@ export const BookUnit: React.FC = () => {
               <PersonFilter
                 value={form.personFilters}
                 roles={roles}
+                itemType="book"
                 onChange={(pf) => set('personFilters', pf)}
                 initialPersons={initialPersons}
               />
@@ -937,6 +949,7 @@ export const BookUnit: React.FC = () => {
               <PersonFilter
                 value={form.personFilters}
                 roles={roles}
+                itemType="book"
                 onChange={() => {}}
                 initialPersons={initialPersons}
                 readOnly
