@@ -1,6 +1,7 @@
 export interface PersonRoleFilter {
   roleId: number;
   personIds: number[];
+  personNames?: string[];
 }
 
 export interface FormatDto {
@@ -120,11 +121,11 @@ export interface RoleDetails {
   name: string;
 }
 
-export interface ReferenceContextState {
-  roles: RoleDetails[];
-  isLoading: boolean;
-  error: string | null;
-}
+// export interface ReferenceContextState {
+//   roles: RoleDetails[];
+//   isLoading: boolean;
+//   error: string | null;
+// }
 
 export interface PublisherDetails {
   id: number;

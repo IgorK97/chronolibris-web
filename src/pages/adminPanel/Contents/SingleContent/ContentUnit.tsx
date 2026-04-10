@@ -12,6 +12,7 @@ import { useLanguages, useCountries } from '@/api/references';
 import { usePersonRoles, usePersonSuggestions } from '@api/searchReference';
 import type {
   PersonRoleDto,
+  PersonRoleFilter,
   PersonRoleFilterRequest,
   PersonSuggestionDto,
 } from '@/types';
@@ -90,6 +91,7 @@ function PersonFilter({
   initialPersons?: SelectedPerson[];
   readOnly?: boolean;
 }) {
+  console.log('VALUE: ', value);
   const [input, setInput] = useState('');
   const [selected, setSelected] = useState<SelectedPerson[]>(() => {
     if (initialPersons && initialPersons.length > 0) return initialPersons;
@@ -271,6 +273,7 @@ export const ContentUnit: React.FC = () => {
 
   useEffect(() => {
     if (content) {
+      console.log('CONTENT', content.participants);
       setForm({
         title: content.title ?? '',
         description: content.description ?? '',
@@ -278,19 +281,24 @@ export const ContentUnit: React.FC = () => {
         languageId: content.languageId ?? 0,
         countryId: content.countryId ?? 0,
         year: content.year != null ? String(content.year) : '',
-        personFilters: (content.participants ?? []).map((group: any) => ({
-          roleId: group.role,
-          personIds: (group.persons ?? []).map((p: any) => p.id),
-        })),
+        personFilters: (content.participants ?? []).map(
+          (pf: PersonRoleFilter) => ({
+            roleId: pf.roleId,
+            personIds: pf.personIds,
+          })
+        ),
       });
       setSelectedThemes(content.themes ?? []);
 
       const persons: SelectedPerson[] = (content.participants ?? []).flatMap(
-        (group: any) =>
-          (group.persons ?? []).map((p: any) => ({
-            id: p.id,
-            name: p.fullName,
-            roleId: group.role,
+        (group: PersonRoleFilter) =>
+          (group.personIds ?? []).map((p: number, index) => ({
+            id: p,
+            name:
+              group.personNames && group.personNames.length > index
+                ? group.personNames[index]
+                : '',
+            roleId: group.roleId,
           }))
       );
       setInitialPersons(persons);

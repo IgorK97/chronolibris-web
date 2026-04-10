@@ -1,9 +1,28 @@
 import type {
-  BookPersonGroupDetails,
+  // BookPersonGroupDetails,
   PersonRoleFilter,
   TagDetails,
   ThemeDto,
 } from './references';
+
+// export interface ContentDto {
+//   id: number;
+//   title: string;
+//   description: string;
+//   countryId: number;
+//   countryName?: string | null;
+//   contentTypeId: number;
+//   contentType?: string | null;
+//   languageId: number;
+//   languageName?: string | null;
+//   year?: number | null;
+//   createdAt: string;
+//   updatedAt?: string | null;
+//   authors: string[];
+//   themes: ThemeDto[];
+//   booksCount: number;
+//   tags: TagDetails[];
+// }
 
 export interface ContentDto {
   id: number;
@@ -16,11 +35,12 @@ export interface ContentDto {
   languageId: number;
   languageName?: string | null;
   year?: number | null;
-  // parentContentId?: number | null;
-  // position?: number | null;
+  parentContentId?: number | null;
+  position?: number | null;
   createdAt: string;
   updatedAt?: string | null;
   authors: string[];
+  participants: PersonRoleFilter[];
   themes: ThemeDto[];
   booksCount: number;
   tags: TagDetails[];
@@ -40,26 +60,6 @@ export interface ContentFilterRequest {
   personFilters?: PersonRoleFilter[];
   cursor?: string | null;
   limit?: number;
-}
-
-export interface ContentDto {
-  id: number;
-  title: string;
-  description: string;
-  countryId: number;
-  countryName?: string | null;
-  contentTypeId: number;
-  contentType?: string | null;
-  languageId: number;
-  languageName?: string | null;
-  year?: number | null;
-  parentContentId?: number | null;
-  position?: number | null;
-  createdAt: string;
-  updatedAt?: string | null;
-  authors: string[];
-  participants: BookPersonGroupDetails[];
-  themes: ThemeDto[];
 }
 
 export interface CreateContentRequest {
