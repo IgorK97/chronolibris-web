@@ -17,6 +17,7 @@ import type { CommentDto } from '@/types';
 import { useStore } from '@/stores/globalStore';
 import styles from './BookTabs.module.css';
 import { TARGET_TYPE } from '@/types';
+import { renderFormattedText } from './utils';
 // import ReactMarkdown from 'react-markdown';
 // import remarkGfm from 'remark-gfm';
 
@@ -254,46 +255,6 @@ export function CommentItem({
 }
 
 // Компонент для спойлера
-function Spoiler({ children }: { children: React.ReactNode }) {
-  const [isVisible, setIsVisible] = useState(false);
-
-  return (
-    <span
-      onClick={(e) => {
-        e.stopPropagation();
-        setIsVisible(!isVisible);
-      }}
-      className={`${styles.spoiler} ${isVisible ? styles['spoiler-visible'] : ''}`}
-    >
-      {isVisible ? (
-        children
-      ) : (
-        <span className={styles['spoiler-label']}>####</span>
-      )}
-    </span>
-  );
-}
-
-const renderFormattedText = (text: string) => {
-  const regex = /(\*\*.*?\*\*|~~.*?~~|_.*?_|>!.*?!<)/g;
-  const parts = text.split(regex);
-
-  return parts.map((part, index) => {
-    if (part.startsWith('**') && part.endsWith('**')) {
-      return <strong key={index}>{part.slice(2, -2)}</strong>;
-    }
-    if (part.startsWith('~~') && part.endsWith('~~')) {
-      return <del key={index}>{part.slice(2, -2)}</del>;
-    }
-    if (part.startsWith('_') && part.endsWith('_')) {
-      return <em key={index}>{part.slice(1, -1)}</em>;
-    }
-    if (part.startsWith('>!') && part.endsWith('!<')) {
-      return <Spoiler key={index}>{part.slice(2, -2)}</Spoiler>;
-    }
-    return part;
-  });
-};
 
 export function SmartCommentItem({
   comment,

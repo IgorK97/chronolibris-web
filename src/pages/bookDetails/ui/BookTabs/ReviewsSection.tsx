@@ -6,7 +6,8 @@ import {
   VoteButton,
   ScoreDisplay,
   ThreeDotsMenu,
-  ComposeBox,
+  // ComposeBox,
+  SmartTextBox,
 } from './BookTabsAtoms';
 import styles from './BookTabs.module.css';
 import {
@@ -19,6 +20,7 @@ import {
 import type { ReviewDetails } from '@/types';
 import { useStore } from '@/stores/globalStore';
 import { TARGET_TYPE } from '@/types';
+import { renderFormattedText } from './utils';
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -186,7 +188,8 @@ function ReviewItem({
             className={`${styles['review-text-wrap']} ${expanded ? styles['review-text-wrap-expanded'] : ''}`}
             style={{ ['--lines' as string]: TRUNCATE_LINES }}
           >
-            <p className={styles['comment-text']}>{review.text}</p>
+            {/* <p className={styles['comment-text']}>{review.text}</p> */}
+            {renderFormattedText(review.text!)}
           </div>
 
           {isOverflowing && (
@@ -327,7 +330,7 @@ export function ReviewsSection({
   return (
     <div className={styles['tab-content']}>
       {canReview && user?.role == 'reader' && (
-        <ComposeBox
+        <SmartTextBox
           placeholder="Поделитесь своим впечатлением о книге..."
           onSubmit={handleSubmit}
           type="review"
@@ -340,7 +343,7 @@ export function ReviewsSection({
             onChange={handlePickRating}
             disabled={isMutating}
           />
-        </ComposeBox>
+        </SmartTextBox>
       )}
       {!canReview && (
         <div className={styles['reviews-locked']}>
