@@ -212,6 +212,7 @@ function ReviewItem({
           <div className={styles['comment-footer']}>
             <div className={styles['vote-group']}>
               <VoteButton
+                disabled={review.userName === user?.userName}
                 type="like"
                 count={votes.likes}
                 active={votes.userVote === 'like'}
@@ -219,6 +220,7 @@ function ReviewItem({
               />
               <ScoreDisplay likes={votes.likes} dislikes={votes.dislikes} />
               <VoteButton
+                disabled={review.userName === user?.userName}
                 type="dislike"
                 count={votes.dislikes}
                 active={votes.userVote === 'dislike'}

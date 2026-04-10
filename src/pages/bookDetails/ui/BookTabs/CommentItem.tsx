@@ -1,4 +1,5 @@
-import { useState } from 'react';
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useEffect, useState } from 'react';
 import {
   useInfiniteQuery,
   useMutation,
@@ -7,8 +8,9 @@ import {
 import { commentsApi } from '@/api/comments';
 import {
   Avatar,
-  ComposeBox,
+  // ComposeBox,
   ScoreDisplay,
+  SmartTextBox,
   ThreeDotsMenu,
   VoteButton,
 } from './BookTabsAtoms';
@@ -23,236 +25,236 @@ import { renderFormattedText } from './utils';
 
 const MAX_INDENT_DEPTH = 3; // После 3 уровня вправо больше не сдвигается
 
-export function CommentItem({
-  comment,
-  depth = 0,
-  bookId,
-}: {
-  comment: CommentDto;
-  depth?: number;
-  bookId: number;
-}) {
-  const { user } = useStore();
-  const isAuth = !!user;
-  const qc = useQueryClient();
-  const [isReplying, setIsReplying] = useState(false);
-  const [showMore, setShowMore] = useState(false);
+// export function CommentItem({
+//   comment,
+//   depth = 0,
+//   bookId,
+// }: {
+//   comment: CommentDto;
+//   depth?: number;
+//   bookId: number;
+// }) {
+//   const { user } = useStore();
+//   const isAuth = !!user;
+//   const qc = useQueryClient();
+//   const [isReplying, setIsReplying] = useState(false);
+//   const [showMore, setShowMore] = useState(false);
 
-  const {
-    data: infiniteReplies,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery({
-    queryKey: ['comments', 'replies', comment.id],
-    queryFn: ({ pageParam }) => commentsApi.getReplies(comment.id, pageParam),
-    initialPageParam: undefined as number | undefined,
-    getNextPageParam: (lastPage) =>
-      lastPage.length > 0 ? lastPage[lastPage.length - 1].id : undefined,
-    enabled: showMore,
-    staleTime: 0,
-  });
+//   const {
+//     data: infiniteReplies,
+//     fetchNextPage,
+//     hasNextPage,
+//     isFetchingNextPage,
+//   } = useInfiniteQuery({
+//     queryKey: ['comments', 'replies', comment.id],
+//     queryFn: ({ pageParam }) => commentsApi.getReplies(comment.id, pageParam),
+//     initialPageParam: undefined as number | undefined,
+//     getNextPageParam: (lastPage) =>
+//       lastPage.length > 0 ? lastPage[lastPage.length - 1].id : undefined,
+//     enabled: showMore,
+//     staleTime: 0,
+//   });
 
-  const allReplies = infiniteReplies?.pages.flat() || [];
-  const repliesQueryKey = ['comments', 'replies', comment.id];
+//   const allReplies = infiniteReplies?.pages.flat() || [];
+//   const repliesQueryKey = ['comments', 'replies', comment.id];
 
-  const deleteMutation = useMutation({
-    mutationFn: () => commentsApi.delete(comment.id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['comments', bookId] }),
-  });
+//   const deleteMutation = useMutation({
+//     mutationFn: () => commentsApi.delete(comment.id),
+//     onSuccess: () => qc.invalidateQueries({ queryKey: ['comments', bookId] }),
+//   });
 
-  const handleHideReplies = () => {
-    setShowMore(false);
-    qc.removeQueries({ queryKey: repliesQueryKey });
-  };
+//   const handleHideReplies = () => {
+//     setShowMore(false);
+//     qc.removeQueries({ queryKey: repliesQueryKey });
+//   };
 
-  const hasReplies = comment.repliesCount > 0;
+//   const hasReplies = comment.repliesCount > 0;
 
-  const indentStyle = {
-    marginLeft: depth > 0 && depth <= MAX_INDENT_DEPTH ? '24px' : '0px',
-    borderLeft: depth > 0 ? '2px solid var(--border-color, #e5e7eb)' : 'none',
-    paddingLeft: depth > 0 ? '16px' : '0px',
-  };
+//   const indentStyle = {
+//     marginLeft: depth > 0 && depth <= MAX_INDENT_DEPTH ? '24px' : '0px',
+//     borderLeft: depth > 0 ? '2px solid var(--border-color, #e5e7eb)' : 'none',
+//     paddingLeft: depth > 0 ? '16px' : '0px',
+//   };
 
-  const userName =
-    comment.userLogin == null || comment.userLogin == undefined
-      ? '[Недоступно]'
-      : comment.userLogin;
+//   const userName =
+//     comment.userLogin == null || comment.userLogin == undefined
+//       ? '[Недоступно]'
+//       : comment.userLogin;
 
-  // console.log(userName, 'Kukusiki');
-  const [votes, setVotes] = useState({
-    likes: comment.likesCount,
-    dislikes: comment.dislikesCount,
+//   // console.log(userName, 'Kukusiki');
+//   const [votes, setVotes] = useState({
+//     likes: comment.likesCount,
+//     dislikes: comment.dislikesCount,
 
-    userVote:
-      comment.userVote === true
-        ? 'like'
-        : comment.userVote === false
-          ? 'dislike'
-          : null,
-  } as {
-    likes: number;
-    dislikes: number;
-    userVote: 'like' | 'dislike' | null;
-  });
-  const handleVote = async (type: 'like' | 'dislike') => {
-    if (!isAuth) return;
-    const score = type === 'like' ? 1 : -1;
+//     userVote:
+//       comment.userVote === true
+//         ? 'like'
+//         : comment.userVote === false
+//           ? 'dislike'
+//           : null,
+//   } as {
+//     likes: number;
+//     dislikes: number;
+//     userVote: 'like' | 'dislike' | null;
+//   });
+//   const handleVote = async (type: 'like' | 'dislike') => {
+//     if (!isAuth) return;
+//     const score = type === 'like' ? 1 : -1;
 
-    //Оптимистичное обновление
-    setVotes((prev) => {
-      if (prev.userVote === type) {
-        return {
-          likes: type === 'like' ? prev.likes - 1 : prev.likes,
-          dislikes: type === 'dislike' ? prev.dislikes - 1 : prev.dislikes,
-          userVote: null,
-        };
-      }
-      return {
-        likes:
-          type === 'like'
-            ? prev.likes + 1
-            : prev.userVote === 'like'
-              ? prev.likes - 1
-              : prev.likes,
-        dislikes:
-          type === 'dislike'
-            ? prev.dislikes + 1
-            : prev.userVote === 'dislike'
-              ? prev.dislikes - 1
-              : prev.dislikes,
-        userVote: type,
-      };
-    });
+//     //Оптимистичное обновление
+//     setVotes((prev) => {
+//       if (prev.userVote === type) {
+//         return {
+//           likes: type === 'like' ? prev.likes - 1 : prev.likes,
+//           dislikes: type === 'dislike' ? prev.dislikes - 1 : prev.dislikes,
+//           userVote: null,
+//         };
+//       }
+//       return {
+//         likes:
+//           type === 'like'
+//             ? prev.likes + 1
+//             : prev.userVote === 'like'
+//               ? prev.likes - 1
+//               : prev.likes,
+//         dislikes:
+//           type === 'dislike'
+//             ? prev.dislikes + 1
+//             : prev.userVote === 'dislike'
+//               ? prev.dislikes - 1
+//               : prev.dislikes,
+//         userVote: type,
+//       };
+//     });
 
-    await commentsApi.rateComment({
-      commentId: comment.id,
-      score,
-    });
-  };
-  return (
-    <div className={styles['comment-wrapper']} style={indentStyle}>
-      <div className={styles['comment-item']}>
-        <div className={styles['comment-header']}>
-          <Avatar userName={userName} />
-          <div className={styles['comment-meta']}>
-            <span className={styles['author-name']}>{userName}</span>
-            <span className={styles['comment-date']}>
-              {formatDate(comment.createdAt)}
-            </span>
-          </div>
-          {user?.role == 'reader' && user?.userName === comment.userLogin ? (
-            <ThreeDotsMenu
-              canDelete={true}
-              onDelete={async () => deleteMutation.mutate()}
-              targetId={comment.id}
-              targetTypeId={TARGET_TYPE.COMMENT}
-            />
-          ) : (
-            <ThreeDotsMenu
-              canReport={comment.userLogin == null ? false : true}
-              canDelete={false}
-              onDelete={async () => {}}
-              targetId={comment.id}
-              targetTypeId={TARGET_TYPE.COMMENT}
-            />
-          )}
-        </div>
+//     await commentsApi.rateComment({
+//       commentId: comment.id,
+//       score,
+//     });
+//   };
+//   return (
+//     <div className={styles['comment-wrapper']} style={indentStyle}>
+//       <div className={styles['comment-item']}>
+//         <div className={styles['comment-header']}>
+//           <Avatar userName={userName} />
+//           <div className={styles['comment-meta']}>
+//             <span className={styles['author-name']}>{userName}</span>
+//             <span className={styles['comment-date']}>
+//               {formatDate(comment.createdAt)}
+//             </span>
+//           </div>
+//           {user?.role == 'reader' && user?.userName === comment.userLogin ? (
+//             <ThreeDotsMenu
+//               canDelete={true}
+//               onDelete={async () => deleteMutation.mutate()}
+//               targetId={comment.id}
+//               targetTypeId={TARGET_TYPE.COMMENT}
+//             />
+//           ) : (
+//             <ThreeDotsMenu
+//               canReport={comment.userLogin == null ? false : true}
+//               canDelete={false}
+//               onDelete={async () => {}}
+//               targetId={comment.id}
+//               targetTypeId={TARGET_TYPE.COMMENT}
+//             />
+//           )}
+//         </div>
 
-        <div className={styles['comment-text']}>
-          {comment.text == null ? '[Комментарий удалён]' : comment.text}
-        </div>
+//         <div className={styles['comment-text']}>
+//           {comment.text == null ? '[Комментарий удалён]' : comment.text}
+//         </div>
 
-        <div className={styles['comment-footer']}>
-          <div className={styles['vote-group']}>
-            <VoteButton
-              type="like"
-              count={votes.likes}
-              active={votes.userVote === 'like'}
-              onClick={() => handleVote('like')}
-            />
-            <ScoreDisplay likes={votes.likes} dislikes={votes.dislikes} />
-            <VoteButton
-              type="dislike"
-              count={votes.dislikes}
-              active={votes.userVote === 'dislike'}
-              onClick={() => handleVote('dislike')}
-            />
-          </div>
-          {user?.role == 'reader' && (
-            <button
-              className={styles['reply-btn']}
-              onClick={() => setIsReplying(!isReplying)}
-            >
-              Ответить
-            </button>
-          )}
-        </div>
+//         <div className={styles['comment-footer']}>
+//           <div className={styles['vote-group']}>
+//             <VoteButton
+//               type="like"
+//               count={votes.likes}
+//               active={votes.userVote === 'like'}
+//               onClick={() => handleVote('like')}
+//             />
+//             <ScoreDisplay likes={votes.likes} dislikes={votes.dislikes} />
+//             <VoteButton
+//               type="dislike"
+//               count={votes.dislikes}
+//               active={votes.userVote === 'dislike'}
+//               onClick={() => handleVote('dislike')}
+//             />
+//           </div>
+//           {user?.role == 'reader' && (
+//             <button
+//               className={styles['reply-btn']}
+//               onClick={() => setIsReplying(!isReplying)}
+//             >
+//               Ответить
+//             </button>
+//           )}
+//         </div>
 
-        {isReplying && (
-          <div className={styles['reply-compose']}>
-            <ComposeBox
-              type="comment"
-              placeholder="Ваш ответ..."
-              onSubmit={async (text) => {
-                await commentsApi.create({
-                  bookId,
-                  text,
-                  parentCommentId: comment.id,
-                });
-                setIsReplying(false);
-                setShowMore(true);
-                qc.invalidateQueries({
-                  queryKey: ['comments', 'replies', comment.id],
-                });
-              }}
-            />
-          </div>
-        )}
-      </div>
+//         {isReplying && (
+//           <div className={styles['reply-compose']}>
+//             <ComposeBox
+//               type="comment"
+//               placeholder="Ваш ответ..."
+//               onSubmit={async (text) => {
+//                 await commentsApi.create({
+//                   bookId,
+//                   text,
+//                   parentCommentId: comment.id,
+//                 });
+//                 setIsReplying(false);
+//                 setShowMore(true);
+//                 qc.invalidateQueries({
+//                   queryKey: ['comments', 'replies', comment.id],
+//                 });
+//               }}
+//             />
+//           </div>
+//         )}
+//       </div>
 
-      {hasReplies && (
-        <button
-          className={styles['show-more-btn']}
-          onClick={showMore ? handleHideReplies : () => setShowMore(true)}
-        >
-          <span>
-            {showMore ? '-' : '+'}{' '}
-            {showMore ? 'Скрыть ответы' : 'Показать ответы'} (
-            {comment.repliesCount})
-          </span>
-        </button>
-      )}
+//       {hasReplies && (
+//         <button
+//           className={styles['show-more-btn']}
+//           onClick={showMore ? handleHideReplies : () => setShowMore(true)}
+//         >
+//           <span>
+//             {showMore ? '-' : '+'}{' '}
+//             {showMore ? 'Скрыть ответы' : 'Показать ответы'} (
+//             {comment.repliesCount})
+//           </span>
+//         </button>
+//       )}
 
-      {showMore && hasReplies && (
-        <div className={styles['replies-container']}>
-          {allReplies.map((reply) => (
-            <CommentItem
-              key={reply.id}
-              comment={reply}
-              depth={depth + 1}
-              bookId={bookId}
-            />
-          ))}
-          {hasNextPage && (
-            <button
-              className={styles['load-more-replies']}
-              onClick={() => fetchNextPage()}
-              disabled={isFetchingNextPage}
-              style={{
-                marginLeft: '24px',
-                fontSize: '0.85rem',
-                marginTop: '8px',
-              }}
-            >
-              {isFetchingNextPage ? 'Загрузка...' : 'Загрузить еще ответы'}
-            </button>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
+//       {showMore && hasReplies && (
+//         <div className={styles['replies-container']}>
+//           {allReplies.map((reply) => (
+//             <CommentItem
+//               key={reply.id}
+//               comment={reply}
+//               depth={depth + 1}
+//               bookId={bookId}
+//             />
+//           ))}
+//           {hasNextPage && (
+//             <button
+//               className={styles['load-more-replies']}
+//               onClick={() => fetchNextPage()}
+//               disabled={isFetchingNextPage}
+//               style={{
+//                 marginLeft: '24px',
+//                 fontSize: '0.85rem',
+//                 marginTop: '8px',
+//               }}
+//             >
+//               {isFetchingNextPage ? 'Загрузка...' : 'Загрузить еще ответы'}
+//             </button>
+//           )}
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
 
 // Компонент для спойлера
 
@@ -270,6 +272,7 @@ export function SmartCommentItem({
   const qc = useQueryClient();
   const [isReplying, setIsReplying] = useState(false);
   const [showMore, setShowMore] = useState(false);
+  const [opened, setOpened] = useState(!comment.deletedAt);
 
   const {
     data: infiniteReplies,
@@ -285,6 +288,10 @@ export function SmartCommentItem({
     enabled: showMore,
     staleTime: 0,
   });
+
+  useEffect(() => {
+    setOpened(!comment.deletedAt);
+  }, [comment]);
 
   const allReplies = infiniteReplies?.pages.flat() || [];
   const repliesQueryKey = ['comments', 'replies', comment.id];
@@ -363,7 +370,19 @@ export function SmartCommentItem({
       score,
     });
   };
-  return (
+  return !opened ? (
+    <div className={styles['comment-wrapper-del']} style={indentStyle}>
+      {' '}
+      <button
+        className={styles['star-pick-btn']}
+        style={{ color: 'black' }}
+        onClick={() => setOpened(true)}
+      >
+        +
+      </button>{' '}
+      <p>{'[Удалено]'}</p>
+    </div>
+  ) : (
     <div className={styles['comment-wrapper']} style={indentStyle}>
       <div className={styles['comment-item']}>
         <div className={styles['comment-header']}>
@@ -383,7 +402,7 @@ export function SmartCommentItem({
             />
           ) : (
             <ThreeDotsMenu
-              canReport={comment.userLogin == null ? false : true}
+              canReport={comment.deletedAt ? true : false}
               canDelete={false}
               onDelete={async () => {}}
               targetId={comment.id}
@@ -399,7 +418,17 @@ export function SmartCommentItem({
 
         <div className={styles['comment-footer']}>
           <div className={styles['vote-group']}>
+            {comment.deletedAt && (
+              <button
+                className={styles['star-pick-btn']}
+                style={{ color: 'black' }}
+                onClick={() => setOpened(false)}
+              >
+                -
+              </button>
+            )}
             <VoteButton
+              disabled={!!comment.deletedAt || comment.userLogin === userName}
               type="like"
               count={votes.likes}
               active={votes.userVote === 'like'}
@@ -407,13 +436,14 @@ export function SmartCommentItem({
             />
             <ScoreDisplay likes={votes.likes} dislikes={votes.dislikes} />
             <VoteButton
+              disabled={!!comment.deletedAt || comment.userLogin === userName}
               type="dislike"
               count={votes.dislikes}
               active={votes.userVote === 'dislike'}
               onClick={() => handleVote('dislike')}
             />
           </div>
-          {user?.role == 'reader' && (
+          {user?.role == 'reader' && !comment.deletedAt && (
             <button
               className={styles['reply-btn']}
               onClick={() => setIsReplying(!isReplying)}
@@ -425,7 +455,7 @@ export function SmartCommentItem({
 
         {isReplying && (
           <div className={styles['reply-compose']}>
-            <ComposeBox
+            <SmartTextBox
               type="comment"
               placeholder="Ваш ответ..."
               onSubmit={async (text) => {
@@ -461,7 +491,7 @@ export function SmartCommentItem({
       {showMore && hasReplies && (
         <div className={styles['replies-container']}>
           {allReplies.map((reply) => (
-            <CommentItem
+            <SmartCommentItem
               key={reply.id}
               comment={reply}
               depth={depth + 1}

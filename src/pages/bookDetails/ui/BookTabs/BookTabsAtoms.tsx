@@ -32,12 +32,14 @@ export function Avatar({ userName }: { userName: string }) {
 export function VoteButton({
   type,
   count,
+  disabled,
   active,
   onClick,
 }: {
   type: 'like' | 'dislike';
   count: number;
   active: boolean;
+  disabled: boolean;
   onClick: () => void;
 }) {
   const [showTooltip, setShowTooltip] = useState(false);
@@ -51,6 +53,7 @@ export function VoteButton({
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
         aria-label={type === 'like' ? 'Нравится' : 'Не нравится'}
+        disabled={disabled}
       >
         <Icon size={14} />
       </button>

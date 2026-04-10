@@ -218,6 +218,18 @@
   flex-direction: column;
 }
 
+.comment-wrapper-del {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: row;
+}
+
+.comment-wrapper {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
 .comment,
 .review {
   position: relative;
