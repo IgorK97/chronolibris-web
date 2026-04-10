@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ThumbsUp,
   ThumbsDown,
@@ -202,7 +202,7 @@ export function ComposeBox({
             className={styles['compose-reply-cancel']}
             onClick={onCancelReply}
           >
-            <X />
+            <X style={{ cursor: 'pointer' }} />
           </button>
         </div>
       )}
@@ -225,7 +225,7 @@ export function ComposeBox({
           <button
             className={`${styles['compose-submit']} ${styles['compose-delete']}`}
             onClick={onDelete}
-            style={{ backgroundColor: '#dc2626' }} // Красная кнопка
+            style={{ backgroundColor: '#dc2626' }}
           >
             Удалить отзыв
           </button>
@@ -240,6 +240,146 @@ export function ComposeBox({
             Отправить
           </button>
         )}
+      </div>
+    </div>
+  );
+}
+
+export function SmartTextBox({
+  placeholder,
+  replyingTo,
+  onCancelReply,
+  onSubmit,
+  onDelete,
+  initialText = '',
+  children,
+  type,
+  isReadOnly = false,
+}: {
+  placeholder: string;
+  replyingTo?: { parentId: number; authorName: string } | null;
+  onCancelReply?: () => void;
+  onSubmit: (text: string) => void;
+  children?: React.ReactNode;
+  type: 'review' | 'comment';
+  onDelete?: () => void;
+  initialText?: string;
+  isReadOnly?: boolean;
+}) {
+  const [text, setText] = useState(initialText);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const MAX = 5000;
+  const MIN = 120;
+
+  useEffect(() => {
+    setText(initialText);
+  }, [initialText]);
+
+  const handleSubmit = () => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    onSubmit(trimmed);
+    if (!initialText) setText('');
+  };
+
+  const insertControl = (symbol: string, endSymbol = symbol) => {
+    const el = textareaRef.current;
+    if (!el) return;
+    const start = el.selectionStart;
+    const end = el.selectionEnd;
+    const selected = text.substring(start, end);
+    const before = text.substring(0, start);
+    const after = text.substring(end);
+
+    setText(`${before}${symbol}${selected}${endSymbol}${after}`);
+  };
+
+  return (
+    <div className={styles['compose']}>
+      {replyingTo && (
+        <div className={styles['compose-reply-banner']}>
+          <CornerDownRight size={13} />
+          <span>
+            Ответ для <strong>{replyingTo.authorName}</strong>
+          </span>
+          <button
+            className={styles['compose-reply-cancel']}
+            onClick={onCancelReply}
+          >
+            <X style={{ cursor: 'pointer' }} />
+          </button>
+        </div>
+      )}
+      {children}
+      <div>
+        <div className={styles['toolbar']}>
+          <button
+            className={`${styles['toolbar-btn']} ${styles['bold']}`}
+            onClick={() => insertControl('**')}
+            title="Жирный"
+          >
+            B
+          </button>
+
+          <button
+            className={`${styles['toolbar-btn']} ${styles['italic']}`}
+            onClick={() => insertControl('_')}
+            title="Курсив"
+          >
+            i
+          </button>
+
+          <button
+            className={`${styles['toolbar-btn']} ${styles['strike']}`}
+            onClick={() => insertControl('~~')}
+            title="Зачеркнутый"
+          >
+            S
+          </button>
+
+          <button
+            className={`${styles['toolbar-btn']} ${styles['spoiler-btn']}`}
+            onClick={() => insertControl('>!', '!<')}
+            title="Скрыть"
+          >
+            Скрыть
+          </button>
+        </div>
+        <textarea
+          ref={textareaRef}
+          className={styles['compose-textarea']}
+          placeholder={placeholder}
+          value={text}
+          maxLength={MAX}
+          onChange={(e) => setText(e.target.value)}
+          rows={3}
+          minLength={type === 'review' ? MIN : 1}
+          disabled={isReadOnly}
+        />
+        <div className={styles['compose-footer']}>
+          <span className={styles['compose-counter']}>
+            {text.length}/{MAX}
+          </span>
+          {initialText ? (
+            <button
+              className={`${styles['compose-submit']} ${styles['compose-delete']}`}
+              onClick={onDelete}
+              style={{ backgroundColor: '#dc2626' }}
+            >
+              Удалить отзыв
+            </button>
+          ) : (
+            <button
+              className={styles['compose-submit']}
+              disabled={
+                !text.trim() || text.length < (type === 'review' ? MIN : 1)
+              }
+              onClick={handleSubmit}
+            >
+              Отправить
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

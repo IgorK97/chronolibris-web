@@ -1,8 +1,14 @@
-import { ComposeBox } from './BookTabsAtoms';
+import {
+  // ComposeBox,
+  SmartTextBox,
+} from './BookTabsAtoms';
 import styles from './BookTabs.module.css';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { commentsApi } from '@/api/comments';
-import { CommentItem } from './CommentItem';
+import {
+  // CommentItem,
+  SmartCommentItem,
+} from './CommentItem';
 import { useStore } from '@/stores/globalStore';
 
 export function CommentsSection({ bookId }: { bookId: number }) {
@@ -21,7 +27,7 @@ export function CommentsSection({ bookId }: { bookId: number }) {
   return (
     <div className={styles['tab-content']}>
       {user?.role == 'reader' && (
-        <ComposeBox
+        <SmartTextBox
           type="comment"
           placeholder="Напишите комментарий..."
           onSubmit={async (text) => {
@@ -33,7 +39,7 @@ export function CommentsSection({ bookId }: { bookId: number }) {
 
       <div className={styles['comment-list']}>
         {allComments.map((c) => (
-          <CommentItem key={c.id} comment={c} bookId={bookId} />
+          <SmartCommentItem key={c.id} comment={c} bookId={bookId} />
         ))}
 
         {hasNextPage && (

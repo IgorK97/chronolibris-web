@@ -141,7 +141,7 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
       selectionId,
     },
     20,
-    hasFilters || queryReady,
+    hasFilters,
     mode
   );
 
@@ -224,13 +224,6 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
           )}
 
           <div className={styles['results-area']}>
-            {/* {urlQuery && !isLoading && !isError && (
-              <div className={styles['results-header']}>
-                {allBooks.length > 0
-                  ? `Результаты по запросу`
-                  : `По вашему запросу ничего не найдено`}
-              </div>
-            )} */}
             {isLoading && (
               <div className={styles['loading-state']}>
                 <div className={styles.spinner} />
