@@ -167,14 +167,14 @@ export const SimpleEntityManager: React.FC<SimpleEntityManagerProps> = ({
                     <button
                       onClick={handleUpdate}
                       disabled={isUpdating}
-                      className={`${styles.btn}`}
+                      className={`${styles.btn} ${styles['btn-update']}`}
                     >
                       {isUpdating ? 'Сохранение...' : 'Сохранить'}
                     </button>
                     <button
                       onClick={cancelEditing}
                       disabled={isUpdating}
-                      className={`${styles.btn}`}
+                      className={`${styles.btn} ${styles['btn-danger']}`}
                     >
                       Отмена
                     </button>

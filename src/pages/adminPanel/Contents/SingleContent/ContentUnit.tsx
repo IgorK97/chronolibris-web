@@ -635,24 +635,7 @@ export const ContentUnit: React.FC = () => {
                 <div
                   key={book.id}
                   className={styles['book-item']}
-                  style={{
-                    padding: '12px',
-                    border: '1px solid var(--color-border, #ddd)',
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    transition: 'background-color 0.2s',
-                  }}
                   onClick={() => navigate(`/books/${book.id}`)}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.backgroundColor =
-                      'var(--color-bg-secondary, #f9f9f9)')
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.backgroundColor = 'transparent')
-                  }
                 >
                   {book.coverPath && (
                     <img
