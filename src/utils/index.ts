@@ -3,6 +3,22 @@ export const unfavColor = '#666';
 export const fillFavColor = '#D32F2F';
 export const fillUnfavColor = 'none';
 
+export const pluralize = (
+  count: number,
+  one: string,
+  few: string,
+  many: string
+) => {
+  const n = Math.abs(count);
+  const lastDigit = n % 10;
+  const lastTwo = n % 100;
+
+  if (lastDigit === 1 && lastTwo !== 11) return one;
+  if (lastDigit >= 2 && lastDigit <= 4 && (lastTwo < 10 || lastTwo >= 20))
+    return few;
+  return many;
+};
+
 export function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();

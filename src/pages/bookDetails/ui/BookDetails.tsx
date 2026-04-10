@@ -11,6 +11,7 @@ import styles from './BookDetails.module.css';
 import { useStore } from '../../../stores/globalStore';
 import { useBookDetails } from '../../../api/books';
 import { useRoles } from '../../../api/references';
+import { pluralize } from '@/utils';
 import type {
   BookDetails,
   // ShelfDetails
@@ -417,7 +418,13 @@ export const BookDetailsComponent = ({
                         </span>
                         <span className={styles['stat-count']}>
                           {fullBookDetails.ratingsCount}{' '}
-                          {t('book.ratings_count')}
+                          {/* {t('book.ratings_count')} */}
+                          {pluralize(
+                            fullBookDetails.ratingsCount,
+                            t('book.rating.one'),
+                            t('book.rating.few'),
+                            t('books.rating.many')
+                          )}
                         </span>
                       </div>
                       {fullBookDetails.userRating > 0 && (
@@ -498,7 +505,13 @@ export const BookDetailsComponent = ({
                         {fullBookDetails.reviewsCount}
                       </span>
                       <span className={styles['stat-count']}>
-                        {t('book.review_count')}
+                        {/* {t('book.review_count')} */}
+                        {pluralize(
+                          fullBookDetails.reviewsCount,
+                          t('book.review.one'),
+                          t('book.review.few'),
+                          t('book.review.many')
+                        )}
                       </span>
                     </div>
                   </div>
