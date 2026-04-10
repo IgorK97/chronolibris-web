@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronRight, X } from 'lucide-react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import {
   useAllSelections,
   // useSelectionsInfinite
@@ -56,18 +56,6 @@ export function SelectionPanel({
                     onClick={() => onSelect(isSelected ? null : sel.id)}
                   >
                     <span className={styles['selection-name']}>{sel.name}</span>
-                    {isSelected && (
-                      <button
-                        className={styles['deselect-btn']}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onSelect(null);
-                        }}
-                        aria-label="Снять выбор"
-                      >
-                        <X style={{ cursor: 'pointer' }} size={12} />
-                      </button>
-                    )}
                   </li>
                 );
               })}
