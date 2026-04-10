@@ -10,6 +10,7 @@ import { useShelves, collectionsApi } from '../../../api/collections';
 import { BookListByCategory } from './BookListByCategory';
 import styles from './MyBooks.module.css';
 import { ShelfRefiningModal } from './ShelfRefiningModal';
+import { createPortal } from 'react-dom';
 
 export const MyBooks = ({
   onNavigateToBook,
@@ -127,7 +128,7 @@ export const MyBooks = ({
               setModalOpen(true);
             }}
           >
-            <Plus size={18} /> Добавить полку
+            <Plus style={{ cursor: 'pointer' }} size={18} /> Добавить полку
           </button>
         </nav>
       </aside>
@@ -140,21 +141,23 @@ export const MyBooks = ({
           />
         )}
       </main>
-      {modalOpen && (
-        <ShelfRefiningModal
-          onClose={() => {
-            setModalOpen(false);
-            setRenameTarget(null);
-          }}
-          onSubmit={
-            modalMode === 'create' ? handleCreateShelf : handleRenameShelf
-          }
-          initialName={modalMode === 'rename' ? renameTarget?.name : ''}
-          title={
-            modalMode === 'create' ? 'Создать полку' : 'Редактировать полку'
-          }
-        />
-      )}
+      {modalOpen &&
+        createPortal(
+          <ShelfRefiningModal
+            onClose={() => {
+              setModalOpen(false);
+              setRenameTarget(null);
+            }}
+            onSubmit={
+              modalMode === 'create' ? handleCreateShelf : handleRenameShelf
+            }
+            initialName={modalMode === 'rename' ? renameTarget?.name : ''}
+            title={
+              modalMode === 'create' ? 'Создать полку' : 'Редактировать полку'
+            }
+          />,
+          document.body
+        )}
     </div>
   );
 };

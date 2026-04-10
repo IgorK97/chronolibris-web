@@ -19,7 +19,7 @@ export const ShelfRefiningModal = ({
     <div className={styles['modal-overlay']}>
       <div className={styles['modal-content']}>
         <button className={styles['close-btn']} onClick={onClose}>
-          <X />
+          <X style={{ cursor: 'pointer' }} />
         </button>
         {title && <p>{title}</p>}
         <BookShelfConstructing

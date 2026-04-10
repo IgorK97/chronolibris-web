@@ -596,13 +596,15 @@ export const BookDetailsComponent = ({
           onClose={() => setIsReportOpen(false)}
         />
       )}
-      {isShelfPanelOpen && (
-        <ShelfSelectionModal
-          bookId={fullBookDetails.id}
-          onClose={() => setIsShelfPanelOpen(false)}
-          onRefresh={refetchShelves}
-        />
-      )}
+      {isShelfPanelOpen &&
+        createPortal(
+          <ShelfSelectionModal
+            bookId={fullBookDetails.id}
+            onClose={() => setIsShelfPanelOpen(false)}
+            onRefresh={refetchShelves}
+          />,
+          document.body
+        )}
     </div>
   );
 };

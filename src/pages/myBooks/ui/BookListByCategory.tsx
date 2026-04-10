@@ -6,6 +6,7 @@ import { ManagedBookCard } from './ManagedBookCard';
 import { ShelfSelectionModal } from './ShelfSelectionModal';
 import styles from './BookCategoryList.module.css';
 import type { BookListItem } from '@/types';
+import { createPortal } from 'react-dom';
 
 interface Props {
   shelfId: number;
@@ -65,13 +66,15 @@ export const BookListByCategory = ({ shelfId, onNavigateToBook }: Props) => {
         {isFetchingNextPage && <div>Загрузка...</div>}
       </div>
 
-      {editingBook && (
-        <ShelfSelectionModal
-          bookId={editingBook.id}
-          onClose={() => setEditingBook(null)}
-          onRefresh={refetch}
-        />
-      )}
+      {editingBook &&
+        createPortal(
+          <ShelfSelectionModal
+            bookId={editingBook.id}
+            onClose={() => setEditingBook(null)}
+            onRefresh={refetch}
+          />,
+          document.body
+        )}
     </div>
   );
 };
