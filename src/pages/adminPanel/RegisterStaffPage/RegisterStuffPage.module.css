@@ -88,6 +88,6 @@
 }
 
 .submit-btn:disabled {
-  background: #93b4f0;
+  opacity: 0.6;
   cursor: default;
 }

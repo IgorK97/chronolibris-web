@@ -1,6 +1,6 @@
-import { useState } from 'react';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useMemo, useState } from 'react';
 import { usersApi } from '@/api/user';
-import axios from 'axios';
 import styles from './RegisterStuffPage.module.css';
 
 type StaffRole = 'moderator' | 'admin';
@@ -47,6 +47,13 @@ const EMPTY_ERRORS: FormErrors = {
   firstName: null,
 };
 
+const VALIDATION_RULES = {
+  userName: /^[a-zA-Z0-9_]{5,256}$/,
+  email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  phone: /^(?:\+7|8)[0-9]{7,14}$/,
+  password: /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,128}$/,
+};
+
 export function RegisterStaffPage() {
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [errors, setErrors] = useState<FormErrors>(EMPTY_ERRORS);
@@ -61,47 +68,39 @@ export function RegisterStaffPage() {
 
   const validate = (): boolean => {
     const e = { ...EMPTY_ERRORS };
-    let ok = true;
 
-    if (!form.userName.trim()) {
-      e.userName = 'Введите имя пользователя';
-      ok = false;
-    } else if (form.userName.trim().length < 3) {
-      e.userName = 'Минимум 3 символа';
-      ok = false;
+    if (!form.firstName.trim()) e.firstName = 'Имя не может быть пустым';
+    if (!form.lastName.trim()) e.lastName = 'Фамилия не может быть пустой';
+
+    if (!VALIDATION_RULES.userName.test(form.userName)) {
+      e.userName = 'Минимум 5 симвоолов: латиница, цифры или _';
     }
 
-    if (!form.email.trim()) {
-      e.email = 'Введите email';
-      ok = false;
-    } else if (!/\S+@\S+\.\S+/.test(form.email)) {
-      e.email = 'Некорректный email';
-      ok = false;
-    }
-    if (!form.phoneNumber.trim()) {
-      e.phoneNumber = 'Введите номер телефона';
-      ok = false;
-    } else if (!/^(\+7|8)?[0-9]{10}$/.test(form.phoneNumber)) {
-      e.phoneNumber = 'Некорректный номер';
-      ok = false;
+    if (!VALIDATION_RULES.email.test(form.email)) {
+      e.email = 'Некорректный формат почты';
     }
 
-    if (!form.password) {
-      e.password = 'Введите пароль';
-      ok = false;
-    } else if (form.password.length < 6) {
-      e.password = 'Минимум 6 символов';
-      ok = false;
+    if (!VALIDATION_RULES.phone.test(form.phoneNumber)) {
+      e.phoneNumber = 'Некорректный формат телефона';
+    }
+
+    if (!VALIDATION_RULES.password.test(form.password)) {
+      e.password =
+        'Пароль должен быть длиной не менее 8 символов и содержать цифры,' +
+        ' латинские заглавные и строчные буквы и один из символов #?!@$%^&*-';
     }
 
     if (form.password !== form.confirm) {
       e.confirm = 'Пароли не совпадают';
-      ok = false;
     }
 
     setErrors(e);
-    return ok;
+    return Object.keys(e).length === 0;
   };
+
+  useEffect(() => {
+    validate();
+  }, [form]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,26 +126,16 @@ export function RegisterStaffPage() {
       );
       setForm(EMPTY_FORM);
       setErrors(EMPTY_ERRORS);
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        const msg = err.response?.data?.message ?? 'Ошибка при регистрации.';
-
-        if (msg.toLowerCase().includes('имя пользователя')) {
-          setErrors((prev) => ({ ...prev, username: msg }));
-        } else if (msg.toLowerCase().includes('email')) {
-          setErrors((prev) => ({ ...prev, email: msg }));
-        } else if (msg.toLowerCase().includes('телефон')) {
-          setErrors((prev) => ({ ...prev, phone: msg }));
-        } else {
-          setServerError(msg);
-        }
-      } else {
-        setServerError('Произошла непредвиденная ошибка.');
-      }
+    } catch (err: any) {
+      setServerError(`Ошибка: ${err.response.data?.detail}`);
     } finally {
       setLoading(false);
     }
   };
+
+  const isValid = useMemo(() => {
+    return validate();
+  }, [form]);
 
   return (
     <div className={styles.page}>
@@ -225,7 +214,7 @@ export function RegisterStaffPage() {
         <button
           type="submit"
           className={styles['submit-btn']}
-          disabled={loading}
+          disabled={loading || !isValid}
         >
           {loading ? 'Регистрация...' : 'Зарегистрировать'}
         </button>
@@ -257,7 +246,7 @@ function Field({
         onChange={onChange}
         placeholder={label}
       />
-      {error && <span className={styles.errorText}>{error}</span>}
+      {error && <span className={styles['error-text']}>{error}</span>}
     </div>
   );
 }

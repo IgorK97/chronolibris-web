@@ -1,11 +1,20 @@
-import React, { useState } from 'react';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/set-state-in-effect */
+import React, { useEffect, useState } from 'react';
 import styles from './Auth.module.css';
 
 import { usersApi } from '../../../api/user';
 import { useStore } from '../../../stores/globalStore';
 import { t } from 'i18next';
-import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
+
+const VALIDATION_RULES = {
+  userName: /^[a-zA-Z0-9_]{5,256}$/,
+  email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  phone: /^(?:\+7|8)[0-9]{7,14}$/,
+  password: /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,128}$/,
+};
+
 interface RegisterForm {
   userName: string;
   email: string;
@@ -92,52 +101,45 @@ export const Auth = ({ onNavigate }: AuthProps) => {
       firstName: null,
       lastName: null,
     };
-    let ok = true;
+    if (!regForm.firstName.trim()) e.firstName = 'Имя не может быть пустым';
+    if (!regForm.lastName.trim()) e.lastName = 'Фамилия не может быть пустой';
 
-    if (!regForm.userName.trim()) {
-      e.userName = t('auth.error_name');
-      ok = false;
-    } else if (regForm.userName.trim().length < 3) {
-      e.userName = 'Имя пользователя должно быть не менее 3 символов';
-      ok = false;
+    if (!VALIDATION_RULES.userName.test(regForm.userName)) {
+      e.userName = 'Минимум 5 симвоолов: латиница, цифры или _';
     }
 
-    if (regForm.email.trim() && !/\S+@\S+\.\S+/.test(regForm.email)) {
-      e.email = t('auth.incorr_email');
-      ok = false;
+    if (!VALIDATION_RULES.email.test(regForm.email)) {
+      e.email = 'Некорректный формат почты';
     }
 
-    if (regForm.phone.trim() && !/^(\+7|8)?[0-9]{10}$/.test(regForm.phone)) {
-      e.phone = t('auth.error_phone');
-      ok = false;
+    if (!VALIDATION_RULES.phone.test(regForm.phone)) {
+      e.phone = 'Некорректный формат телефона';
     }
 
-    if (!regForm.password.trim()) {
-      e.password = t('auth.error_pass');
-      ok = false;
-    } else if (regForm.password.length < 8) {
-      e.password = t('auth.short_pass');
-      ok = false;
+    if (!VALIDATION_RULES.password.test(regForm.password)) {
+      e.password =
+        'Пароль должен быть длиной не менее 8 символов и содержать цифры,' +
+        ' латинские заглавные и строчные буквы и один из символов #?!@$%^&*-';
     }
 
     if (regForm.password !== regForm.confirmPassword) {
-      e.confirmPassword = t('auth.error_conf_pass');
-      ok = false;
+      e.confirmPassword = 'Пароли не совпадают';
     }
+
     setRegErrors(e);
-    return ok;
+    return Object.keys(e).length === 0;
   };
 
   const validateLogin = (): boolean => {
     const e: LoginErrors = { userName: null, password: null };
     let ok = true;
 
-    if (!loginForm.userName.trim()) {
+    if (!loginForm.userName.trim() || loginForm.userName.length < 5) {
       e.userName = 'Введите имя пользователя';
       ok = false;
     }
 
-    if (!loginForm.password.trim()) {
+    if (!loginForm.password.trim() || loginForm.password.length < 8) {
       e.password = t('auth.error_pass');
       ok = false;
     }
@@ -145,8 +147,13 @@ export const Auth = ({ onNavigate }: AuthProps) => {
     return ok;
   };
 
+  useEffect(() => {
+    if (isRegister) validateRegister();
+    else validateLogin();
+  }, [loginForm, regForm, isRegister]);
+
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); // Prevent page reload on form submit
+    e.preventDefault();
     setServerError(null);
 
     const valid = isRegister ? validateRegister() : validateLogin();
@@ -168,19 +175,8 @@ export const Auth = ({ onNavigate }: AuthProps) => {
       const resProfile = await usersApi.getProfile();
       setUser(resProfile);
       onNavigate();
-    } catch (e) {
-      if (axios.isAxiosError(e)) {
-        const serverMessage = e.response?.data?.message;
-        console.log('TUTU!!! Server error:', serverMessage || e.message);
-        alert(
-          serverMessage ||
-            'Authentication error. Please check your credentials and try again.'
-        );
-        return;
-      } else {
-        alert(`An unexpected error ${e} occurred. Please try again later.`);
-      }
-      console.error('Auth error:', e);
+    } catch (e: any) {
+      setServerError(`Ошибка: ${e.response.data?.detail}`);
     }
   };
 

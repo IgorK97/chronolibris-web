@@ -59,6 +59,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: opacity 0.2s;
+  width: 100%;
 }
 
 .button:hover {
