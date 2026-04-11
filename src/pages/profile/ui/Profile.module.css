@@ -7,6 +7,10 @@
   min-height: 100vh;
 }
 
+.error-text {
+  color: red;
+}
+
 .scroll-container {
   padding-bottom: 50px;
   width: 100%;

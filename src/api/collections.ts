@@ -12,7 +12,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import { queryClient } from './queryClient';
+// import { queryClient } from './queryClient';
 
 export const collectionsApi = {
   getAllSelections: () => apiClient.get<SelectionDetails[]>('/Selections'),
@@ -91,7 +91,7 @@ export const collectionsApi = {
 };
 
 export const useCreateShelf = () => {
-  // const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (name: string) => collectionsApi.createShelf(name),
     onSuccess: () => {
@@ -102,7 +102,7 @@ export const useCreateShelf = () => {
 };
 
 export const useUpdateShelf = () => {
-  // const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, name }: { id: number; name: string }) =>
       collectionsApi.updateShelf(id, name),
@@ -113,7 +113,7 @@ export const useUpdateShelf = () => {
 };
 
 export const useDeleteShelf = () => {
-  // const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: number) => collectionsApi.deleteShelf(id),
     onSuccess: () => {

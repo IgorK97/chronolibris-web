@@ -79,7 +79,20 @@ export default function App() {
   };
   return (
     <QueryClientProvider client={queryClient}>
-      <Toaster position="top-right" />
+      <Toaster
+        containerStyle={{
+          zIndex: 99999,
+        }}
+        toastOptions={{
+          style: {
+            cursor: 'pointer',
+          },
+          error: {
+            duration: 5000,
+          },
+        }}
+        position="top-right"
+      />
       <Routes>
         <Route element={<MainLayout />}>
           {/* Только неавторизованные */}
