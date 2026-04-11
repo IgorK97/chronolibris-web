@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
 import styles from './SimpleEntityManager.module.css';
+import { AlertDialog } from '@/components/dialogs/AlertDialog';
 
 export interface SimpleEntity {
   id: number;
@@ -45,6 +46,9 @@ export const SimpleEntityManager: React.FC<SimpleEntityManagerProps> = ({
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editName, setEditName] = useState('');
 
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deletingEntityId, setDeletingEntityId] = useState(0);
+
   const handleCreate = async () => {
     if (!newName.trim()) {
       alert('Название обязательно');
@@ -73,13 +77,8 @@ export const SimpleEntityManager: React.FC<SimpleEntityManagerProps> = ({
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('Вы уверены, что хотите удалить этот элемент?')) return;
-    try {
-      await onDelete(id);
-    } catch (err: any) {
-      alert(err?.response?.data?.message || 'Ошибка удаления');
-    }
+  const handleDelete = async () => {
+    await onDelete(deletingEntityId);
   };
 
   const startEditing = (item: SimpleEntity) => {
@@ -193,7 +192,10 @@ export const SimpleEntityManager: React.FC<SimpleEntityManagerProps> = ({
                       Редактировать
                     </button>
                     <button
-                      onClick={() => handleDelete(item.id)}
+                      onClick={() => {
+                        setDeletingEntityId(item.id);
+                        setDeleteModalOpen(true);
+                      }}
                       disabled={isDeleting || isUpdating}
                       className={`${styles.btn} ${styles['btn-danger']}`}
                     >
@@ -206,6 +208,18 @@ export const SimpleEntityManager: React.FC<SimpleEntityManagerProps> = ({
           </tbody>
         </table>
       </div>
+      <AlertDialog
+        description={`Это действие нельзя будет отменить`}
+        open={deleteModalOpen}
+        title={`Вы действительно хотите это удалить?`}
+        handleAccept={() => {
+          handleDelete();
+        }}
+        handleReject={() => {
+          setDeleteModalOpen(false);
+          setDeletingEntityId(0);
+        }}
+      />
     </div>
   );
 };

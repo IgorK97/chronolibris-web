@@ -34,6 +34,7 @@ import { fileToBase64, storageUrl } from '@/utils';
 import { ContentList } from '@/components/Contents/ContentList';
 import { BookFileManagement } from './BookFileManagement';
 import { ErrorMsg } from '@/components';
+import { AlertDialog } from '@/components/dialogs/AlertDialog';
 
 interface SelectedPerson {
   id: number;
@@ -424,6 +425,10 @@ export const BookUnit: React.FC = () => {
   const { data: countries = [] } = useCountries();
   const { data: roles = [] } = usePersonRoles();
 
+  const [deletingContentId, setDeletingContentId] = useState(0);
+  // const [addingContentId, setAddingContentId] = useState(0);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
   const publishers: AutocompleteItem[] = [];
   const [initialPersons, setInitialPersons] = useState<SelectedPerson[]>([]);
 
@@ -659,35 +664,28 @@ export const BookUnit: React.FC = () => {
     }
   };
 
-  const handleUnlinkContent = async (contentId: number) => {
-    if (window.confirm('Удалить этот контент из книги?')) {
-      try {
-        await unlinkMutation.mutateAsync({ bookId: id!, contentId });
-        refetchContents();
-      } catch (err: any) {
-        alert(err.response?.data?.message || 'Ошибка');
-      }
-    }
+  const handleUnlinkContent = async () => {
+    await unlinkMutation.mutateAsync({
+      bookId: id!,
+      contentId: deletingContentId,
+    });
+    refetchContents();
+    setDeleteModalOpen(false);
   };
 
   const handleAddContent = async (content: ContentDto) => {
-    if (window.confirm(`Добавить контент "${content.title}" к этой книге?`)) {
-      try {
-        await linkMutation.mutateAsync({
-          bookId: id!,
-          contentId: content.id,
-          data: {
-            bookId: id!,
-            contentId: content.id,
-            order: (contents?.length || 0) + 1,
-          },
-        });
-        setShowContentSearch(false);
-        refetchContents();
-      } catch (err: any) {
-        alert(err.response?.data?.message || 'Ошибка');
-      }
-    }
+    await linkMutation.mutateAsync({
+      bookId: id!,
+      contentId: content.id,
+      data: {
+        bookId: id!,
+        contentId: content.id,
+        order: (contents?.length || 0) + 1,
+      },
+    });
+    setShowContentSearch(false);
+    refetchContents();
+    // setDeleteModalOpen(false);
   };
 
   const isSaving = createMutation.isPending || updateMutation.isPending;
@@ -1070,6 +1068,18 @@ export const BookUnit: React.FC = () => {
           )}
         </div>
       </div>
+      <AlertDialog
+        description={`При необходимости его можно будет привязать заново`}
+        open={deleteModalOpen}
+        title={`Вы действительно хотите отвязать контент от книги?`}
+        handleAccept={() => {
+          handleUnlinkContent();
+        }}
+        handleReject={() => {
+          setDeleteModalOpen(false);
+          setDeletingContentId(0);
+        }}
+      />
 
       {!isNew && (
         <div className={styles['contents-section']}>
@@ -1087,7 +1097,10 @@ export const BookUnit: React.FC = () => {
             items={contents}
             renderActions={(content) => (
               <button
-                onClick={() => handleUnlinkContent(content.id)}
+                onClick={() => {
+                  setDeletingContentId(content.id);
+                  setDeleteModalOpen(true);
+                }}
                 className={`${styles['btn']} ${styles['btn-danger']}`}
                 disabled={unlinkMutation.isPending}
               >

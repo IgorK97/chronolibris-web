@@ -243,6 +243,7 @@ export const Auth = ({ onNavigate }: AuthProps) => {
               value={loginForm.userName}
               onChange={(v) => setLoginForm({ ...loginForm, userName: v })}
               error={loginErrors.userName}
+              maxLength={128}
             />
             <InputField
               label={t('auth.l_pass')}
@@ -250,6 +251,7 @@ export const Auth = ({ onNavigate }: AuthProps) => {
               onChange={(v) => setLoginForm({ ...loginForm, password: v })}
               error={loginErrors.password}
               type="password"
+              maxLength={128}
             />
           </>
         )}
@@ -277,12 +279,14 @@ interface InputFieldProps {
   onChange: (v: string) => void;
   error?: string | null;
   type?: string;
+  maxLength?:number;
 }
 
 function InputField({
   label,
   value,
   onChange,
+  maxLength = 256,
   error,
   type = 'text',
 }: InputFieldProps) {
@@ -295,6 +299,7 @@ function InputField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={label}
+        maxLength={maxLength}
       />
       {error && <span className={styles['error-text']}>{error}</span>}
     </div>

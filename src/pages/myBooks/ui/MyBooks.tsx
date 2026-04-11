@@ -16,6 +16,7 @@ import { BookListByCategory } from './BookListByCategory';
 import styles from './MyBooks.module.css';
 import { ShelfRefiningModal } from './ShelfRefiningModal';
 import { createPortal } from 'react-dom';
+import { AlertDialog } from '@/components/dialogs/AlertDialog';
 
 export const MyBooks = ({
   onNavigateToBook,
@@ -28,6 +29,8 @@ export const MyBooks = ({
   const { mutateAsync: createShelf } = useCreateShelf();
   const { mutateAsync: updateShelf } = useUpdateShelf();
   const { mutateAsync: deleteShelf } = useDeleteShelf();
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deletingShelfId, setDeletingShelfId] = useState<number>(0);
   const [selectedShelfId, setSelectedShelfId] = useState<number | null>(null);
   const [shelfMenuId, setShelfMenuId] = useState<number | null>(null);
   const activeShelfId = selectedShelfId ?? shelves?.[0]?.id;
@@ -56,14 +59,6 @@ export const MyBooks = ({
     await updateShelf({ id: renameTarget.id, name: newName.trim() });
     setModalOpen(false);
     setRenameTarget(null);
-    setShelfMenuId(null);
-  };
-
-  const handleDelete = async (id: number) => {
-    if (confirm('Удалить полку?')) {
-      await deleteShelf(id);
-      setSelectedShelfId(null);
-    }
     setShelfMenuId(null);
   };
 
@@ -113,7 +108,10 @@ export const MyBooks = ({
                     </button>
                     {shelf.shelfType === 3 && (
                       <button
-                        onClick={() => handleDelete(shelf.id)}
+                        onClick={() => {
+                          setDeletingShelfId(shelf.id);
+                          setDeleteModalOpen(true);
+                        }}
                         className={styles['danger']}
                       >
                         <Trash2 size={14} /> Удалить
@@ -144,6 +142,24 @@ export const MyBooks = ({
           />
         )}
       </main>
+      <AlertDialog
+        description={`Действие удалит книжную полку вместе со всем ее содержимым.
+                   Это действие нельзя будет отменить`}
+        open={deleteModalOpen}
+        title={`Вы действительно хотите удалить эту книжную полку?`}
+        handleAccept={async () => {
+          await deleteShelf(deletingShelfId);
+          setDeletingShelfId(0);
+          setSelectedShelfId(null);
+          setDeleteModalOpen(false);
+          setShelfMenuId(null);
+        }}
+        handleReject={() => {
+          setDeleteModalOpen(false);
+          setDeletingShelfId(0);
+          setShelfMenuId(null);
+        }}
+      />
       {modalOpen &&
         createPortal(
           <ShelfRefiningModal

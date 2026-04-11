@@ -13,6 +13,7 @@ import type {
   UpdatePublisherRequest,
 } from '@/types';
 import styles from './PublisherManager.module.css';
+import { AlertDialog } from '@/components/dialogs/AlertDialog';
 
 export const PublisherManager: React.FC = () => {
   const { data: publishers, isLoading, error } = usePublishers();
@@ -20,6 +21,9 @@ export const PublisherManager: React.FC = () => {
   const createMutation = useCreatePublisher();
   const updateMutation = useUpdatePublisher();
   const deleteMutation = useDeletePublisher();
+
+  const [deletingPublisherId, setDeletingPublisherId] = useState(0);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const [formData, setFormData] = useState<CreatePublisherRequest>({
     name: '',
@@ -90,15 +94,9 @@ export const PublisherManager: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (window.confirm('Вы уверены, что хотите удалить это издательство?')) {
-      try {
-        await deleteMutation.mutateAsync(id);
-      } catch (err: any) {
-        console.error('Ошибка удаления издательства:', err);
-        alert(err.response?.data?.message || 'Ошибка удаления издательства');
-      }
-    }
+  const handleDelete = async () => {
+    await deleteMutation.mutateAsync(deletingPublisherId);
+    setDeleteModalOpen(false);
   };
 
   const startEditing = (publisher: PublisherDto) => {
@@ -329,7 +327,10 @@ export const PublisherManager: React.FC = () => {
                         Редактировать
                       </button>
                       <button
-                        onClick={() => handleDelete(publisher.id)}
+                        onClick={() => {
+                          setDeletingPublisherId(publisher.id);
+                          setDeleteModalOpen(true);
+                        }}
                         className={`${styles['btn']} ${styles['btn-danger']}`}
                         disabled={
                           deleteMutation.isPending || updateMutation.isPending
@@ -345,6 +346,18 @@ export const PublisherManager: React.FC = () => {
           </tbody>
         </table>
       </div>
+      <AlertDialog
+        description={`Это действие нельзя будет отменить`}
+        open={deleteModalOpen}
+        title={`Вы действительно хотите удалить это издательство?`}
+        handleAccept={() => {
+          handleDelete();
+        }}
+        handleReject={() => {
+          setDeleteModalOpen(false);
+          setDeletingPublisherId(0);
+        }}
+      />
     </div>
   );
 };

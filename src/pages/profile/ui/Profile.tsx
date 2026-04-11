@@ -137,6 +137,8 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
         ...updatedProfile,
       });
       setProfileSuccess(true);
+      // const queryClient = useQueryClient();
+      // queryClient.invalidateQueries();
     } catch (e: any) {
       setProfileError(`Ошибка: ${e.response.data?.detail}. Попробуйте снова`);
     }

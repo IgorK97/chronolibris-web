@@ -27,14 +27,8 @@ export const ContentTagsManagement: React.FC<ContentTagsManagerProps> = ({
   const removeMutation = useRemoveTagFromContent();
 
   const handleRemoveTag = async (tagId: number) => {
-    if (window.confirm('Удалить этот тег из контента?')) {
-      try {
-        await removeMutation.mutateAsync({ contentId, tagId });
-        refetchTags();
-      } catch (err: any) {
-        alert(err.response?.data?.message || 'Ошибка при удалении тега');
-      }
-    }
+    await removeMutation.mutateAsync({ contentId, tagId });
+    refetchTags();
   };
 
   const handleAddTag = async (tag: TagDetails) => {

@@ -1,25 +1,22 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useDeleteContent } from '@/api/contents';
 import { useDebounce } from '@/hooks/useDebounce';
 import styles from './ContentManagement.module.css';
 import { useNavigate } from 'react-router-dom';
 import { ContentList } from '@/components/Contents/ContentList';
+import { AlertDialog } from '@/components/dialogs/AlertDialog';
 
 export const ContentManagement = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const deleteMutation = useDeleteContent();
   const debouncedSearch = useDebounce(searchQuery, 500);
+  const [deletingContentId, setDeletingContentId] = useState(0);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
-  const handleDelete = async (id: number) => {
-    if (window.confirm('Вы уверены, что хотите удалить этот контент?')) {
-      try {
-        await deleteMutation.mutateAsync(id);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (err: any) {
-        alert(err.response?.data?.message || 'Ошибка удаления');
-      }
-    }
+  const handleDelete = async () => {
+    await deleteMutation.mutateAsync(deletingContentId);
+    setDeleteModalOpen(true);
   };
 
   const apiFilter = {
@@ -53,12 +50,28 @@ export const ContentManagement = () => {
         </div>
       </div>
 
+      <AlertDialog
+        description={`Это действие нельзя будет отменить`}
+        open={deleteModalOpen}
+        title={`Вы действительно хотите удалить этот контент?`}
+        handleAccept={() => {
+          handleDelete();
+        }}
+        handleReject={() => {
+          setDeleteModalOpen(false);
+          setDeletingContentId(0);
+        }}
+      />
+
       <div className={styles['contents-list']}>
         <ContentList
           filter={apiFilter}
           renderActions={(content) => (
             <button
-              onClick={() => handleDelete(content.id)}
+              onClick={() => {
+                setDeletingContentId(content.id);
+                setDeleteModalOpen(true);
+              }}
               className={`${styles['btn']} ${styles['btn-danger']}`}
               disabled={deleteMutation.isPending}
             >

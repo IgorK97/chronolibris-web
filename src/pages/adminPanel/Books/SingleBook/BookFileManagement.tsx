@@ -15,6 +15,7 @@ import { BookFileStatuses } from '@/types';
 import styles from './BookFileManagement.module.css';
 import { Download, Trash2 } from 'lucide-react';
 import { t } from 'i18next';
+import { AlertDialog } from '@/components/dialogs/AlertDialog';
 
 interface BookFileManagementProps {
   bookId: number;
@@ -37,6 +38,8 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
   // const downloadMutation = useDownloadBookFile();
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
+  const [deletingBookfile, setDeletingBookfile] = useState<number>(0);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const [selectedFormat, setSelectedFormat] = useState<number>(0);
   const [isReadable, setIsReadable] = useState<boolean>(false);
@@ -91,15 +94,10 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (window.confirm('Вы уверены, что хотите удалить этот файл?')) {
-      try {
-        await deleteMutation.mutateAsync(id);
-        refetch();
-      } catch (err: any) {
-        alert(err.response?.data?.message || 'Ошибка удаления файла');
-      }
-    }
+  const handleDelete = async () => {
+    await deleteMutation.mutateAsync(deletingBookfile);
+    refetch();
+    setDeleteModalOpen(false);
   };
 
   const handleDownload = async (bookFileId: number, formatId: number) => {
@@ -215,7 +213,16 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
           {uploadMutation.isPending ? 'Загрузка...' : 'Загрузить'}
         </button>
       </div>
-
+      <AlertDialog
+        description={`Это действие нельзя будет отменить, все сопутствующие фрагменты и данные будут также удалены`}
+        open={deleteModalOpen}
+        title={`Вы действительно хотите удалить этот файл книги?`}
+        handleAccept={handleDelete}
+        handleReject={() => {
+          setDeleteModalOpen(false);
+          setDeletingBookfile(0);
+        }}
+      />
       <div className={styles['files-list']}>
         <h4>Существующие файлы ({bookFiles?.length || 0})</h4>
         <table className={styles['files-table']}>
@@ -249,7 +256,10 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
                     <Download style={{ cursor: 'pointer' }} />
                   </button>
                   <button
-                    onClick={() => handleDelete(file.id)}
+                    onClick={() => {
+                      setDeletingBookfile(file.id);
+                      setDeleteModalOpen(true);
+                    }}
                     disabled={
                       deleteMutation.isPending || updateMutation.isPending
                     }

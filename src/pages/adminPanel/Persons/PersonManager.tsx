@@ -12,12 +12,15 @@ import {
 import type { CreatePersonRequest, UpdatePersonRequest } from '@/types';
 import styles from './PersonManager.module.css';
 import type { PersonDto } from '@/types';
+import { AlertDialog } from '@/components/dialogs/AlertDialog';
 
 export const PersonManager: React.FC = () => {
   const { data: persons, isLoading, error } = usePersons();
   const createMutation = useCreatePerson();
   const updateMutation = useUpdatePerson();
   const deleteMutation = useDeletePerson();
+  const [deletingPersonId, setDeletingPersonId] = useState(0);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const [formData, setFormData] = useState<CreatePersonRequest>({
     name: '',
@@ -84,15 +87,9 @@ export const PersonManager: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (window.confirm('Вы уверены, что хотите удалить эту персону?')) {
-      try {
-        await deleteMutation.mutateAsync(id);
-      } catch (err: any) {
-        console.error('Ошибка удаления персоны:', err);
-        alert(err.response?.data?.message || 'Ошибка удаления персоны');
-      }
-    }
+  const handleDelete = async () => {
+    await deleteMutation.mutateAsync(deletingPersonId);
+    setDeleteModalOpen(false);
   };
 
   const startEditing = (person: PersonDto) => {
@@ -270,7 +267,10 @@ export const PersonManager: React.FC = () => {
                         Редактировать
                       </button>
                       <button
-                        onClick={() => handleDelete(person.id)}
+                        onClick={() => {
+                          setDeletingPersonId(person.id);
+                          setDeleteModalOpen(true);
+                        }}
                         className={`${styles['btn']} ${styles['btn-danger']}`}
                         disabled={
                           deleteMutation.isPending || updateMutation.isPending
@@ -286,6 +286,18 @@ export const PersonManager: React.FC = () => {
           </tbody>
         </table>
       </div>
+      <AlertDialog
+        description={`Это действие нельзя будет отменить`}
+        open={deleteModalOpen}
+        title={`Вы действительно хотите удалить персоналию?`}
+        handleAccept={() => {
+          handleDelete();
+        }}
+        handleReject={() => {
+          setDeleteModalOpen(false);
+          setDeletingPersonId(0);
+        }}
+      />
     </div>
   );
 };

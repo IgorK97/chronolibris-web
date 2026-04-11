@@ -197,6 +197,7 @@ export function RegisterStaffPage() {
           value={form.password}
           onChange={set('password')}
           error={errors.password}
+          maxLength={128}
         />
 
         <Field
@@ -205,6 +206,7 @@ export function RegisterStaffPage() {
           value={form.confirm}
           onChange={set('confirm')}
           error={errors.confirm}
+          maxLength={128}
         />
 
         {serverError && <p className={styles.serverError}>{serverError}</p>}
@@ -226,12 +228,14 @@ export function RegisterStaffPage() {
 function Field({
   label,
   value,
+  maxLength = 256,
   onChange,
   error,
   type = 'text',
 }: {
   label: string;
   value: string;
+  maxLength?: number;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error: string | null;
   type?: string;
@@ -245,6 +249,7 @@ function Field({
         value={value}
         onChange={onChange}
         placeholder={label}
+        maxLength={maxLength}
       />
       {error && <span className={styles['error-text']}>{error}</span>}
     </div>
