@@ -4,12 +4,19 @@
 
 .sidebar {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 16px;
   align-self: flex-start;
   position: sticky;
   top: 10px;
   margin-bottom: 20px;
+  margin-right: 10px;
+}
+
+@media (width<=768px) {
+  .sidebar {
+    flex-direction: row;
+  }
 }
 
 .content-layout {

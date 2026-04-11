@@ -208,9 +208,10 @@
 }
 
 .fields-row {
-  display: grid;
+  display: flex;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .checkbox-label {

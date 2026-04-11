@@ -46,6 +46,10 @@
   box-shadow: 0 0 0 2px rgb(99 102 241 / 15%);
 }
 
+.list-section {
+  overflow-x: auto;
+}
+
 .list-section h3 {
   margin: 0 0 12px;
   font-size: 15px;

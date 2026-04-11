@@ -20,6 +20,7 @@
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 24px;
+  overflow-x: auto;
 }
 
 .form-section,
@@ -120,7 +121,7 @@
   border-collapse: collapse;
   background: white;
   border-radius: 8px;
-  overflow: hidden;
+  overflow: visible;
   box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
 }
 
