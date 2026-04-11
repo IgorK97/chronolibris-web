@@ -591,13 +591,15 @@ export const BookDetailsComponent = ({
           }
         />
       </div>
-      {isReportOpen && (
-        <ReportModal
-          targetId={fullBookDetails.id}
-          targetTypeId={TARGET_TYPE.BOOK}
-          onClose={() => setIsReportOpen(false)}
-        />
-      )}
+      {isReportOpen &&
+        createPortal(
+          <ReportModal
+            targetId={fullBookDetails.id}
+            targetTypeId={TARGET_TYPE.BOOK}
+            onClose={() => setIsReportOpen(false)}
+          />,
+          document.body
+        )}
       {isShelfPanelOpen &&
         createPortal(
           <ShelfSelectionModal

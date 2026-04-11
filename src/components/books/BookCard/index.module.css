@@ -9,8 +9,9 @@
   position: relative;
   width: 100%;
   aspect-ratio: 2 / 3;
-  border-radius: 8px;
-  overflow: hidden;
+
+  /* border-radius: 8px; */
+  overflow: visible;
   cursor: pointer;
   transition: opacity 0.2s ease;
 }
@@ -24,6 +25,23 @@
   height: 100%;
   object-fit: cover;
   border-radius: 8px;
+}
+
+.menu-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.menu-item:hover {
+  background-color: #f5f5f5;
+}
+
+.delete-wrapper:hover {
+  background-color: #fef2f2;
 }
 
 .favorite-button {
@@ -130,7 +148,8 @@
   cursor: pointer;
   border-radius: 6px;
   color: #333;
-  width: 100%;
+
+  /* width: 100%; */
   transition: background-color 0.2s;
 }
 
@@ -151,9 +170,26 @@
   cursor: pointer;
 }
 
+.text-label {
+  align-items: center;
+}
+
 @media (width<=768px) {
   .card {
     width: 150px;
+  }
+
+  .text-label {
+    display: none;
+  }
+
+  .dropdown {
+    min-width: unset;
+    width: fit-content;
+  }
+
+  .menu-item {
+    justify-content: center;
   }
 }
 

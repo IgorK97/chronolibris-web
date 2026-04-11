@@ -25,6 +25,12 @@
   border-radius: 10px;
 }
 
+@media (width<=768px) {
+  .tag-type {
+    display: none;
+  }
+}
+
 .tag-remove {
   background: none;
   border: none;

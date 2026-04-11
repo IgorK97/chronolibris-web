@@ -27,29 +27,39 @@ export const ManagedBookCard = ({ book, onRemove, onEdit, onPress }: Props) => {
         <div className={styles['menu-container']}>
           <button
             className={styles['menu-trigger']}
-            onClick={() => setShowMenu(!showMenu)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowMenu(!showMenu);
+            }}
           >
             <MoreVertical size={20} />
           </button>
           {showMenu && (
             <div className={styles['dropdown']}>
-              <button
+              <div
                 onClick={() => {
                   onEdit(book);
                   setShowMenu(false);
                 }}
+                className={styles['menu-item']}
               >
-                <Edit3 size={14} /> Редактировать
-              </button>
-              <button
+                <button type="button">
+                  <Edit3 size={14} />
+                </button>
+                <span className={styles['text-label']}>Редактировать</span>
+              </div>
+              <div
+                className={`${styles['menu-item']} ${styles['delete-wrapper']}`}
                 onClick={() => {
                   onRemove(book.id);
                   setShowMenu(false);
                 }}
-                className={styles['delete-option']}
               >
-                <Trash2 size={14} /> Удалить из списка
-              </button>
+                <button type="button" className={styles['delete-option']}>
+                  <Trash2 size={14} />
+                </button>
+                <span className={styles['text-label']}>Удалить из списка</span>
+              </div>
             </div>
           )}
         </div>

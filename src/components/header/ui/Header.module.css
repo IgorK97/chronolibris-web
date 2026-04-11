@@ -150,6 +150,10 @@
   .search-row .search-wrapper {
     max-width: 100%;
   }
+
+  .register-btn {
+    display: none;
+  }
 }
 
 .navigation-menu-root {
