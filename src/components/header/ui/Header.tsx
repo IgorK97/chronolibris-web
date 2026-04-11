@@ -2,7 +2,7 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useStore } from '@/stores/globalStore';
 import styles from './Header.module.css';
 import { useEffect, useRef, useState } from 'react';
-import { Search, ShieldCheck, UserStar } from 'lucide-react';
+import { Library, Search, ShieldCheck, UserStar } from 'lucide-react';
 import { CatalogPanel } from '@/pages/Search/';
 import { AdminSidebar } from '@/components/AdminSideBar/AdminSideBar';
 
@@ -73,7 +73,7 @@ export default function Header() {
             </Link>
             <button
               className={styles['catalog-btn']}
-              onClick={() => setCatalogOpen(true)}
+              onClick={() => setCatalogOpen(!catalogOpen)}
             >
               Каталог
             </button>
@@ -111,7 +111,10 @@ export default function Header() {
                   ))}
                 {user.role == 'reader' && (
                   <Link to="/mybooks" className={styles['catalog-btn']}>
-                    Мои книги
+                    <span className={styles['catalog-btn-label']}>
+                      Мои книги
+                    </span>
+                    {<Library className={styles['catalog-btn-icon']} />}
                   </Link>
                 )}
                 <Link to="/profile" className={styles['profile-icon']}>

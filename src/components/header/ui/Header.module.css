@@ -57,6 +57,10 @@
   background: var(--mlib-hovered);
 }
 
+.catalog-btn-icon {
+  display: none;
+}
+
 .search-wrapper {
   display: flex;
   align-items: center;
@@ -127,6 +131,14 @@
 @media (width<=768px) {
   .center-section {
     display: none;
+  }
+
+  .catalog-btn-label {
+    display: none;
+  }
+
+  .catalog-btn-icon {
+    display: inline;
   }
 
   .search-row {
