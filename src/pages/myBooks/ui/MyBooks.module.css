@@ -13,6 +13,11 @@
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 0.1);
+}
+
+.sidebar.collapsed {
+  width: 30px;
 }
 
 .sidebar-header {
@@ -20,8 +25,7 @@
   display: flex;
   flex-direction: row;
   column-gap: 10px;
-  margin-left: 10px;
-  margin-top: 5px;
+  padding: 5px;
 }
 
 .shelf-list {
@@ -267,4 +271,10 @@
 .danger:hover {
   background-color: #fef2f2 !important;
   color: #b91c1c;
+}
+
+.collapsed .header-text,
+.collapsed .shelf-list,
+.collapsed .add-shelf-btn .add-shelf-text {
+  display: none;
 }

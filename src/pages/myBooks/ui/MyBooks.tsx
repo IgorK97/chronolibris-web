@@ -35,6 +35,7 @@ export const MyBooks = ({
   const [shelfMenuId, setShelfMenuId] = useState<number | null>(null);
   const activeShelfId = selectedShelfId ?? shelves?.[0]?.id;
   const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
   const [modalMode, setModalMode] = useState<'create' | 'rename'>('create');
   const [renameTarget, setRenameTarget] = useState<{
     id: number;
@@ -65,9 +66,14 @@ export const MyBooks = ({
   if (activeShelfId === null || isLoading) return <div>Загрузка...</div>;
   return (
     <div className={styles['layout']}>
-      <aside className={styles['sidebar']}>
-        <div className={styles['sidebar-header']}>
-          <LibraryBig size={20} /> {t('mybooks.my_books')}
+      <aside
+        className={`${styles['sidebar']} ${isCollapsed ? styles['collapsed'] : ''}`}
+      >
+        <div
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className={styles['sidebar-header']}
+        >
+          <LibraryBig size={20} /> {!isCollapsed ? t('mybooks.my_books') : ''}
         </div>
 
         <nav className={styles['shelf-list']}>
@@ -75,51 +81,53 @@ export const MyBooks = ({
             <div
               key={shelf.id}
               className={`${styles['shelf-item']} ${activeShelfId === shelf.id ? styles.active : ''}`}
-              onClick={() => setSelectedShelfId(shelf.id)}
+              onClick={() => !isCollapsed && setSelectedShelfId(shelf.id)}
             >
               <div className={styles['shelf-main']}>
                 <span className={styles['shelf-name']}>{shelf.name}</span>
               </div>
 
-              <div className={styles['shelf-action-btn']}>
-                <button
-                  onClick={(e) => {
-                    // e.stopPropagation();
-                    // setShelfMenuId(shelf.id);
-                    e.stopPropagation();
-                    setShelfMenuId((prev) =>
-                      prev === shelf.id ? null : shelf.id
-                    );
-                  }}
-                >
-                  <Menu style={{ cursor: 'pointer' }} size={16} />
-                </button>
-                {shelfMenuId === shelf.id && (
-                  <div className={styles['shelf-popup']}>
-                    <button
-                      onClick={() => {
-                        setModalMode('rename');
-                        setRenameTarget({ id: shelf.id, name: shelf.name });
-                        setModalOpen(true);
-                        setShelfMenuId(null);
-                      }}
-                    >
-                      <Edit3 size={14} /> Переименовать
-                    </button>
-                    {shelf.shelfType === 3 && (
+              {!isCollapsed && (
+                <div className={styles['shelf-action-btn']}>
+                  <button
+                    onClick={(e) => {
+                      // e.stopPropagation();
+                      // setShelfMenuId(shelf.id);
+                      e.stopPropagation();
+                      setShelfMenuId((prev) =>
+                        prev === shelf.id ? null : shelf.id
+                      );
+                    }}
+                  >
+                    <Menu style={{ cursor: 'pointer' }} size={16} />
+                  </button>
+                  {shelfMenuId === shelf.id && (
+                    <div className={styles['shelf-popup']}>
                       <button
                         onClick={() => {
-                          setDeletingShelfId(shelf.id);
-                          setDeleteModalOpen(true);
+                          setModalMode('rename');
+                          setRenameTarget({ id: shelf.id, name: shelf.name });
+                          setModalOpen(true);
+                          setShelfMenuId(null);
                         }}
-                        className={styles['danger']}
                       >
-                        <Trash2 size={14} /> Удалить
+                        <Edit3 size={14} /> Переименовать
                       </button>
-                    )}
-                  </div>
-                )}
-              </div>
+                      {shelf.shelfType === 3 && (
+                        <button
+                          onClick={() => {
+                            setDeletingShelfId(shelf.id);
+                            setDeleteModalOpen(true);
+                          }}
+                          className={styles['danger']}
+                        >
+                          <Trash2 size={14} /> Удалить
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           ))}
           <button
