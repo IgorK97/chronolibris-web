@@ -845,17 +845,21 @@ export const Reader: React.FC<ReaderProps> = ({
         <div className={styles['toolbar-inner']}>
           <div className={styles['controls']}>
             {onBack && (
-              <button onClick={onBack} className={styles['nav-button']}>
-                <ChevronLeft /> Вернуться к книге
+              <button
+                className={styles['back-btn']}
+                onClick={() => window.history.back()}
+              >
+                <ChevronLeft size={20} />
+                <span>{/* Оборачиваем текст */} Назад</span>
               </button>
             )}
             {fetchedTocData && (
               <button
-                onClick={() => setTocOpen((v) => !v)}
-                className={`${styles['nav-button']} ${tocOpen ? styles['nav-button-active'] : ''}`}
-                aria-label="Содержание"
+                className={styles['toolbar-btn']}
+                onClick={() => setTocOpen(true)}
               >
-                <TableOfContents /> Содержание
+                <TableOfContents size={20} />
+                <span>{/* Оборачиваем текст */} Содержание</span>
               </button>
             )}
             <button
@@ -927,9 +931,9 @@ export const Reader: React.FC<ReaderProps> = ({
                 title={`Закладки (${bookmarks.filter((b) => b.bookFileId === bookFileId).length})`}
               >
                 <Bookmark color="red" />{' '}
-                {bookmarks.filter((b) => b.bookFileId === bookFileId).length > 0
+                {/* {bookmarks.filter((b) => b.bookFileId === bookFileId).length > 0
                   ? bookmarks.filter((b) => b.bookFileId === bookFileId).length
-                  : ''}
+                  : ''} */}
               </button>
             )}
             <button
