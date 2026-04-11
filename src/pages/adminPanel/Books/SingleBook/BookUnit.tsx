@@ -1,6 +1,12 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useMemo,
+} from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
@@ -384,12 +390,33 @@ const emptyForm = (): FormState => ({
   personFilters: [],
 });
 
+const VALIDATION_RULES = {
+  // isbn: /^(?=(?:\D?\d){10}(?:(?:\D?\d){3})?$)[\d-]+$/,
+  isbn: /^(?=(?:\D?\d){10}(?:(?:\D?\d){3})?$)[\d-]+$/,
+  title: { min: 1, max: 500 },
+  description: { min: 100, max: 2000 },
+  year: { min: -5000, max: 3000 },
+  sourceMax: 500,
+};
+
+const ErrorMsg = ({ text }: { text?: string }) =>
+  text ? (
+    <span
+      className={styles['error-text']}
+      style={{ color: '#d32f2f', fontSize: '12px', marginTop: '4px' }}
+    >
+      {text}
+    </span>
+  ) : null;
+
 export const BookUnit: React.FC = () => {
   const { bookId } = useParams<{ bookId: string }>();
   const navigate = useNavigate();
   const isNew = bookId === 'new';
   const { user } = useStore();
   const id = bookId && !isNew ? parseInt(bookId, 10) : null;
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [globalError, setGlobalError] = useState('');
 
   const {
     data: book,
@@ -412,6 +439,85 @@ export const BookUnit: React.FC = () => {
   const [mode, setMode] = useState<'view' | 'edit'>('view');
   const [showContentSearch, setShowContentSearch] = useState(false);
   const [form, setForm] = useState<FormState>(emptyForm);
+
+  const validate = useCallback(
+    (data: FormState) => {
+      const newErrors: Record<string, string> = {};
+
+      if (
+        !data.title.trim() ||
+        data.title.length > VALIDATION_RULES.title.max
+      ) {
+        newErrors.title = `Не более ${VALIDATION_RULES.title.max} символов`;
+      }
+
+      if (
+        data.description.length < VALIDATION_RULES.description.min ||
+        data.description.length > VALIDATION_RULES.description.max
+      ) {
+        newErrors.description = `От ${VALIDATION_RULES.description.min} до ${VALIDATION_RULES.description.max} символов`;
+      }
+
+      if (data.isbn && !VALIDATION_RULES.isbn.test(data.isbn)) {
+        newErrors.isbn = 'Некорректный формат ISBN';
+      }
+
+      if (data.year) {
+        const y = parseInt(data.year, 10);
+        if (
+          isNaN(y) ||
+          y < VALIDATION_RULES.year.min ||
+          y > VALIDATION_RULES.year.max
+        ) {
+          newErrors.year = `Год от ${VALIDATION_RULES.year.min} до ${VALIDATION_RULES.year.max}`;
+        }
+      }
+
+      if (data.source.length > VALIDATION_RULES.sourceMax) {
+        newErrors.source = `Источник не более ${VALIDATION_RULES.sourceMax} символов`;
+      }
+
+      if (!data.languageId) newErrors.language = 'Выберите язык';
+      if (!data.countryId) newErrors.country = 'Выберите страну';
+      if (isNew && !data.coverFile) newErrors.cover = 'Обложка обязательна';
+
+      setErrors(newErrors);
+      return Object.keys(newErrors).length === 0;
+    },
+    [isNew]
+  );
+
+  const isChanged = useMemo(() => {
+    if (isNew) return true;
+    if (!book) return false;
+
+    return (
+      form.title !== (book.title ?? '') ||
+      form.description !== (book.description ?? '') ||
+      form.isbn !== (book.isbn ?? '') ||
+      form.year !== (book.year != null ? String(book.year) : '') ||
+      form.source !== (book.source ?? '') ||
+      form.languageId !== (book.language?.id ?? null) ||
+      form.countryId !== (book.country?.id ?? null) ||
+      form.publisherId !== (book.publisher?.id ?? null) ||
+      form.isAvailable !== book.isAvailable ||
+      form.isReviewable !== book.isReviewable ||
+      form.coverFile !== null ||
+      JSON.stringify(form.personFilters) !==
+        JSON.stringify(
+          (book.participants ?? []).map((p) => ({
+            roleId: p.role,
+            personIds: p.persons.map((pers) => pers.id),
+          }))
+        )
+    );
+  }, [form, book, isNew]);
+
+  useEffect(() => {
+    if (mode === 'edit') {
+      validate(form);
+    }
+  }, [form, mode, validate]);
 
   useEffect(() => {
     if (isNew) {
@@ -464,20 +570,14 @@ export const BookUnit: React.FC = () => {
   );
 
   const handleSave = async () => {
-    if (!form.title.trim()) {
-      alert('Название обязательно');
-      return;
-    }
+    if (!validate(form)) return;
 
     try {
+      const clearPersonFilters = form.personFilters.filter(
+        (f) => f.roleId !== null && f.personIds.length > 0
+      );
       if (isNew) {
-        if (!form.coverFile) {
-          alert('Выберите обложку');
-          return;
-        }
-
-        const coverBase64 = await fileToBase64(form.coverFile);
-
+        const coverBase64 = await fileToBase64(form.coverFile!);
         const payload: CreateBookRequest = {
           title: form.title,
           description: form.description,
@@ -492,8 +592,8 @@ export const BookUnit: React.FC = () => {
           countryId: form.countryId!,
           publisherId: form.publisherId,
           coverBase64,
-          coverContentType: form.coverFile.type,
-          personFilters: form.personFilters,
+          coverContentType: form.coverFile!.type,
+          personFilters: clearPersonFilters,
         };
 
         const newId = await createMutation.mutateAsync(payload);
@@ -525,14 +625,14 @@ export const BookUnit: React.FC = () => {
           publisherIdProvided: true,
           coverBase64,
           coverContentType: form.coverFile?.type ?? null,
-          personFilters: form.personFilters,
+          personFilters: clearPersonFilters,
         };
 
         await updateMutation.mutateAsync({ id: id!, data: payload });
         setMode('view');
       }
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Ошибка сохранения');
+      setGlobalError(err.response?.data?.message || 'Ошибка!');
     }
   };
 
@@ -600,6 +700,7 @@ export const BookUnit: React.FC = () => {
   };
 
   const isSaving = createMutation.isPending || updateMutation.isPending;
+  const isValid = Object.keys(errors).length === 0;
 
   if (isLoading) return <div className={styles['loading']}>Загрузка...</div>;
   if (error || (!book && !isNew))
@@ -614,6 +715,8 @@ export const BookUnit: React.FC = () => {
           <ArrowLeft style={{ cursor: 'pointer' }} /> Назад
         </button>
         <h2>{isNew ? 'Новая книга' : book?.title}</h2>
+        <ErrorMsg text={globalError} />
+
         {!isNew && (
           <div>
             <button
@@ -645,7 +748,7 @@ export const BookUnit: React.FC = () => {
               <button
                 className={`${styles['btn']} ${styles['btn-update']}`}
                 onClick={handleSave}
-                disabled={isSaving}
+                disabled={isSaving || !isValid || !isChanged}
               >
                 {isSaving ? 'Сохранение...' : isNew ? 'Создать' : 'Сохранить'}
               </button>
@@ -664,6 +767,7 @@ export const BookUnit: React.FC = () => {
                 currentCoverPath={book?.coverUri ?? null}
                 onFileChange={(file) => set('coverFile', file)}
               />
+              <ErrorMsg text={errors.cover} />
 
               <div className={styles['field-group']}>
                 <label className={styles['field-label']}>Название *</label>
@@ -673,6 +777,7 @@ export const BookUnit: React.FC = () => {
                   onChange={(e) => set('title', e.target.value)}
                   placeholder="Название книги"
                 />
+                <ErrorMsg text={errors.title} />
               </div>
 
               <div className={styles['field-group']}>
@@ -684,6 +789,7 @@ export const BookUnit: React.FC = () => {
                   rows={4}
                   placeholder="Описание книги"
                 />
+                <ErrorMsg text={errors.description} />
               </div>
 
               <div className={styles['fields-row']}>
@@ -695,6 +801,7 @@ export const BookUnit: React.FC = () => {
                     onChange={(e) => set('isbn', e.target.value)}
                     placeholder="ISBN"
                   />
+                  <ErrorMsg text={errors.isbn} />
                 </div>
                 <div className={styles['field-group']}>
                   <label className={styles['field-label']}>Год</label>
@@ -705,6 +812,7 @@ export const BookUnit: React.FC = () => {
                     onChange={(e) => set('year', e.target.value)}
                     placeholder="Год"
                   />
+                  <ErrorMsg text={errors.year} />
                 </div>
               </div>
 
@@ -737,6 +845,7 @@ export const BookUnit: React.FC = () => {
                   onChange={(e) => set('source', e.target.value)}
                   placeholder="Источник"
                 />
+                <ErrorMsg text={errors.source} />
               </div>
 
               <AutocompleteField
@@ -754,6 +863,7 @@ export const BookUnit: React.FC = () => {
                   set('languageName', '');
                 }}
               />
+              <ErrorMsg text={errors.language} />
 
               <AutocompleteField
                 label="Страна"
@@ -770,6 +880,7 @@ export const BookUnit: React.FC = () => {
                   set('countryName', '');
                 }}
               />
+              <ErrorMsg text={errors.country} />
 
               <AutocompleteField
                 label="Издательство"
