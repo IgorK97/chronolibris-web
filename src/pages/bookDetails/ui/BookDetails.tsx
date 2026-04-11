@@ -49,6 +49,7 @@ import { ShelfSelectionModal } from '@/pages/MyBooks/ui/ShelfSelectionModal';
 import { GenreChip } from '@/components/GenreChip';
 import { TagChip } from '@/components';
 import { BookTabs } from './BookTabs';
+import { AlertDialog } from '@/components/dialogs/AlertDialog';
 interface BookDetailsProps {
   onNavigateToReviews: (id: number) => void;
   onNavigateToRead: (bookFileId?: number) => void;
@@ -91,6 +92,8 @@ export const BookDetailsComponent = ({
   const isAuth = !!user;
   const FAVORITES_SHELF_ID = shelves?.find((s) => s.shelfType === 1)?.id;
   const READ_SHELF_ID = shelves?.find((s) => s.shelfType === 2)?.id;
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const [hoverRating, setHoverRating] = useState<number>(0);
   const [isRatingPopupOpen, setIsRatingPopupOpen] = useState(false);
@@ -189,6 +192,12 @@ export const BookDetailsComponent = ({
       : await collectionsApi.removeBookFromShelf(shelfId, fullBookDetails.id);
 
     if (success) refetchBook();
+  };
+
+  const handleDelete = async () => {
+    await deleteReview.mutateAsync(userReview?.id ?? 0);
+    setIsRatingPopupOpen(false);
+    setDeleteModalOpen(false);
   };
 
   const handleDownload = async (bookFileId: number, formatId: number) => {
@@ -468,16 +477,7 @@ export const BookDetailsComponent = ({
                               <button
                                 className={styles['delete-review-btn']}
                                 onClick={async () => {
-                                  if (
-                                    window.confirm(
-                                      t('book.confirm_delete_review')
-                                    )
-                                  ) {
-                                    await deleteReview.mutateAsync(
-                                      userReview.id
-                                    );
-                                    setIsRatingPopupOpen(false);
-                                  }
+                                  setDeleteModalOpen(true);
                                 }}
                                 disabled={deleteReview.isPending}
                               >
@@ -607,6 +607,17 @@ export const BookDetailsComponent = ({
           />,
           document.body
         )}
+      <AlertDialog
+        description={`Это действие нельзя будет отменить. Оценка будет удалена вместе с отзывом`}
+        open={deleteModalOpen}
+        title={`Вы действительно хотите удалить оценку?`}
+        handleAccept={() => {
+          handleDelete();
+        }}
+        handleReject={() => {
+          setDeleteModalOpen(false);
+        }}
+      />
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { useInfiniteChildTags, useDeleteTag } from '@/api/tags';
 import { TAG_TYPES, type TagDetails } from '@/types';
 import styles from './TagsTable.module.css';
 import { ExpandChildButton } from '@/components/buttons/ExpandChildButton';
+import { AlertDialog } from '@/components/dialogs/AlertDialog';
 
 interface TagRowProps {
   tag: TagDetails;
@@ -22,6 +23,7 @@ export const TagRow: React.FC<TagRowProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const deleteMutation = useDeleteTag();
   const loaderRef = useRef<HTMLTableRowElement | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -52,11 +54,9 @@ export const TagRow: React.FC<TagRowProps> = ({
     return () => observer.disconnect();
   }, [isExpanded, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (window.confirm(`Удалить тег «${tag.name}»?`)) {
-      deleteMutation.mutate(tag.id);
-    }
+  const handleDelete = () => {
+    deleteMutation.mutate(tag.id);
+    setDeleteModalOpen(false);
   };
 
   const handleRowClick = () => {
@@ -116,7 +116,10 @@ export const TagRow: React.FC<TagRowProps> = ({
 
         <td className={styles['td']}>
           <button
-            onClick={handleDelete}
+            onClick={(e: React.MouseEvent) => {
+              e.stopPropagation();
+              setDeleteModalOpen(true);
+            }}
             className={styles['delete-button']}
             disabled={deleteMutation.isPending || tag.hasChildren}
           >
@@ -124,6 +127,18 @@ export const TagRow: React.FC<TagRowProps> = ({
           </button>
         </td>
       </tr>
+
+      <AlertDialog
+        description={`Это действие нельзя будет отменить`}
+        open={deleteModalOpen}
+        title={`Вы действительно хотите удалить этот тег?`}
+        handleAccept={() => {
+          handleDelete();
+        }}
+        handleReject={() => {
+          setDeleteModalOpen(false);
+        }}
+      />
 
       {isExpanded && (
         <>

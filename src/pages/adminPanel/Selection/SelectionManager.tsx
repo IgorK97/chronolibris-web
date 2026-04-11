@@ -14,6 +14,7 @@ import type { BookListItem } from '@/types';
 import styles from './SelectionManager.module.css';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { AlertDialog } from '@/components/dialogs/AlertDialog';
 
 interface SelectionManagerEditProps {
   mode: 'edit';
@@ -187,6 +188,7 @@ const SelectionEditView: React.FC<SelectionEditViewProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({ name: '', description: '' });
   const [bookId, setBookId] = useState('');
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const { data: selection, isLoading: selectionLoading } =
     useSelection(selectionId);
@@ -248,10 +250,9 @@ const SelectionEditView: React.FC<SelectionEditViewProps> = ({
   };
 
   const handleDelete = () => {
-    if (window.confirm('Вы уверены, что хотите удалить подборку?')) {
-      deleteMutation.mutate(selectionId);
-      onBack();
-    }
+    deleteMutation.mutate(selectionId);
+    setDeleteModalOpen(false);
+    onBack();
   };
 
   const handleAddBook = () => {
@@ -349,7 +350,9 @@ const SelectionEditView: React.FC<SelectionEditViewProps> = ({
                 {selection.isActive ? 'Скрыть' : 'Показать'}
               </button>
               <button
-                onClick={handleDelete}
+                onClick={() => {
+                  setDeleteModalOpen(true);
+                }}
                 className={`${styles['btn']} ${styles['btn-danger']}`}
               >
                 Удалить
@@ -358,6 +361,18 @@ const SelectionEditView: React.FC<SelectionEditViewProps> = ({
           </>
         )}
       </div>
+
+      <AlertDialog
+        description={`Это действие нельзя будет отменить`}
+        open={deleteModalOpen}
+        title={`Вы действительно хотите удалить эту подборку?`}
+        handleAccept={() => {
+          handleDelete();
+        }}
+        handleReject={() => {
+          setDeleteModalOpen(false);
+        }}
+      />
 
       <div className={styles['books-section']}>
         <h2 className={styles['section-title']}>Книги в подборке</h2>

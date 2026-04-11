@@ -21,6 +21,7 @@ import type { ReviewDetails } from '@/types';
 import { useStore } from '@/stores/globalStore';
 import { TARGET_TYPE } from '@/types';
 import { renderFormattedText } from './utils';
+import { AlertDialog } from '@/components/dialogs/AlertDialog';
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -255,15 +256,11 @@ export function ReviewsSection({
   onRatingChanged,
 }: ReviewsSectionProps) {
   const [pickedRating, setPickedRating] = useState<number>(userCurrentScore);
-  const handleDeleteReview = async (reviewId: number) => {
-    if (!window.confirm('Вы уверены, что хотите удалить этот отзыв?')) return;
-
-    try {
-      await deleteReview.mutateAsync(reviewId);
-      onRatingChanged();
-    } catch (error) {
-      console.error('Ошибка при удалении:', error);
-    }
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const handleDeleteReview = async () => {
+    await deleteReview.mutateAsync(userReviewId!);
+    onRatingChanged();
+    setDeleteModalOpen(false);
   };
 
   useEffect(() => {
@@ -336,7 +333,7 @@ export function ReviewsSection({
           placeholder="Поделитесь своим впечатлением о книге..."
           onSubmit={handleSubmit}
           type="review"
-          onDelete={() => userReviewId && handleDeleteReview(userReviewId)}
+          onDelete={() => userReviewId && setDeleteModalOpen(true)}
           initialText={userReviewText || ''}
           isReadOnly={!!userReviewText}
         >
@@ -367,10 +364,22 @@ export function ReviewsSection({
             review={r}
             isAuth={isAuth}
             canDelete={isAuth && r.userName === user?.userName}
-            onDelete={() => handleDeleteReview(r.id)}
+            onDelete={async () => setDeleteModalOpen(true)}
           />
         ))}
       </div>
+
+      <AlertDialog
+        description={`Это действие нельзя будет отменить, но его можно написать заново`}
+        open={deleteModalOpen}
+        title={`Вы действительно хотите удалить отзыв?`}
+        handleAccept={() => {
+          handleDeleteReview();
+        }}
+        handleReject={() => {
+          setDeleteModalOpen(false);
+        }}
+      />
 
       {hasNextPage && (
         <button

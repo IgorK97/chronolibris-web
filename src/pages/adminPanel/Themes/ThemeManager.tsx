@@ -12,12 +12,16 @@ import type { ThemeDto } from '@/types';
 import styles from './ThemeManager.module.css';
 import { ExpandChildButton } from '@/components/buttons/ExpandChildButton';
 import { Check, Pencil, Trash2, X } from 'lucide-react';
+import { AlertDialog } from '@/components/dialogs/AlertDialog';
 
 export const ThemeManager: React.FC = () => {
   const { data: themes, isLoading, error, refetch } = useThemes();
   const createMutation = useCreateTheme();
   const updateMutation = useUpdateTheme();
   const deleteMutation = useDeleteTheme();
+
+  const [deletingThemeId, setDeletingThemeId] = useState(number);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const [formData, setFormData] = useState<CreateThemeRequest>({
     name: '',
@@ -75,16 +79,11 @@ export const ThemeManager: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (window.confirm('Вы уверены, что хотите удалить эту тему?')) {
-      try {
-        await deleteMutation.mutateAsync(id);
-        refetch();
-      } catch (err: any) {
-        console.error('Ошибка удаления темы:', err);
-        alert(err.response?.data?.message || 'Ошибка удаления темы');
-      }
-    }
+  const handleDelete = async () => {
+    await deleteMutation.mutateAsync(deletingThemeId);
+    refetch();
+    setDeletingThemeId(0);
+    setDeleteModalOpen(false);
   };
 
   const startEditing = (theme: ThemeDto) => {
@@ -208,7 +207,10 @@ export const ThemeManager: React.FC = () => {
               onStartEditing={startEditing}
               onCancelEditing={cancelEditing}
               onUpdate={handleUpdate}
-              onDelete={handleDelete}
+              onDelete={() => {
+                setDeletingThemeId(theme.id);
+                setDeleteModalOpen(true);
+              }}
               onToggleExpand={toggleExpand}
               isExpanded={expandedThemes.has(theme.id)}
               expandedThemes={expandedThemes}
@@ -224,6 +226,18 @@ export const ThemeManager: React.FC = () => {
           ))}
         </div>
       </div>
+      <AlertDialog
+        description={`Это действие нельзя будет отменить`}
+        open={deleteModalOpen}
+        title={`Вы действительно хотите удалить эту тему?`}
+        handleAccept={() => {
+          handleDelete();
+        }}
+        handleReject={() => {
+          setDeleteModalOpen(false);
+          setDeletingThemeId(0);
+        }}
+      />
     </div>
   );
 };
