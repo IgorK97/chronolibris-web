@@ -6,7 +6,12 @@ import {
 import { useTranslation } from 'react-i18next';
 import { LibraryBig, Plus, Menu, Edit3, Trash2 } from 'lucide-react';
 import { useStore } from '../../../stores/globalStore';
-import { useShelves, collectionsApi } from '../../../api/collections';
+import {
+  useShelves,
+  useCreateShelf,
+  useUpdateShelf,
+  useDeleteShelf,
+} from '../../../api/collections';
 import { BookListByCategory } from './BookListByCategory';
 import styles from './MyBooks.module.css';
 import { ShelfRefiningModal } from './ShelfRefiningModal';
@@ -19,11 +24,10 @@ export const MyBooks = ({
 }) => {
   const { t } = useTranslation();
   const { user } = useStore();
-  const {
-    data: shelves,
-    isLoading,
-    refetch: refetchShelves,
-  } = useShelves(user?.userId || 0);
+  const { data: shelves, isLoading } = useShelves(user?.userId || 0);
+  const { mutateAsync: createShelf } = useCreateShelf();
+  const { mutateAsync: updateShelf } = useUpdateShelf();
+  const { mutateAsync: deleteShelf } = useDeleteShelf();
   const [selectedShelfId, setSelectedShelfId] = useState<number | null>(null);
   const [shelfMenuId, setShelfMenuId] = useState<number | null>(null);
   const activeShelfId = selectedShelfId ?? shelves?.[0]?.id;
@@ -36,8 +40,9 @@ export const MyBooks = ({
 
   const handleCreateShelf = async (name: string) => {
     if (!name.trim()) return;
-    await collectionsApi.createShelf(name.trim());
-    await refetchShelves();
+    await createShelf(name.trim());
+    // await collectionsApi.createShelf(name.trim());
+    // await refetchShelves();
     setModalOpen(false);
   };
 
@@ -48,8 +53,7 @@ export const MyBooks = ({
       setRenameTarget(null);
       return;
     }
-    await collectionsApi.updateShelf(renameTarget.id, newName.trim());
-    await refetchShelves();
+    await updateShelf({ id: renameTarget.id, name: newName.trim() });
     setModalOpen(false);
     setRenameTarget(null);
     setShelfMenuId(null);
@@ -57,8 +61,7 @@ export const MyBooks = ({
 
   const handleDelete = async (id: number) => {
     if (confirm('Удалить полку?')) {
-      await collectionsApi.deleteShelf(id);
-      refetchShelves();
+      await deleteShelf(id);
       setSelectedShelfId(null);
     }
     setShelfMenuId(null);

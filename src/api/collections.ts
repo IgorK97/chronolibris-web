@@ -12,6 +12,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
+import { queryClient } from './queryClient';
 
 export const collectionsApi = {
   getAllSelections: () => apiClient.get<SelectionDetails[]>('/Selections'),
@@ -87,6 +88,38 @@ export const collectionsApi = {
 
   seekBookInShelf: (bookId: number) =>
     apiClient.get<number[]>(`/Shelves/books/${bookId}`),
+};
+
+export const useCreateShelf = () => {
+  // const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (name: string) => collectionsApi.createShelf(name),
+    onSuccess: () => {
+      // Автоматически обновляем список полок для текущего пользователя
+      queryClient.invalidateQueries({ queryKey: ['shelves'] });
+    },
+  });
+};
+
+export const useUpdateShelf = () => {
+  // const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, name }: { id: number; name: string }) =>
+      collectionsApi.updateShelf(id, name),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['shelves'] });
+    },
+  });
+};
+
+export const useDeleteShelf = () => {
+  // const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => collectionsApi.deleteShelf(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['shelves'] });
+    },
+  });
 };
 
 export const useSeekedShelves = (bookId: number) => {

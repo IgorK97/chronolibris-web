@@ -13,9 +13,9 @@ import { MyBooks } from '../pages/MyBooks';
 import { usersApi } from '../api/user';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import {
-  MutationCache,
-  QueryCache,
-  QueryClient,
+  // MutationCache,
+  // QueryCache,
+  // QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
 import {
@@ -37,30 +37,8 @@ import { ModerationPage } from '@/pages/Moderation/ModerationPage';
 import SearchPage from '@/pages/Search/ui/SearchPage';
 import { RegisterStaffPage } from '@/pages/AdminPanel/RegisterStaffPage/RegisterStuffPage';
 import { PublicOnlyRoute } from './routes/PublicOnlyRoute';
-import toast from 'react-hot-toast';
-
-const queryClient = new QueryClient({
-  // Обработка ошибок для всех useQuery
-  queryCache: new QueryCache({
-    onError: (error: any) => {
-      if (error.response?.status >= 500) {
-        toast.error(
-          `Ошибка сервера: ${error.response.data?.message || 'Попробуйте позже'}`
-        );
-      }
-    },
-  }),
-  // Обработка ошибок для всех useMutation (создание, удаление, изменение)
-  mutationCache: new MutationCache({
-    onError: (error: any) => {
-      if (error.response?.status >= 500) {
-        toast.error(
-          `Не удалось выполнить действие: ${error.response.data?.message || 'Ошибка сервера'}`
-        );
-      }
-    },
-  }),
-});
+import { queryClient } from '@/api/queryClient';
+import { Toaster } from 'react-hot-toast';
 
 export default function App() {
   const { setUser, isInitialized, setInitialized } = useStore();
@@ -101,6 +79,7 @@ export default function App() {
   };
   return (
     <QueryClientProvider client={queryClient}>
+      <Toaster position="top-right" />
       <Routes>
         <Route element={<MainLayout />}>
           {/* Только неавторизованные */}
