@@ -186,13 +186,6 @@ function PersonFilter({
                 className={styles['dropdown-item']}
                 onMouseDown={() => handleSelect(s)}
               >
-                {/* {s.imagePath && (
-                  <img
-                    src={s.imagePath}
-                    alt=""
-                    className={styles['person-avatar']}
-                  />
-                )} */}
                 <span>{s.name}</span>
               </li>
             ))}
@@ -421,7 +414,13 @@ export function AdvancedSearchPanel({
   const { data: roles = [] } = usePersonRoles();
   const [draft, setDraft] = useState<AdvancedFilters>(filters);
   const handleApply = () => {
-    onChange(draft);
+    const resDraft: AdvancedFilters = {
+      personFilters: draft.personFilters.filter((pf) => pf.roleId),
+      excludedTagIds: draft.excludedTagIds,
+      requiredTagIds: draft.requiredTagIds,
+      themeId: draft.themeId,
+    };
+    onChange(resDraft);
   };
 
   const isDirty = JSON.stringify(draft) !== JSON.stringify(filters);
