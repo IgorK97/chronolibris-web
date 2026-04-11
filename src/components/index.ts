@@ -9,3 +9,4 @@ export * from './buttons';
 export * from './header';
 export * from './reports';
 export * from './ui';
+export * from './text/ErrorMsg';

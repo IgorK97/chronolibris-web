@@ -33,6 +33,7 @@ import { useStore } from '@/stores/globalStore';
 import { fileToBase64, storageUrl } from '@/utils';
 import { ContentList } from '@/components/Contents/ContentList';
 import { BookFileManagement } from './BookFileManagement';
+import { ErrorMsg } from '@/components';
 
 interface SelectedPerson {
   id: number;
@@ -399,16 +400,6 @@ const VALIDATION_RULES = {
   sourceMax: 500,
 };
 
-const ErrorMsg = ({ text }: { text?: string }) =>
-  text ? (
-    <span
-      className={styles['error-text']}
-      style={{ color: '#d32f2f', fontSize: '12px', marginTop: '4px' }}
-    >
-      {text}
-    </span>
-  ) : null;
-
 export const BookUnit: React.FC = () => {
   const { bookId } = useParams<{ bookId: string }>();
   const navigate = useNavigate();
@@ -533,9 +524,9 @@ export const BookUnit: React.FC = () => {
         title: book.title ?? '',
         description: book.description ?? '',
         isbn: book.isbn ?? '',
-        bbk: (book as any).bbk ?? '',
-        udk: (book as any).udk ?? '',
-        source: (book as any).source ?? '',
+        bbk: book.bbk ?? '',
+        udk: book.udk ?? '',
+        source: book.source ?? '',
         year: book.year != null ? String(book.year) : '',
         isAvailable: book.isAvailable,
         isReviewable: book.isReviewable,

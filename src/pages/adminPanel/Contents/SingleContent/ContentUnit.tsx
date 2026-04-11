@@ -1,6 +1,12 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useMemo,
+} from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   useContentById,
@@ -24,6 +30,7 @@ import styles from './ContentUnit.module.css';
 import { ArrowLeft, X } from 'lucide-react';
 import { storageUrl } from '@/utils';
 import { GenreChip } from '@/components/GenreChip';
+import { ErrorMsg } from '@/components';
 
 const DOCUMENT_TYPES = [
   { id: 1, name: 'Дневник', nature: 'Document' },
@@ -75,6 +82,12 @@ const emptyForm = (): FormState => ({
   year: '',
   personFilters: [],
 });
+
+const VALIDATION_RULES = {
+  title: { min: 1, max: 500 },
+  description: { min: 100, max: 2000 },
+  year: { min: -5000, max: 3000 },
+};
 
 function PersonFilter({
   value,
@@ -256,6 +269,9 @@ export const ContentUnit: React.FC = () => {
   const { data: associatedBooks = [], isLoading: isLoadingAssociatedBooks } =
     useContentBooks(id);
 
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [globalError, setGlobalError] = useState('');
+
   const createMutation = useCreateContent();
   const patchMutation = usePatchContent();
 
@@ -263,6 +279,59 @@ export const ContentUnit: React.FC = () => {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [selectedThemes, setSelectedThemes] = useState<ThemeDto[]>([]);
   const [initialPersons, setInitialPersons] = useState<SelectedPerson[]>([]);
+
+  const validate = useCallback(
+    (data: FormState) => {
+      const newErrors: Record<string, string> = {};
+
+      if (
+        !data.title.trim() ||
+        data.title.length > VALIDATION_RULES.title.max
+      ) {
+        newErrors.title = `Не более ${VALIDATION_RULES.title.max} символов`;
+      }
+
+      if (
+        data.description.length < VALIDATION_RULES.description.min ||
+        data.description.length > VALIDATION_RULES.description.max
+      ) {
+        newErrors.description = `От ${VALIDATION_RULES.description.min} до ${VALIDATION_RULES.description.max} символов`;
+      }
+
+      if (data.year) {
+        const y = parseInt(data.year, 10);
+        if (
+          isNaN(y) ||
+          y < VALIDATION_RULES.year.min ||
+          y > VALIDATION_RULES.year.max
+        ) {
+          newErrors.year = `Год от ${VALIDATION_RULES.year.min} до ${VALIDATION_RULES.year.max}`;
+        }
+      }
+
+      if (!data.languageId) newErrors.language = 'Выберите язык';
+      if (!data.countryId) newErrors.country = 'Выберите страну';
+      if (!data.contentTypeId)
+        newErrors.contentTypeId = 'Выберите тип документа';
+      if (
+        !data.personFilters.filter(
+          (pf) => pf.roleId == 1 && pf.personIds.length > 0
+        )
+      )
+        newErrors.personFilters =
+          'Укажите хотя бы одного автора (создателя контента)';
+
+      setErrors(newErrors);
+      return Object.keys(newErrors).length === 0;
+    },
+    [isNew]
+  );
+
+  useEffect(() => {
+    if (mode === 'edit') {
+      validate(form);
+    }
+  }, [form, mode, validate]);
 
   useEffect(() => {
     if (isNew) {
@@ -311,12 +380,42 @@ export const ContentUnit: React.FC = () => {
     []
   );
 
-  const handleSave = async () => {
-    if (!form.title.trim()) {
-      alert('Название обязательно');
-      return;
-    }
+  const isChanged = useMemo(() => {
+    if (isNew) return true;
+    if (!content) return false;
 
+    return (
+      form.title !== (content.title ?? '') ||
+      form.description !== (content.description ?? '') ||
+      form.year !== (content.year != null ? String(content.year) : '') ||
+      form.languageId !== (content.languageId ?? null) ||
+      form.countryId !== (content.countryId ?? null) ||
+      form.contentTypeId !== (content.contentTypeId ?? null) ||
+      JSON.stringify(form.personFilters) !==
+        JSON.stringify(
+          (content.participants ?? []).map((p) => ({
+            roleId: p.roleId,
+            personIds: p.personIds.map((pers) => pers),
+          }))
+        ) ||
+      JSON.stringify(
+        selectedThemes.map((theme) => ({
+          id: theme.id,
+        }))
+      ) !==
+        JSON.stringify(
+          (content.themes ?? []).map((theme) => ({
+            id: theme.id,
+          }))
+        )
+    );
+  }, [form, content, isNew, selectedThemes]);
+
+  const handleSave = async () => {
+    if (!validate(form)) return;
+    const clearPersonFilters = form.personFilters.filter(
+      (f) => f.roleId !== null && f.personIds.length > 0
+    );
     const requestData = {
       title: form.title,
       description: form.description,
@@ -325,7 +424,7 @@ export const ContentUnit: React.FC = () => {
       countryId: form.countryId || null,
       year: form.year ? parseInt(form.year) : null,
       themeIds: selectedThemes.map((t) => t.id),
-      personFilters: form.personFilters,
+      personFilters: clearPersonFilters,
     };
 
     try {
@@ -366,6 +465,7 @@ export const ContentUnit: React.FC = () => {
 
   const isSaving = createMutation.isPending || patchMutation.isPending;
   const isEditing = mode === 'edit';
+  const isValid = Object.keys(errors).length === 0;
 
   const langName =
     languages.find((l: any) => l.id === form.languageId)?.name ?? '';
@@ -385,6 +485,8 @@ export const ContentUnit: React.FC = () => {
           <ArrowLeft style={{ cursor: 'pointer' }} /> Назад к списку
         </button>
         <h2>{isNew ? 'Новый контент' : content?.title}</h2>
+        <ErrorMsg text={globalError} />
+
         <div className={styles['header-actions']}>
           {!isNew && !isEditing && (
             <button
@@ -406,7 +508,7 @@ export const ContentUnit: React.FC = () => {
               <button
                 className={`${styles['btn']} ${styles['btn-update']}`}
                 onClick={handleSave}
-                disabled={isSaving}
+                disabled={isSaving || !isValid || !isChanged}
               >
                 {isSaving ? 'Сохранение...' : isNew ? 'Создать' : 'Сохранить'}
               </button>
@@ -429,6 +531,7 @@ export const ContentUnit: React.FC = () => {
                   onChange={(e) => set('title', e.target.value)}
                   placeholder="Название контента"
                 />
+                <ErrorMsg text={errors.title} />
               </div>
 
               <div className={styles['field-group']}>
@@ -440,6 +543,7 @@ export const ContentUnit: React.FC = () => {
                   rows={4}
                   placeholder="Описание контента"
                 />
+                <ErrorMsg text={errors.description} />
               </div>
 
               <div className={styles['field-group']}>
@@ -456,6 +560,7 @@ export const ContentUnit: React.FC = () => {
                     </option>
                   ))}
                 </select>
+                <ErrorMsg text={errors.contentTypeId} />
               </div>
 
               <div className={styles['field-group']}>
@@ -467,6 +572,7 @@ export const ContentUnit: React.FC = () => {
                   onChange={(e) => set('year', e.target.value)}
                   placeholder="Год"
                 />
+                <ErrorMsg text={errors.year} />
               </div>
 
               <div className={styles['field-group']}>
@@ -483,6 +589,7 @@ export const ContentUnit: React.FC = () => {
                     </option>
                   ))}
                 </select>
+                <ErrorMsg text={errors.language} />
               </div>
 
               <div className={styles['field-group']}>
@@ -499,6 +606,7 @@ export const ContentUnit: React.FC = () => {
                     </option>
                   ))}
                 </select>
+                <ErrorMsg text={errors.country} />
               </div>
 
               <PersonFilter
@@ -508,6 +616,7 @@ export const ContentUnit: React.FC = () => {
                 onChange={(pf) => set('personFilters', pf)}
                 initialPersons={initialPersons}
               />
+              <ErrorMsg text={errors.personFilters} />
 
               <div className={styles['field-group']}>
                 <label className={styles['field-label']}>Темы</label>
