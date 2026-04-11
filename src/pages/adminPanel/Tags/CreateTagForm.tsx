@@ -30,8 +30,9 @@ export const CreateTagForm: React.FC<CreateTagFormProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    if (tagTypeId != selectedParentTag?.tagTypeId) {
+    if (selectedParentTag && tagTypeId != selectedParentTag?.tagTypeId) {
       setError('Типы тегов в отношении должны совпадать');
+      selectedParentTag = null;
       return;
     }
     createMutation.mutate(
@@ -48,6 +49,7 @@ export const CreateTagForm: React.FC<CreateTagFormProps> = ({
         },
       }
     );
+    selectedParentTag = null;
   };
 
   const serverErrorMessage = createMutation.error
@@ -69,6 +71,7 @@ export const CreateTagForm: React.FC<CreateTagFormProps> = ({
           className={styles['input']}
           placeholder="Введите название тега"
           required
+          maxLength={500}
         />
       </div>
 
@@ -92,7 +95,7 @@ export const CreateTagForm: React.FC<CreateTagFormProps> = ({
         {selectedParentTag ? (
           <div className={styles['parent-tag-selected']}>
             <span style={{ marginRight: '5px' }}>
-              {TAG_TYPES.find((t) => t.id === selectedParentTag.tagTypeId)
+              {TAG_TYPES.find((t) => t.id === selectedParentTag?.tagTypeId)
                 ?.name ?? selectedParentTag.tagTypeName}
             </span>
             <span style={{ marginRight: '5px' }}>{selectedParentTag.name}</span>

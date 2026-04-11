@@ -118,7 +118,7 @@ export const TagRow: React.FC<TagRowProps> = ({
           <button
             onClick={handleDelete}
             className={styles['delete-button']}
-            disabled={deleteMutation.isPending}
+            disabled={deleteMutation.isPending || tag.hasChildren}
           >
             {deleteMutation.isPending ? '...' : 'Удалить'}
           </button>
