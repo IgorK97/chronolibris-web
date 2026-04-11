@@ -280,52 +280,45 @@ export const ContentUnit: React.FC = () => {
   const [selectedThemes, setSelectedThemes] = useState<ThemeDto[]>([]);
   const [initialPersons, setInitialPersons] = useState<SelectedPerson[]>([]);
 
-  const validate = useCallback(
-    (data: FormState) => {
-      const newErrors: Record<string, string> = {};
+  const validate = useCallback((data: FormState) => {
+    const newErrors: Record<string, string> = {};
 
+    if (!data.title.trim() || data.title.length > VALIDATION_RULES.title.max) {
+      newErrors.title = `Не более ${VALIDATION_RULES.title.max} символов`;
+    }
+
+    if (
+      data.description.length < VALIDATION_RULES.description.min ||
+      data.description.length > VALIDATION_RULES.description.max
+    ) {
+      newErrors.description = `От ${VALIDATION_RULES.description.min} до ${VALIDATION_RULES.description.max} символов`;
+    }
+
+    if (data.year) {
+      const y = parseInt(data.year, 10);
       if (
-        !data.title.trim() ||
-        data.title.length > VALIDATION_RULES.title.max
+        isNaN(y) ||
+        y < VALIDATION_RULES.year.min ||
+        y > VALIDATION_RULES.year.max
       ) {
-        newErrors.title = `Не более ${VALIDATION_RULES.title.max} символов`;
+        newErrors.year = `Год от ${VALIDATION_RULES.year.min} до ${VALIDATION_RULES.year.max}`;
       }
+    }
 
-      if (
-        data.description.length < VALIDATION_RULES.description.min ||
-        data.description.length > VALIDATION_RULES.description.max
-      ) {
-        newErrors.description = `От ${VALIDATION_RULES.description.min} до ${VALIDATION_RULES.description.max} символов`;
-      }
-
-      if (data.year) {
-        const y = parseInt(data.year, 10);
-        if (
-          isNaN(y) ||
-          y < VALIDATION_RULES.year.min ||
-          y > VALIDATION_RULES.year.max
-        ) {
-          newErrors.year = `Год от ${VALIDATION_RULES.year.min} до ${VALIDATION_RULES.year.max}`;
-        }
-      }
-
-      if (!data.languageId) newErrors.language = 'Выберите язык';
-      if (!data.countryId) newErrors.country = 'Выберите страну';
-      if (!data.contentTypeId)
-        newErrors.contentTypeId = 'Выберите тип документа';
-      if (
-        !data.personFilters.filter(
-          (pf) => pf.roleId == 1 && pf.personIds.length > 0
-        )
+    if (!data.languageId) newErrors.language = 'Выберите язык';
+    if (!data.countryId) newErrors.country = 'Выберите страну';
+    if (!data.contentTypeId) newErrors.contentTypeId = 'Выберите тип документа';
+    if (
+      !data.personFilters.filter(
+        (pf) => pf.roleId == 1 && pf.personIds.length > 0
       )
-        newErrors.personFilters =
-          'Укажите хотя бы одного автора (создателя контента)';
+    )
+      newErrors.personFilters =
+        'Укажите хотя бы одного автора (создателя контента)';
 
-      setErrors(newErrors);
-      return Object.keys(newErrors).length === 0;
-    },
-    [isNew]
-  );
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }, []);
 
   useEffect(() => {
     if (mode === 'edit') {
@@ -436,7 +429,7 @@ export const ContentUnit: React.FC = () => {
         setMode('view');
       }
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Ошибка при сохранении');
+      setGlobalError(err.response?.data?.message || 'Ошибка при сохранении');
     }
   };
 

@@ -30,7 +30,7 @@ export const SimpleEntityManager: React.FC<SimpleEntityManagerProps> = ({
   title,
   createLabel,
   createPlaceholder = 'Название',
-  maxLength = 255,
+  maxLength = 256,
   items,
   isLoading,
   error,

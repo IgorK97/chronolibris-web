@@ -29,6 +29,7 @@ export const LanguageManager = () => {
       isCreating={create.isPending}
       isUpdating={update.isPending}
       isDeleting={del.isPending}
+      maxLength={50}
     />
   );
 };

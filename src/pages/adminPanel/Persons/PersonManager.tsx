@@ -166,7 +166,8 @@ export const PersonManager: React.FC = () => {
             disabled={
               createMutation.isPending ||
               !formData.name.trim() ||
-              !formData.description.trim()
+              !formData.description.trim() ||
+              formData.description.length < 100
             }
             className={styles['btn']}
           >
@@ -201,7 +202,7 @@ export const PersonManager: React.FC = () => {
                           })
                         }
                         className={styles['input-field']}
-                        maxLength={255}
+                        maxLength={256}
                       />
                     </td>
                     <td>
@@ -215,6 +216,8 @@ export const PersonManager: React.FC = () => {
                         }
                         className={styles['input-field textarea']}
                         rows={2}
+                        maxLength={2000}
+                        minLength={100}
                       />
                     </td>
                     <td>
@@ -227,7 +230,12 @@ export const PersonManager: React.FC = () => {
                           )
                         }
                         className={`${styles['btn']} ${styles['btn-update']}`}
-                        disabled={updateMutation.isPending}
+                        disabled={
+                          updateMutation.isPending ||
+                          !editFormData?.description ||
+                          editFormData?.description.length < 100 ||
+                          !editFormData.name.trim()
+                        }
                       >
                         {updateMutation.isPending
                           ? 'Сохранение...'

@@ -161,7 +161,7 @@ export const PublisherManager: React.FC = () => {
                 setFormData({ ...formData, name: e.target.value })
               }
               className={styles['input-field']}
-              maxLength={255}
+              maxLength={256}
             />
           </div>
 
@@ -187,6 +187,8 @@ export const PublisherManager: React.FC = () => {
             <label>Описание</label>
             <textarea
               placeholder="Описание издательства"
+              maxLength={2000}
+              minLength={100}
               value={formData.description}
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
@@ -201,7 +203,7 @@ export const PublisherManager: React.FC = () => {
             disabled={
               createMutation.isPending ||
               !formData.name.trim() ||
-              !formData.description.trim() ||
+              formData.description.length < 100 ||
               formData.countryId <= 0
             }
             className={styles['btn']}
@@ -239,7 +241,7 @@ export const PublisherManager: React.FC = () => {
                           })
                         }
                         className={styles['input-field']}
-                        maxLength={255}
+                        maxLength={256}
                       />
                     </td>
                     <td>
@@ -253,6 +255,8 @@ export const PublisherManager: React.FC = () => {
                         }
                         className={styles['input-field textarea']}
                         rows={2}
+                        minLength={100}
+                        maxLength={2000}
                       />
                     </td>
                     <td>
@@ -286,7 +290,12 @@ export const PublisherManager: React.FC = () => {
                           )
                         }
                         className={`${styles['btn']} ${styles['btn-update']}`}
-                        disabled={updateMutation.isPending}
+                        disabled={
+                          updateMutation.isPending ||
+                          !editFormData?.name.trim() ||
+                          editFormData.description.length < 100 ||
+                          editFormData.countryId <= 0
+                        }
                       >
                         {updateMutation.isPending
                           ? 'Сохранение...'
