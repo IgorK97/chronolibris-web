@@ -1,4 +1,6 @@
-import { useState, useCallback, useRef } from 'react';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useState, useCallback, useRef, useEffect } from 'react';
 import {
   useInfiniteReports,
   useTargetInfo,
@@ -232,6 +234,9 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
   const [reportText, setReportText] = useState<string>(report.comment);
   const createTask = useCreateModerationTask();
   const resolveTask = useResolveTask();
+  const [error, setError] = useState(
+    report.comment.length < 20 ? 'Напишие комментарий к решению' : ''
+  );
 
   const reasonLabel =
     REASON_TYPES.find((r) => r.id === report.reasonTypeId)?.label ??
@@ -246,6 +251,11 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
     report.taskStatusId === TASK_STATUS.REJECTED;
 
   const isFree = !report.moderationTaskId;
+  const isActionLoading = createTask.isPending || resolveTask.isPending;
+
+  useEffect(() => {
+    setError(reportText.length < 20 ? 'Напишие комментарий к решению' : '');
+  }, [reportText]);
 
   const handleTakeTask = async () => {
     await createTask.mutateAsync({
@@ -257,17 +267,19 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
   };
 
   const handleResolve = async (resolution: boolean) => {
-    if (!report.moderationTaskId) return;
-    if (reportText.length < 20) return;
-    await resolveTask.mutateAsync({
-      taskId: report.moderationTaskId,
-      resolution,
-      reportText,
-    });
-    onUpdated();
+    try {
+      if (!report.moderationTaskId) return;
+      if (reportText.length < 20) return;
+      await resolveTask.mutateAsync({
+        taskId: report.moderationTaskId,
+        resolution,
+        reportText,
+      });
+      onUpdated();
+    } catch (e: any) {
+      setError(`Ошибка: ${e.response.data?.detail}`);
+    }
   };
-
-  const isActionLoading = createTask.isPending || resolveTask.isPending;
 
   return (
     <>
@@ -333,12 +345,17 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
 
           {isInProgress && (
             <>
-              <textarea
-                placeholder="Комментарий"
-                value={reportText}
-                onChange={(e) => setReportText(e.target.value)}
-                minLength={50}
-              />
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <textarea
+                  placeholder="Комментарий"
+                  value={reportText}
+                  onChange={(e) => setReportText(e.target.value)}
+                  minLength={50}
+                />
+                {error && (
+                  <p style={{ marginTop: '5px', color: 'red' }}>{error}</p>
+                )}
+              </div>
               <button
                 className={`${styles['action-btn']} ${styles['accept-btn']}`}
                 onClick={() => handleResolve(true)}
