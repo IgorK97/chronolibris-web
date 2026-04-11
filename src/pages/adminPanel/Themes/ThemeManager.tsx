@@ -20,7 +20,7 @@ export const ThemeManager: React.FC = () => {
   const updateMutation = useUpdateTheme();
   const deleteMutation = useDeleteTheme();
 
-  const [deletingThemeId, setDeletingThemeId] = useState(number);
+  const [deletingThemeId, setDeletingThemeId] = useState(0);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const [formData, setFormData] = useState<CreateThemeRequest>({
