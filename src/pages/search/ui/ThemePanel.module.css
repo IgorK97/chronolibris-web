@@ -1,6 +1,5 @@
 .panel {
   width: 200px;
-  min-width: 200px;
   flex-shrink: 0;
   background: #fff;
   border-right: 1px solid #e8e8e8;
@@ -18,8 +17,7 @@
 }
 
 .panel-collapsed {
-  width: 200px;
-  min-width: 200px;
+  width: 120px;
 }
 
 .header {

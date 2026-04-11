@@ -8,6 +8,13 @@
   font-family: Georgia, 'Times New Roman', serif;
 }
 
+.back-btn,
+.toolbar-btn {
+  display: flex;
+  flex-direction: row;
+  cursor: pointer;
+}
+
 .loading {
   display: flex;
   flex-direction: column;

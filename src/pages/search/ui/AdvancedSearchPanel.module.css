@@ -68,6 +68,10 @@
 }
 
 @media (width<=700px) {
+  .panel {
+    max-width: 90vw;
+  }
+
   .body {
     grid-template-columns: 1fr;
   }
@@ -171,6 +175,7 @@
   background: #fff;
   border-radius: 6px;
   border: 1px solid #1c255a;
+  max-width: 80vw;
 }
 
 .person-name {
@@ -179,8 +184,11 @@
   flex: 1;
   min-width: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+
+  /* text-overflow: ellipsis; */
+
+  /* white-space: nowrap; */
+  overflow-wrap: break-word;
 }
 
 .role-select {

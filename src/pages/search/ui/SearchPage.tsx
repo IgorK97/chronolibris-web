@@ -186,7 +186,7 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
           />
         </div>
 
-        <div style={{ marginLeft: '32px', flex: 1 }}>
+        <div style={{ flex: 1 }}>
           <div className={styles['filter-bar']}>
             <button
               className={`${styles['advanced-toggle']} ${

@@ -1,18 +1,15 @@
 .page {
   max-width: 100%;
-  margin: 0 auto;
-  padding: 32px 16px 64px;
-  font-family:
-    Georgia, 'Times New Roman', Times, serif; /* Их все вместе надо писать? */
 }
 
 .sidebar {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 16px;
   align-self: flex-start;
   position: sticky;
-  top: 80px;
+  top: 10px;
+  margin-bottom: 20px;
 }
 
 .content-layout {
@@ -20,6 +17,7 @@
   flex: 1;
   min-height: 0;
   overflow: hidden;
+  flex-wrap: wrap;
 }
 
 .results-area {

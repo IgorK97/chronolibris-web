@@ -1,6 +1,5 @@
 .panel {
   width: 200px;
-  min-width: 200px;
   background: #fafafa;
   border-right: 1px solid#e5e7eb;
   border-radius: 10px;
@@ -15,8 +14,7 @@
 }
 
 .panel-collapsed {
-  width: 200px;
-  min-width: 200px;
+  width: 120px;
 }
 
 .header {
