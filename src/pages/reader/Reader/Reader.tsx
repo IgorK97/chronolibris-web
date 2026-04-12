@@ -21,7 +21,16 @@ import {
   Trash2,
   X,
 } from 'lucide-react';
-import type { Bookmark as BookmarkDetails } from '@/types';
+import type {
+  Bookmark as BookmarkDetails,
+  ImgNode,
+  InlineNode,
+  Note,
+  PageNumberNode,
+  TextSegment,
+  TocBodyItem,
+  TocData,
+} from '@/types';
 
 import type { CreateBookmarkRequest } from '@/types';
 import {
@@ -36,74 +45,13 @@ import { formatDate } from '@/utils';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useReaderSettings } from './UseReaderSettings';
 import { Badge } from '../../../components/ui/badge';
-
-export interface PageNumberNode {
-  pn: number;
-}
-
-export interface Footnote {
-  t: string;
-  xp: number[];
-  c: string | string[];
-}
-
-export interface Note {
-  t: string;
-  role: string;
-  xp: number[];
-  c: string;
-  f?: Footnote;
-}
-
-export type InlineNode = Note | { t: 'em' | 'st'; c: string } | PageNumberNode;
-
-export interface ImgNode {
-  t: 'img';
-  src: string;
-}
-
-export interface TextSegment {
-  t: string;
-  xp?: number[];
-  c: string | TextSegment[] | (string | InlineNode)[] | ImgNode[]; //широкий юнион
-}
-
-export interface TocPart {
-  s: number;
-  e: number;
-  xps: number[];
-  xpe: number[];
-  url: string;
-}
-
-export interface TocBodyItem {
-  s: number;
-  e: number;
-  t: string;
-  c?: TocBodyItem[];
-}
-
-export interface TocMeta {
-  Title: string;
-  Authors: { Role: string; First?: string; Last?: string }[];
-  Annotation: string;
-  Lang: string;
-}
-
-export interface TocData {
-  Meta: TocMeta;
-  full_length: number;
-  Body: TocBodyItem[];
-  Parts: TocPart[];
-}
+import { booksApi } from '@/api/books';
 
 interface ReaderProps {
   bookFileId: number;
   initialChunkIndex?: number;
   onBack?: () => void;
 }
-
-export type HighlightColor = 'yellow' | 'green' | 'blue' | 'pink' | 'none';
 
 const DEFAULT_FONT_SIZE = 18;
 const MIN_FONT_SIZE = 12;
@@ -123,21 +71,21 @@ const FONT_OPTIONS: { label: string; value: string }[] = [
 const TEXT_COLORS = ['#2c2c2c', '#3b2e1e', '#c8bfb0'];
 const PAGE_COLORS = ['#faf8f4', '#f4ede0', '#1e1c18'];
 const BG_COLORS = ['#e8e4dc', '#d9cdb8', '#131210'];
-const fetchToc = async (bookFileId: number): Promise<TocData> => {
-  const res = await fetch(`/api/books/files/${bookFileId}/toc`);
-  if (!res.ok) throw new Error('Failed to fetch TOC');
-  return res.json();
-};
-const fetchChunk = async (
-  bookFileId: number,
-  chunkIndex: string
-): Promise<TextSegment[]> => {
-  const res = await fetch(
-    `/api/books/files/${bookFileId}/chunks/${chunkIndex}`
-  );
-  if (!res.ok) throw new Error('Ошибка загрузки фрагмента');
-  return res.json();
-};
+// const fetchToc = async (bookFileId: number): Promise<TocData> => {
+//   const res = await fetch(`/api/books/files/${bookFileId}/toc`);
+//   if (!res.ok) throw new Error('Ошибка получения');
+//   return res.json();
+// };
+// const fetchChunk = async (
+//   bookFileId: number,
+//   chunkIndex: string
+// ): Promise<TextSegment[]> => {
+//   const res = await fetch(
+//     `/api/books/files/${bookFileId}/chunks/${chunkIndex}`
+//   );
+//   if (!res.ok) throw new Error('Ошибка загрузки фрагмента');
+//   return res.json();
+// };
 
 export const Reader: React.FC<ReaderProps> = ({
   bookFileId,
@@ -178,17 +126,9 @@ export const Reader: React.FC<ReaderProps> = ({
     bookFileId ?? null,
     user?.userName ?? null
   );
-  // const upsertProgress = useUpsertReadingProgress();
   const progressLoaded = useRef(false);
   console.log(bookmarks);
   const savedPercentRef = useRef<number>(0);
-  // const { data: savedProgress } = useReadingProgress(bookFileId);
-  // useEffect(() => {
-  //   if (savedProgress !== undefined) {
-  //     savedPercentRef.current = savedProgress?.percentage ?? 0;
-  //     progressLoaded.current = true;
-  //   }
-  // }, [savedProgress]);
 
   const createBookmarkMutation = useCreateBookmark(user?.userName ?? '');
   const updateBookmarkMutation = useUpdateBookmark();
@@ -214,7 +154,7 @@ export const Reader: React.FC<ReaderProps> = ({
 
   const { data: fetchedTocData } = useQuery<TocData, Error>({
     queryKey: ['toc', bookFileId],
-    queryFn: () => fetchToc(bookFileId),
+    queryFn: () => booksApi.fetchToc(bookFileId),
     staleTime: Infinity,
     gcTime: 20 * 60 * 1000,
     retry: 2,
@@ -313,7 +253,7 @@ export const Reader: React.FC<ReaderProps> = ({
         // Если URL нет, отклоняем промис с ошибкой
         return Promise.reject(new Error('URL for chunk not available'));
       }
-      return fetchChunk(bookFileId, url);
+      return booksApi.fetchChunk(bookFileId, url);
     },
     enabled: !!fetchedTocData && currentPartIndex < fetchedTocData.Parts.length,
     staleTime: Infinity, // Какова вероятность того,
@@ -411,7 +351,8 @@ export const Reader: React.FC<ReaderProps> = ({
 
     queryClient.prefetchQuery({
       queryKey: ['chunk', bookFileId, nextIdx],
-      queryFn: () => fetchChunk(bookFileId, fetchedTocData.Parts[nextIdx].url),
+      queryFn: () =>
+        booksApi.fetchChunk(bookFileId, fetchedTocData.Parts[nextIdx].url),
     });
   }, [
     bookFileId,

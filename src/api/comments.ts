@@ -13,13 +13,13 @@ export const commentsApi = {
       `/Comments/${parentId}/replies?limit=${limit}&lastId=${lastId || ''}`
     ),
 
-  rateComment: (command: { commentId: number; score: number }) =>
-    apiClient.post('/Comments/rate', command),
-
   create: (req: CreateCommentRequest) =>
     apiClient.post<number>('/Comments', req),
 
   delete: (id: number) => apiClient.delete<void>(`/Comments/${id}`),
+
+  rateComment: (command: { commentId: number; score: number }) =>
+    apiClient.post('/Comments/rate', command),
 };
 export const useRateComment = (bookId: number, parentId?: number) => {
   const qc = useQueryClient();

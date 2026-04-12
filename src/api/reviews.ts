@@ -20,6 +20,9 @@ export const reviewsApi = {
       `/Reviews/${bookId}?limit=${limit}&lastId=${lastId || ''}`
     ),
 
+  getMyReview: (bookId: number) =>
+    apiClient.get<MyReviewDetails>(`/Reviews/my/${bookId}`),
+
   create: (command: CreateReviewRequest) =>
     apiClient.post<number, CreateReviewRequest>('/Reviews', command),
 
@@ -30,9 +33,6 @@ export const reviewsApi = {
 
   rateReview: (command: RateReviewCommand) =>
     apiClient.post('/Reviews/rate', command),
-
-  getMyReview: (bookId: number) =>
-    apiClient.get<MyReviewDetails>(`/Reviews/my/${bookId}`),
 };
 
 export const useInfiniteReviews = (bookId: number, isAuth: boolean) => {

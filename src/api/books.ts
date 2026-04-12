@@ -10,42 +10,26 @@ import type {
   BookDetails,
   BookDto,
   BookFilterRequest,
-  BookFilters,
-  BookListItem,
+  // BookFilters,
+  // BookListItem,
   BookListResponse,
   ContentDto,
   CreateBookRequest,
-  PagedResult,
-  SearchParams,
+  TextSegment,
+  TocData,
+  // PagedResult,
+  // SearchParams,
   UpdateBookRequest,
-  UpdateReadingProgressCommand,
 } from '../types';
-import { useDebounce } from '../hooks/useDebounce';
+// import { useDebounce } from '../hooks/useDebounce';
 import { collectionsApi } from './collections';
 
 export const booksApi = {
-  getMetadata: (bookId: number, administration: boolean) =>
-    apiClient.get<BookDetails>(`/Books/${bookId}/info?mode=${administration}`),
-
-  getReadBooks: (params: { userId: number; lastId?: number; limit: number }) =>
-    apiClient.get<PagedResult<BookListItem>>(
-      `/Books/readbooks?userId=${params.userId}&lastId=${params.lastId ?? ''}&limit=${params.limit}`
-    ),
-
-  search: (params: SearchParams) =>
-    apiClient.get<PagedResult<BookListItem>>('/Books/search', params),
-
-  updateProgress: (command: UpdateReadingProgressCommand) =>
-    apiClient.post(`/Books/${command.bookId}/progress`, command),
-
   getBooks: (filter: BookFilterRequest): Promise<BookListResponse> =>
     apiClient.get<BookListResponse>('/Books', filter),
 
   getBookById: (id: number): Promise<BookDto> =>
     apiClient.get<BookDto>(`/Books/${id}`),
-
-  getBookContents: (bookId: number): Promise<ContentDto[]> =>
-    apiClient.get<ContentDto[]>(`/Books/${bookId}/contents`),
 
   createBook: (data: CreateBookRequest): Promise<number> =>
     apiClient.post<number, CreateBookRequest>('/Books', data),
@@ -54,6 +38,12 @@ export const booksApi = {
     apiClient.put<void, UpdateBookRequest>(`/Books/${id}`, data),
 
   deleteBook: (id: number): Promise<void> => apiClient.delete(`/Books/${id}`),
+
+  getMetadata: (bookId: number, administration: boolean) =>
+    apiClient.get<BookDetails>(`/Books/${bookId}/info?mode=${administration}`),
+
+  getBookContents: (bookId: number): Promise<ContentDto[]> =>
+    apiClient.get<ContentDto[]>(`/Books/${bookId}/contents`),
 
   linkContentToBook: (
     bookId: number,
@@ -67,6 +57,17 @@ export const booksApi = {
 
   unlinkContentFromBook: (bookId: number, contentId: number): Promise<void> =>
     apiClient.delete(`/Books/${bookId}/contents/${contentId}`),
+
+  fetchToc: (bookFileId: number): Promise<TocData> =>
+    apiClient.get<TocData>(`/api/books/files/${bookFileId}/toc`),
+
+  fetchChunk: (
+    bookFileId: number,
+    chunkIndex: string
+  ): Promise<TextSegment[]> =>
+    apiClient.get<TextSegment[]>(
+      `/api/books/files/${bookFileId}/chunks/${chunkIndex}`
+    ),
 };
 
 export const useBookDetails = (
@@ -79,18 +80,6 @@ export const useBookDetails = (
     queryKey: ['books', bookId, userName],
     queryFn: () => booksApi.getMetadata(bookId, administration),
     enabled: enabled,
-  });
-
-export const useInfiniteReadBooks = (userId: number) =>
-  useInfiniteQuery({
-    queryKey: ['books', 'read', userId],
-    queryFn: ({ pageParam }) =>
-      booksApi.getReadBooks({ userId, lastId: pageParam, limit: 10 }),
-    initialPageParam: undefined as number | undefined,
-    getNextPageParam: (lastPage) =>
-      lastPage.items.length > 0
-        ? lastPage.items[lastPage.items.length - 1].id
-        : undefined,
   });
 
 export const useInfiniteShelfBooks = (
@@ -128,53 +117,53 @@ export const useSelectionBooks = (selectionId: number) =>
     enabled: !!selectionId,
   });
 
-export const useInfiniteSearch = (
-  userId: number,
-  params: { query: string; filters: BookFilters }
-) =>
-  useInfiniteQuery({
-    queryKey: ['books', 'search', userId, params.query, params.filters],
-    queryFn: ({ pageParam }) =>
-      booksApi.search({
-        query: params.query,
-        userId,
-        lastId: pageParam,
-        limit: 10,
-        genreIds: params.filters.genreIds,
-        languages: params.filters.languages,
-        rating: params.filters.rating,
-        yearFrom: params.filters.yearFrom,
-        yearTo: params.filters.yearTo,
-      }),
-    enabled: params.query.length > 2 || params.filters.genreIds.length > 0,
-    initialPageParam: undefined as number | undefined,
-    getNextPageParam: (lastPage) =>
-      lastPage.hasNext ? lastPage.lastId : undefined,
-  });
+// export const useInfiniteSearch = (
+//   userId: number,
+//   params: { query: string; filters: BookFilters }
+// ) =>
+//   useInfiniteQuery({
+//     queryKey: ['books', 'search', userId, params.query, params.filters],
+//     queryFn: ({ pageParam }) =>
+//       booksApi.search({
+//         query: params.query,
+//         userId,
+//         lastId: pageParam,
+//         limit: 10,
+//         genreIds: params.filters.genreIds,
+//         languages: params.filters.languages,
+//         rating: params.filters.rating,
+//         yearFrom: params.filters.yearFrom,
+//         yearTo: params.filters.yearTo,
+//       }),
+//     enabled: params.query.length > 2 || params.filters.genreIds.length > 0,
+//     initialPageParam: undefined as number | undefined,
+//     getNextPageParam: (lastPage) =>
+//       lastPage.hasNext ? lastPage.lastId : undefined,
+//   });
 
-export const useInfiniteSearchDebounced = (
-  query: string,
-  userId: number,
-  filters: BookFilters
-) => {
-  const debouncedQuery = useDebounce(query, 1000);
+// export const useInfiniteSearchDebounced = (
+//   query: string,
+//   userId: number,
+//   filters: BookFilters
+// ) => {
+//   const debouncedQuery = useDebounce(query, 1000);
 
-  return useInfiniteQuery({
-    queryKey: ['books', 'search', debouncedQuery, userId, filters],
-    queryFn: ({ pageParam }) =>
-      booksApi.search({
-        query: debouncedQuery,
-        userId,
-        lastId: pageParam,
-        limit: 10,
-        ...filters,
-      }),
-    enabled: debouncedQuery.length > 2,
-    initialPageParam: undefined as number | undefined,
-    getNextPageParam: (lastPage) =>
-      lastPage.hasNext ? lastPage.lastId : undefined,
-  });
-};
+//   return useInfiniteQuery({
+//     queryKey: ['books', 'search', debouncedQuery, userId, filters],
+//     queryFn: ({ pageParam }) =>
+//       booksApi.search({
+//         query: debouncedQuery,
+//         userId,
+//         lastId: pageParam,
+//         limit: 10,
+//         ...filters,
+//       }),
+//     enabled: debouncedQuery.length > 2,
+//     initialPageParam: undefined as number | undefined,
+//     getNextPageParam: (lastPage) =>
+//       lastPage.hasNext ? lastPage.lastId : undefined,
+//   });
+// };
 
 export const useBooks = (filter: BookFilterRequest) =>
   useQuery({

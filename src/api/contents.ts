@@ -26,28 +26,6 @@ export const contentsApi = {
   getContentBooks: (contentId: number): Promise<BookDto[]> =>
     apiClient.get<BookDto[]>(`/Contents/${contentId}/books`),
 
-  createContent: (data: CreateContentRequest): Promise<number> =>
-    apiClient.post<number, CreateContentRequest>('/Contents', data),
-
-  deleteContent: (id: number): Promise<void> =>
-    apiClient.delete(`/Contents/${id}`),
-
-  patchContent: (data: PatchContentRequest): Promise<void> =>
-    apiClient.put<void, PatchContentRequest>(`/Contents/${data.id}`, data),
-
-  linkBookToContent: (
-    contentId: number,
-    bookId: number,
-    data: BookContentLinkRequest
-  ): Promise<void> =>
-    apiClient.post<void, BookContentLinkRequest>(
-      `/Contents/${contentId}/books/${bookId}`,
-      data
-    ),
-
-  unlinkBookFromContent: (contentId: number, bookId: number): Promise<void> =>
-    apiClient.delete(`/Contents/${contentId}/books/${bookId}`),
-
   getContentTags: (contentId: number): Promise<TagDetails[]> =>
     apiClient.get<TagDetails[]>(`/Contents/${contentId}/tags`),
 
@@ -70,6 +48,28 @@ export const contentsApi = {
 
   removeTagFromContent: (contentId: number, tagId: number): Promise<void> =>
     apiClient.delete(`/Contents/${contentId}/tags/${tagId}`),
+
+  createContent: (data: CreateContentRequest): Promise<number> =>
+    apiClient.post<number, CreateContentRequest>('/Contents', data),
+
+  putContent: (data: PatchContentRequest): Promise<void> =>
+    apiClient.put<void, PatchContentRequest>(`/Contents/${data.id}`, data),
+
+  deleteContent: (id: number): Promise<void> =>
+    apiClient.delete(`/Contents/${id}`),
+
+  linkBookToContent: (
+    contentId: number,
+    bookId: number,
+    data: BookContentLinkRequest
+  ): Promise<void> =>
+    apiClient.post<void, BookContentLinkRequest>(
+      `/Contents/${contentId}/books/${bookId}`,
+      data
+    ),
+
+  unlinkBookFromContent: (contentId: number, bookId: number): Promise<void> =>
+    apiClient.delete(`/Contents/${contentId}/books/${bookId}`),
 };
 
 export const useContents = (filter: ContentFilterRequest) => {
@@ -147,7 +147,7 @@ export const useCreateContent = () => {
 export const usePatchContent = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: contentsApi.patchContent,
+    mutationFn: contentsApi.putContent,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['contents', variables.id] });
       queryClient.invalidateQueries({ queryKey: ['contents'] });

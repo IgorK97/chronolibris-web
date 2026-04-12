@@ -9,34 +9,31 @@ import { apiClient } from './apiClient';
 import { useQuery } from '@tanstack/react-query';
 
 export const searchReferenceApi = {
-  getLanguages: () =>
-    apiClient.get<LanguageDto[]>('/search/reference/languages'),
+  getLanguages: () => apiClient.get<LanguageDto[]>('/search/languages'),
 
-  getCountries: () =>
-    apiClient.get<CountryDto[]>('/search/reference/countries'),
+  getCountries: () => apiClient.get<CountryDto[]>('/search/countries'),
 
-  getPersonRoles: () =>
-    apiClient.get<PersonRoleDto[]>('/search/reference/person-roles'),
+  getPersonRoles: () => apiClient.get<PersonRoleDto[]>('/search/person-roles'),
 
   searchPersons: (name: string, limit = 10) =>
     apiClient.get<PersonSuggestionDto[], { name: string; limit: number }>(
-      '/search/reference/persons',
+      '/search/persons',
       { name, limit }
     ),
 
   searchTags: (name: string, limit = 10) =>
     apiClient.get<TagSuggestionDto[], { name: string; limit: number }>(
-      '/search/reference/tags',
+      '/search/tags',
       { name, limit }
     ),
 
   getPersonsByIds: (ids: number[]) =>
-    apiClient.get<PersonSuggestionDto[]>('/search/reference/persons-batch', {
+    apiClient.get<PersonSuggestionDto[]>('/search/persons-batch', {
       ids: ids.join(','),
     }),
 
   getTagsByIds: (ids: number[]) =>
-    apiClient.get<TagSuggestionDto[]>('/search/reference/tags-batch', {
+    apiClient.get<TagSuggestionDto[]>('/search/tags-batch', {
       ids: ids.join(','),
     }),
 };
