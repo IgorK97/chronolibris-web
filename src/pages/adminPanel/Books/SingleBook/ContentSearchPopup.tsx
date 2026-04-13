@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from 'react';
-import { useContents } from '@/api/contents';
+// import { useContents } from '@/api/contents';
 import type { ContentDto, ContentFilterRequest } from '@/types';
 import styles from './ContentSearchPopup.module.css';
 import { useDebounce } from '@/hooks/useDebounce';

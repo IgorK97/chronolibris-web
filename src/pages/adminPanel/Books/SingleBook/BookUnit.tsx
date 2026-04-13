@@ -11,8 +11,6 @@ import { useDropzone } from 'react-dropzone';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   useBookContents,
-  useUnlinkContentFromBook,
-  useLinkContentToBook,
   useCreateBook,
   useUpdateBook,
   useBookDetails,
@@ -35,6 +33,7 @@ import { ContentList } from '@/components/Contents/ContentList';
 import { BookFileManagement } from './BookFileManagement';
 import { ErrorMsg } from '@/components';
 import { AlertDialog } from '@/components/dialogs/AlertDialog';
+import { useLinkBookToContent, useUnlinkBookFromContent } from '@/api/contents';
 
 interface SelectedPerson {
   id: number;
@@ -416,8 +415,8 @@ export const BookUnit: React.FC = () => {
     error,
   } = useBookDetails(id ?? 0, user?.userName ?? '', true, !!id);
   const { data: contents, refetch: refetchContents } = useBookContents(id);
-  const unlinkMutation = useUnlinkContentFromBook();
-  const linkMutation = useLinkContentToBook();
+  const unlinkMutation = useUnlinkBookFromContent();
+  const linkMutation = useLinkBookToContent();
   const createMutation = useCreateBook();
   const updateMutation = useUpdateBook();
 

@@ -6,13 +6,13 @@ import {
 } from '@tanstack/react-query';
 import { apiClient } from './apiClient';
 import type {
-  BookContentLinkRequest,
+  // BookContentLinkRequest,
   BookDetails,
   BookDto,
-  BookFilterRequest,
+  // BookFilterRequest,
   // BookFilters,
   // BookListItem,
-  BookListResponse,
+  // BookListResponse,
   ContentDto,
   CreateBookRequest,
   TextSegment,
@@ -25,8 +25,8 @@ import type {
 import { collectionsApi } from './collections';
 
 export const booksApi = {
-  getBooks: (filter: BookFilterRequest): Promise<BookListResponse> =>
-    apiClient.get<BookListResponse>('/Books', filter),
+  // getBooks: (filter: BookFilterRequest): Promise<BookListResponse> =>
+  //   apiClient.get<BookListResponse>('/Books', filter),
 
   getBookById: (id: number): Promise<BookDto> =>
     apiClient.get<BookDto>(`/Books/${id}`),
@@ -37,7 +37,7 @@ export const booksApi = {
   updateBook: (id: number, data: UpdateBookRequest): Promise<void> =>
     apiClient.put<void, UpdateBookRequest>(`/Books/${id}`, data),
 
-  deleteBook: (id: number): Promise<void> => apiClient.delete(`/Books/${id}`),
+  // deleteBook: (id: number): Promise<void> => apiClient.delete(`/Books/${id}`),
 
   getMetadata: (bookId: number, administration: boolean) =>
     apiClient.get<BookDetails>(`/Books/${bookId}/info?mode=${administration}`),
@@ -45,18 +45,18 @@ export const booksApi = {
   getBookContents: (bookId: number): Promise<ContentDto[]> =>
     apiClient.get<ContentDto[]>(`/Books/${bookId}/contents`),
 
-  linkContentToBook: (
-    bookId: number,
-    contentId: number,
-    data: BookContentLinkRequest
-  ): Promise<void> =>
-    apiClient.post<void, BookContentLinkRequest>(
-      `/Books/${bookId}/contents/${contentId}`,
-      data
-    ),
+  // linkContentToBook: (
+  //   bookId: number,
+  //   contentId: number,
+  //   data: BookContentLinkRequest
+  // ): Promise<void> =>
+  //   apiClient.post<void, BookContentLinkRequest>(
+  //     `/Books/${bookId}/contents/${contentId}`,
+  //     data
+  //   ),
 
-  unlinkContentFromBook: (bookId: number, contentId: number): Promise<void> =>
-    apiClient.delete(`/Books/${bookId}/contents/${contentId}`),
+  // unlinkContentFromBook: (bookId: number, contentId: number): Promise<void> =>
+  //   apiClient.delete(`/Books/${bookId}/contents/${contentId}`),
 
   fetchToc: (bookFileId: number): Promise<TocData> =>
     apiClient.get<TocData>(`/api/books/files/${bookFileId}/toc`),
@@ -165,23 +165,23 @@ export const useSelectionBooks = (selectionId: number) =>
 //   });
 // };
 
-export const useBooks = (filter: BookFilterRequest) =>
-  useQuery({
-    queryKey: ['books', filter],
-    queryFn: () => booksApi.getBooks(filter),
-    staleTime: 2 * 60 * 1000,
-  });
+// export const useBooks = (filter: BookFilterRequest) =>
+//   useQuery({
+//     queryKey: ['books', filter],
+//     queryFn: () => booksApi.getBooks(filter),
+//     staleTime: 2 * 60 * 1000,
+//   });
 
-export const useBookById = (id: number | null) =>
-  useQuery({
-    queryKey: ['books', id],
-    queryFn: () => {
-      if (id === null) throw new Error('ID книги не указан');
-      return booksApi.getBookById(id);
-    },
-    enabled: id !== null,
-    staleTime: 5 * 60 * 1000,
-  });
+// export const useBookById = (id: number | null) =>
+//   useQuery({
+//     queryKey: ['books', id],
+//     queryFn: () => {
+//       if (id === null) throw new Error('ID книги не указан');
+//       return booksApi.getBookById(id);
+//     },
+//     enabled: id !== null,
+//     staleTime: 5 * 60 * 1000,
+//   });
 
 export const useCreateBook = () => {
   const queryClient = useQueryClient();
@@ -200,13 +200,13 @@ export const useUpdateBook = () => {
   });
 };
 
-export const useDeleteBook = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: booksApi.deleteBook,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['books'] }),
-  });
-};
+// export const useDeleteBook = () => {
+//   const queryClient = useQueryClient();
+//   return useMutation({
+//     mutationFn: booksApi.deleteBook,
+//     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['books'] }),
+//   });
+// };
 
 export const useBookContents = (bookId: number | null) =>
   useQuery({
@@ -219,32 +219,32 @@ export const useBookContents = (bookId: number | null) =>
     staleTime: 2 * 60 * 1000,
   });
 
-export const useLinkContentToBook = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({
-      bookId,
-      contentId,
-      data,
-    }: {
-      bookId: number;
-      contentId: number;
-      data: BookContentLinkRequest;
-    }) => booksApi.linkContentToBook(bookId, contentId, data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['books'] }),
-  });
-};
+// export const useLinkContentToBook = () => {
+//   const queryClient = useQueryClient();
+//   return useMutation({
+//     mutationFn: ({
+//       bookId,
+//       contentId,
+//       data,
+//     }: {
+//       bookId: number;
+//       contentId: number;
+//       data: BookContentLinkRequest;
+//     }) => booksApi.linkContentToBook(bookId, contentId, data),
+//     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['books'] }),
+//   });
+// };
 
-export const useUnlinkContentFromBook = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({
-      bookId,
-      contentId,
-    }: {
-      bookId: number;
-      contentId: number;
-    }) => booksApi.unlinkContentFromBook(bookId, contentId),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['books'] }),
-  });
-};
+// export const useUnlinkContentFromBook = () => {
+//   const queryClient = useQueryClient();
+//   return useMutation({
+//     mutationFn: ({
+//       bookId,
+//       contentId,
+//     }: {
+//       bookId: number;
+//       contentId: number;
+//     }) => booksApi.unlinkContentFromBook(bookId, contentId),
+//     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['books'] }),
+//   });
+// };

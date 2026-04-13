@@ -4,7 +4,6 @@ import React, { useState, useRef } from 'react';
 import {
   useBookFiles,
   useUploadBookFile,
-  useUpdateBookFile,
   useDeleteBookFile,
   // useDownloadBookFile,
   bookFilesApi,
@@ -33,7 +32,6 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
   const { data: bookFiles, isLoading, error, refetch } = useBookFiles(bookId);
   const { data: formats } = useFormats();
   const uploadMutation = useUploadBookFile();
-  const updateMutation = useUpdateBookFile();
   const deleteMutation = useDeleteBookFile();
   // const downloadMutation = useDownloadBookFile();
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
@@ -260,9 +258,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
                       setDeletingBookfile(file.id);
                       setDeleteModalOpen(true);
                     }}
-                    disabled={
-                      deleteMutation.isPending || updateMutation.isPending
-                    }
+                    disabled={deleteMutation.isPending}
                   >
                     <Trash2 style={{ cursor: 'pointer' }} />
                   </button>

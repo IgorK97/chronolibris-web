@@ -72,13 +72,13 @@ export const contentsApi = {
     apiClient.delete(`/Contents/${contentId}/books/${bookId}`),
 };
 
-export const useContents = (filter: ContentFilterRequest) => {
-  return useQuery({
-    queryKey: ['contents', filter],
-    queryFn: () => contentsApi.getContents(filter),
-    staleTime: 2 * 60 * 1000,
-  });
-};
+// export const useContents = (filter: ContentFilterRequest) => {
+//   return useQuery({
+//     queryKey: ['contents', filter],
+//     queryFn: () => contentsApi.getContents(filter),
+//     staleTime: 2 * 60 * 1000,
+//   });
+// };
 
 interface UseOptions {
   enabled?: boolean;

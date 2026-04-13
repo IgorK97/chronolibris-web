@@ -9,6 +9,7 @@
   "compilerOptions": {
     // "types": ["vite-plugin-pwa/info.d.ts", "vite-plugin-pwa/client.d.ts"],
     "strict": true,
+    "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],

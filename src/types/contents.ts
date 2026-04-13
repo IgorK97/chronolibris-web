@@ -56,8 +56,8 @@ export interface ContentListResponse {
 
 export interface ContentFilterRequest {
   searchQuery?: string | null;
-  authorName?: string | null;
-  personFilters?: PersonRoleFilter[];
+  // authorName?: string | null;
+  // personFilters?: PersonRoleFilter[];
   cursor?: string | null;
   limit?: number;
 }
