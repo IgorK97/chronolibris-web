@@ -9,9 +9,6 @@ import type {
 export const bookFilesApi = {
   getBookFiles: (bookId: number): Promise<BookFileDto[]> =>
     apiClient.get<BookFileDto[]>(`/BookFiles/book/${bookId}`),
-
-  // getBookFile: (id: number): Promise<BookFileDto> =>
-  //   apiClient.get<BookFileDto>(`/BookFiles/${id}`),
   //Нельзя это упростить?
 
   uploadBookFile: async (data: UploadBookFileRequest): Promise<number> => {
@@ -29,35 +26,11 @@ export const bookFilesApi = {
     return response.data;
   },
 
-  // updateBookFile: async (data: UpdateBookFileRequest): Promise<number> => {
-  //   const formData = new FormData();
-  //   formData.append('isReadable', data.isReadable.toString());
-  //   formData.append('file', data.file);
-
-  //   const response = await axiosInstance.put<number>(
-  //     `/BookFiles/book/${data.bookId}/format/${data.formatId}`,
-  //     formData,
-  //     {
-  //       headers: {
-  //         'Content-Type': 'multipart/form-data',
-  //       },
-  //     }
-  //   );
-  //   return response.data;
-  // },
-
   deleteBookFile: (id: number): Promise<void> =>
     apiClient.delete(`/BookFiles/${id}`),
 
   download: (bookFileId: number) =>
     apiClient.download(`/bookFiles/${bookFileId}/download`),
-
-  // downloadBookFile: async (id: number): Promise<Blob> => {
-  //   const response = await axiosInstance.get(`/BookFiles/${id}/download`, {
-  //     responseType: 'blob',
-  //   });
-  //   return response.data;
-  // },
 };
 
 export const useBookFiles = (bookId: number | null) => {
@@ -71,18 +44,6 @@ export const useBookFiles = (bookId: number | null) => {
     staleTime: 2 * 60 * 1000,
   });
 };
-
-// export const useBookFile = (id: number | null) => {
-//   return useQuery({
-//     queryKey: ['bookFile', id],
-//     queryFn: () => {
-//       if (id === null) throw new Error('ID файла не указан');
-//       return bookFilesApi.getBookFile(id);
-//     },
-//     enabled: id !== null,
-//     staleTime: 5 * 60 * 1000,
-//   });
-// };
 
 export const useUploadBookFile = () => {
   const queryClient = useQueryClient();
@@ -99,19 +60,6 @@ export const useUploadBookFile = () => {
   });
 };
 
-// export const useUpdateBookFile = () => {
-//   const queryClient = useQueryClient();
-
-//   return useMutation({
-//     mutationFn: bookFilesApi.updateBookFile,
-//     onSuccess: (_, variables) => {
-//       queryClient.invalidateQueries({
-//         queryKey: ['bookFiles', variables.bookId],
-//       });
-//     },
-//   });
-// };
-
 export const useDeleteBookFile = () => {
   const queryClient = useQueryClient();
 
@@ -123,9 +71,3 @@ export const useDeleteBookFile = () => {
     },
   });
 };
-
-// export const useDownloadBookFile = () => {
-//   return useMutation({
-//     mutationFn: bookFilesApi.downloadBookFile,
-//   });
-// };

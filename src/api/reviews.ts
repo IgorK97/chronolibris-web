@@ -32,7 +32,7 @@ export const reviewsApi = {
   delete: (reviewId: number) => apiClient.delete<void>(`/Reviews/${reviewId}`),
 
   rateReview: (command: RateReviewCommand) =>
-    apiClient.post('/Reviews/rate', command),
+    apiClient.post('/Reviews/rate', command), //потом надо бы исправить (нет получения типа), но это несущественно
 };
 
 export const useInfiniteReviews = (bookId: number, isAuth: boolean) => {
@@ -57,7 +57,6 @@ export const useCreateReview = (bookId: number) => {
   return useMutation({
     mutationFn: (req: CreateReviewRequest) => reviewsApi.create(req),
     onSuccess: () => {
-      //все связанные данные
       qc.invalidateQueries({ queryKey: reviewKeys.all });
       //Обновляются данные самой книги (из-за рейтинга)
       qc.invalidateQueries({ queryKey: ['books', bookId] });
@@ -98,6 +97,6 @@ export const useMyReview = (bookId: number, isAuth: boolean) => {
     queryKey: ['reviews', 'my', bookId],
     queryFn: () => reviewsApi.getMyReview(bookId),
     enabled: isAuth && !!bookId,
-    retry: false, // Если 404 (отзыва нет), не нужно пытаться снова
+    retry: false, // Если отзыва нет, то не надо повторять запросы вообще (пока не инвалидирован кэш)
   });
 };

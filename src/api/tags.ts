@@ -10,6 +10,7 @@ import {
 export const tagsApi = {
   getTagTypes: () => apiClient.get<TagType[]>('/Tags/types'),
 
+  //Потом проверить
   getRootTags: (
     tagTypeId?: number | null,
     searchTerm?: string | null,

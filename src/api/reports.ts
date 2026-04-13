@@ -17,7 +17,8 @@ import {
 
 export const reportsApi = {
   createReport: (data: CreateReportRequest) =>
-    apiClient.post<void, CreateReportRequest>('/reports', data),
+    apiClient.post<void, CreateReportRequest>('/reports', data), //Так-то хотел результат получать,
+  //но по факту это делается через исключение. Потом исправить
 
   getReports: (params: GetReportsRequest) =>
     apiClient.get<GetReportsResponse, GetReportsRequest>(

@@ -27,7 +27,7 @@ export const usePersons = () => {
   return useQuery({
     queryKey: ['persons'],
     queryFn: personsApi.getPersons,
-    staleTime: 5 * 60 * 1000, // 5 минут кэш
+    staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 };

@@ -19,7 +19,7 @@ export const commentsApi = {
   delete: (id: number) => apiClient.delete<void>(`/Comments/${id}`),
 
   rateComment: (command: { commentId: number; score: number }) =>
-    apiClient.post('/Comments/rate', command),
+    apiClient.post('/Comments/rate', command), //потом посмотреть, стоит ли менять и получать с сервера сам комментарий
 };
 export const useRateComment = (bookId: number, parentId?: number) => {
   const qc = useQueryClient();

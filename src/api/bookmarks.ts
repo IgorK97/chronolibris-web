@@ -11,13 +11,13 @@ export const bookmarksApi = {
     apiClient.get<Bookmark[]>(`/Bookmarks/${bookFileId}`),
 
   createBookmark: (data: CreateBookmarkRequest): Promise<Bookmark> =>
-    apiClient.post<Bookmark>('/Bookmarks', data),
+    apiClient.post<Bookmark>('/Bookmarks', data), //По факту возвращает id и createdAt, потом перепишу
 
-  updateBookmark: (id: number, data: UpdateBookmarkRequest): Promise<boolean> =>
-    apiClient.put<boolean>(`/Bookmarks/${id}`, data),
+  updateBookmark: (id: number, data: UpdateBookmarkRequest): Promise<void> =>
+    apiClient.put<void>(`/Bookmarks/${id}`, data),
 
-  deleteBookmark: (id: number): Promise<boolean> =>
-    apiClient.delete<boolean>(`/Bookmarks/${id}`),
+  deleteBookmark: (id: number): Promise<void> =>
+    apiClient.delete<void>(`/Bookmarks/${id}`),
 };
 
 export const useBookmarks = (
@@ -53,7 +53,7 @@ export const useCreateBookmark = (userName: string) => {
         id: bookmarkDataFromServer.id,
         createdAt: bookmarkDataFromServer.createdAt,
       };
-      console.log('Bookmark created:', newBookmark);
+      // console.log('Bookmark created:', newBookmark);
       queryClient.setQueryData<Bookmark[]>(
         ['bookmarks', variables.bookFileId, userName],
         (oldBookmarks) => {

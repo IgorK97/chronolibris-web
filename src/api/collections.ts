@@ -64,7 +64,7 @@ export const collectionsApi = {
   getUserShelves: () => apiClient.get<ShelfDetails[]>(`/Shelves/user`),
 
   addBookToShelf: (shelfId: number, bookId: number) =>
-    apiClient.post<boolean>(`/Shelves/${shelfId}/books/${bookId}`),
+    apiClient.post(`/Shelves/${shelfId}/books/${bookId}`),
 
   getShelfBooks: (
     userId: number,
@@ -77,14 +77,13 @@ export const collectionsApi = {
     ),
 
   removeBookFromShelf: (shelfId: number, bookId: number) =>
-    apiClient.delete<boolean>(`/Shelves/${shelfId}/books/${bookId}`),
+    apiClient.delete(`/Shelves/${shelfId}/books/${bookId}`),
 
   createShelf: (name: string) => apiClient.post<number>(`/Shelves`, { name }),
 
   updateShelf: (shelfId: number, name: string) =>
-    apiClient.put<boolean>(`/Shelves/${shelfId}`, { name }),
-  deleteShelf: (shelfId: number) =>
-    apiClient.delete<boolean>(`/Shelves/${shelfId}`),
+    apiClient.put(`/Shelves/${shelfId}`, { name }),
+  deleteShelf: (shelfId: number) => apiClient.delete(`/Shelves/${shelfId}`),
 
   seekBookInShelf: (bookId: number) =>
     apiClient.get<number[]>(`/Shelves/books/${bookId}`),
@@ -95,7 +94,6 @@ export const useCreateShelf = () => {
   return useMutation({
     mutationFn: (name: string) => collectionsApi.createShelf(name),
     onSuccess: () => {
-      // Автоматически обновляем список полок для текущего пользователя
       queryClient.invalidateQueries({ queryKey: ['shelves'] });
     },
   });
@@ -168,19 +166,6 @@ export const useSelections = (
     staleTime: 5 * 60 * 1000,
   });
 };
-
-// export const useSelectionBooks = (
-//   selectionId: number,
-//   lastId: number | null,
-//   limit: number = 10
-// ) => {
-//   return useQuery({
-//     queryKey: ['selectionBooks', selectionId, lastId, limit],
-//     queryFn: () =>
-//       collectionsApi.getSelectionBooks(selectionId, lastId ?? 0, limit),
-//     enabled: !!selectionId,
-//   });
-// };
 
 export const useSelectionBooks = (
   selectionId: number,

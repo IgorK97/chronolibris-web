@@ -28,9 +28,12 @@ export const ContentList: React.FC<ContentListProps> = ({
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useInfiniteContents(filter ?? { limit: 20 }, {
-    enabled: !isStatic && !!filter,
-  });
+  } = useInfiniteContents(
+    filter ?? { limit: 20, lastId: null, searchQuery: null },
+    {
+      enabled: !isStatic && !!filter,
+    }
+  );
 
   const observerRef = useRef<HTMLDivElement | null>(null);
 

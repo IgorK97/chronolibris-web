@@ -25,6 +25,7 @@ export const themesApi = {
   updateTheme: (id: number, data: UpdateThemeRequest): Promise<void> =>
     apiClient.put<void, UpdateThemeRequest>(`/Themes/${id}`, data),
 
+  //Почему воид можно не указывать?
   deleteTheme: (id: number): Promise<void> => apiClient.delete(`/Themes/${id}`),
 };
 

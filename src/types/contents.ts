@@ -5,25 +5,6 @@ import type {
   ThemeDto,
 } from './references';
 
-// export interface ContentDto {
-//   id: number;
-//   title: string;
-//   description: string;
-//   countryId: number;
-//   countryName?: string | null;
-//   contentTypeId: number;
-//   contentType?: string | null;
-//   languageId: number;
-//   languageName?: string | null;
-//   year?: number | null;
-//   createdAt: string;
-//   updatedAt?: string | null;
-//   authors: string[];
-//   themes: ThemeDto[];
-//   booksCount: number;
-//   tags: TagDetails[];
-// }
-
 export interface ContentDto {
   id: number;
   title: string;
@@ -55,11 +36,9 @@ export interface ContentListResponse {
 }
 
 export interface ContentFilterRequest {
-  searchQuery?: string | null;
-  // authorName?: string | null;
-  // personFilters?: PersonRoleFilter[];
-  cursor?: string | null;
-  limit?: number;
+  searchQuery: string | null;
+  lastId: number | null;
+  limit: number | null;
 }
 
 export interface CreateContentRequest {
@@ -89,12 +68,6 @@ export interface UpdateContentRequest {
   personFilters?: PersonRoleFilter[];
   themeIds?: number[];
 }
-
-// export interface BookContentLinkRequest {
-//   contentId: number;
-//   bookId: number;
-//   order: number;
-// }
 
 export type PatchContentRequest = Partial<UpdateContentRequest> & {
   id: number;

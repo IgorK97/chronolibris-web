@@ -7,18 +7,21 @@ import {
 import { apiClient } from './apiClient';
 import type {
   ContentDto,
-  ContentListResponse,
+  // ContentListResponse,
   ContentFilterRequest,
   TagDetails,
   CreateContentRequest,
   PatchContentRequest,
   BookContentLinkRequest,
+  PagedResult,
 } from '../types';
 import type { BookDto } from '../types';
 
 export const contentsApi = {
-  getContents: (filter: ContentFilterRequest): Promise<ContentListResponse> =>
-    apiClient.get<ContentListResponse>('/Contents', filter),
+  getContents: (
+    filter: ContentFilterRequest
+  ): Promise<PagedResult<ContentDto>> =>
+    apiClient.get<PagedResult<ContentDto>>('/Contents', filter),
 
   getContentById: (id: number): Promise<ContentDto> =>
     apiClient.get<ContentDto>(`/Contents/${id}`),
@@ -29,6 +32,7 @@ export const contentsApi = {
   getContentTags: (contentId: number): Promise<TagDetails[]> =>
     apiClient.get<TagDetails[]>(`/Contents/${contentId}/tags`),
 
+  //Здесь потом проверить
   searchTags: (
     searchTerm: string,
     tagTypeId?: number | null,
@@ -72,14 +76,6 @@ export const contentsApi = {
     apiClient.delete(`/Contents/${contentId}/books/${bookId}`),
 };
 
-// export const useContents = (filter: ContentFilterRequest) => {
-//   return useQuery({
-//     queryKey: ['contents', filter],
-//     queryFn: () => contentsApi.getContents(filter),
-//     staleTime: 2 * 60 * 1000,
-//   });
-// };
-
 interface UseOptions {
   enabled?: boolean;
 }
@@ -92,18 +88,15 @@ export const useInfiniteContents = (
   return useInfiniteQuery({
     queryKey: ['contents', 'infinite', filter],
 
-    //pageParam будет распознан как string | undefined
     queryFn: ({ pageParam }) =>
       contentsApi.getContents({
         ...filter,
-        cursor: pageParam,
+        lastId: pageParam,
       }),
+    //Что я здесь написал?
+    initialPageParam: null as number | null,
 
-    //тип для начального значения параметра страницы
-    initialPageParam: undefined as string | undefined,
-
-    //возврат undefined, если следующей страницы нет
-    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+    getNextPageParam: (lastPage) => lastPage.lastId ?? null,
 
     staleTime: 2 * 60 * 1000,
     enabled: enabled && !!filter,
