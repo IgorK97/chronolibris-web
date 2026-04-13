@@ -41,14 +41,14 @@ export const booksApi = {
     apiClient.get<ContentDto[]>(`/Books/${bookId}/contents`),
 
   fetchToc: (bookFileId: number): Promise<TocData> =>
-    apiClient.get<TocData>(`/api/books/files/${bookFileId}/toc`),
+    apiClient.get<TocData>(`/Books/files/${bookFileId}/toc`),
 
   fetchChunk: (
     bookFileId: number,
     chunkIndex: string
   ): Promise<TextSegment[]> =>
     apiClient.get<TextSegment[]>(
-      `/api/books/files/${bookFileId}/chunks/${chunkIndex}`
+      `/books/files/${bookFileId}/chunks/${chunkIndex}`
     ),
 };
 

@@ -152,13 +152,20 @@ export const Reader: React.FC<ReaderProps> = ({
     y: number;
   } | null>(null);
 
-  const { data: fetchedTocData } = useQuery<TocData, Error>({
+  const { data: fetchedTocData } = useQuery({
     queryKey: ['toc', bookFileId],
-    queryFn: () => booksApi.fetchToc(bookFileId),
+    queryFn: () => {
+      console.log('TOC RETR: ', bookFileId);
+      return booksApi.fetchToc(bookFileId);
+    },
     staleTime: Infinity,
     gcTime: 20 * 60 * 1000,
     retry: 2,
   });
+
+  useEffect(() => {
+    console.log('TOC DATA: ', fetchedTocData);
+  }, [fetchedTocData]);
 
   // Находит индекс первого параграфа, который полностью виден в текущей вьюпорте
   const captureVisibleParaIndex = useCallback(() => {
