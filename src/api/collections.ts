@@ -122,7 +122,7 @@ export const useDeleteShelf = () => {
 
 export const useSeekedShelves = (bookId: number) => {
   return useQuery({
-    queryKey: ['seekedShelves', bookId],
+    queryKey: ['shelves', bookId],
     queryFn: () => collectionsApi.seekBookInShelf(bookId),
     enabled: !!bookId,
   });

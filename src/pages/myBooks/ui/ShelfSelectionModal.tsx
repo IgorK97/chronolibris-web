@@ -27,13 +27,12 @@ export const ShelfSelectionModal = ({ bookId, onClose, onRefresh }: Props) => {
 
   const handleToggle = async (shelfId: number) => {
     const isOnShelf = seekedShelves?.includes(shelfId);
-    const success = isOnShelf
-      ? await collectionsApi.removeBookFromShelf(shelfId, bookId)
-      : await collectionsApi.addBookToShelf(shelfId, bookId);
-    if (success) {
-      refetchSeeked();
-      if (onRefresh) onRefresh();
-    }
+    console.log(isOnShelf, 'TUTA TUTA');
+    if (isOnShelf) await collectionsApi.removeBookFromShelf(shelfId, bookId);
+    else await collectionsApi.addBookToShelf(shelfId, bookId);
+
+    refetchSeeked();
+    if (onRefresh) onRefresh();
   };
 
   const handleCreate = async (newName: string) => {
@@ -52,7 +51,7 @@ export const ShelfSelectionModal = ({ bookId, onClose, onRefresh }: Props) => {
         <button className={styles['close-btn']} onClick={onClose}>
           <X />
         </button>
-        <h3>Добавить в коллекцию</h3>
+        <h3>Добавить на книжные полки</h3>
         <ul className={styles['list']}>
           {shelves?.map((shelf) => (
             <li key={shelf.id} onClick={() => handleToggle(shelf.id)}>

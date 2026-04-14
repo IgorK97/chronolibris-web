@@ -46,6 +46,7 @@ export default defineConfig({
     include: ['.json', '.js'],
   },
   server: {
+    host: true,
     port: 5173,
     https: {
       key: fs.readFileSync(
@@ -62,6 +63,29 @@ export default defineConfig({
       },
       '/storage': {
         target: 'https://127.0.0.1:9000',
+        rewrite: (path) => path.replace(/^\/storage/, ''),
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
+  preview: {
+    host: true,
+    port: 4173,
+    https: {
+      key: fs.readFileSync(
+        path.resolve(__dirname, './certs/localhost+2-key.pem')
+      ),
+      cert: fs.readFileSync(path.resolve(__dirname, './certs/localhost+2.pem')),
+    },
+    proxy: {
+      '/api': {
+        target: 'https://localhost:7016',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/storage': {
+        target: 'https://localhost:9000',
         rewrite: (path) => path.replace(/^\/storage/, ''),
         changeOrigin: true,
         secure: false,

@@ -101,33 +101,46 @@ export const Auth = ({ onNavigate }: AuthProps) => {
       firstName: null,
       lastName: null,
     };
-    if (!regForm.firstName.trim()) e.firstName = 'Имя не может быть пустым';
-    if (!regForm.lastName.trim()) e.lastName = 'Фамилия не может быть пустой';
+    let ok = true;
+
+    if (!regForm.firstName.trim()) {
+      e.firstName = 'Имя не может быть пустым';
+      ok = false;
+    }
+    if (!regForm.lastName.trim()) {
+      e.lastName = 'Фамилия не может быть пустой';
+      ok = false;
+    }
 
     if (!VALIDATION_RULES.userName.test(regForm.userName)) {
       e.userName = 'Минимум 5 симвоолов: латиница, цифры или _';
+      ok = false;
     }
 
     if (!VALIDATION_RULES.email.test(regForm.email)) {
       e.email = 'Некорректный формат почты';
+      ok = false;
     }
 
     if (!VALIDATION_RULES.phone.test(regForm.phone)) {
       e.phone = 'Некорректный формат телефона';
+      ok = false;
     }
 
     if (!VALIDATION_RULES.password.test(regForm.password)) {
       e.password =
         'Пароль должен быть длиной не менее 8 символов и содержать цифры,' +
         ' латинские заглавные и строчные буквы и один из символов #?!@$%^&*-';
+      ok = false;
     }
 
     if (regForm.password !== regForm.confirmPassword) {
       e.confirmPassword = 'Пароли не совпадают';
+      ok = false;
     }
 
     setRegErrors(e);
-    return Object.keys(e).length === 0;
+    return ok;
   };
 
   const validateLogin = (): boolean => {
@@ -155,10 +168,10 @@ export const Auth = ({ onNavigate }: AuthProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setServerError(null);
-
+    console.log('I AM TUTA');
     const valid = isRegister ? validateRegister() : validateLogin();
     if (!valid) return;
-
+    console.log('I AM HERE');
     try {
       if (isRegister) {
         await usersApi.register({
@@ -239,7 +252,7 @@ export const Auth = ({ onNavigate }: AuthProps) => {
         ) : (
           <>
             <InputField
-              label={t('auth.l_name')}
+              label={'Имя пользователя'}
               value={loginForm.userName}
               onChange={(v) => setLoginForm({ ...loginForm, userName: v })}
               error={loginErrors.userName}
@@ -279,7 +292,7 @@ interface InputFieldProps {
   onChange: (v: string) => void;
   error?: string | null;
   type?: string;
-  maxLength?:number;
+  maxLength?: number;
 }
 
 function InputField({
