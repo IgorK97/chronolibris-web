@@ -314,6 +314,27 @@ function AutocompleteField({
   );
 }
 
+const validateRealFileType = async (file: File): Promise<boolean> => {
+  const signatures: Record<string, string> = {
+    ffd8ff: 'image/jpeg',
+    '89504e47': 'image/png',
+    '52494646': 'image/webp',
+  };
+  const header = await new Promise<string>((resolve) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const arr = new Uint8Array(reader.result as ArrayBuffer).subarray(0, 4);
+      let header = '';
+      for (let i = 0; i < arr.length; i++) {
+        header += arr[i].toString(16);
+      }
+      resolve(header);
+    };
+    reader.readAsArrayBuffer(file.slice(0, 4));
+  });
+  return Object.keys(signatures).some((sig) => header.startsWith(sig));
+};
+
 function CoverUpload({
   currentCoverPath,
   onFileChange,
@@ -322,30 +343,53 @@ function CoverUpload({
   onFileChange: (file: File | null) => void;
 }) {
   const [preview, setPreview] = useState(storageUrl(currentCoverPath));
-  console.log(
-    'Current cover path:',
-    currentCoverPath,
-    'Resolved URL:',
-    preview
-  );
+  const handleRemove = () => {
+    setPreview(null);
+    onFileChange(null);
+    if (preview) {
+      URL.revokeObjectURL(preview);
+    }
+  };
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: { 'image/*': [] },
+    accept: {
+      'image/jpeg': [],
+      'image/png': [],
+      'image/webp': [],
+    },
+    maxSize: 5 * 1024 * 1024,
     maxFiles: 1,
-    onDrop: ([file]) => {
-      onFileChange(file);
-      setPreview(URL.createObjectURL(file));
+    onDrop: async ([file]) => {
+      if (!file) return;
+
+      const isValid = await validateRealFileType(file);
+
+      if (isValid) {
+        onFileChange(file);
+        setPreview(URL.createObjectURL(file));
+      } else {
+        alert('Файл не похож на изображение');
+      }
     },
   });
 
   return (
-    <div {...getRootProps()} className={styles['cover-upload']}>
-      <input {...getInputProps()} />
-      {preview ? (
-        <img src={preview} className={styles['cover-preview']} />
-      ) : (
-        <span>
-          {isDragActive ? 'Отпустите файл...' : 'Нажмите или перетащите'}
-        </span>
+    <div style={{ display: 'flex', flexDirection: 'row' }}>
+      <div {...getRootProps()} className={styles['cover-upload']}>
+        <input {...getInputProps()} />
+        {preview ? (
+          <img src={preview} className={styles['cover-preview']} />
+        ) : (
+          <span>
+            {isDragActive
+              ? 'Отпустите файл...'
+              : 'Нажмите или перетащите (jpeg, png, webp, до 5 МБ)'}
+          </span>
+        )}
+      </div>
+      {preview && (
+        <button onClick={handleRemove}>
+          <X style={{ cursor: 'pointer', color: 'red' }} />
+        </button>
       )}
     </div>
   );
@@ -392,11 +436,10 @@ const emptyForm = (): FormState => ({
 });
 
 const VALIDATION_RULES = {
-  // isbn: /^(?=(?:\D?\d){10}(?:(?:\D?\d){3})?$)[\d-]+$/,
   isbn: /^(?=(?:\D?\d){10}(?:(?:\D?\d){3})?$)[\d-]+$/,
   title: { min: 1, max: 500 },
-  description: { min: 100, max: 2000 },
-  year: { min: -5000, max: 3000 },
+  description: { min: 100, max: 5000 },
+  year: { min: -10000, max: new Date().getFullYear() + 1 },
   sourceMax: 500,
 };
 
