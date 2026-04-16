@@ -4,16 +4,19 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import styles from './Profile.module.css';
-import parsePhoneNumber from 'libphonenumber-js';
+// import parsePhoneNumber from 'libphonenumber-js';
 import { useStore } from '../../../stores/globalStore';
 import { usersApi } from '../../../api/user';
+import { PhoneInputField } from '@/components/PhoneInputField/PhoneInputField';
 
 const VALIDATION_RULES = {
-  userName: /^(?=.*[a-zA-Z])[a-zA-Z0-9_]{5,32}$/,
-  email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  // phone: /^(?:\+7|8)[0-9]{7,14}$/,
-  password: /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,128}$/,
-  anyName: /^[\p{L}\s-]{1,64}$/u,
+  anyName: /^(?=.*?\p{L})[\p{L}\s-]{1,64}$/u,
+  userName: /^(?=.*?[a-zA-Z])[a-zA-Z0-9_]{5,32}$/,
+  password:
+    /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-+=/\\`:;{}()~[\]"'_<>|,.])[A-Za-z0-9#?!@$%^&*-+=/\\`:;{}()~[\]"'_<>|,.]{8,256}$/,
+  phone: /^(?:\+7|8)[0-9]{10}$/,
+  email:
+    /^(?=^.{1,254}$)(?!.*\.\.)(?!^\.)(?!.*@\.)(?!.*@-)(?!.*\.@)[a-zA-Z0-9._%+-]+@(?!.*-\.)(?!.*\.-)[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
 };
 
 interface ProfileProps {
@@ -27,7 +30,7 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
   const [profileForm, setProfileForm] = useState({
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
-    phoneNumber: user?.phoneNumber || '',
+    phoneNumber: (user?.phoneNumber ?? '').slice(2) || '',
     email: user?.email || '',
     userName: user?.userName || '',
   });
@@ -59,12 +62,12 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
       newErrors.userName = 'От 5 до 32 символов: латиница, цифры или _';
     }
 
-    if (data.email && !VALIDATION_RULES.email.test(data.email)) {
+    if (!VALIDATION_RULES.email.test(data.email)) {
       newErrors.email = 'Некорректный формат почты';
     }
 
-    const phoneNumber = parsePhoneNumber(profileForm.phoneNumber, 'RU');
-    if (!phoneNumber) {
+    // const phoneNumber = parsePhoneNumber(profileForm.phoneNumber, 'RU');
+    if (!VALIDATION_RULES.phone.test(`+7` + data.phoneNumber)) {
       newErrors.phone = 'Некорректный формат телефона';
     }
 
@@ -79,7 +82,7 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
         ' латинские заглавные и строчные буквы и один из символов #?!@$%^&*-';
     }
 
-    if (newPassword !== confirmPassword) {
+    if (newPassword && newPassword !== confirmPassword) {
       newErrors.confirmPassword = 'Пароли не совпадают';
     }
 
@@ -112,7 +115,7 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
           lastName: profile.lastName ?? '',
           userName: profile.userName ?? '',
           email: profile.email ?? '',
-          phoneNumber: profile.phoneNumber ?? '',
+          phoneNumber: (profile.phoneNumber ?? '').slice(2) ?? '',
         };
         setProfileForm(initial);
         setProfileSnapshot(initial);
@@ -141,7 +144,7 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
         firstName: profileForm.firstName,
         lastName: profileForm.lastName,
         email: profileForm.email,
-        phoneNumber: profileForm.phoneNumber,
+        phoneNumber: `+7` + profileForm.phoneNumber,
         userName: profileForm.userName,
       });
       setUser({
@@ -215,7 +218,7 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
                 placeholder={'имя'}
               />
               {errors.firstName && (
-                <span className={styles['error-text']}>{errors.firstName}</span>
+                <span className={styles['error-msg']}>{errors.firstName}</span>
               )}
             </div>
 
@@ -234,7 +237,7 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
                 placeholder={'фамилия'}
               />
               {errors.lastName && (
-                <span className={styles['error-text']}>{errors.lastName}</span>
+                <span className={styles['error-msg']}>{errors.lastName}</span>
               )}
             </div>
 
@@ -253,7 +256,7 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
                 placeholder={t('profile.ph_name')}
               />
               {errors.userName && (
-                <span className={styles['error-text']}>{errors.userName}</span>
+                <span className={styles['error-msg']}>{errors.userName}</span>
               )}
             </div>
 
@@ -271,11 +274,20 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
                 placeholder={t('profile.ph_email')}
               />
               {errors.email && (
-                <span className={styles['error-text']}>{errors.email}</span>
+                <span className={styles['error-msg']}>{errors.email}</span>
               )}
             </div>
 
-            <div className={styles['input-group']}>
+            <PhoneInputField
+              label={'Телефон'}
+              value={profileForm.phoneNumber}
+              onChange={(v) =>
+                setProfileForm({ ...profileForm, phoneNumber: v })
+              }
+              error={errors.phone}
+            />
+
+            {/* <div className={styles['input-group']}>
               <label className={styles['label']}>Телефон</label>
               <input
                 type="tel"
@@ -293,13 +305,13 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
                   {errors.phoneNumber}
                 </span>
               )}
-            </div>
+            </div> */}
           </div>
           {profileSuccess && (
             <p className={styles['success-msg']}>Данные сохранены</p>
           )}
           {profileError && (
-            <p className={styles['error-text']}>{profileError}</p>
+            <p className={styles['error-msg']}>{profileError}</p>
           )}
           <button
             type="submit"
@@ -329,6 +341,11 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
                 placeholder={t('profile.ph_pass')}
                 autoComplete="new-password"
               />
+              {newPassword && errors.currentPassword && (
+                <span className={styles['error-msg']}>
+                  {errors.currentPassword}
+                </span>
+              )}
             </div>
 
             <div className={styles['input-group']}>
@@ -344,6 +361,11 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
                 autoComplete="new-password"
                 maxLength={128}
               />
+              {newPassword && errors.newPassword && (
+                <span className={styles['error-msg']}>
+                  {errors.newPassword}
+                </span>
+              )}
             </div>
 
             <div className={styles['input-group']}>
@@ -358,11 +380,9 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
                 placeholder={t('profile.ph_conf_pass')}
               />
 
-              {newPassword &&
-                confirmPassword &&
-                newPassword !== confirmPassword && (
-                  <p className={styles['error-msg']}>Пароли не совпадают</p>
-                )}
+              {newPassword && errors.confirmPassword && (
+                <p className={styles['error-msg']}>{errors.confirmPassword}</p>
+              )}
             </div>
             {passwordError && (
               <p className={styles['error-msg']}>{passwordError}</p>

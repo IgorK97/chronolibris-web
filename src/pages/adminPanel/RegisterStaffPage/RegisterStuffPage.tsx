@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { usersApi } from '@/api/user';
 import styles from './RegisterStuffPage.module.css';
+import { PhoneInputField } from '@/components/PhoneInputField/PhoneInputField';
 
 type StaffRole = 'moderator' | 'admin';
 
@@ -48,10 +49,13 @@ const EMPTY_ERRORS: FormErrors = {
 };
 
 const VALIDATION_RULES = {
-  userName: /^[a-zA-Z0-9_]{5,256}$/,
-  email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  phone: /^(?:\+7|8)[0-9]{7,14}$/,
-  password: /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,128}$/,
+  anyName: /^(?=.*?\p{L})[\p{L}\s-]{1,64}$/u,
+  userName: /^(?=.*?[a-zA-Z])[a-zA-Z0-9_]{5,32}$/,
+  password:
+    /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-+=/\\`:;{}()~[\]"'_<>|,.])[A-Za-z0-9#?!@$%^&*-+=/\\`:;{}()~[\]"'_<>|,.]{8,256}$/,
+  phone: /^(?:\+7|8)[0-9]{10}$/,
+  email:
+    /^(?=^.{1,254}$)(?!.*\.\.)(?!^\.)(?!.*@\.)(?!.*@-)(?!.*\.@)[a-zA-Z0-9._%+-]+@(?!.*-\.)(?!.*\.-)[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
 };
 
 export function RegisterStaffPage() {
@@ -68,34 +72,45 @@ export function RegisterStaffPage() {
 
   const validate = (): boolean => {
     const e = { ...EMPTY_ERRORS };
-
-    if (!form.firstName.trim()) e.firstName = 'Имя не может быть пустым';
-    if (!form.lastName.trim()) e.lastName = 'Фамилия не может быть пустой';
+    let ok = true;
+    if (!VALIDATION_RULES.anyName.test(form.firstName)) {
+      e.firstName = 'Имя - от 1 до 64 символов (буквы, пробелы, дефис)';
+      ok = false;
+    }
+    if (!VALIDATION_RULES.anyName.test(form.lastName)) {
+      e.lastName = 'Фамилия - от 1 до 64 символов (буквы, пробелы, дефис)';
+      ok = false;
+    }
 
     if (!VALIDATION_RULES.userName.test(form.userName)) {
       e.userName = 'Минимум 5 симвоолов: латиница, цифры или _';
+      ok = false;
     }
 
     if (!VALIDATION_RULES.email.test(form.email)) {
       e.email = 'Некорректный формат почты';
+      ok = false;
     }
 
-    if (!VALIDATION_RULES.phone.test(form.phoneNumber)) {
+    if (!VALIDATION_RULES.phone.test(`+7` + form.phoneNumber)) {
       e.phoneNumber = 'Некорректный формат телефона';
+      ok = false;
     }
 
     if (!VALIDATION_RULES.password.test(form.password)) {
       e.password =
         'Пароль должен быть длиной не менее 8 символов и содержать цифры,' +
         ' латинские заглавные и строчные буквы и один из символов #?!@$%^&*-';
+      ok = false;
     }
 
     if (form.password !== form.confirm) {
       e.confirm = 'Пароли не совпадают';
+      ok = false;
     }
 
     setErrors(e);
-    return Object.keys(e).length === 0;
+    return ok;
   };
 
   useEffect(() => {
@@ -114,7 +129,7 @@ export function RegisterStaffPage() {
       await usersApi.registerStaff({
         userName: form.userName.trim(),
         email: form.email.trim(),
-        phoneNumber: form.phoneNumber.trim(),
+        phoneNumber: `+7` + form.phoneNumber.trim(),
         password: form.password,
         role: form.role,
         lastName: form.lastName,
@@ -124,7 +139,7 @@ export function RegisterStaffPage() {
       setSuccess(
         `${form.role === 'admin' ? 'Администратор' : 'Модератор'} «${form.userName}» успешно зарегистрирован.`
       );
-      setForm(EMPTY_FORM);
+      // setForm(EMPTY_FORM);
       setErrors(EMPTY_ERRORS);
     } catch (err: any) {
       setServerError(`Ошибка: ${err.response.data?.detail}`);
@@ -183,14 +198,19 @@ export function RegisterStaffPage() {
           error={errors.email}
         />
 
-        <Field
+        {/* <Field
           label="Телефон"
           type="tel"
           value={form.phoneNumber}
           onChange={set('phoneNumber')}
           error={errors.phoneNumber}
+        /> */}
+        <PhoneInputField
+          label={'Телефон'}
+          value={form.phoneNumber}
+          onChange={(v) => setForm({ ...form, phoneNumber: v })}
+          error={errors.phoneNumber}
         />
-
         <Field
           label="Пароль"
           type="password"
@@ -209,9 +229,9 @@ export function RegisterStaffPage() {
           maxLength={128}
         />
 
-        {serverError && <p className={styles.serverError}>{serverError}</p>}
+        {serverError && <p className={styles['server-error']}>{serverError}</p>}
 
-        {success && <p className={styles.successMsg}>{success}</p>}
+        {success && <p className={styles['success-msg']}>{success}</p>}
 
         <button
           type="submit"

@@ -7,6 +7,7 @@ import { usersApi } from '../../../api/user';
 import { useStore } from '../../../stores/globalStore';
 import { t } from 'i18next';
 import { useSearchParams } from 'react-router-dom';
+import { PhoneInputField } from '@/components/PhoneInputField/PhoneInputField';
 
 const VALIDATION_RULES = {
   anyName: /^(?=.*?\p{L})[\p{L}\s-]{1,64}$/u,
@@ -15,7 +16,7 @@ const VALIDATION_RULES = {
     /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-+=/\\`:;{}()~[\]"'_<>|,.])[A-Za-z0-9#?!@$%^&*-+=/\\`:;{}()~[\]"'_<>|,.]{8,256}$/,
   phone: /^(?:\+7|8)[0-9]{10}$/,
   email:
-    /^(?=^.{1,256}$)(?!.*\.\.)(?!^\.)(?!.*@\.)(?!.*@-)(?!.*\.@)[a-zA-Zа-яА-ЯёЁ0-9._%+-]+@(?!.*-\.)(?!.*\.-)[a-zA-ZёЁа-яА-Я0-9.-]+\.[a-zA-Zа-яА-ЯёЁ]{2,}$/,
+    /^(?=^.{1,254}$)(?!.*\.\.)(?!^\.)(?!.*@\.)(?!.*@-)(?!.*\.@)[a-zA-Z0-9._%+-]+@(?!.*-\.)(?!.*\.-)[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
 };
 
 interface RegisterForm {
@@ -124,8 +125,9 @@ export const Auth = ({ onNavigate }: AuthProps) => {
       e.email = 'Некорректный формат почты';
       ok = false;
     }
-    const phoneNumber = parsePhoneNumber(regForm.phone, 'RU');
-    if (!phoneNumber) {
+    console.log(regForm.phone);
+    // const phoneNumber = parsePhoneNumber(regForm.phone, 'RU');
+    if (!VALIDATION_RULES.phone.test(`+7` + regForm.phone)) {
       e.phone = 'Некорректный формат телефона';
       ok = false;
     }
@@ -174,7 +176,7 @@ export const Auth = ({ onNavigate }: AuthProps) => {
     console.log('I AM TUTA');
     const valid = isRegister ? validateRegister() : validateLogin();
     if (!valid) return;
-    const phoneNumber = parsePhoneNumber(regForm.phone, 'RU');
+    // const phoneNumber = parsePhoneNumber(regForm.phone, 'RU');
     console.log('I AM HERE');
     try {
       if (isRegister) {
@@ -184,7 +186,7 @@ export const Auth = ({ onNavigate }: AuthProps) => {
           lastName: regForm.lastName,
           email: regForm.email,
           password: regForm.password,
-          phoneNumber: phoneNumber!.number,
+          phoneNumber: `+7` + regForm.phone,
         });
       } else {
         await usersApi.login(loginForm.userName, loginForm.password);
@@ -234,13 +236,19 @@ export const Auth = ({ onNavigate }: AuthProps) => {
               error={regErrors.email}
               type="email"
             />
-            <InputField
+            <PhoneInputField
+              label={t('auth.l_phone')}
+              value={regForm.phone}
+              onChange={(v) => setRegForm({ ...regForm, phone: v })}
+              error={regErrors.phone}
+            />
+            {/* <InputField
               label={t('auth.l_phone')}
               value={regForm.phone}
               onChange={(v) => setRegForm({ ...regForm, phone: v })}
               error={regErrors.phone}
               type="tel"
-            />
+            /> */}
             <InputField
               label={t('auth.l_pass')}
               value={regForm.password}
@@ -278,7 +286,7 @@ export const Auth = ({ onNavigate }: AuthProps) => {
           </>
         )}
 
-        {serverError && <p className={styles['server-error']}>{serverError}</p>}
+        {serverError && <p className={styles['error-text']}>{serverError}</p>}
 
         <button type="submit" className={styles['button']}>
           {isRegister ? t('auth.action_reg') : t('auth.action_auth')}
