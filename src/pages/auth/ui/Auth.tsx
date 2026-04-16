@@ -2,17 +2,20 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import React, { useEffect, useState } from 'react';
 import styles from './Auth.module.css';
-
+// import parsePhoneNumber from 'libphonenumber-js';
 import { usersApi } from '../../../api/user';
 import { useStore } from '../../../stores/globalStore';
 import { t } from 'i18next';
 import { useSearchParams } from 'react-router-dom';
 
 const VALIDATION_RULES = {
-  userName: /^[a-zA-Z0-9_]{5,256}$/,
-  email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  phone: /^(?:\+7|8)[0-9]{7,14}$/,
-  password: /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,128}$/,
+  anyName: /^(?=.*?\p{L})[\p{L}\s-]{1,64}$/u,
+  userName: /^(?=.*?[a-zA-Z])[a-zA-Z0-9_]{5,32}$/,
+  password:
+    /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-+=/\\`:;{}()~[\]"'_<>|,.])[A-Za-z0-9#?!@$%^&*-+=/\\`:;{}()~[\]"'_<>|,.]{8,256}$/,
+  phone: /^(?:\+7|8)[0-9]{10}$/,
+  email:
+    /^(?=^.{1,256}$)(?!.*\.\.)(?!^\.)(?!.*@\.)(?!.*@-)(?!.*\.@)[a-zA-Zа-яА-ЯёЁ0-9._%+-]+@(?!.*-\.)(?!.*\.-)[a-zA-ZёЁа-яА-Я0-9.-]+\.[a-zA-Zа-яА-ЯёЁ]{2,}$/,
 };
 
 interface RegisterForm {
@@ -103,17 +106,17 @@ export const Auth = ({ onNavigate }: AuthProps) => {
     };
     let ok = true;
 
-    if (!regForm.firstName.trim()) {
-      e.firstName = 'Имя не может быть пустым';
+    if (!VALIDATION_RULES.anyName.test(regForm.firstName)) {
+      e.firstName = 'Имя - от 1 до 64 символов (буквы, пробелы, дефис)';
       ok = false;
     }
-    if (!regForm.lastName.trim()) {
-      e.lastName = 'Фамилия не может быть пустой';
+    if (!VALIDATION_RULES.anyName.test(regForm.lastName)) {
+      e.lastName = 'Фамилия - от 1 до 64 символов (буквы, пробелы, дефис)';
       ok = false;
     }
 
     if (!VALIDATION_RULES.userName.test(regForm.userName)) {
-      e.userName = 'Минимум 5 симвоолов: латиница, цифры или _';
+      e.userName = 'От 5 до 32 символов: латиница, цифры или _';
       ok = false;
     }
 
@@ -121,8 +124,8 @@ export const Auth = ({ onNavigate }: AuthProps) => {
       e.email = 'Некорректный формат почты';
       ok = false;
     }
-
-    if (!VALIDATION_RULES.phone.test(regForm.phone)) {
+    const phoneNumber = parsePhoneNumber(regForm.phone, 'RU');
+    if (!phoneNumber) {
       e.phone = 'Некорректный формат телефона';
       ok = false;
     }
@@ -147,12 +150,12 @@ export const Auth = ({ onNavigate }: AuthProps) => {
     const e: LoginErrors = { userName: null, password: null };
     let ok = true;
 
-    if (!loginForm.userName.trim() || loginForm.userName.length < 5) {
-      e.userName = 'Введите имя пользователя';
+    if (!VALIDATION_RULES.userName.test(loginForm.userName)) {
+      e.userName = 'Введите корректное имя пользователя';
       ok = false;
     }
 
-    if (!loginForm.password.trim() || loginForm.password.length < 8) {
+    if (!VALIDATION_RULES.password.test(loginForm.password)) {
       e.password = t('auth.error_pass');
       ok = false;
     }
@@ -171,6 +174,7 @@ export const Auth = ({ onNavigate }: AuthProps) => {
     console.log('I AM TUTA');
     const valid = isRegister ? validateRegister() : validateLogin();
     if (!valid) return;
+    const phoneNumber = parsePhoneNumber(regForm.phone, 'RU');
     console.log('I AM HERE');
     try {
       if (isRegister) {
@@ -180,7 +184,7 @@ export const Auth = ({ onNavigate }: AuthProps) => {
           lastName: regForm.lastName,
           email: regForm.email,
           password: regForm.password,
-          phoneNumber: regForm.phone,
+          phoneNumber: phoneNumber!.number,
         });
       } else {
         await usersApi.login(loginForm.userName, loginForm.password);
@@ -207,18 +211,21 @@ export const Auth = ({ onNavigate }: AuthProps) => {
               value={regForm.userName}
               onChange={(v) => setRegForm({ ...regForm, userName: v })}
               error={regErrors.userName}
+              maxLength={32}
             />
             <InputField
               label={t('auth.f_name')}
               value={regForm.firstName}
               onChange={(v) => setRegForm({ ...regForm, firstName: v })}
               error={regErrors.firstName}
+              maxLength={64}
             />
             <InputField
               label={t('auth.l_name')}
               value={regForm.lastName}
               onChange={(v) => setRegForm({ ...regForm, lastName: v })}
               error={regErrors.lastName}
+              maxLength={64}
             />
             <InputField
               label={t('auth.l_email')}
@@ -240,6 +247,7 @@ export const Auth = ({ onNavigate }: AuthProps) => {
               onChange={(v) => setRegForm({ ...regForm, password: v })}
               error={regErrors.password}
               type="password"
+              maxLength={128}
             />
             <InputField
               label={t('auth.l_conf_pass')}
@@ -247,6 +255,7 @@ export const Auth = ({ onNavigate }: AuthProps) => {
               onChange={(v) => setRegForm({ ...regForm, confirmPassword: v })}
               error={regErrors.confirmPassword}
               type="password"
+              maxLength={128}
             />
           </>
         ) : (
@@ -256,7 +265,7 @@ export const Auth = ({ onNavigate }: AuthProps) => {
               value={loginForm.userName}
               onChange={(v) => setLoginForm({ ...loginForm, userName: v })}
               error={loginErrors.userName}
-              maxLength={128}
+              maxLength={32}
             />
             <InputField
               label={t('auth.l_pass')}

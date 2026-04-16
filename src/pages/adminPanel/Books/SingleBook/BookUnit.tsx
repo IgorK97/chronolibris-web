@@ -915,7 +915,7 @@ export const BookUnit: React.FC = () => {
             </div>
           ) : (
             <div className={styles['edit-form']}>
-              {book?.coverUri && (
+              {book?.coverUri ? (
                 <div className={styles['field-group']}>
                   <label className={styles['field-label']}>Обложка</label>
                   <div
@@ -928,6 +928,12 @@ export const BookUnit: React.FC = () => {
                       className={styles['cover-preview']}
                     />
                   </div>
+                </div>
+              ) : (
+                <div className={styles['image-placeholder']}>
+                  <span className={styles['image-placeholder-title']}>
+                    {book?.title}
+                  </span>
                 </div>
               )}
 

@@ -4,14 +4,16 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import styles from './Profile.module.css';
-
+import parsePhoneNumber from 'libphonenumber-js';
 import { useStore } from '../../../stores/globalStore';
 import { usersApi } from '../../../api/user';
 
 const VALIDATION_RULES = {
-  userName: /^[a-zA-Z0-9_]{5,256}$/,
+  userName: /^(?=.*[a-zA-Z])[a-zA-Z0-9_]{5,32}$/,
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  phone: /^(?:\+7|8)[0-9]{7,14}$/,
+  // phone: /^(?:\+7|8)[0-9]{7,14}$/,
+  password: /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,128}$/,
+  anyName: /^[\p{L}\s-]{1,64}$/u,
 };
 
 interface ProfileProps {
@@ -45,27 +47,49 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
   const validateProfile = (data: typeof profileForm) => {
     const newErrors: Record<string, string> = {};
 
-    if (!data.firstName.trim())
-      newErrors.firstName = 'Имя не может быть пустым';
-    if (!data.lastName.trim())
-      newErrors.lastName = 'Фамилия не может быть пустой';
+    if (!VALIDATION_RULES.anyName.test(profileForm.firstName)) {
+      newErrors.firstName = 'Имя - от 1 до 64 символов (буквы, пробелы, дефис)';
+    }
+    if (!VALIDATION_RULES.anyName.test(profileForm.lastName)) {
+      newErrors.lastName =
+        'Фамилия - от 1 до 64 символов (буквы, пробелы, дефис)';
+    }
 
-    if (!VALIDATION_RULES.userName.test(data.userName)) {
-      newErrors.userName = 'Минимум 5 символов: латиница, цифры или _';
+    if (!VALIDATION_RULES.userName.test(profileForm.userName)) {
+      newErrors.userName = 'От 5 до 32 символов: латиница, цифры или _';
     }
 
     if (data.email && !VALIDATION_RULES.email.test(data.email)) {
       newErrors.email = 'Некорректный формат почты';
     }
 
-    if (data.phoneNumber && !VALIDATION_RULES.phone.test(data.phoneNumber)) {
-      newErrors.phoneNumber = 'Некорректный формат телефона';
+    const phoneNumber = parsePhoneNumber(profileForm.phoneNumber, 'RU');
+    if (!phoneNumber) {
+      newErrors.phone = 'Некорректный формат телефона';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+  const validatePasswords = () => {
+    const newErrors: Record<string, string> = {};
+    if (!VALIDATION_RULES.password.test(newPassword)) {
+      newErrors.newPassword =
+        'Пароль должен быть длиной не менее 8 символов и содержать цифры,' +
+        ' латинские заглавные и строчные буквы и один из символов #?!@$%^&*-';
+    }
 
+    if (newPassword !== confirmPassword) {
+      newErrors.confirmPassword = 'Пароли не совпадают';
+    }
+
+    if (currentPassword.trim().length < 8) {
+      newErrors.currentPassword = 'Текущий пароль должен быть указан';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
   useEffect(() => {
     validateProfile(profileForm);
   }, [profileForm]);
@@ -74,21 +98,9 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
     return JSON.stringify(profileForm) !== JSON.stringify(profileSnapshot);
   }, [profileForm, profileSnapshot]);
 
-  const isProfileValid = useMemo(() => {
-    return (
-      profileForm.firstName.trim() !== '' &&
-      profileForm.lastName.trim() !== '' &&
-      VALIDATION_RULES.userName.test(profileForm.userName) &&
-      (!profileForm.email || VALIDATION_RULES.email.test(profileForm.email)) &&
-      (!profileForm.phoneNumber ||
-        VALIDATION_RULES.phone.test(profileForm.phoneNumber))
-    );
-  }, [profileForm]);
+  const isProfileValid = Object.keys(errors).length === 0;
 
-  const passwordReady =
-    currentPassword.length > 8 &&
-    newPassword.length > 8 &&
-    newPassword === confirmPassword;
+  const passwordReady = Object.keys(errors).length === 0;
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -146,7 +158,7 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
 
   const handleChangePassword = async (e?: FormEvent) => {
     e?.preventDefault();
-    if (!user || !passwordReady) return;
+    if (!user || !validatePasswords()) return;
     setPasswordError('');
     setPasswordSuccess(false);
 

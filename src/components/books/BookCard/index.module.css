@@ -5,6 +5,29 @@
   flex-direction: column;
 }
 
+.image-placeholder {
+  width: 100%;
+  height: 100%;
+  background-color: #c8b89a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.image-placeholder-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #3b2f1e;
+  text-align: center;
+  line-height: 1.3;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+}
+
 .image-wrapper {
   position: relative;
   width: 100%;

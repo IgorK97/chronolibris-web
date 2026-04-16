@@ -386,11 +386,19 @@ export const BookDetailsComponent = ({
       <div className={styles['scroll-container']}>
         <div className={styles['book-body']}>
           <div className={styles['cover-container']}>
-            <img
-              src={getImageUrl(fullBookDetails.coverUri)}
-              alt={fullBookDetails.title}
-              className={styles['cover']}
-            />
+            {fullBookDetails.coverUri ? (
+              <img
+                src={getImageUrl(fullBookDetails.coverUri)}
+                alt={fullBookDetails.title}
+                className={styles['cover']}
+              />
+            ) : (
+              <div className={styles['image-placeholder']}>
+                <span className={styles['image-placeholder-title']}>
+                  {fullBookDetails.title}
+                </span>
+              </div>
+            )}
             {fullBookDetails.year && (
               <span className={styles['meta-text']}>
                 {fullBookDetails.year} {t('book.year')}

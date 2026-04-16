@@ -50,9 +50,9 @@ export default defineConfig({
     port: 5173,
     https: {
       key: fs.readFileSync(
-        path.resolve(__dirname, './certs/localhost+2-key.pem')
+        path.resolve(__dirname, './certs/localhost+3-key.pem')
       ),
-      cert: fs.readFileSync(path.resolve(__dirname, './certs/localhost+2.pem')),
+      cert: fs.readFileSync(path.resolve(__dirname, './certs/localhost+3.pem')),
     },
     strictPort: true,
     proxy: {
@@ -74,9 +74,9 @@ export default defineConfig({
     port: 4173,
     https: {
       key: fs.readFileSync(
-        path.resolve(__dirname, './certs/localhost+2-key.pem')
+        path.resolve(__dirname, './certs/localhost+3-key.pem')
       ),
-      cert: fs.readFileSync(path.resolve(__dirname, './certs/localhost+2.pem')),
+      cert: fs.readFileSync(path.resolve(__dirname, './certs/localhost+3.pem')),
     },
     proxy: {
       '/api': {

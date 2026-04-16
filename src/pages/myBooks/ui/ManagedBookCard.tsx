@@ -17,12 +17,21 @@ export const ManagedBookCard = ({ book, onRemove, onEdit, onPress }: Props) => {
   return (
     <div className={styles['card']}>
       <div className={styles['image-wrapper']}>
-        <img
-          src={getImageUrl(book.coverUri)}
-          onClick={onPress}
-          className={styles['image']}
-          alt={book.title}
-        />
+        {book.coverUri ? (
+          <img
+            src={getImageUrl(book.coverUri)}
+            alt={book.title}
+            onClick={onPress}
+            className={styles['image']}
+            loading="lazy"
+          />
+        ) : (
+          <div className={styles['image-placeholder']}>
+            <span className={styles['image-placeholder-title']}>
+              {book.title}
+            </span>
+          </div>
+        )}
 
         <div className={styles['menu-container']}>
           <button

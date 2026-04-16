@@ -37,12 +37,20 @@ export const BookCard: React.FC<BookCardProps> = ({
   return (
     <div className={styles['card']}>
       <div className={styles['image-wrapper']} onClick={onPress}>
-        <img
-          src={`${coverUrl}/${bookInfo.coverUri}`}
-          alt={bookInfo.title}
-          className={styles['image']}
-          loading="lazy"
-        />
+        {bookInfo.coverUri ? (
+          <img
+            src={`${coverUrl}/${bookInfo.coverUri}`}
+            alt={bookInfo.title}
+            className={styles['image']}
+            loading="lazy"
+          />
+        ) : (
+          <div className={styles['image-placeholder']}>
+            <span className={styles['image-placeholder-title']}>
+              {bookInfo.title}
+            </span>
+          </div>
+        )}
 
         {user?.role == 'reader' && (
           <button
