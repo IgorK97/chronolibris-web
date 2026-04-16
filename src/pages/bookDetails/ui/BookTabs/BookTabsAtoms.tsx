@@ -12,6 +12,7 @@ import { ReportModal } from '@/components/reports/ReportModal';
 import { useStore } from '@stores/globalStore';
 import { AlertDialog } from '@/components/dialogs/AlertDialog';
 import { TARGET_TYPE } from '@/types';
+import { createPortal } from 'react-dom';
 export function Avatar({ userName }: { userName: string }) {
   return (
     <div
@@ -149,13 +150,15 @@ export function ThreeDotsMenu({
           </div>
         )}
       </div>
-      {reportOpen && (
-        <ReportModal
-          targetId={targetId}
-          targetTypeId={targetTypeId}
-          onClose={() => setReportOpen(false)}
-        />
-      )}
+      {reportOpen &&
+        createPortal(
+          <ReportModal
+            targetId={targetId}
+            targetTypeId={targetTypeId}
+            onClose={() => setReportOpen(false)}
+          />,
+          document.body
+        )}
       {
         <AlertDialog
           description={`Это действие нельзя будет отменить, но его можно написать заново`}

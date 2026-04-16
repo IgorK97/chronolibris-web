@@ -81,10 +81,7 @@ export function SmartCommentItem({
     paddingLeft: depth > 0 ? '16px' : '0px',
   };
 
-  const userName =
-    comment.userLogin == null || comment.userLogin == undefined
-      ? '[Недоступно]'
-      : comment.userLogin;
+  const userName = user?.userName;
 
   // console.log(userName, 'Kukusiki');
   const [votes, setVotes] = useState({
@@ -104,6 +101,8 @@ export function SmartCommentItem({
   });
   const handleVote = async (type: 'like' | 'dislike') => {
     if (!isAuth) return;
+    console.log('VOTE');
+
     const score = type === 'like' ? 1 : -1;
 
     //Оптимистичное обновление
@@ -153,7 +152,7 @@ export function SmartCommentItem({
     <div className={styles['comment-wrapper']} style={indentStyle}>
       <div className={styles['comment-item']}>
         <div className={styles['comment-header']}>
-          <Avatar userName={userName} />
+          <Avatar userName={comment.userLogin || 'U'} />
           <div className={styles['comment-meta']}>
             <span className={styles['author-name']}>{userName}</span>
             <span className={styles['comment-date']}>
@@ -169,7 +168,7 @@ export function SmartCommentItem({
             />
           ) : (
             <ThreeDotsMenu
-              canReport={comment.deletedAt ? true : false}
+              canReport={comment.deletedAt ? false : true}
               canDelete={false}
               onDelete={async () => {}}
               targetId={comment.id}
@@ -199,7 +198,10 @@ export function SmartCommentItem({
               type="like"
               count={votes.likes}
               active={votes.userVote === 'like'}
-              onClick={() => handleVote('like')}
+              onClick={() => {
+                console.log(!!comment.deletedAt);
+                handleVote('like');
+              }}
             />
             <ScoreDisplay likes={votes.likes} dislikes={votes.dislikes} />
             <VoteButton
