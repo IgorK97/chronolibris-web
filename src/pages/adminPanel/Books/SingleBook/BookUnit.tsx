@@ -436,11 +436,13 @@ const emptyForm = (): FormState => ({
 });
 
 const VALIDATION_RULES = {
-  isbn: /^(?=(?:\D?\d){10}(?:(?:\D?\d){3})?$)[\d-]+$/,
-  title: { min: 1, max: 500 },
-  description: { min: 100, max: 5000 },
+  title: /^[\p{L}\d\p{P}\s№§]{1,500}$/u,
+  description: /^[^]{120,5000}$/u,
   year: { min: -10000, max: new Date().getFullYear() + 1 },
-  sourceMax: 500,
+  isbn: /(?:(?=(?:[^0-9]*[0-9]){10}(?:(?:[^0-9]*[0-9]){3})?$)[\d-]+)?$/,
+  bbk: /^[\d\p{L}[\]()+:/="'*.]{0,500}$/u,
+  udk: /^[\d\p{L}[\]()+:/="'*.]{0,500}$/u,
+  source: /^[\d\s\p{L};/\\:?&=%#[\]\-.,—№§]{0,500}$/u,
 };
 
 export const BookUnit: React.FC = () => {
