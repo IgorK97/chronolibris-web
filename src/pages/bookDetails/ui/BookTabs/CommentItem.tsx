@@ -154,7 +154,7 @@ export function SmartCommentItem({
         <div className={styles['comment-header']}>
           <Avatar userName={comment.userLogin || 'U'} />
           <div className={styles['comment-meta']}>
-            <span className={styles['author-name']}>{userName}</span>
+            <span className={styles['author-name']}>{comment.userLogin}</span>
             <span className={styles['comment-date']}>
               {formatDate(comment.createdAt)}
             </span>
