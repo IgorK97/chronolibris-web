@@ -50,6 +50,7 @@ import { GenreChip } from '@/components/GenreChip';
 import { TagChip } from '@/components';
 import { BookTabs } from './BookTabs';
 import { AlertDialog } from '@/components/dialogs/AlertDialog';
+import { StarRating } from './Components/StarRating';
 interface BookDetailsProps {
   onNavigateToReviews: (id: number) => void;
   onNavigateToRead: (bookFileId?: number) => void;
@@ -95,17 +96,17 @@ export const BookDetailsComponent = ({
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
-  const [hoverRating, setHoverRating] = useState<number>(0);
-  const [isRatingPopupOpen, setIsRatingPopupOpen] = useState(false);
-  const ratingRef = useRef<HTMLDivElement>(null);
+  // const [hoverRating, setHoverRating] = useState<number>(0);
+  // const [isRatingPopupOpen, setIsRatingPopupOpen] = useState(false);
+  // const ratingRef = useRef<HTMLDivElement>(null);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isShelfPanelOpen, setIsShelfPanelOpen] = useState(false);
 
-  const handleMouseEnter = () => {
-    if (user?.role !== 'reader') return;
-    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
-    setIsRatingPopupOpen(true);
-  };
+  // const handleMouseEnter = () => {
+  //   if (user?.role !== 'reader') return;
+  //   if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+  //   setIsRatingPopupOpen(true);
+  // };
   const {
     data: fullBookDetails,
     refetch: refetchBook,
@@ -138,14 +139,14 @@ export const BookDetailsComponent = ({
   const deleteReview = useDeleteReview(Number(bookId) || 0);
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
-  const handleMouseLeave = () => {
-    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+  // const handleMouseLeave = () => {
+  //   if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
 
-    closeTimerRef.current = setTimeout(() => {
-      setIsRatingPopupOpen(false);
-      setHoverRating(0);
-    }, 300);
-  };
+  //   closeTimerRef.current = setTimeout(() => {
+  //     setIsRatingPopupOpen(false);
+  //     setHoverRating(0);
+  //   }, 300);
+  // };
   useEffect(() => {
     return () => {
       if (closeTimerRef.current) {
@@ -169,7 +170,7 @@ export const BookDetailsComponent = ({
         score: rating,
       });
     }
-    setIsRatingPopupOpen(false);
+    // setIsRatingPopupOpen(false);
   };
 
   if (isLoading) return <div className={styles.loader}>Загрузка...</div>;
@@ -196,7 +197,7 @@ export const BookDetailsComponent = ({
 
   const handleDelete = async () => {
     await deleteReview.mutateAsync(userReview?.id ?? 0);
-    setIsRatingPopupOpen(false);
+    // setIsRatingPopupOpen(false);
     setDeleteModalOpen(false);
   };
 
@@ -422,7 +423,17 @@ export const BookDetailsComponent = ({
               <p className={styles['author']}>{authors}</p>
               {fullBookDetails.isReviewable && (
                 <div className={styles['stats-row']}>
-                  <div className={styles['stat-block']} ref={ratingRef}>
+                  <StarRating
+                    averageRating={fullBookDetails.averageRating}
+                    ratingsCount={fullBookDetails.ratingsCount}
+                    userRating={fullBookDetails.userRating}
+                    isReader={user?.role === 'reader'}
+                    hasReview={!!userReview}
+                    isDeleting={deleteReview.isPending}
+                    onRate={handleRateBook}
+                    onDeleteClick={() => setDeleteModalOpen(true)}
+                  />
+                  {/* <div className={styles['stat-block']} ref={ratingRef}>
                     <div
                       className={styles['rating-trigger']}
                       onMouseEnter={handleMouseEnter}
@@ -435,7 +446,7 @@ export const BookDetailsComponent = ({
                         </span>
                         <span className={styles['stat-count']}>
                           {fullBookDetails.ratingsCount}{' '}
-                          {/* {t('book.ratings_count')} */}
+                      
                           {pluralize(
                             fullBookDetails.ratingsCount,
                             t('book.rating.one'),
@@ -498,7 +509,7 @@ export const BookDetailsComponent = ({
                         </div>
                       )}
                     </div>
-                  </div>
+                  </div> */}
 
                   <div className={styles['stat-divider']} />
 

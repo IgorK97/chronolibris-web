@@ -6,8 +6,6 @@ import {
   VoteButton,
   ScoreDisplay,
   ThreeDotsMenu,
-  // ComposeBox,
-  SmartTextBox,
 } from './BookTabsAtoms';
 import styles from './BookTabs.module.css';
 import {
@@ -22,6 +20,7 @@ import { useStore } from '@/stores/globalStore';
 import { TARGET_TYPE } from '@/types';
 import { renderFormattedText } from './utils';
 import { AlertDialog } from '@/components/dialogs/AlertDialog';
+import { SmartTextBox } from './SmartTextBox';
 
 function StarRating({ rating }: { rating: number }) {
   return (

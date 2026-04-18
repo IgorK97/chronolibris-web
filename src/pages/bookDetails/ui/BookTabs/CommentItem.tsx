@@ -10,7 +10,6 @@ import {
   Avatar,
   // ComposeBox,
   ScoreDisplay,
-  SmartTextBox,
   ThreeDotsMenu,
   VoteButton,
 } from './BookTabsAtoms';
@@ -20,6 +19,7 @@ import { useStore } from '@/stores/globalStore';
 import styles from './BookTabs.module.css';
 import { TARGET_TYPE } from '@/types';
 import { renderFormattedText } from './utils';
+import { SmartTextBox } from './SmartTextBox';
 // import ReactMarkdown from 'react-markdown';
 // import remarkGfm from 'remark-gfm';
 

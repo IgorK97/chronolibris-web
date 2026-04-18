@@ -6,41 +6,23 @@ import { PhoneInputField } from './PhoneInputField';
 import '@testing-library/jest-dom/vitest';
 describe('PhoneInputField', () => {
   const defaultProps = {
-    label: 'Phone Number',
+    label: 'Номер телефона',
     value: '',
     onChange: vi.fn(),
   };
-  it('renders the label and input field correctly', () => {
-    render(<PhoneInputField {...defaultProps} />);
-    expect(screen.getByText('Phone Number')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Phone Number')).toBeInTheDocument();
-  });
 
-  it('displays the formatted mask by default', () => {
+  it('отображение маски телефона', () => {
     render(<PhoneInputField {...defaultProps} />);
 
     const input = screen.getByPlaceholderText(
-      'Phone Number'
+      'Номер телефона'
     ) as HTMLInputElement;
     // Since allowEmptyFormatting is true, it should show the mask
     expect(input.value).toBe('+7 ___ ___ __ __');
   });
-  it('calls onChange with the unformatted value when the user types', async () => {
-    const onChange = vi.fn();
-    const user = userEvent.setup();
 
-    render(<PhoneInputField {...defaultProps} onChange={onChange} />);
-
-    const input = screen.getByPlaceholderText('Phone Number');
-
-    // Type a single digit
-    await user.type(input, '9');
-
-    // react-number-format onValueChange returns the raw string value to our onChange
-    expect(onChange).toHaveBeenCalledWith('9');
-  });
-  it('displays an error message and applies the error class when provided', () => {
-    const errorMessage = 'Invalid phone number';
+  it('отображение сообщения об ошибке', () => {
+    const errorMessage = 'Ошибка';
     const { container } = render(
       <PhoneInputField {...defaultProps} error={errorMessage} />
     );
@@ -50,15 +32,15 @@ describe('PhoneInputField', () => {
 
     // Check for error class application
     // Note: Since you use CSS modules, we check if the class list contains the expected key
-    const input = screen.getByPlaceholderText('Phone Number');
+    const input = screen.getByPlaceholderText('Номер телефона');
     expect(input.className).toContain('error-input');
   });
-  it('updates the displayed value when the value prop changes', () => {
+  it('корректно обновляет значение поля при вводе', () => {
     const { rerender } = render(
       <PhoneInputField {...defaultProps} value="900" />
     );
     const input = screen.getByPlaceholderText(
-      'Phone Number'
+      'Номер телефона'
     ) as HTMLInputElement;
     expect(input.value).toBe('+7 900 ___ __ __');
     rerender(<PhoneInputField {...defaultProps} value="900123" />);

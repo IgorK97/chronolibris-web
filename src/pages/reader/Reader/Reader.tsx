@@ -16,9 +16,9 @@ import {
   ChevronRight,
   ChevronUp,
   Palette,
-  PencilLine,
+  // PencilLine,
   TableOfContents,
-  Trash2,
+  // Trash2,
   X,
 } from 'lucide-react';
 import type {
@@ -46,6 +46,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useReaderSettings } from './UseReaderSettings';
 import { Badge } from '../../../components/ui/badge';
 import { booksApi } from '@/api/books';
+import { BookmarkPanel } from './BookmarkPanel';
 
 interface ReaderProps {
   bookFileId: number;
@@ -1443,106 +1444,6 @@ const BookmarkEditModal: React.FC<BookmarkEditModalProps> = ({
     document.body
   );
 };
-
-interface BookmarkPanelProps {
-  open: boolean;
-  onClose: () => void;
-  bookmarks: BookmarkDetails[];
-  isLoading?: boolean;
-  onEdit: (bm: BookmarkDetails) => void;
-  onDelete: (id: number) => void;
-  onNavigate: (bm: BookmarkDetails) => void;
-}
-
-const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
-  open,
-  onClose,
-  bookmarks,
-  isLoading,
-  onEdit,
-  onDelete,
-  onNavigate,
-}) =>
-  createPortal(
-    <>
-      <div
-        className={`${styles['toc-overlay']} ${open ? styles['toc-overlay-open'] : ''}`}
-        onClick={onClose}
-      />
-      <aside
-        className={`${styles['toc-sidebar']} ${styles['bm-sidebar']} ${open ? styles['toc-sidebar-open'] : ''}`}
-        aria-label="Закладки"
-        role="complementary"
-      >
-        <div className={styles['toc-header']}>
-          <span className={styles['toc-title']}>
-            Закладки ({bookmarks.length})
-          </span>
-          <button
-            className={styles['footnote-close']}
-            onClick={onClose}
-            aria-label="Закрыть"
-          >
-            <X style={{ cursor: 'pointer' }} />
-          </button>
-        </div>
-
-        {bookmarks.length === 0 ? (
-          isLoading ? (
-            <div className={styles['bm-empty']}>Загрузка закладок...</div>
-          ) : (
-            <div className={styles['bm-empty']}>
-              Правый клик на абзаце,
-              <br />
-              чтобы поставить закладку
-            </div>
-          )
-        ) : (
-          <div className={styles['toc-list']}>
-            {[...bookmarks]
-              .sort((a, b) => a.paraIndex - b.paraIndex)
-              .map((bm) => (
-                <div key={bm.id} className={styles['bm-item']}>
-                  <div className={styles['bm-item-icon']}>
-                    <Bookmark color="red" />
-                  </div>
-                  <div className={styles['bm-item-body']}>
-                    <div
-                      className={styles['bm-item-title']}
-                      onClick={() => onNavigate(bm)}
-                      title="Перейти к закладке"
-                    >
-                      Абзац №{bm.paraIndex}
-                    </div>
-                    {bm.note && (
-                      <div className={styles['bm-item-note']}>{bm.note}</div>
-                    )}
-                    <div className={styles['bm-item-meta']}>
-                      {formatDate(bm.createdAt)}
-                    </div>
-                    <div className={styles['bm-item-actions']}>
-                      <button
-                        className={styles['bm-item-btn']}
-                        onClick={() => onEdit(bm)}
-                      >
-                        <PencilLine /> Изменить
-                      </button>
-                      <button
-                        className={styles['bm-item-btn']}
-                        onClick={() => onDelete(bm.id)}
-                      >
-                        <Trash2 /> Удалить
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-          </div>
-        )}
-      </aside>
-    </>,
-    document.body
-  );
 
 interface ImageLightboxProps {
   src: string | null;
