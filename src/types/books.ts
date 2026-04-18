@@ -94,8 +94,8 @@ export interface CreateBookRequest {
   bbk?: string | null;
   udk?: string | null;
   source?: string | null;
-  coverBase64: string;
-  coverContentType: string;
+  coverBase64: string | null;
+  coverContentType: string | null;
   isAvailable: boolean;
   isReviewable: boolean;
   publisherId?: number | null;

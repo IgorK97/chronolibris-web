@@ -484,21 +484,15 @@ export const BookUnit: React.FC = () => {
     (data: FormState) => {
       const newErrors: Record<string, string> = {};
 
-      if (
-        !data.title.trim() ||
-        data.title.length > VALIDATION_RULES.title.max
-      ) {
-        newErrors.title = `Не более ${VALIDATION_RULES.title.max} символов`;
+      if (!VALIDATION_RULES.title.test(data.title)) {
+        newErrors.title = `Не более 500 символов, буквы, цифры, пунктуация, пробелы, символы №§`;
       }
 
-      if (
-        data.description.length < VALIDATION_RULES.description.min ||
-        data.description.length > VALIDATION_RULES.description.max
-      ) {
-        newErrors.description = `От ${VALIDATION_RULES.description.min} до ${VALIDATION_RULES.description.max} символов`;
+      if (!VALIDATION_RULES.description.test(data.description)) {
+        newErrors.description = `Не более 5000 символов и не менее 120`;
       }
 
-      if (data.isbn && !VALIDATION_RULES.isbn.test(data.isbn)) {
+      if (!VALIDATION_RULES.isbn.test(data.isbn)) {
         newErrors.isbn = 'Некорректный формат ISBN';
       }
 
@@ -513,13 +507,14 @@ export const BookUnit: React.FC = () => {
         }
       }
 
-      if (data.source.length > VALIDATION_RULES.sourceMax) {
-        newErrors.source = `Источник не более ${VALIDATION_RULES.sourceMax} символов`;
+      if (!VALIDATION_RULES.source.test(data.source)) {
+        newErrors.source =
+          'Буквы, цифры, пробелы, символы ;/\\:?&=%#[]-.,—№§. Не более 500 символов';
       }
 
       if (!data.languageId) newErrors.language = 'Выберите язык';
       if (!data.countryId) newErrors.country = 'Выберите страну';
-      if (isNew && !data.coverFile) newErrors.cover = 'Обложка обязательна';
+      // if (isNew && !data.coverFile) newErrors.cover = 'Обложка обязательна';
 
       setErrors(newErrors);
       return Object.keys(newErrors).length === 0;
@@ -617,7 +612,9 @@ export const BookUnit: React.FC = () => {
         (f) => f.roleId !== null && f.personIds.length > 0
       );
       if (isNew) {
-        const coverBase64 = await fileToBase64(form.coverFile!);
+        const coverBase64 = form.coverFile
+          ? await fileToBase64(form.coverFile)
+          : null;
         const payload: CreateBookRequest = {
           title: form.title,
           description: form.description,
@@ -632,7 +629,7 @@ export const BookUnit: React.FC = () => {
           countryId: form.countryId!,
           publisherId: form.publisherId,
           coverBase64,
-          coverContentType: form.coverFile!.type,
+          coverContentType: form.coverFile?.type ?? null,
           personFilters: clearPersonFilters,
         };
 
