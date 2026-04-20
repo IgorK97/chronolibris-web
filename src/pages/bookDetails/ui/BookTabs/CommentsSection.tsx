@@ -1,7 +1,7 @@
-import {
-  // ComposeBox,
-  SmartTextBox,
-} from './BookTabsAtoms';
+import {} from // ComposeBox,
+// SmartTextBox,
+'./BookTabsAtoms';
+import { SmartTextBox } from './SmartTextBox';
 import styles from './BookTabs.module.css';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { commentsApi } from '@/api/comments';
