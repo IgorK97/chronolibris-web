@@ -33,7 +33,8 @@
       "@pages/*": ["./src/pages/*"],
       "@utils/*": ["./src/utils/*"],
       "@app/*": ["./src/app/*"],
-      "@lib/*": ["./src/lib/*"]
+      "@lib/*": ["./src/lib/*"],
+      "@types/*": ["./src/types/*"]
     }
   },
   "include": ["src"]

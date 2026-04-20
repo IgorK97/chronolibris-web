@@ -41,7 +41,7 @@ build
 .npm/
 
 # ======================
-# EDITOR
+# EDITOR FILES
 # ======================
 .vscode/*
 !.vscode/extensions.json
