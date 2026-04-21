@@ -65,7 +65,7 @@
 
 1. Clone the repository:
    ```bash
-   git clone [https://github.com/IgorK97/chronolibris-web.git](https://github.com/IgorK97/chronolibris-web.git)
+   git clone https://github.com/IgorK97/chronolibris-web.git
    ```
 2. Install dependecies:
    ```bash
