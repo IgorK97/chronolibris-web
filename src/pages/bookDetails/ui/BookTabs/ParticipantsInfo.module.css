@@ -92,6 +92,7 @@
   border-radius: 12px;
   padding: 0.75rem 1rem;
   transition: background 0.15s ease;
+  max-width: 100%;
 }
 
 .info-card:hover {
@@ -112,6 +113,8 @@
   font-weight: 500;
   color: #1a1a1a;
   line-height: 1.4;
+  max-width: 100%;
+  overflow-wrap: break-word;
 }
 
 .info-row {

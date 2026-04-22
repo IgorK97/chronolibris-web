@@ -47,58 +47,48 @@ export const ParticipantsInfo = ({
       <div className={styles['book-info']}>
         <div className={styles['info-card']}>
           <div className={styles['info-label']}>Источник данных</div>
-          <div className={styles['info-value']}>
-            {bookInfo.source ?? 'неизвестно'}
-          </div>
+          <div className={styles['info-value']}>{bookInfo.source ?? '—'}</div>
         </div>
 
         <div className={styles['info-card']}>
           <div className={styles['info-label']}>ISBN</div>
-          <div className={styles['info-value']}>
-            {bookInfo.isbn ?? 'нет данных'}
-          </div>
+          <div className={styles['info-value']}>{bookInfo.isbn ?? '—'}</div>
         </div>
 
         <div className={styles['info-card']}>
           <div className={styles['info-row']}>
             <div className={styles['info-label']}>ББК</div>
-            <div className={styles['info-value']}>
-              {bookInfo.bbk ?? 'нет данных'}
-            </div>
+            <div className={styles['info-value']}>{bookInfo.bbk ?? '—'}</div>
           </div>
           <div className={styles['info-row']}>
             <div className={styles['info-label']}>УДК</div>
-            <div className={styles['info-value']}>
-              {bookInfo.udk ?? 'нет данных'}
-            </div>
+            <div className={styles['info-value']}>{bookInfo.udk ?? '—'}</div>
           </div>
         </div>
 
         <div className={styles['info-card']}>
           <div className={styles['info-label']}>Язык</div>
           <div className={styles['info-value']}>
-            {bookInfo.language?.name ?? 'неизвестно'}
+            {bookInfo.language?.name ?? '—'}
           </div>
         </div>
 
         <div className={styles['info-card']}>
           <div className={styles['info-label']}>Страна</div>
           <div className={styles['info-value']}>
-            {bookInfo.country?.name ?? 'неизвестно'}
+            {bookInfo.country?.name ?? '—'}
           </div>
         </div>
 
         <div className={styles['info-card']}>
           <div className={styles['info-label']}>Год публикации</div>
-          <div className={styles['info-value']}>
-            {bookInfo.year ?? 'неизвестно'}
-          </div>
+          <div className={styles['info-value']}>{bookInfo.year ?? '—'}</div>
         </div>
 
         <div className={styles['info-card']}>
           <div className={styles['info-label']}>Издательство</div>
           <div className={styles['info-value']}>
-            {bookInfo.publisher?.name ?? 'неизвестно'}
+            {bookInfo.publisher?.name ?? '—'}
           </div>
         </div>
       </div>
