@@ -132,7 +132,7 @@ export const BookDetailsComponent = ({
     Number(bookId) || 0,
     isAuth
   );
-  const { data: userReview } = useMyReview(Number(bookId) || 0, isAuth);
+  const { data: userReview } = useMyReview(Number(bookId) || 0, isReader());
 
   const createReview = useCreateReview(Number(bookId) || 0);
   const updateReview = useUpdateReview(Number(bookId) || 0);
@@ -433,83 +433,6 @@ export const BookDetailsComponent = ({
                     onRate={handleRateBook}
                     onDeleteClick={() => setDeleteModalOpen(true)}
                   />
-                  {/* <div className={styles['stat-block']} ref={ratingRef}>
-                    <div
-                      className={styles['rating-trigger']}
-                      onMouseEnter={handleMouseEnter}
-                      onMouseLeave={handleMouseLeave}
-                    >
-                      <span className={styles['stat-icon']}>★</span>
-                      <div className={styles['stat-content']}>
-                        <span className={styles['stat-score']}>
-                          {fullBookDetails.averageRating?.toFixed(1)}
-                        </span>
-                        <span className={styles['stat-count']}>
-                          {fullBookDetails.ratingsCount}{' '}
-                      
-                          {pluralize(
-                            fullBookDetails.ratingsCount,
-                            t('book.rating.one'),
-                            t('book.rating.few'),
-                            t('books.rating.many')
-                          )}
-                        </span>
-                      </div>
-                      {fullBookDetails.userRating > 0 && (
-                        <span className={styles['user-rating-badge']}>
-                          {t('book.your_rating')}:{' '}
-                          {fullBookDetails.userRating.toFixed(1)}★
-                        </span>
-                      )}
-                      {isRatingPopupOpen && (
-                        <div
-                          className={styles['rating-popup']}
-                          onMouseEnter={handleMouseEnter}
-                          onMouseLeave={handleMouseLeave}
-                        >
-                          <span className={styles['rating-popup-title']}>
-                            {fullBookDetails.userRating
-                              ? t('book.change_rating')
-                              : t('book.rate_book')}
-                          </span>
-                          <div className={styles['stars-row']}>
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <button
-                                key={star}
-                                className={`${styles['star-btn']} ${
-                                  star <=
-                                  (hoverRating || fullBookDetails.userRating)
-                                    ? styles['star-btn-active']
-                                    : ''
-                                }`}
-                                onMouseEnter={() => setHoverRating(star)}
-                                onMouseLeave={() => setHoverRating(0)}
-                                onClick={() => handleRateBook(star)}
-                              >
-                                ★
-                              </button>
-                            ))}
-                          </div>
-                          {userReview && (
-                            <div className={styles['delete-section']}>
-                              <hr className={styles['separator']} />
-                              <button
-                                className={styles['delete-review-btn']}
-                                onClick={async () => {
-                                  setDeleteModalOpen(true);
-                                }}
-                                disabled={deleteReview.isPending}
-                              >
-                                {deleteReview.isPending
-                                  ? t('common.deleting')
-                                  : t('book.delete_rating_and_review')}
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div> */}
 
                   <div className={styles['stat-divider']} />
 
