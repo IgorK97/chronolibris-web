@@ -442,7 +442,7 @@ const VALIDATION_RULES = {
   isbn: /(?:(?=(?:[^0-9]*[0-9]){10}(?:(?:[^0-9]*[0-9]){3})?$)[\d-]+)?$/,
   bbk: /^[\d\p{L}[\]()+:/="'*.]{0,500}$/u,
   udk: /^[\d\p{L}[\]()+:/="'*.]{0,500}$/u,
-  source: /^[\d\s\p{L};/\\:?&=%#[\]\-.,—№§]{0,500}$/u,
+  source: /^[\d\s\p{L};/\\:?&=%#[\]\-._,—№§]{0,500}$/u,
 };
 
 export const BookUnit: React.FC = () => {
@@ -509,7 +509,7 @@ export const BookUnit: React.FC = () => {
 
       if (!VALIDATION_RULES.source.test(data.source)) {
         newErrors.source =
-          'Буквы, цифры, пробелы, символы ;/\\:?&=%#[]-.,—№§. Не более 500 символов';
+          'Буквы, цифры, пробелы, символы ;/\\:?&=%#[]-.,_—№§. Не более 500 символов';
       }
 
       if (!data.languageId) newErrors.language = 'Выберите язык';
