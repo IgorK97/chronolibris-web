@@ -33,19 +33,19 @@ export const contentsApi = {
     apiClient.get<TagDetails[]>(`/Contents/${contentId}/tags`),
 
   //Здесь потом проверить
-  searchTags: (
-    searchTerm: string,
-    tagTypeId?: number | null,
-    limit: number = 5
-  ): Promise<TagDetails[]> => {
-    const params = new URLSearchParams();
-    params.append('searchTerm', searchTerm);
-    if (tagTypeId) params.append('tagTypeId', tagTypeId.toString());
-    params.append('limit', limit.toString());
-    return apiClient.get<TagDetails[]>(
-      `/Contents/tags/search?${params.toString()}`
-    );
-  },
+  // searchTags: (
+  //   searchTerm: string,
+  //   tagTypeId?: number | null,
+  //   limit: number = 5
+  // ): Promise<TagDetails[]> => {
+  //   const params = new URLSearchParams();
+  //   params.append('searchTerm', searchTerm);
+  //   if (tagTypeId) params.append('tagTypeId', tagTypeId.toString());
+  //   params.append('limit', limit.toString());
+  //   return apiClient.get<TagDetails[]>(
+  //     `/Contents/tags/search?${params.toString()}`
+  //   );
+  // },
 
   addTagToContent: (contentId: number, tagId: number): Promise<void> =>
     apiClient.post<void>(`/Contents/${contentId}/tags/${tagId}`),
@@ -204,17 +204,17 @@ export const useContentTags = (contentId: number | null) => {
   });
 };
 
-export const useSearchTags = (
-  searchTerm: string,
-  tagTypeId?: number | null
-) => {
-  return useQuery({
-    queryKey: ['searchTags', searchTerm, tagTypeId],
-    queryFn: () => contentsApi.searchTags(searchTerm, tagTypeId, 5),
-    enabled: searchTerm.length >= 2,
-    staleTime: 1 * 60 * 1000,
-  });
-};
+// export const useSearchTags = (
+//   searchTerm: string,
+//   tagTypeId?: number | null
+// ) => {
+//   return useQuery({
+//     queryKey: ['searchTags', searchTerm, tagTypeId],
+//     queryFn: () => contentsApi.searchTags(searchTerm, tagTypeId, 5),
+//     enabled: searchTerm.length >= 2,
+//     staleTime: 1 * 60 * 1000,
+//   });
+// };
 
 export const useAddTagToContent = () => {
   const queryClient = useQueryClient();

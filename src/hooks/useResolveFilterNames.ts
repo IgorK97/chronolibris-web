@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef, useState } from 'react';
 import { useStore } from '@/stores/globalStore';
 import type { AdvancedFilters } from '@/utils/filterParams';
@@ -29,25 +30,36 @@ export function useResolveFilterNames({
     const allTagIds = [...filters.requiredTagIds, ...filters.excludedTagIds];
 
     const filtersKey = JSON.stringify({ allPersonIds, allTagIds });
-    if (filtersKey === prevFiltersKey.current) return;
+    if (filtersKey === prevFiltersKey.current) {
+      console.log('No missing IDs, skipping resolution!!!');
+      return;
+    }
     prevFiltersKey.current = filtersKey;
     const missingPersonIds = allPersonIds.filter(
       (id) => !filterNamesCache.persons[id]
     );
-    const missingTagIds = allTagIds.filter((id) => !filterNamesCache.tags[id]);
-
-    if (missingPersonIds.length === 0 && missingTagIds.length === 0) return;
-
-    let cancelled = false;
     setIsResolving(true);
+    const missingTagIds = allTagIds.filter((id) => !filterNamesCache.tags[id]);
+    let cancelled = false;
 
+    if (missingPersonIds.length === 0 && missingTagIds.length === 0) {
+      cancelled = true;
+      console.log('No missing IDs, skipping resolution');
+      setIsResolving(false);
+      return;
+    }
+
+    console.log('TUTA');
     const func = async () => {
       try {
         const resolvedPersons: Array<{ id: number; name: string }> = [];
         const notFoundPersonIds: number[] = [];
+        console.log('ZDESYA', missingTagIds);
+
         if (missingPersonIds.length > 0) {
           const batch =
             await searchReferenceApi.getPersonsByIds(missingPersonIds);
+          console.log('Resolved persons:', batch);
           for (const p of batch) resolvedPersons.push(p);
           const foundIds = new Set(batch.map((p) => p.id));
           for (const id of missingPersonIds) {
@@ -71,8 +83,11 @@ export function useResolveFilterNames({
             if (!foundIds.has(id)) notFoundTagIds.push(id);
           }
         }
+        console.log('cancelled:', cancelled);
+
         if (cancelled) return;
         if (resolvedPersons.length > 0) cachePersons(resolvedPersons);
+        console.log('Resolved tags:', resolvedTags);
         if (resolvedTags.length > 0) cacheTags(resolvedTags);
 
         if (notFoundPersonIds.length > 0) removePersons(notFoundPersonIds);
@@ -105,14 +120,18 @@ export function useResolveFilterNames({
           onInvalidIds(validFilters);
         }
       } finally {
+        // if (!cancelled)
+        //   setIsResolving(false);
         if (!cancelled) setIsResolving(false);
       }
     };
     func();
     return () => {
+      console.log('Canceled filter name resolution');
+      prevFiltersKey.current = '';
       cancelled = true;
     };
-  }, [filters]);
+  }, [filters.requiredTagIds, filters.excludedTagIds, filters.personFilters]);
 
   return { isResolving };
 }

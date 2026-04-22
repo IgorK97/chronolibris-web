@@ -2,13 +2,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   useContentTags,
-  useSearchTags,
+  // useSearchTags,
   useAddTagToContent,
   useRemoveTagFromContent,
 } from '@/api/contents';
 import type { TagDetails } from '@/types';
 import styles from './ContentTagsManagement.module.css';
 import { TagChip } from '@/components/TagChip';
+import { useInfiniteRootTags } from '@/api/tags';
 
 interface ContentTagsManagerProps {
   contentId: number;
@@ -22,7 +23,8 @@ export const ContentTagsManagement: React.FC<ContentTagsManagerProps> = ({
   const searchRef = useRef<HTMLDivElement>(null);
 
   const { data: tags, refetch: refetchTags } = useContentTags(contentId);
-  const { data: searchResults } = useSearchTags(searchTerm);
+  // const { data: searchResults } = useSearchTags(searchTerm);
+  const { data: searchResults } = useInfiniteRootTags(null, searchTerm, 5);
   const addMutation = useAddTagToContent();
   const removeMutation = useRemoveTagFromContent();
 
@@ -107,34 +109,40 @@ export const ContentTagsManagement: React.FC<ContentTagsManagerProps> = ({
           />
         </div>
 
-        {showSearch && searchResults && searchResults.length > 0 && (
-          <div className={styles['search-results']}>
-            {searchResults
-              .filter((tag) => !existingTagIds.includes(tag.id))
-              .map((tag) => (
-                <div
-                  key={tag.id}
-                  className={styles['search-result-item']}
-                  onClick={() => handleAddTag(tag)}
-                >
-                  <span className={styles['result-name']}>{tag.name}</span>
-                  <span className={styles['result-type']}>
-                    {tag.tagTypeName}
-                  </span>
+        {showSearch &&
+          searchResults &&
+          searchResults.pages.flatMap((page) => page.items).length > 0 && (
+            <div className={styles['search-results']}>
+              {searchResults.pages
+                .flatMap((page) => page.items)
+                .filter((tag) => !existingTagIds.includes(tag.id))
+                .map((tag) => (
+                  <div
+                    key={tag.id}
+                    className={styles['search-result-item']}
+                    onClick={() => handleAddTag(tag)}
+                  >
+                    <span className={styles['result-name']}>{tag.name}</span>
+                    <span className={styles['result-type']}>
+                      {tag.tagTypeName}
+                    </span>
+                  </div>
+                ))}
+              {searchResults.pages
+                .flatMap((page) => page.items)
+                .filter((tag) => !existingTagIds.includes(tag.id)).length ===
+                0 && (
+                <div className={styles['search-no-results']}>
+                  Все найденные теги уже добавлены
                 </div>
-              ))}
-            {searchResults.filter((tag) => !existingTagIds.includes(tag.id))
-              .length === 0 && (
-              <div className={styles['search-no-results']}>
-                Все найденные теги уже добавлены
-              </div>
-            )}
-          </div>
-        )}
+              )}
+            </div>
+          )}
 
         {showSearch &&
           searchTerm.length >= 2 &&
-          (!searchResults || searchResults.length === 0) && (
+          (!searchResults ||
+            searchResults.pages.flatMap((page) => page.items).length === 0) && (
             <div className={styles['search-no-results']}>Теги не найдены</div>
           )}
       </div>

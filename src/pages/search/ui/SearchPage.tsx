@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   useState,
   // useEffect,
@@ -35,6 +36,7 @@ import { AdvancedSearchPanel } from './AdvancedSearchPanel';
 import { ThemePanel } from './ThemePanel';
 import { SelectionPanel } from './SelectionPanel';
 import { useResolveFilterNames } from '@/hooks/useResolveFilterNames';
+// import { Circles } from 'react-loading-icons';
 
 interface SearchPageProps {
   onNavigateToBook: (bookdId: number) => void;
@@ -64,22 +66,28 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchParams.toString()]
   );
+  const filtersCurrent: AdvancedFilters = useMemo(
+    () => filtersFromParams(searchParams),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      searchParams.get('personFilters'),
+      searchParams.get('requiredTagIds'),
+      searchParams.get('excludedTagIds'),
+    ]
+  );
 
   const [mode, setMode] = useState(false);
 
-  const setFilters = useCallback(
-    (next: AdvancedFilters) => {
-      setSearchParams((prev) => {
-        const updated = new URLSearchParams(prev);
-        filtersToParams(next, updated);
-        return updated;
-      });
-    },
-    [setSearchParams]
-  );
+  const setFilters = useCallback((next: AdvancedFilters) => {
+    setSearchParams((prev) => {
+      const updated = new URLSearchParams(prev);
+      filtersToParams(next, updated);
+      return updated;
+    });
+  }, []);
 
   const { isResolving } = useResolveFilterNames({
-    filters,
+    filters: filtersCurrent,
     onInvalidIds: setFilters,
   });
 
@@ -196,6 +204,7 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
             >
               <Funnel />
               Фильтры
+              {/* {isResolving && <Circles />} */}
               {isResolving && (
                 <span
                   className={styles['spinner-small']}
