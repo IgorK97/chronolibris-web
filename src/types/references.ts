@@ -217,6 +217,7 @@ export interface TagSuggestionDto {
   id: number;
   name: string;
   matchedName: string | null;
+  tagTypeName?: string;
 }
 
 export const TAG_TYPES = [

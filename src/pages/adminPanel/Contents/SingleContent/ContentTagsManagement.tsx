@@ -6,10 +6,13 @@ import {
   useAddTagToContent,
   useRemoveTagFromContent,
 } from '@/api/contents';
-import type { TagDetails } from '@/types';
+import type { 
+  // TagDetails, 
+  TagSuggestionDto } from '@/types';
 import styles from './ContentTagsManagement.module.css';
 import { TagChip } from '@/components/TagChip';
-import { useInfiniteRootTags } from '@/api/tags';
+// import { useInfiniteRootTags } from '@/api/tags';
+import { useTagSuggestions } from '@/api/searchReference';
 
 interface ContentTagsManagerProps {
   contentId: number;
@@ -24,7 +27,7 @@ export const ContentTagsManagement: React.FC<ContentTagsManagerProps> = ({
 
   const { data: tags, refetch: refetchTags } = useContentTags(contentId);
   // const { data: searchResults } = useSearchTags(searchTerm);
-  const { data: searchResults } = useInfiniteRootTags(null, searchTerm, 5);
+  const { data: searchResults } = useTagSuggestions(searchTerm);
   const addMutation = useAddTagToContent();
   const removeMutation = useRemoveTagFromContent();
 
@@ -33,7 +36,7 @@ export const ContentTagsManagement: React.FC<ContentTagsManagerProps> = ({
     refetchTags();
   };
 
-  const handleAddTag = async (tag: TagDetails) => {
+  const handleAddTag = async (tag: TagSuggestionDto) => {
     try {
       await addMutation.mutateAsync({ contentId, tagId: tag.id });
       setSearchTerm('');
@@ -111,11 +114,10 @@ export const ContentTagsManagement: React.FC<ContentTagsManagerProps> = ({
 
         {showSearch &&
           searchResults &&
-          searchResults.pages.flatMap((page) => page.items).length > 0 && (
+          searchResults.length > 0 && (
             <div className={styles['search-results']}>
-              {searchResults.pages
-                .flatMap((page) => page.items)
-                .filter((tag) => !existingTagIds.includes(tag.id))
+              {searchResults.
+              filter((tag) => !existingTagIds.includes(tag.id))
                 .map((tag) => (
                   <div
                     key={tag.id}
@@ -128,8 +130,7 @@ export const ContentTagsManagement: React.FC<ContentTagsManagerProps> = ({
                     </span>
                   </div>
                 ))}
-              {searchResults.pages
-                .flatMap((page) => page.items)
+              {searchResults
                 .filter((tag) => !existingTagIds.includes(tag.id)).length ===
                 0 && (
                 <div className={styles['search-no-results']}>
@@ -142,7 +143,7 @@ export const ContentTagsManagement: React.FC<ContentTagsManagerProps> = ({
         {showSearch &&
           searchTerm.length >= 2 &&
           (!searchResults ||
-            searchResults.pages.flatMap((page) => page.items).length === 0) && (
+            searchResults.length === 0) && (
             <div className={styles['search-no-results']}>Теги не найдены</div>
           )}
       </div>
