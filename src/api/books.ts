@@ -138,41 +138,6 @@ export const useBookDetails = (
     enabled: enabled,
   });
 
-export const useInfiniteShelfBooks = (
-  userId: number,
-  shelfId: number | undefined
-) =>
-  useInfiniteQuery({
-    queryKey: ['books', 'shelf', shelfId, userId],
-    queryFn: ({ pageParam }) =>
-      collectionsApi.getShelfBooks(userId, shelfId!, pageParam, 10),
-    initialPageParam: null as number | null,
-    getNextPageParam: (lastPage) =>
-      lastPage.hasNext ? lastPage.lastId : undefined,
-    enabled: !!userId && !!shelfId,
-  });
-
-export const useInfiniteSelectionBooks = (
-  userId: number,
-  selectionId: number
-) =>
-  useInfiniteQuery({
-    queryKey: ['books', 'selection', selectionId, userId],
-    queryFn: ({ pageParam }) =>
-      collectionsApi.getSelectionBooks(selectionId, pageParam ?? 0, 10),
-    initialPageParam: null as number | null,
-    getNextPageParam: (lastPage) =>
-      lastPage.hasNext ? lastPage.lastId : undefined, //Нет ли здесь ошибки?
-    enabled: !!userId && !!selectionId,
-  });
-
-export const useSelectionBooks = (selectionId: number) =>
-  useQuery({
-    queryKey: ['selection', selectionId],
-    queryFn: () => collectionsApi.getSelectionBooks(selectionId, 0, 10),
-    enabled: !!selectionId,
-  });
-
 export const useCreateBook = () => {
   const queryClient = useQueryClient();
   return useMutation({

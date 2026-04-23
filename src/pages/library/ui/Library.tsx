@@ -3,12 +3,18 @@ import { SectionHeader } from './SectionHeader';
 import { BookCard } from '../../../components/Books';
 import { type BookListItem } from '../../../types';
 import { useStore } from '../../../stores/globalStore';
-import { useSelectionBooks } from '../../../api/books';
+import { useSelectionBooksDefault } from '@api/collections';
 import styles from './Library.module.css';
 import ErrorBoundary from '@/components/ErrorBoundary/ErrorBoundary';
-import { useSelectionsInfinite } from '@/api/collections';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { collectionsApi, useShelves } from '@api/collections';
+import {
+  useAddBookToShelf,
+  useRemoveBookFromShelf,
+  useSelectionsInfinite,
+} from '@/api/collections';
+import {
+  // collectionsApi,
+  useShelves,
+} from '@api/collections';
 
 interface LibraryProps {
   onNavigateToBook: (id: number) => void;
@@ -29,7 +35,7 @@ const SelectionSection = ({
   onNavigateToList: (id: number, title: string) => void;
   onFavoriteToggle?: (bookId: number, currentIsFavorite: boolean) => void;
 }) => {
-  const { data, isLoading } = useSelectionBooks(id);
+  const { data, isLoading } = useSelectionBooksDefault(id);
 
   const displayBooks = (data?.items ?? []).slice(0, 6);
 
@@ -45,7 +51,7 @@ const SelectionSection = ({
         onPress={() => onNavigateToList(id, title)}
       />
       <div className={styles['book-grid']}>
-        {displayBooks.map((book) => (
+        {displayBooks.map((book: BookListItem) => (
           <BookCard
             key={book.id}
             bookInfo={book}
@@ -65,26 +71,32 @@ export const Library = ({
   const { user, setCurrentBook } = useStore();
   const { data: shelves } = useShelves(user?.userId || 0);
   const favoritesShelfId = shelves?.find((s) => s.shelfType === 1)?.id;
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
+  const { mutateAsync: addBookToShelf } = useAddBookToShelf();
+  const { mutateAsync: removeBookFromShelf } = useRemoveBookFromShelf();
+  // const favoriteMutation = useMutation({
+  //   mutationFn: ({ bookId, add }: { bookId: number; add: boolean }) => {
+  //     if (!favoritesShelfId)
+  //       return Promise.reject('Не указана полка избранного');
+  //     return add
+  //       ? await addBookToShelf({ shelfId: favoritesShelfId, bookId })
+  //       : await removeBookFromShelf({ shelfId: favoritesShelfId, bookId });
+  //   },
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ['selection'] });
+  //     queryClient.invalidateQueries({ queryKey: ['books'] });
+  //     // queryClient.invalidateQueries({ queryKey: ['shelfBooks'] });
+  //   },
+  // });
 
-  const favoriteMutation = useMutation({
-    mutationFn: ({ bookId, add }: { bookId: number; add: boolean }) => {
-      if (!favoritesShelfId)
-        return Promise.reject('Не указана полка избранного');
-      return add
-        ? collectionsApi.addBookToShelf(favoritesShelfId, bookId)
-        : collectionsApi.removeBookFromShelf(favoritesShelfId, bookId);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['selection'] });
-      queryClient.invalidateQueries({ queryKey: ['books'] });
-      // queryClient.invalidateQueries({ queryKey: ['shelfBooks'] });
-    },
-  });
-
-  const handleFavoriteToggle = (bookId: number, currentIsFavorite: boolean) => {
+  const handleFavoriteToggle = async (
+    bookId: number,
+    currentIsFavorite: boolean
+  ) => {
     if (!favoritesShelfId) return;
-    favoriteMutation.mutate({ bookId, add: !currentIsFavorite });
+    if (!currentIsFavorite)
+      await addBookToShelf({ shelfId: favoritesShelfId, bookId });
+    else await removeBookFromShelf({ shelfId: favoritesShelfId, bookId });
   };
   const {
     data,

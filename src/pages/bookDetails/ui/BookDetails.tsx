@@ -17,18 +17,15 @@ import { pluralize } from '@/utils';
 import type {
   BookDetails,
   // ShelfDetails
-} from '../../../types';
+} from '@/types';
 import {
-  collectionsApi,
+  // collectionsApi,
+  useAddBookToShelf,
+  useRemoveBookFromShelf,
   // useSeekedShelves,
   useShelves,
-} from '../../../api/collections';
-import {
-  favColor,
-  fillFavColor,
-  fillUnfavColor,
-  getImageUrl,
-} from '../../../utils';
+} from '@api/collections';
+import { favColor, fillFavColor, fillUnfavColor, getImageUrl } from '@/utils';
 import { t } from 'i18next';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -140,6 +137,8 @@ export const BookDetailsComponent = ({
   const updateReview = useUpdateReview(Number(bookId) || 0);
   const deleteReview = useDeleteReview(Number(bookId) || 0);
   const [downloadError, setDownloadError] = useState<string | null>(null);
+  const { mutateAsync: addBookToShelf } = useAddBookToShelf();
+  const { mutateAsync: removeBookFromShelf } = useRemoveBookFromShelf();
   // const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const { mutateAsync: download, isPending: isDownloading } =
     useDownloadBookFile();
@@ -194,11 +193,10 @@ export const BookDetailsComponent = ({
     if (!user || !shelfId) return;
     try {
       if (!isCurrentStatus)
-        await collectionsApi.addBookToShelf(shelfId, fullBookDetails.id);
-      else
-        await collectionsApi.removeBookFromShelf(shelfId, fullBookDetails.id);
+        await addBookToShelf({ shelfId, bookId: fullBookDetails.id });
+      else await removeBookFromShelf({ shelfId, bookId: fullBookDetails.id });
 
-      await refetchBook();
+      // await refetchBook();
     } catch (error: any) {
       //
     }

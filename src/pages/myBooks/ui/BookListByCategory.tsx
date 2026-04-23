@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { useStore } from '../../../stores/globalStore';
-import { useInfiniteShelfBooks } from '../../../api/books';
-import { collectionsApi } from '../../../api/collections';
+import {
+  useInfiniteShelfBooks,
+  useRemoveBookFromShelf,
+} from '@api/collections';
+// import { collectionsApi } from '../../../api/collections';
 import { ManagedBookCard } from './ManagedBookCard';
 import { ShelfSelectionModal } from './ShelfSelectionModal';
 import styles from './BookCategoryList.module.css';
@@ -39,13 +42,13 @@ export const BookListByCategory = ({ shelfId, onNavigateToBook }: Props) => {
     if (observerTarget.current) observer.observe(observerTarget.current);
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
-
+  const { mutateAsync: removeBookFromShelf } = useRemoveBookFromShelf();
   const allBooks = data?.pages.flatMap((page) => page.items) || [];
 
   return (
     <div className={styles['container']}>
       <div className={styles['grid']}>
-        {allBooks.map((book) => (
+        {allBooks.map((book: BookListItem) => (
           <ManagedBookCard
             key={book.id}
             book={book}
@@ -54,8 +57,8 @@ export const BookListByCategory = ({ shelfId, onNavigateToBook }: Props) => {
               onNavigateToBook(book.id);
             }}
             onRemove={async (id) => {
-              await collectionsApi.removeBookFromShelf(shelfId, id);
-              refetch();
+              await removeBookFromShelf({ shelfId, bookId: id });
+              // refetch();
             }}
             onEdit={(book) => setEditingBook(book)}
           />

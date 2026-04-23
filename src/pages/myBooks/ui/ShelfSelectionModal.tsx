@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { SquareCheckBig, Square, X } from 'lucide-react';
 import {
-  collectionsApi,
+  // collectionsApi,
+  useAddBookToShelf,
+  useCreateShelf,
+  useRemoveBookFromShelf,
   useSeekedShelves,
   useShelves,
-} from '../../../api/collections';
-import { useStore } from '../../../stores/globalStore';
+} from '@api/collections';
+import { useStore } from '@stores/globalStore';
 import styles from './ShelfSelectionModal.module.css';
 import { BookShelfConstructing } from './BookShelfConstructing';
 
@@ -20,24 +23,27 @@ export const ShelfSelectionModal = ({ bookId, onClose, onRefresh }: Props) => {
   const { data: shelves, refetch: refetchShelves } = useShelves(
     user?.userId || 0
   );
-  const { data: seekedShelves, refetch: refetchSeeked } =
-    useSeekedShelves(bookId);
+  const { data: seekedShelves } = useSeekedShelves(bookId);
   const [isCreating, setIsCreating] = useState(false);
+
+  const { mutateAsync: createShelf } = useCreateShelf();
+  const { mutateAsync: addBookToShelf } = useAddBookToShelf();
+  const { mutateAsync: removeBookFromShelf } = useRemoveBookFromShelf();
   // const [newName, setNewName] = useState('');
 
   const handleToggle = async (shelfId: number) => {
     const isOnShelf = seekedShelves?.includes(shelfId);
-    console.log(isOnShelf, 'TUTA TUTA');
-    if (isOnShelf) await collectionsApi.removeBookFromShelf(shelfId, bookId);
-    else await collectionsApi.addBookToShelf(shelfId, bookId);
+    // console.log(isOnShelf, 'TUTA TUTA');
+    if (isOnShelf) await removeBookFromShelf({ shelfId, bookId });
+    else await addBookToShelf({ shelfId, bookId });
 
-    refetchSeeked();
+    // refetchSeeked();
     if (onRefresh) onRefresh();
   };
 
   const handleCreate = async (newName: string) => {
     if (!newName.trim()) return;
-    const id = await collectionsApi.createShelf(newName.trim());
+    const id = await createShelf(newName.trim());
     if (id) {
       refetchShelves();
       // setNewName('');

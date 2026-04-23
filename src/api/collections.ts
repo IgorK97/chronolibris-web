@@ -12,6 +12,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
+import { queryClient } from './queryClient';
 // import { queryClient } from './queryClient';
 
 export const collectionsApi = {
@@ -64,7 +65,7 @@ export const collectionsApi = {
   getUserShelves: () => apiClient.get<ShelfDetails[]>(`/Shelves/user`),
 
   addBookToShelf: (shelfId: number, bookId: number) =>
-    apiClient.post(`/Shelves/${shelfId}/books/${bookId}`),
+    apiClient.post<void>(`/Shelves/${shelfId}/books/${bookId}`),
 
   getShelfBooks: (
     userId: number,
@@ -89,8 +90,27 @@ export const collectionsApi = {
     apiClient.get<number[]>(`/Shelves/books/${bookId}`),
 };
 
+export const useAddBookToShelf = () => {
+  return useMutation({
+    mutationFn: ({ shelfId, bookId }: { shelfId: number; bookId: number }) =>
+      collectionsApi.addBookToShelf(shelfId, bookId),
+    onSuccess: (_, { bookId }) => {
+      queryClient.invalidateQueries({ queryKey: ['shelves', bookId] });
+    },
+  });
+};
+
+export const useRemoveBookFromShelf = () => {
+  return useMutation({
+    mutationFn: ({ shelfId, bookId }: { shelfId: number; bookId: number }) =>
+      collectionsApi.removeBookFromShelf(shelfId, bookId),
+    onSuccess: (_, { bookId }) => {
+      queryClient.invalidateQueries({ queryKey: ['shelves', bookId] });
+    },
+  });
+};
+
 export const useCreateShelf = () => {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (name: string) => collectionsApi.createShelf(name),
     onSuccess: () => {
@@ -98,6 +118,34 @@ export const useCreateShelf = () => {
     },
   });
 };
+
+export const useInfiniteShelfBooks = (
+  userId: number,
+  shelfId: number | undefined
+) =>
+  useInfiniteQuery({
+    queryKey: ['books', 'shelf', shelfId, userId],
+    queryFn: ({ pageParam }) =>
+      collectionsApi.getShelfBooks(userId, shelfId!, pageParam, 10),
+    initialPageParam: null as number | null,
+    getNextPageParam: (lastPage) =>
+      lastPage.hasNext ? lastPage.lastId : undefined,
+    enabled: !!userId && !!shelfId,
+  });
+
+export const useInfiniteSelectionBooks = (
+  userId: number,
+  selectionId: number
+) =>
+  useInfiniteQuery({
+    queryKey: ['books', 'selection', selectionId, userId],
+    queryFn: ({ pageParam }) =>
+      collectionsApi.getSelectionBooks(selectionId, pageParam ?? 0, 10),
+    initialPageParam: null as number | null,
+    getNextPageParam: (lastPage) =>
+      lastPage.hasNext ? lastPage.lastId : undefined, //Нет ли здесь ошибки?
+    enabled: !!userId && !!selectionId,
+  });
 
 export const useUpdateShelf = () => {
   const queryClient = useQueryClient();
@@ -166,6 +214,13 @@ export const useSelections = (
     staleTime: 5 * 60 * 1000,
   });
 };
+
+export const useSelectionBooksDefault = (selectionId: number) =>
+  useQuery({
+    queryKey: ['selection', selectionId],
+    queryFn: () => collectionsApi.getSelectionBooks(selectionId, 0, 10),
+    enabled: !!selectionId,
+  });
 
 export const useSelectionBooks = (
   selectionId: number,
