@@ -43,10 +43,10 @@ import {
 } from '@/api/bookmarks';
 import { useStore } from '@/stores/globalStore';
 import { formatDate } from '@/utils';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+// import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useReaderSettings } from './UseReaderSettings';
 import { Badge } from '../../../components/ui/badge';
-import { booksApi } from '@/api/books';
+import { prefetchBookChunk, useBookChunk, useBookToc } from '@/api/books';
 import { BookmarkPanel } from './BookmarkPanel';
 
 interface ReaderProps {
@@ -139,16 +139,7 @@ export const Reader: React.FC<ReaderProps> = ({
     y: number;
   } | null>(null);
 
-  const { data: fetchedTocData } = useQuery({
-    queryKey: ['toc', bookFileId],
-    queryFn: () => {
-      console.log('TOC RETR: ', bookFileId);
-      return booksApi.fetchToc(bookFileId);
-    },
-    staleTime: Infinity,
-    gcTime: 20 * 60 * 1000,
-    retry: 2,
-  });
+  const { data: fetchedTocData } = useBookToc(bookFileId);
 
   useEffect(() => {
     console.log('TOC DATA: ', fetchedTocData);
@@ -236,25 +227,12 @@ export const Reader: React.FC<ReaderProps> = ({
 
   const [twoPageMode, setTwoPageMode] = useState(false);
 
-  const { data: segments, isLoading } = useQuery({
-    queryKey: ['chunk', bookFileId, currentPartIndex],
-    // queryFn: () =>
-    //   fetchChunk(bookFileId, fetchedTocData?.Parts[currentPartIndex].url),
-    queryFn: () => {
-      //URL существует (fetchedTocData гарантирован enabled, но url может отсутствовать)
-      const url = fetchedTocData?.Parts[currentPartIndex]?.url;
-      if (!url) {
-        // Если URL нет, отклонить промис с ошибкой
-        return Promise.reject(new Error('URL for chunk not available'));
-      }
-      return booksApi.fetchChunk(bookFileId, url);
-    },
-    enabled: !!fetchedTocData && currentPartIndex < fetchedTocData.Parts.length,
-    staleTime: Infinity, // Какова вероятность того,
-    // что текст книги изменится во время чтения пользователя?
-    gcTime: 10 * 60 * 1000,
-  });
-  const queryClient = useQueryClient();
+  const { data: segments, isLoading } = useBookChunk(
+    bookFileId,
+    currentPartIndex,
+    fetchedTocData
+  );
+  // const queryClient = useQueryClient();
 
   const recalcCols = () => {
     const vp = viewportRef.current;
@@ -342,12 +320,12 @@ export const Reader: React.FC<ReaderProps> = ({
 
     const nextIdx = currentPartIndex + 1;
     if (nextIdx >= fetchedTocData.Parts.length) return;
-
-    queryClient.prefetchQuery({
-      queryKey: ['chunk', bookFileId, nextIdx],
-      queryFn: () =>
-        booksApi.fetchChunk(bookFileId, fetchedTocData.Parts[nextIdx].url),
-    });
+    prefetchBookChunk(bookFileId, nextIdx, fetchedTocData);
+    // queryClient.prefetchQuery({
+    //   queryKey: ['chunk', bookFileId, nextIdx],
+    //   queryFn: () =>
+    //     booksApi.fetchChunk(bookFileId, fetchedTocData.Parts[nextIdx].url),
+    // });
   }, [
     bookFileId,
     currentCol,
