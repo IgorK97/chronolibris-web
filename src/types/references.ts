@@ -121,12 +121,6 @@ export interface RoleDetails {
   name: string;
 }
 
-// export interface ReferenceContextState {
-//   roles: RoleDetails[];
-//   isLoading: boolean;
-//   error: string | null;
-// }
-
 export interface PublisherDetails {
   id: number;
   name: string;

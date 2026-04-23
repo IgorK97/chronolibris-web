@@ -198,13 +198,6 @@ export function RegisterStaffPage() {
           error={errors.email}
         />
 
-        {/* <Field
-          label="Телефон"
-          type="tel"
-          value={form.phoneNumber}
-          onChange={set('phoneNumber')}
-          error={errors.phoneNumber}
-        /> */}
         <PhoneInputField
           label={'Телефон'}
           value={form.phoneNumber}

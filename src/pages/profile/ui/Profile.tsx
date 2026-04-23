@@ -286,26 +286,6 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
               }
               error={errors.phone}
             />
-
-            {/* <div className={styles['input-group']}>
-              <label className={styles['label']}>Телефон</label>
-              <input
-                type="tel"
-                className={styles['text-input']}
-                value={profileForm.phoneNumber}
-                onChange={(e) =>
-                  setProfileForm({
-                    ...profileForm,
-                    phoneNumber: e.target.value,
-                  })
-                }
-              />
-              {errors.phoneNumber && (
-                <span className={styles['error-text']}>
-                  {errors.phoneNumber}
-                </span>
-              )}
-            </div> */}
           </div>
           {profileSuccess && (
             <p className={styles['success-msg']}>Данные сохранены</p>

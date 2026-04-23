@@ -3,7 +3,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BookmarkPanel } from './BookmarkPanel';
 import '@testing-library/jest-dom/vitest';
 
-// Mock the utility since it might depend on local browser settings
 vi.mock('@/utils', () => ({
   formatDate: (date: string) => `${date}`,
 }));
@@ -61,9 +60,7 @@ describe('BookmarkPanel', () => {
     const deleteButtons = screen.getAllByText('Удалить');
     fireEvent.click(deleteButtons[0]);
 
-    // Check if delete was called
     expect(defaultProps.onDelete).toHaveBeenCalledWith(101);
-    // Crucial: ensure click did NOT bubble up to the navigation handler
     expect(defaultProps.onNavigate).not.toHaveBeenCalled();
   });
   it('скрытие панели при нажатии на кнопку Скрыть', () => {

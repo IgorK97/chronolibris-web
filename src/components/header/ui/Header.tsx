@@ -6,14 +6,6 @@ import { Library, Search, ShieldCheck, UserStar } from 'lucide-react';
 import { CatalogPanel } from '@/pages/Search/';
 import { AdminSidebar } from '@/components/AdminSideBar/AdminSideBar';
 
-// const FILTER_PARAMS = [
-//   'themeId',
-//   'selectionId',
-//   'personFilters',
-//   'requiredTagIds',
-//   'excludedTagIds',
-// ];
-
 export default function Header() {
   const { user } = useStore();
   const navigate = useNavigate();

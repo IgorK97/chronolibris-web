@@ -173,7 +173,8 @@ export const TagRow: React.FC<TagRowProps> = ({
                   key={child.id}
                   tag={child}
                   depth={depth + 1}
-                  isSelected={isSelected && false} // только листовой выбор через onSelectParent
+                  // isSelected={isSelected && false}
+                  isSelected={false}
                   onSelectParent={onSelectParent}
                   resetKey={resetKey}
                 />

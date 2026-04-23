@@ -22,6 +22,7 @@ export const ContentManagement = () => {
   const apiFilter = {
     searchQuery: debouncedSearch,
     limit: 20,
+    lastId: null,
   };
 
   return (

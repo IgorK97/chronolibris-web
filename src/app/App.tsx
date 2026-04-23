@@ -53,7 +53,7 @@ export default function App() {
         setUser(freshUser);
       } catch (e) {
         setUser(null);
-        console.error('Session expired or server error', e);
+        console.error('Ошибка входа. Попробуйте войти в аккаунт позднее', e);
       } finally {
         setInitialized(true);
       }

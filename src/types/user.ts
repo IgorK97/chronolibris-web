@@ -42,13 +42,6 @@ export interface LoginResult {
   message?: string;
 }
 
-// export interface RegistrationResult {
-//   success: boolean;
-//   token: string;
-//   refreshToken: string;
-//   message?: string;
-// }
-
 export interface RegistrationResult {
   success: boolean;
   token: string;

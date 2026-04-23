@@ -5,12 +5,10 @@ import { BookCard } from './index';
 import { useStore } from '@/stores/globalStore';
 import '@testing-library/jest-dom/vitest';
 
-// 1. Mock the global store
 vi.mock('@/stores/globalStore', () => ({
   useStore: vi.fn(),
 }));
-// 2. Mock environment variables
-// In Vitest, you can use vi.stubEnv
+
 vi.stubEnv('VITE_STORAGE_URL', 'http://test-storage.com');
 describe('BookCard', () => {
   const mockBook = {
@@ -30,7 +28,6 @@ describe('BookCard', () => {
   };
   beforeEach(() => {
     vi.clearAllMocks();
-    // Default mock: user is a reader
     (useStore as any).mockReturnValue({ user: { role: 'reader' } });
   });
 
@@ -57,21 +54,11 @@ describe('BookCard', () => {
     };
     render(<BookCard {...defaultProps} bookInfo={bookWithoutCover} />);
 
-    // Check for the title inside the placeholder div
     const placeholder = screen.getAllByText('Книга');
     expect(placeholder).toHaveLength(2);
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
-  //   it('клик по картинке', () => {
-  //     render(<BookCard {...defaultProps} />);
-
-  //     // The wrapper has the onClick, but clicking the image bubbles up
-  //     const imageWrapper = screen.getByAltText('Книга').parentElement!;
-  //     fireEvent.click(imageWrapper);
-
-  //     expect(defaultProps.onPress).toHaveBeenCalledTimes(1);
-  //   });
   describe('Логика избранного', () => {
     it('отображение иконки для читателей', () => {
       render(<BookCard {...defaultProps} />);
@@ -93,7 +80,6 @@ describe('BookCard', () => {
       const favButton = screen.getByLabelText('Toggle favorite');
       fireEvent.click(favButton);
 
-      // Check callback
       expect(defaultProps.onFavoriteToggle).toHaveBeenCalledWith(
         mockBook.id,
         mockBook.isFavorite

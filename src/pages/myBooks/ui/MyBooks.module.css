@@ -7,7 +7,7 @@
 
 .layout {
   display: flex;
-  max-height: 85vh; /* was 100vh — fill the flex parent, not the viewport */
+  max-height: 85vh;
   background: #f5f5f5;
   overflow: hidden;
 }

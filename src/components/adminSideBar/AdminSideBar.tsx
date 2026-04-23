@@ -83,7 +83,6 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         aria-hidden="true"
       />
 
-      {/* aside? */}
       <aside
         ref={sidebarRef}
         className={`${styles.sidebar} ${isOpen ? styles['sidebar-open'] : ''}`}

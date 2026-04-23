@@ -69,7 +69,6 @@
   opacity: 1;
 }
 
-/* Что это и зачем? */
 .toolbar-collapsed .toolbar-inner {
   max-height: 0;
   padding-top: 0;
@@ -127,7 +126,7 @@
 
 .nav-pad {
   cursor: pointer;
-  transition: background 0.2s; /* What is that? */
+  transition: background 0.2s;
 }
 
 .nav-pad:hover {

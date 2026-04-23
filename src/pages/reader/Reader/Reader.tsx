@@ -73,21 +73,6 @@ const FONT_OPTIONS: { label: string; value: string }[] = [
 const TEXT_COLORS = ['#2c2c2c', '#3b2e1e', '#c8bfb0'];
 const PAGE_COLORS = ['#faf8f4', '#f4ede0', '#1e1c18'];
 const BG_COLORS = ['#e8e4dc', '#d9cdb8', '#131210'];
-// const fetchToc = async (bookFileId: number): Promise<TocData> => {
-//   const res = await fetch(`/api/books/files/${bookFileId}/toc`);
-//   if (!res.ok) throw new Error('Ошибка получения');
-//   return res.json();
-// };
-// const fetchChunk = async (
-//   bookFileId: number,
-//   chunkIndex: string
-// ): Promise<TextSegment[]> => {
-//   const res = await fetch(
-//     `/api/books/files/${bookFileId}/chunks/${chunkIndex}`
-//   );
-//   if (!res.ok) throw new Error('Ошибка загрузки фрагмента');
-//   return res.json();
-// };
 
 export const Reader: React.FC<ReaderProps> = ({
   bookFileId,
@@ -191,7 +176,7 @@ export const Reader: React.FC<ReaderProps> = ({
         return parseInt(p.getAttribute('data-para-index') || '0', 10);
       }
     }
-    // Если полностью видимых нет, берем тот, чье начало ближе всего к началу вьюпорта
+    // Если полностью видимых нет, нужен тот, чье начало ближе всего к началу вьюпорта
     const firstVisible = Array.from(paragraphs).find(
       (p) => p.offsetLeft + p.offsetWidth > contentLeft
     );
@@ -259,7 +244,7 @@ export const Reader: React.FC<ReaderProps> = ({
       //URL существует (fetchedTocData гарантирован enabled, но url может отсутствовать)
       const url = fetchedTocData?.Parts[currentPartIndex]?.url;
       if (!url) {
-        // Если URL нет, отклоняем промис с ошибкой
+        // Если URL нет, отклонить промис с ошибкой
         return Promise.reject(new Error('URL for chunk not available'));
       }
       return booksApi.fetchChunk(bookFileId, url);
@@ -800,7 +785,7 @@ export const Reader: React.FC<ReaderProps> = ({
                 onClick={() => window.history.back()}
               >
                 <ChevronLeft size={20} />
-                <span>{/* Оборачиваем текст */} Назад</span>
+                <span>Назад</span>
               </button>
             )}
             {fetchedTocData && (
@@ -809,7 +794,7 @@ export const Reader: React.FC<ReaderProps> = ({
                 onClick={() => setTocOpen(true)}
               >
                 <TableOfContents size={20} />
-                <span>{/* Оборачиваем текст */} Содержание</span>
+                <span>Содержание</span>
               </button>
             )}
             <button
@@ -1131,79 +1116,6 @@ const TocSidebar: React.FC<TocSidebarProps> = ({
     document.body
   );
 };
-
-// const TocSidebar: React.FC<TocSidebarProps> = ({
-//   open,
-//   onClose,
-//   tocData,
-//   currentPartIndex,
-//   onSelectPart,
-// }) => {
-//   if (!tocData) return null;
-
-//   const renderBodyItems = (items: TocBodyItem[], depth = 0): React.ReactNode =>
-//     items.map((item, i) => {
-//       const partIdx = tocData.Parts.findIndex(
-//         (p) => item.s >= p.s && item.s <= p.e
-//       );
-//       const isActive = partIdx === currentPartIndex;
-//       return (
-//         <div key={i}>
-//           <button
-//             className={`${styles['toc-item']} ${isActive ? styles['toc-item-active'] : ''}`}
-//             style={{ paddingLeft: `${16 + depth * 16}px` }}
-//             onClick={() => partIdx !== -1 && onSelectPart(partIdx)}
-//           >
-//             {item.t}
-//           </button>
-//           {item.c && item.c.length > 0 && renderBodyItems(item.c, depth + 1)}
-//         </div>
-//       );
-//     });
-//   /*What is that? <> */
-//   return createPortal(
-//     <>
-//       <div
-//         className={`${styles['toc-overlay']} ${open ? styles['toc-overlay-open'] : ''}`}
-//         onClick={onClose}
-//       />
-//       <aside
-//         className={`${styles['toc-sidebar']} ${open ? styles['toc-sidebar-open'] : ''}`}
-//         aria-label="Содержание"
-//         role="navigation"
-//       >
-//         <div className={styles['toc-header']}>
-//           <span className={styles['toc-title']}>Содержание</span>
-//           <button
-//             className={styles['footnote-close']}
-//             onClick={onClose}
-//             aria-label="Закрыть"
-//           >
-//             <X />
-//           </button>
-//         </div>
-//         {tocData.Meta.Title && (
-//           <div className={styles['toc-book-title']}>{tocData.Meta.Title}</div>
-//         )}
-//         <div className={styles['toc-list']}>
-//           {tocData.Body.length > 0
-//             ? renderBodyItems(tocData.Body)
-//             : tocData.Parts.map((part, idx) => (
-//                 <button
-//                   key={idx}
-//                   className={`${styles['toc-item']} ${idx === currentPartIndex ? styles['toc-item-active'] : ''}`}
-//                   style={{ paddingLeft: 16 }}
-//                   onClick={() => onSelectPart(idx)}
-//                 >
-//                   {part.url}
-//                 </button>
-//               ))}
-//         </div>
-//       </aside>
-//     </>,
-//     document.body
-//   );
-// };
 
 interface FootnoteModalProps {
   note: Note | null;

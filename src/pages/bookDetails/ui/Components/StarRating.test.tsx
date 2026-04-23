@@ -4,7 +4,6 @@ import { StarRating } from './StarRating';
 import { vi, describe, it, expect } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 
-// Мокаем i18next и pluralize
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
@@ -45,10 +44,8 @@ describe('StarRating Component', () => {
   it('должен вызывать onRate с правильным значением при клике на звезду', async () => {
     render(<StarRating {...defaultProps} />);
 
-    // Открываем попап
     fireEvent.mouseEnter(screen.getByTestId('rating-trigger'));
 
-    // Находим 4-ю звезду и кликаем
     const star4 = screen.getByTestId('star-4');
     fireEvent.click(star4);
 

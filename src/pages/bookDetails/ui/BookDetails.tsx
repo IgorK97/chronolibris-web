@@ -370,7 +370,7 @@ export const BookDetailsComponent = ({
                         ))}
                       </ul>
                     )}
-                    {downloadError && ( //Why () is necessary?
+                    {downloadError && (
                       <p className={styles['download-error']}>
                         {downloadError}
                       </p>
