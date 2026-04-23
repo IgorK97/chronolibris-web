@@ -8,7 +8,7 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 vi.mock('@/utils', () => ({
-  pluralize: (n: number) => 'ratings',
+  pluralize: (_: number) => 'ratings',
 }));
 
 describe('StarRating Component', () => {

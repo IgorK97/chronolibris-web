@@ -1,6 +1,6 @@
 import {
   useQuery,
-  useInfiniteQuery,
+  // useInfiniteQuery,
   useQueryClient,
   useMutation,
 } from '@tanstack/react-query';
@@ -22,7 +22,7 @@ import type {
   UpdateBookRequest,
 } from '../types';
 // import { useDebounce } from '../hooks/useDebounce';
-import { collectionsApi } from './collections';
+// import { collectionsApi } from './collections';
 import { queryClient } from './queryClient';
 
 export const booksApi = {

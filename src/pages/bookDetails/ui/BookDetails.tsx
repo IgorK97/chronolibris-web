@@ -227,7 +227,6 @@ export const BookDetailsComponent = ({
       window.URL.revokeObjectURL(url);
 
       setIsDownloadPanelOpen(false);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setDownloadError(t('book.download_error'));
     } finally {

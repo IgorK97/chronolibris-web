@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { MoreVertical, Trash2, Edit3 } from 'lucide-react';
 import { getImageUrl } from '../../../utils';
 import styles from '@/components/Books/BookCard/index.module.css';

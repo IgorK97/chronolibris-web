@@ -63,12 +63,10 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
   const { setCurrentBook } = useStore();
   const filters: AdvancedFilters = useMemo(
     () => filtersFromParams(searchParams),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchParams.toString()]
   );
   const filtersCurrent: AdvancedFilters = useMemo(
     () => filtersFromParams(searchParams),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       searchParams.get('personFilters'),
       searchParams.get('requiredTagIds'),

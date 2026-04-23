@@ -21,7 +21,7 @@ describe('PhoneInputField', () => {
 
   it('отображение сообщения об ошибке', () => {
     const errorMessage = 'Ошибка';
-    const { container } = render(
+    const { container: _ } = render(
       <PhoneInputField {...defaultProps} error={errorMessage} />
     );
 

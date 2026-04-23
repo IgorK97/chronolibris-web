@@ -11,9 +11,7 @@ import {
   Edit3,
   Trash2,
   Eye,
-  EyeIcon,
   EyeOff,
-  HeartIcon,
 } from 'lucide-react';
 import { useStore } from '../../../stores/globalStore';
 import {
