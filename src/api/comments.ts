@@ -1,6 +1,11 @@
 import { apiClient } from './apiClient';
 import type { CommentDto, CreateCommentRequest } from '../types';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
+import { queryClient } from './queryClient';
 
 export const commentsApi = {
   getByBookId: (bookId: number, lastId?: number, limit = 20) =>
@@ -21,6 +26,68 @@ export const commentsApi = {
   rateComment: (command: { commentId: number; score: number }) =>
     apiClient.post('/Comments/rate', command), //потом посмотреть, стоит ли менять и получать с сервера сам комментарий
 };
+
+export const useDeleteComment = () => {
+  return useMutation({
+    mutationFn: ({
+      id,
+    }: {
+      id: number;
+      bookId: number;
+      parentCommentId: number | null;
+    }) => commentsApi.delete(id),
+    onSuccess: (_, { bookId, parentCommentId }) => {
+      if (parentCommentId) {
+        queryClient.invalidateQueries({
+          queryKey: ['replies', parentCommentId],
+        });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['comments', bookId] });
+      }
+    },
+  });
+};
+
+export const useGetCommentsByBook = (bookId: number) => {
+  return useInfiniteQuery({
+    queryKey: ['comments', bookId],
+    queryFn: ({ pageParam }) => commentsApi.getByBookId(bookId, pageParam),
+    initialPageParam: undefined as number | undefined,
+    getNextPageParam: (lastPage) =>
+      lastPage.length > 0 ? lastPage[lastPage.length - 1].id : undefined,
+  });
+};
+
+export const useGetRepliesByComment = (parentId: number, showMore: boolean) => {
+  return useInfiniteQuery({
+    queryKey: ['comments', 'replies', parentId],
+    queryFn: ({ pageParam }) => commentsApi.getReplies(parentId, pageParam),
+    initialPageParam: undefined as number | undefined,
+    getNextPageParam: (lastPage) =>
+      lastPage.length > 0 ? lastPage[lastPage.length - 1].id : undefined,
+    enabled: showMore,
+    staleTime: 0,
+  });
+};
+
+export const useCreateComment = () => {
+  return useMutation({
+    mutationFn: (req: CreateCommentRequest) => commentsApi.create(req),
+    onSuccess: (_, { parentCommentId, bookId }) => {
+      // Можно оптимизировать, добавляя новый комментарий в кэш вместо полной инвалидизации
+      // Но для простоты сейчас просто инвалидируем
+      if (parentCommentId)
+        queryClient.invalidateQueries({
+          queryKey: ['replies', parentCommentId],
+        });
+      else
+        queryClient.invalidateQueries({
+          queryKey: ['comments', bookId],
+        });
+    },
+  });
+};
+
 export const useRateComment = (bookId: number, parentId?: number) => {
   const qc = useQueryClient();
   return useMutation({

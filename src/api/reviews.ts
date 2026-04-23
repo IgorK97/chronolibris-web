@@ -1,9 +1,4 @@
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient } from './apiClient';
 import type {
   ReviewDetails,
@@ -13,6 +8,7 @@ import type {
   UpdateReviewRequest,
   MyReviewDetails,
 } from '../types';
+import { queryClient } from './queryClient';
 
 export const reviewsApi = {
   getByBookId: (bookId: number, lastId?: number, limit = 20) =>
@@ -35,6 +31,17 @@ export const reviewsApi = {
     apiClient.post('/Reviews/rate', command), //потом надо бы исправить (нет получения типа), но это несущественно
 };
 
+export const useRateReview = () => {
+  return useMutation({
+    mutationFn: (command: RateReviewCommand) => reviewsApi.rateReview(command),
+    onSuccess: () => {
+      // queryClient.invalidateQueries({ queryKey: ['books', bookId] });
+      // queryClient.invalidateQueries({ queryKey: reviewKeys.lists(bookId) });
+      // queryClient.invalidateQueries({ queryKey: reviewKeys.my(bookId) });
+    },
+  });
+};
+
 export const useInfiniteReviews = (bookId: number, isAuth: boolean) => {
   return useInfiniteQuery({
     queryKey: [...reviewKeys.lists(bookId), 'reviews', bookId, isAuth],
@@ -53,19 +60,17 @@ export const reviewKeys = {
 };
 
 export const useCreateReview = (bookId: number) => {
-  const qc = useQueryClient();
   return useMutation({
     mutationFn: (req: CreateReviewRequest) => reviewsApi.create(req),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: reviewKeys.all });
+      queryClient.invalidateQueries({ queryKey: reviewKeys.all });
       //Обновляются данные самой книги (из-за рейтинга)
-      qc.invalidateQueries({ queryKey: ['books', bookId] });
+      queryClient.invalidateQueries({ queryKey: ['books', bookId] });
     },
   });
 };
 
 export const useUpdateReview = (bookId: number) => {
-  const qc = useQueryClient();
   return useMutation({
     mutationFn: ({
       reviewId,
@@ -73,21 +78,20 @@ export const useUpdateReview = (bookId: number) => {
     }: UpdateReviewRequest & { reviewId: number }) =>
       reviewsApi.update(reviewId, req),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['books', bookId] });
-      qc.invalidateQueries({ queryKey: reviewKeys.lists(bookId) });
-      qc.invalidateQueries({ queryKey: reviewKeys.my(bookId) });
+      queryClient.invalidateQueries({ queryKey: ['books', bookId] });
+      queryClient.invalidateQueries({ queryKey: reviewKeys.lists(bookId) });
+      queryClient.invalidateQueries({ queryKey: reviewKeys.my(bookId) });
     },
   });
 };
 
 export const useDeleteReview = (bookId: number) => {
-  const qc = useQueryClient();
   return useMutation({
     mutationFn: (reviewId: number) => reviewsApi.delete(reviewId),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['books', bookId] });
-      qc.invalidateQueries({ queryKey: reviewKeys.lists(bookId) });
-      qc.invalidateQueries({ queryKey: reviewKeys.my(bookId) });
+      queryClient.invalidateQueries({ queryKey: ['books', bookId] });
+      queryClient.invalidateQueries({ queryKey: reviewKeys.lists(bookId) });
+      queryClient.invalidateQueries({ queryKey: reviewKeys.my(bookId) });
     },
   });
 };

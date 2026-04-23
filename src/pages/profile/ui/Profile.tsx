@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import styles from './Profile.module.css';
 // import parsePhoneNumber from 'libphonenumber-js';
 import { useStore } from '../../../stores/globalStore';
-import { usersApi } from '../../../api/user';
+import { usersApi } from '@api/user';
 import { PhoneInputField } from '@/components/PhoneInputField/PhoneInputField';
 
 const VALIDATION_RULES = {

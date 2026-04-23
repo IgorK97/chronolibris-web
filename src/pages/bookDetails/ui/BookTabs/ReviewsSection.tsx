@@ -12,8 +12,9 @@ import {
   useInfiniteReviews,
   useCreateReview,
   useUpdateReview,
-  reviewsApi,
+  // reviewsApi,
   useDeleteReview,
+  useRateReview,
 } from '@/api/reviews';
 import type { ReviewDetails } from '@/types';
 import { useStore } from '@/stores/globalStore';
@@ -126,7 +127,7 @@ function ReviewItem({
     window.addEventListener('resize', checkOverflow);
     return () => window.removeEventListener('resize', checkOverflow);
   }, [review.text]);
-
+  const { mutateAsync: rateReview } = useRateReview();
   const handleVote = async (type: 'like' | 'dislike') => {
     if (!isAuth) return;
     const score = type === 'like' ? 1 : -1;
@@ -157,7 +158,7 @@ function ReviewItem({
       };
     });
 
-    await reviewsApi.rateReview({
+    await rateReview({
       reviewId: review.id,
       score,
     });

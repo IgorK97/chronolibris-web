@@ -3,8 +3,12 @@ import {} from // ComposeBox,
 './BookTabsAtoms';
 import { SmartTextBox } from './SmartTextBox';
 import styles from './BookTabs.module.css';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { commentsApi } from '@/api/comments';
+// import { useInfiniteQuery } from '@tanstack/react-query';
+import {
+  // commentsApi,
+  useCreateComment,
+  useGetCommentsByBook,
+} from '@/api/comments';
 import {
   // CommentItem,
   SmartCommentItem,
@@ -13,17 +17,18 @@ import { useStore } from '@/stores/globalStore';
 
 export function CommentsSection({ bookId }: { bookId: number }) {
   const { user } = useStore();
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
-    useInfiniteQuery({
-      queryKey: ['comments', bookId],
-      queryFn: ({ pageParam }) => commentsApi.getByBookId(bookId, pageParam),
-      initialPageParam: undefined as number | undefined,
-      getNextPageParam: (lastPage) =>
-        lastPage.length > 0 ? lastPage[lastPage.length - 1].id : undefined,
-    });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useGetCommentsByBook(bookId);
+  // useInfiniteQuery({
+  //   queryKey: ['comments', bookId],
+  //   queryFn: ({ pageParam }) => commentsApi.getByBookId(bookId, pageParam),
+  //   initialPageParam: undefined as number | undefined,
+  //   getNextPageParam: (lastPage) =>
+  //     lastPage.length > 0 ? lastPage[lastPage.length - 1].id : undefined,
+  // });
 
   const allComments = data?.pages.flat() || [];
-
+  const { mutateAsync: createComment } = useCreateComment();
   return (
     <div className={styles['tab-content']}>
       {user?.role == 'reader' && (
@@ -31,8 +36,8 @@ export function CommentsSection({ bookId }: { bookId: number }) {
           type="comment"
           placeholder="Напишите комментарий..."
           onSubmit={async (text) => {
-            await commentsApi.create({ bookId, text });
-            refetch();
+            await createComment({ bookId, text });
+            // refetch();
           }}
         />
       )}

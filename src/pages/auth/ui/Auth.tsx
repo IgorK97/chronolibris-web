@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from './Auth.module.css';
 // import parsePhoneNumber from 'libphonenumber-js';
-import { usersApi } from '../../../api/user';
+import { usersApi } from '@api/user';
 import { useStore } from '../../../stores/globalStore';
 import { t } from 'i18next';
 import { useSearchParams } from 'react-router-dom';

@@ -1,11 +1,17 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useState } from 'react';
+// import {
+//   // useInfiniteQuery,
+//   // useMutation,
+//   useQueryClient,
+// } from '@tanstack/react-query';
 import {
-  useInfiniteQuery,
-  useMutation,
-  useQueryClient,
-} from '@tanstack/react-query';
-import { commentsApi } from '@/api/comments';
+  // commentsApi,
+  useCreateComment,
+  useDeleteComment,
+  useGetRepliesByComment,
+  useRateComment,
+} from '@/api/comments';
 import {
   Avatar,
   // ComposeBox,
@@ -36,7 +42,7 @@ export function SmartCommentItem({
 }) {
   const { user } = useStore();
   const isAuth = !!user;
-  const qc = useQueryClient();
+  // const qc = useQueryClient();
   const [isReplying, setIsReplying] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const [opened, setOpened] = useState(!comment.deletedAt);
@@ -46,31 +52,32 @@ export function SmartCommentItem({
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useInfiniteQuery({
-    queryKey: ['comments', 'replies', comment.id],
-    queryFn: ({ pageParam }) => commentsApi.getReplies(comment.id, pageParam),
-    initialPageParam: undefined as number | undefined,
-    getNextPageParam: (lastPage) =>
-      lastPage.length > 0 ? lastPage[lastPage.length - 1].id : undefined,
-    enabled: showMore,
-    staleTime: 0,
-  });
+  } = useGetRepliesByComment(comment.id, showMore);
+  // } = useInfiniteQuery({
+  //   queryKey: ['comments', 'replies', comment.id],
+  //   queryFn: ({ pageParam }) => commentsApi.getReplies(comment.id, pageParam),
+  //   initialPageParam: undefined as number | undefined,
+  //   getNextPageParam: (lastPage) =>
+  //     lastPage.length > 0 ? lastPage[lastPage.length - 1].id : undefined,
+  //   enabled: showMore,
+  //   staleTime: 0,
+  // });
 
   useEffect(() => {
     setOpened(!comment.deletedAt);
   }, [comment]);
 
   const allReplies = infiniteReplies?.pages.flat() || [];
-  const repliesQueryKey = ['comments', 'replies', comment.id];
+  // const repliesQueryKey = ['comments', 'replies', comment.id];
 
-  const deleteMutation = useMutation({
-    mutationFn: () => commentsApi.delete(comment.id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['comments', bookId] }),
-  });
+  // const deleteMutation = useMutation({
+  //   mutationFn: () => commentsApi.delete(comment.id),
+  //   onSuccess: () => qc.invalidateQueries({ queryKey: ['comments', bookId] }),
+  // });
 
   const handleHideReplies = () => {
     setShowMore(false);
-    qc.removeQueries({ queryKey: repliesQueryKey });
+    // qc.removeQueries({ queryKey: repliesQueryKey });
   };
 
   const hasReplies = comment.repliesCount > 0;
@@ -99,6 +106,8 @@ export function SmartCommentItem({
     dislikes: number;
     userVote: 'like' | 'dislike' | null;
   });
+  const { mutateAsync: rateComment } = useRateComment(bookId, comment.id);
+  const { mutateAsync: deleteComment } = useDeleteComment();
   const handleVote = async (type: 'like' | 'dislike') => {
     if (!isAuth) return;
     console.log('VOTE');
@@ -131,11 +140,13 @@ export function SmartCommentItem({
       };
     });
 
-    await commentsApi.rateComment({
+    await rateComment({
       commentId: comment.id,
       score,
     });
   };
+
+  const { mutateAsync: createComment } = useCreateComment();
   return !opened ? (
     <div className={styles['comment-wrapper-del']} style={indentStyle}>
       {' '}
@@ -162,7 +173,13 @@ export function SmartCommentItem({
           {user?.role == 'reader' && user?.userName === comment.userLogin ? (
             <ThreeDotsMenu
               canDelete={true}
-              onDelete={async () => deleteMutation.mutate()}
+              onDelete={async () =>
+                deleteComment({
+                  id: comment.id,
+                  bookId,
+                  parentCommentId: comment.parentCommentId,
+                })
+              }
               targetId={comment.id}
               targetTypeId={TARGET_TYPE.COMMENT}
             />
@@ -228,16 +245,16 @@ export function SmartCommentItem({
               type="comment"
               placeholder="Ваш ответ..."
               onSubmit={async (text) => {
-                await commentsApi.create({
+                await createComment({
                   bookId,
                   text,
                   parentCommentId: comment.id,
                 });
                 setIsReplying(false);
                 setShowMore(true);
-                qc.invalidateQueries({
-                  queryKey: ['comments', 'replies', comment.id],
-                });
+                // qc.invalidateQueries({
+                //   queryKey: ['comments', 'replies', comment.id],
+                // });
               }}
             />
           </div>
