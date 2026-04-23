@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   ArrowLeft,
   Bookmark,
@@ -188,11 +190,16 @@ export const BookDetailsComponent = ({
     isCurrentStatus: boolean
   ) => {
     if (!user || !shelfId) return;
-    const success = !isCurrentStatus
-      ? await collectionsApi.addBookToShelf(shelfId, fullBookDetails.id)
-      : await collectionsApi.removeBookFromShelf(shelfId, fullBookDetails.id);
+    try {
+      if (!isCurrentStatus)
+        await collectionsApi.addBookToShelf(shelfId, fullBookDetails.id);
+      else
+        await collectionsApi.removeBookFromShelf(shelfId, fullBookDetails.id);
 
-    if (success) refetchBook();
+      await refetchBook();
+    } catch (error: any) {
+      //
+    }
   };
 
   const handleDelete = async () => {
@@ -353,7 +360,12 @@ export const BookDetailsComponent = ({
                             <span className={styles['download-file-size']}>
                               {formatFileSize(file.fileSizeBytes)}
                             </span>
-                            {isDownloading && <Circles />}
+                            {isDownloading && (
+                              <Circles
+                                fill="#d32f2f"
+                                // style={{ color: '#fff3e0' }}
+                              />
+                            )}
                           </li>
                         ))}
                       </ul>
