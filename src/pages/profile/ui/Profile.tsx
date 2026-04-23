@@ -37,7 +37,9 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
 
   const [profileSnapshot, setProfileSnapshot] = useState({ ...profileForm });
   const [errors, setErrors] = useState<Record<string, string>>({});
-
+  const [passwordErrors, setPasswordErrors] = useState<Record<string, string>>(
+    {}
+  );
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -90,12 +92,16 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
       newErrors.currentPassword = 'Текущий пароль должен быть указан';
     }
 
-    setErrors(newErrors);
+    setPasswordErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
   useEffect(() => {
     validateProfile(profileForm);
   }, [profileForm]);
+
+  useEffect(() => {
+    validatePasswords();
+  }, [currentPassword, newPassword, confirmPassword]);
 
   const profileChanged = useMemo(() => {
     return JSON.stringify(profileForm) !== JSON.stringify(profileSnapshot);
@@ -103,7 +109,7 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
 
   const isProfileValid = Object.keys(errors).length === 0;
 
-  const passwordReady = Object.keys(errors).length === 0;
+  const passwordReady = Object.keys(passwordErrors).length === 0;
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -152,6 +158,7 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
         ...updatedProfile,
       });
       setProfileSuccess(true);
+      setProfileSnapshot({ ...profileForm });
       // const queryClient = useQueryClient();
       // queryClient.invalidateQueries();
     } catch (e: any) {
@@ -303,7 +310,7 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
           </button>
         </form>
 
-        <form className={styles['section']} onClick={handleChangePassword}>
+        <form className={styles['section']} onSubmit={handleChangePassword}>
           <h3 className={styles['section-title']}>
             {t('profile.label_security')}
           </h3>
@@ -321,9 +328,9 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
                 placeholder={t('profile.ph_pass')}
                 autoComplete="new-password"
               />
-              {newPassword && errors.currentPassword && (
+              {newPassword && passwordErrors.currentPassword && (
                 <span className={styles['error-msg']}>
-                  {errors.currentPassword}
+                  {passwordErrors.currentPassword}
                 </span>
               )}
             </div>
@@ -341,9 +348,9 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
                 autoComplete="new-password"
                 maxLength={128}
               />
-              {newPassword && errors.newPassword && (
+              {newPassword && passwordErrors.newPassword && (
                 <span className={styles['error-msg']}>
-                  {errors.newPassword}
+                  {passwordErrors.newPassword}
                 </span>
               )}
             </div>
@@ -360,8 +367,10 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
                 placeholder={t('profile.ph_conf_pass')}
               />
 
-              {newPassword && errors.confirmPassword && (
-                <p className={styles['error-msg']}>{errors.confirmPassword}</p>
+              {newPassword && passwordErrors.confirmPassword && (
+                <p className={styles['error-msg']}>
+                  {passwordErrors.confirmPassword}
+                </p>
               )}
             </div>
             {passwordError && (
