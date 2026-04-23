@@ -46,13 +46,17 @@ export function SmartCommentItem({
   const [isReplying, setIsReplying] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const [opened, setOpened] = useState(!comment.deletedAt);
-
+  const [repliesCount, setRepliesCount] = useState(comment.repliesCount);
   const {
     data: infiniteReplies,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
   } = useGetRepliesByComment(comment.id, showMore);
+  const [hasReplies, setHasReplies] = useState<boolean>(
+    comment.repliesCount > 0
+  );
+
   // } = useInfiniteQuery({
   //   queryKey: ['comments', 'replies', comment.id],
   //   queryFn: ({ pageParam }) => commentsApi.getReplies(comment.id, pageParam),
@@ -62,12 +66,18 @@ export function SmartCommentItem({
   //   enabled: showMore,
   //   staleTime: 0,
   // });
+  const allReplies = infiniteReplies?.pages.flat() || [];
 
   useEffect(() => {
     setOpened(!comment.deletedAt);
   }, [comment]);
 
-  const allReplies = infiniteReplies?.pages.flat() || [];
+  useEffect(() => {
+    if (infiniteReplies && !hasNextPage) {
+      setRepliesCount(allReplies.length);
+    }
+  }, [allReplies.length, hasNextPage]);
+
   // const repliesQueryKey = ['comments', 'replies', comment.id];
 
   // const deleteMutation = useMutation({
@@ -79,8 +89,6 @@ export function SmartCommentItem({
     setShowMore(false);
     // qc.removeQueries({ queryKey: repliesQueryKey });
   };
-
-  const hasReplies = comment.repliesCount > 0;
 
   const indentStyle = {
     marginLeft: depth > 0 && depth <= MAX_INDENT_DEPTH ? '24px' : '0px',
@@ -251,7 +259,9 @@ export function SmartCommentItem({
                   parentCommentId: comment.id,
                 });
                 setIsReplying(false);
+                setHasReplies(true);
                 setShowMore(true);
+                setRepliesCount((prev) => prev + 1);
                 // qc.invalidateQueries({
                 //   queryKey: ['comments', 'replies', comment.id],
                 // });
@@ -268,8 +278,7 @@ export function SmartCommentItem({
         >
           <span>
             {showMore ? '-' : '+'}{' '}
-            {showMore ? 'Скрыть ответы' : 'Показать ответы'} (
-            {comment.repliesCount})
+            {showMore ? 'Скрыть ответы' : 'Показать ответы'} ({repliesCount})
           </span>
         </button>
       )}

@@ -39,7 +39,10 @@ export const useDeleteComment = () => {
     onSuccess: (_, { bookId, parentCommentId }) => {
       if (parentCommentId) {
         queryClient.invalidateQueries({
-          queryKey: ['replies', parentCommentId],
+          queryKey: ['comments', 'replies', parentCommentId],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['comments', bookId],
         });
       } else {
         queryClient.invalidateQueries({ queryKey: ['comments', bookId] });
@@ -76,11 +79,14 @@ export const useCreateComment = () => {
     onSuccess: (_, { parentCommentId, bookId }) => {
       // Можно оптимизировать, добавляя новый комментарий в кэш вместо полной инвалидизации
       // Но для простоты сейчас просто инвалидируем
-      if (parentCommentId)
+      if (parentCommentId) {
         queryClient.invalidateQueries({
-          queryKey: ['replies', parentCommentId],
+          queryKey: ['comments', bookId],
         });
-      else
+        queryClient.invalidateQueries({
+          queryKey: ['comments', 'replies', parentCommentId],
+        });
+      } else
         queryClient.invalidateQueries({
           queryKey: ['comments', bookId],
         });
