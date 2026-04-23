@@ -15,13 +15,29 @@
   cursor: pointer;
 }
 
-.main-content {
-  min-height: 100vh;
+/* .main-content {
+  min-height: 80vh;
   backdrop-filter: blur(8px) brightness(0.9);
   background-color: var(--color-grey);
   padding: 20px;
+  overflow: hidden;
 }
 
 .app-container {
   min-height: 100vh;
+} */
+
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+  min-height: 0;
+  backdrop-filter: blur(8px) brightness(0.9);
+  background-color: var(--color-grey);
+  padding: 20px;
+  overflow: hidden;
 }
