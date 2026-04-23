@@ -6,7 +6,7 @@ import {
   useUploadBookFile,
   useDeleteBookFile,
   // useDownloadBookFile,
-  bookFilesApi,
+  useDownloadBookFile,
 } from '@/api/bookFiles';
 import { useFormats } from '@/api/references';
 import type { BookFileDto } from '@/types';
@@ -15,6 +15,7 @@ import styles from './BookFileManagement.module.css';
 import { Download, Trash2 } from 'lucide-react';
 import { t } from 'i18next';
 import { AlertDialog } from '@/components/dialogs/AlertDialog';
+import Circles from 'react-loading-icons/dist/esm/components/circles';
 
 interface BookFileManagementProps {
   bookId: number;
@@ -34,7 +35,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
   const uploadMutation = useUploadBookFile();
   const deleteMutation = useDeleteBookFile();
   // const downloadMutation = useDownloadBookFile();
-  const [isDownloading, setIsDownloading] = useState<boolean>(false);
+  // const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const [deletingBookfile, setDeletingBookfile] = useState<number>(0);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -43,7 +44,9 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
   const [isReadable, setIsReadable] = useState<boolean>(false);
   const [editingFile, setEditingFile] = useState<BookFileDto | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const editFileInputRef = useRef<HTMLInputElement>(null);
+  // const editFileInputRef = useRef<HTMLInputElement>(null);
+  const { mutateAsync: download, isPending: isDownloading } =
+    useDownloadBookFile();
 
   const handleUpload = async () => {
     if (!fileInputRef.current?.files?.[0]) {
@@ -100,11 +103,11 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
 
   const handleDownload = async (bookFileId: number, formatId: number) => {
     if (!bookFileId) return;
-    setIsDownloading(true);
+    // setIsDownloading(true);
     setDownloadError(null);
 
     try {
-      const { blob } = await bookFilesApi.download(bookFileId);
+      const { blob } = await download(bookFileId);
 
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -118,7 +121,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
     } catch (error) {
       setDownloadError(t('book.download_error'));
     } finally {
-      setIsDownloading(false);
+      // setIsDownloading(false);
     }
   };
 
@@ -252,6 +255,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
                     }
                   >
                     <Download style={{ cursor: 'pointer' }} />
+                    {isDownloading && <Circles fill="#d32f2f" />}
                   </button>
                   <button
                     onClick={() => {

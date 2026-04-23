@@ -9,7 +9,39 @@ import type {
 export const bookFilesApi = {
   getBookFiles: (bookId: number): Promise<BookFileDto[]> =>
     apiClient.get<BookFileDto[]>(`/BookFiles/book/${bookId}`),
-  //Нельзя это упростить?
+  // 1. application/json
+  //    {"bookId": 5, "formatId": 2}
+  //    только текст, бинарник не положить
+
+  // 2. application/x-www-form-urlencoded
+  //    bookId=5&formatId=2
+  //    тоже только текст, как строка в URL
+
+  // 3. multipart/form-data
+  //    ----boundary
+  //    bookId: 5
+  //    ----boundary
+  //    [бинарные байты файла]
+  //    ----boundary--
+  //    смешанный: каждая часть своего типа
+
+  //Обычный JSON не может содержать бинарные данные (файл).
+  //один HTTP запрос. multipart — это просто формат тела (body) этого запроса
+  // multipart/form-data разбивает запрос на части, каждая со своим заголовком:
+  //POST /BookFiles HTTP/1.1
+  // Content-Type: multipart/form-data; boundary=----abc123
+  // --
+  // Content-Disposition: form-data; name="bookId"
+  //
+  // 123
+  // --
+  // Content-Disposition: form-data; name="file"; filename="book.pdf"
+  // Content-Type: application/pdf
+  //
+  // [бинарные данные файла]
+  // --
+
+  //на сервере - [FromForm]
 
   uploadBookFile: async (data: UploadBookFileRequest): Promise<number> => {
     const formData = new FormData();
@@ -33,6 +65,12 @@ export const bookFilesApi = {
     apiClient.download(`/bookFiles/${bookFileId}/download`),
 };
 
+export const useDownloadBookFile = () => {
+  return useMutation({
+    mutationFn: (bookFileId: number) => bookFilesApi.download(bookFileId),
+  });
+};
+
 export const useBookFiles = (bookId: number | null) => {
   return useQuery({
     queryKey: ['bookFiles', bookId],
@@ -50,7 +88,7 @@ export const useUploadBookFile = () => {
 
   return useMutation({
     mutationFn: bookFilesApi.uploadBookFile,
-    //     //Почему, если поставить _, то ошибка исчезает?
+    //discard (в C#) или unused variable convention (в TypeScript/JS)
 
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({

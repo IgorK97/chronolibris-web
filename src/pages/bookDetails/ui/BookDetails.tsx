@@ -41,7 +41,7 @@ import {
   useMyReview,
   useUpdateReview,
 } from '@/api/reviews';
-import { bookFilesApi, useBookFiles } from '@/api/bookFiles';
+import { useDownloadBookFile, useBookFiles } from '@/api/bookFiles';
 import Circles from 'react-loading-icons/dist/esm/components/circles';
 import { ReportModal } from '@/components/reports/ReportModal';
 import { TARGET_TYPE } from '@/types';
@@ -140,7 +140,9 @@ export const BookDetailsComponent = ({
   const updateReview = useUpdateReview(Number(bookId) || 0);
   const deleteReview = useDeleteReview(Number(bookId) || 0);
   const [downloadError, setDownloadError] = useState<string | null>(null);
-  const [isDownloading, setIsDownloading] = useState<boolean>(false);
+  // const [isDownloading, setIsDownloading] = useState<boolean>(false);
+  const { mutateAsync: download, isPending: isDownloading } =
+    useDownloadBookFile();
   // const handleMouseLeave = () => {
   //   if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
 
@@ -210,11 +212,11 @@ export const BookDetailsComponent = ({
 
   const handleDownload = async (bookFileId: number, formatId: number) => {
     if (!bookFileId) return;
-    setIsDownloading(true);
+    // setIsDownloading(true);
     setDownloadError(null);
 
     try {
-      const { blob } = await bookFilesApi.download(bookFileId);
+      const { blob } = await download(bookFileId);
 
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -231,7 +233,7 @@ export const BookDetailsComponent = ({
     } catch (error) {
       setDownloadError(t('book.download_error'));
     } finally {
-      setIsDownloading(false);
+      // setIsDownloading(false);
     }
   };
 

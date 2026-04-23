@@ -4,7 +4,9 @@ const BASE_URL = '/api';
 
 export const axiosInstance = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true, // Заменяет credentials: "include"
+  withCredentials: true, // Заменяет credentials: "include" в фетче
+  //Access-Control-Allow-Origin: https://app.com  конкретный домен, не *
+  // Access-Control-Allow-Credentials: true
   headers: {
     'Content-Type': 'application/json',
   },

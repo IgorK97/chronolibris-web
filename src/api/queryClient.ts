@@ -26,6 +26,7 @@ export const queryClient = new QueryClient({
       }
       if (error.response?.status >= 400) {
         toast.error(
+          //как лучше хранить и передавать ошибку с сервера?
           `Ошибка ${error.response.status}: ${error.response.data?.detail || error.response.data?.message || 'Ошибка сервера'}`
         );
       }
