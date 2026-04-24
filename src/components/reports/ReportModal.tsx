@@ -15,7 +15,8 @@ const REASON_TYPES: { id: number; label: string }[] = [
   { id: 1, label: 'Спам' },
   { id: 2, label: 'Ненормативная лексика' },
   { id: 3, label: 'Нарушение авторских прав' },
-  { id: 4, label: 'Неприемлемый контент' },
+  { id: 4, label: 'Терроризм и экстремизм' },
+  { id: 5, label: 'Иное' },
 ];
 
 function targetTypeLable(typeId: number): string {
@@ -118,9 +119,20 @@ export function ReportModal({
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   maxLength={2000}
-                  minLength={50}
+                  minLength={20}
                   rows={3}
                 />
+                <span className={styles['char-count']}>
+                  {description.length}/2000
+                </span>
+                {description.length < 20 && (
+                  <span
+                    className={styles['validation-error']}
+                    style={{ color: 'red' }}
+                  >
+                    Описание должно быть не менее 20 символов
+                  </span>
+                )}
               </div>
               <div className={styles.footer}>
                 <button

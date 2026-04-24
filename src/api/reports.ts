@@ -70,7 +70,13 @@ export const useInfiniteReports = (
   filters: Omit<GetReportsRequest, 'lastDate' | 'count'>
 ) => {
   return useInfiniteQuery({
-    queryKey: ['moderation', 'reports', filters],
+    queryKey: [
+      'moderation',
+      'reports',
+      filters.reportStatusId,
+      filters.targetTypeFilter,
+      filters.reportTypeFilter,
+    ],
     queryFn: ({ pageParam }) =>
       reportsApi.getReports({
         ...filters,

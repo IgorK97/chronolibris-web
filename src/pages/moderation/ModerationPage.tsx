@@ -18,7 +18,7 @@ import {
   type ReportShortDto,
 } from '@/types';
 
-type StatusFilter = 'free' | 'inProgress' | 'resolved';
+type StatusFilter = 'free' | 'inProgress' | 'accepted' | 'rejected';
 
 interface Filters {
   statusFilter: StatusFilter;
@@ -34,9 +34,10 @@ const DEFAULT_FILTERS: Filters = {
 
 const REASON_TYPES: { id: number; label: string }[] = [
   { id: 1, label: 'Спам' },
-  { id: 2, label: 'Оскорбление' },
+  { id: 2, label: 'Ненормативная лексика' },
   { id: 3, label: 'Нарушение авторских прав' },
-  { id: 4, label: 'Неприемлемый контент' },
+  { id: 4, label: 'Терроризм и экстремизм' },
+  { id: 5, label: 'Иное' },
 ];
 
 function formatDate(iso: string | null): string {
@@ -58,8 +59,10 @@ function buildFiltersRequest(filters: Filters) {
     reportStatusId = null;
   } else if (filters.statusFilter === 'inProgress') {
     reportStatusId = TASK_STATUS.IN_PROGRESS;
-  } else if (filters.statusFilter === 'resolved') {
+  } else if (filters.statusFilter === 'accepted') {
     reportStatusId = TASK_STATUS.ACCEPTED;
+  } else if (filters.statusFilter === 'rejected') {
+    reportStatusId = TASK_STATUS.REJECTED;
   }
 
   return {
@@ -378,7 +381,12 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
               <span className={styles['resolved-info']}>
                 Решено: {formatDate(report.taskResolvedAt)}
               </span>
-              <textarea placeholder="Комментарий" value={reportText} readOnly />
+              <textarea
+                style={{ minWidth: '50%' }}
+                placeholder="Комментарий"
+                value={reportText}
+                readOnly
+              />
             </>
           )}
         </div>
@@ -464,7 +472,8 @@ export function ModerationPage() {
           >
             <option value="free">Новые (свободные)</option>
             <option value="inProgress">В обработке</option>
-            <option value="resolved">Обработанные</option>
+            <option value="accepted">Принятые</option>
+            <option value="rejected">Отклоненные</option>
           </select>
         </div>
 
@@ -522,12 +531,7 @@ export function ModerationPage() {
       <div className={styles.list}>
         {isLoading && <div className={styles.hint}>Загрузка...</div>}
         {isError && (
-          <div className={styles['error-hint']}>
-            Ошибка загрузки{' '}
-            <button className={styles.linkBtn} onClick={() => refetch()}>
-              Повторить
-            </button>
-          </div>
+          <div className={styles['error-hint']}>Ошибка загрузки </div>
         )}
 
         {!isLoading && allReports.length === 0 && (
