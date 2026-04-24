@@ -28,7 +28,7 @@ export const BookListByCategory = ({ shelfId, onNavigateToBook }: Props) => {
     isFetchingNextPage,
     // isLoading,
     refetch,
-  } = useInfiniteShelfBooks(user?.userId || 0, shelfId);
+  } = useInfiniteShelfBooks(user?.userName || '', shelfId);
 
   useEffect(() => {
     const observer = new IntersectionObserver(

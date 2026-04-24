@@ -19,9 +19,10 @@ interface Props {
 }
 
 export const ShelfSelectionModal = ({ bookId, onClose, onRefresh }: Props) => {
-  const { user } = useStore();
+  const { user, isReader } = useStore();
   const { data: shelves, refetch: refetchShelves } = useShelves(
-    user?.userId || 0
+    user?.userName || '',
+    isReader()
   );
   const { data: seekedShelves } = useSeekedShelves(bookId);
   const [isCreating, setIsCreating] = useState(false);

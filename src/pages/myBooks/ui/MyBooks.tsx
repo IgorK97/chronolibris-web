@@ -32,8 +32,11 @@ export const MyBooks = ({
   onNavigateToBook: (id: number) => void;
 }) => {
   const { t } = useTranslation();
-  const { user } = useStore();
-  const { data: shelves, isLoading } = useShelves(user?.userId || 0);
+  const { user, isReader } = useStore();
+  const { data: shelves, isLoading } = useShelves(
+    user?.userName || '',
+    isReader()
+  );
   const { mutateAsync: createShelf } = useCreateShelf();
   const { mutateAsync: updateShelf } = useUpdateShelf();
   const { mutateAsync: deleteShelf } = useDeleteShelf();

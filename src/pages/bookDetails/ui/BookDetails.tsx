@@ -86,7 +86,8 @@ export const BookDetailsComponent = ({
   const [isReportOpen, setIsReportOpen] = useState(false);
   const { id: bookId } = useParams();
   const { data: shelves, refetch: refetchShelves } = useShelves(
-    user?.userId || 0
+    user?.userName || '',
+    isReader()
   );
 
   const isAuth = !!user;
@@ -113,7 +114,7 @@ export const BookDetailsComponent = ({
     isError,
   } = useBookDetails(
     Number(bookId) || 0,
-    String(user?.userId || 0),
+    String(user?.userName || ''),
     user?.role == 'admin' || user?.role == 'moderator' ? true : false,
     !!Number(bookId)
   );
@@ -490,6 +491,9 @@ export const BookDetailsComponent = ({
                     genreName={theme.name}
                   />
                 ))}
+                {fullBookDetails.themes?.length === 0 && (
+                  <p className={styles['no-genres']}>У книги нет тем</p>
+                )}
               </div>
             </section>
 
@@ -507,6 +511,9 @@ export const BookDetailsComponent = ({
                     }}
                   />
                 ))}
+                {fullBookDetails.tags?.length === 0 && (
+                  <p className={styles['no-tags']}>У книги нет тегов</p>
+                )}
               </div>
             </section>
           </div>

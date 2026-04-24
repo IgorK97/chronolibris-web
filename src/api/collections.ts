@@ -67,14 +67,9 @@ export const collectionsApi = {
   addBookToShelf: (shelfId: number, bookId: number) =>
     apiClient.post<void>(`/Shelves/${shelfId}/books/${bookId}`),
 
-  getShelfBooks: (
-    userId: number,
-    shelfId: number,
-    lastId: number | null,
-    limit: number = 10
-  ) =>
+  getShelfBooks: (shelfId: number, lastId: number | null, limit: number = 10) =>
     apiClient.get<PagedResult<BookListItem>>(
-      `/Shelves/${shelfId}/books?userId=${userId}&lastId=${lastId || ''}&limit=${limit}`
+      `/Shelves/${shelfId}/books?lastId=${lastId || ''}&limit=${limit}`
     ),
 
   removeBookFromShelf: (shelfId: number, bookId: number) =>
@@ -120,17 +115,17 @@ export const useCreateShelf = () => {
 };
 
 export const useInfiniteShelfBooks = (
-  userId: number,
+  userLogin: string,
   shelfId: number | undefined
 ) =>
   useInfiniteQuery({
-    queryKey: ['books', 'shelf', shelfId, userId],
+    queryKey: ['books', 'shelf', shelfId, userLogin],
     queryFn: ({ pageParam }) =>
-      collectionsApi.getShelfBooks(userId, shelfId!, pageParam, 10),
+      collectionsApi.getShelfBooks(shelfId!, pageParam, 10),
     initialPageParam: null as number | null,
     getNextPageParam: (lastPage) =>
       lastPage.hasNext ? lastPage.lastId : undefined,
-    enabled: !!userId && !!shelfId,
+    enabled: !!userLogin && !!shelfId,
   });
 
 export const useInfiniteSelectionBooks = (
@@ -176,11 +171,11 @@ export const useSeekedShelves = (bookId: number) => {
   });
 };
 
-export const useShelves = (userId: number) => {
+export const useShelves = (userLogin: string, reader: boolean) => {
   return useQuery({
-    queryKey: ['shelves', userId],
+    queryKey: ['shelves', userLogin],
     queryFn: () => collectionsApi.getUserShelves(),
-    enabled: !!userId,
+    enabled: !!userLogin && reader,
   });
 };
 

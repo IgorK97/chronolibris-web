@@ -67,7 +67,7 @@ export const StarRating: React.FC<StarRatingProps> = ({
               ratingsCount,
               t('book.rating.one'),
               t('book.rating.few'),
-              t('books.rating.many')
+              t('book.rating.many')
             )}
           </span>
         </div>
