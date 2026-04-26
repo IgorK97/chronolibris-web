@@ -101,8 +101,8 @@ export const useAllThemesFlat = (name: string) => {
   return useQuery({
     queryKey: ['themes', 'flat'],
     queryFn: () => themesApi.getThemesByName(name),
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
+    // staleTime: 5 * 60 * 1000,
+    // refetchOnWindowFocus: false,
     enabled: name.trim().length > 0,
   });
 };
