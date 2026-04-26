@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { createPortal } from 'react-dom';
 import { Puff } from 'react-loading-icons';
 import React, {
   useState,
@@ -20,7 +18,6 @@ import {
   // PencilLine,
   TableOfContents,
   // Trash2,
-  X,
 } from 'lucide-react';
 import type {
   Bookmark as BookmarkDetails,
@@ -29,8 +26,8 @@ import type {
   Note,
   PageNumberNode,
   TextSegment,
-  TocBodyItem,
-  TocData,
+  // TocBodyItem,
+  // TocData,
 } from '@/types';
 
 import type { CreateBookmarkRequest } from '@/types';
@@ -42,12 +39,23 @@ import {
   useDeleteBookmark,
 } from '@/api/bookmarks';
 import { useStore } from '@/stores/globalStore';
-import { formatDate } from '@/utils';
 // import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useReaderSettings } from './UseReaderSettings';
 import { Badge } from '../../../components/ui/badge';
 import { prefetchBookChunk, useBookChunk, useBookToc } from '@/api/books';
 import { BookmarkPanel } from './BookmarkPanel';
+import { TocSidebar } from './TocSidebar';
+import { FootnoteModal } from './FootnoteModal';
+import {
+  BG_COLORS,
+  FONT_OPTIONS,
+  PAGE_COLORS,
+  TEXT_COLORS,
+} from '@/utils/readerOpts';
+import { ColorModal } from './ColorModal';
+import { ContextMenu } from './ContextMenu';
+import { ImageLightbox } from './ImageLightbox';
+import { BookmarkEditModal } from './BookmarkEditModal';
 
 interface ReaderProps {
   bookFileId: number;
@@ -59,20 +67,6 @@ const DEFAULT_FONT_SIZE = 18;
 const MIN_FONT_SIZE = 12;
 const MAX_FONT_SIZE = 32;
 const PREFETCH_THRESHOLD = 3;
-
-const FONT_OPTIONS: { label: string; value: string }[] = [
-  { label: 'Georgia', value: "Georgia, 'Times New Roman', serif" },
-  { label: 'Arial', value: 'Arial, Helvetica, sans-serif' },
-  { label: 'Verdana', value: 'Verdana, Geneva, sans-serif' },
-  { label: 'Times New Roman', value: "'Times New Roman', Times, serif" },
-  { label: 'Courier New', value: "'Courier New', Courier, monospace" },
-  { label: 'Palatino', value: "'Palatino Linotype', Palatino, serif" },
-  { label: 'Trebuchet MS', value: "'Trebuchet MS', sans-serif" },
-];
-
-const TEXT_COLORS = ['#2c2c2c', '#3b2e1e', '#c8bfb0'];
-const PAGE_COLORS = ['#faf8f4', '#f4ede0', '#1e1c18'];
-const BG_COLORS = ['#e8e4dc', '#d9cdb8', '#131210'];
 
 export const Reader: React.FC<ReaderProps> = ({
   bookFileId,
@@ -988,475 +982,3 @@ export const Reader: React.FC<ReaderProps> = ({
 };
 
 export default Reader;
-
-interface TocSidebarProps {
-  open: boolean;
-  onClose: () => void;
-  tocData: TocData | null;
-  currentPartIndex: number;
-  onSelectPart: (idx: number) => void;
-}
-
-const TocSidebar: React.FC<TocSidebarProps> = ({
-  open,
-  onClose,
-  tocData,
-  currentPartIndex,
-  onSelectPart,
-}) => {
-  if (!tocData) return null;
-
-  const renderBodyItems = (
-    items: TocBodyItem[],
-    depth = 0
-  ): React.ReactNode => {
-    return items.map((item, i) => {
-      // Нормализуем получение вложенных элементов (поддержка 'c' и 'C')
-      const children = item.c || (item as any).C;
-
-      const partIdx = tocData.Parts.findIndex(
-        (p) => item.s >= p.s && item.s <= p.e
-      );
-
-      const isActive = partIdx === currentPartIndex;
-
-      return (
-        <div key={`${depth}-${i}`} className={styles['toc-item-container']}>
-          <button
-            className={`${styles['toc-item']} ${isActive ? styles['toc-item-active'] : ''}`}
-            style={{
-              paddingLeft: `${16 + depth * 12}px`, // Уменьшил шаг отступа для компактности
-              fontSize: depth === 0 ? '1rem' : '0.9rem',
-              fontWeight: depth === 0 ? '600' : '400',
-            }}
-            onClick={() => {
-              if (partIdx !== -1) {
-                onSelectPart(partIdx);
-                // Можно добавить onClose(), если нужно закрывать меню при клике
-              }
-            }}
-          >
-            <span className={styles['toc-item-text']}>{item.t.trim()}</span>
-          </button>
-
-          {children && children.length > 0 && (
-            <div className={styles['toc-child-group']}>
-              {renderBodyItems(children, depth + 1)}
-            </div>
-          )}
-        </div>
-      );
-    });
-  };
-
-  return createPortal(
-    <>
-      <div
-        className={`${styles['toc-overlay']} ${open ? styles['toc-overlay-open'] : ''}`}
-        onClick={onClose}
-      />
-      <aside
-        className={`${styles['toc-sidebar']} ${open ? styles['toc-sidebar-open'] : ''}`}
-        aria-label="Содержание"
-        role="navigation"
-      >
-        <div className={styles['toc-header']}>
-          <span className={styles['toc-title']}>Содержание</span>
-          <button
-            className={styles['footnote-close']}
-            onClick={onClose}
-            aria-label="Закрыть"
-          >
-            <X size={24} />
-          </button>
-        </div>
-
-        {tocData.Meta?.Title && (
-          <div className={styles['toc-book-title']}>{tocData.Meta.Title}</div>
-        )}
-
-        <div className={styles['toc-list']}>
-          {tocData.Body && tocData.Body.length > 0
-            ? renderBodyItems(tocData.Body)
-            : tocData.Parts.map((part, idx) => (
-                <button
-                  key={idx}
-                  className={`${styles['toc-item']} ${idx === currentPartIndex ? styles['toc-item-active'] : ''}`}
-                  style={{ paddingLeft: 16 }}
-                  onClick={() => onSelectPart(idx)}
-                >
-                  {part.url || `Часть ${idx + 1}`}
-                </button>
-              ))}
-        </div>
-      </aside>
-    </>,
-    document.body
-  );
-};
-
-interface FootnoteModalProps {
-  note: Note | null;
-  onClose: () => void;
-  textColor: string;
-  pageColor: string;
-  fontFamily: string;
-}
-
-const FootnoteModal: React.FC<FootnoteModalProps> = ({
-  note,
-  onClose,
-  textColor,
-  pageColor,
-  fontFamily,
-}) => {
-  if (!note) return null;
-  const footnoteText = note.f
-    ? Array.isArray(note.f.c)
-      ? note.f.c.join('\n\n')
-      : note.f.c
-    : '';
-  return createPortal(
-    <div className={styles['footnote-overlay']} onClick={onClose}>
-      <div
-        className={styles['footnote-modal']}
-        onClick={(e) => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
-        style={{ background: pageColor, color: textColor, fontFamily }}
-      >
-        <button
-          className={styles['footnote-close']}
-          onClick={onClose}
-          aria-label="Закрыть"
-          style={{ color: textColor }}
-        >
-          <X />
-        </button>
-        <div className={styles['footnote-content']}>
-          <span
-            className={styles['footnote-label']}
-            style={{ color: textColor }}
-          >
-            {note.c}
-          </span>
-          <p style={{ color: textColor }}>{footnoteText}</p>
-        </div>
-      </div>
-    </div>,
-    document.body
-  );
-};
-
-interface ColorModalProps {
-  open: boolean;
-  onClose: () => void;
-  textColor: string;
-  pageColor: string;
-  bgColor: string;
-  onTextColor: (c: string) => void;
-  onPageColor: (c: string) => void;
-  onBgColor: (c: string) => void;
-}
-
-const ColorSwatch: React.FC<{
-  color: string;
-  selected: boolean;
-  onSelect: () => void;
-  dark?: boolean;
-}> = ({ color, selected, onSelect, dark }) => (
-  <button
-    onClick={onSelect}
-    aria-label={color}
-    style={{
-      width: 28,
-      height: 28,
-      borderRadius: '50%',
-      background: color,
-      border: selected
-        ? `3px solid ${dark ? '#fff' : '#1a1a1a'}`
-        : '2px solid #ccc',
-      outline: selected ? `2px solid ${color}` : 'none',
-      outlineOffset: 2,
-      cursor: 'pointer',
-      padding: 0,
-      flexShrink: 0,
-      transition: 'transform 0.1s',
-      transform: selected ? 'scale(1.18)' : 'scale(1)',
-      boxShadow: selected
-        ? '0 0 0 2px rgba(0,0,0,0.18)'
-        : '0 1px 3px rgba(0,0,0,0.12)',
-    }}
-  />
-);
-
-const ColorModal: React.FC<ColorModalProps> = ({
-  open,
-  onClose,
-  textColor,
-  pageColor,
-  bgColor,
-  onTextColor,
-  onPageColor,
-  onBgColor,
-}) => {
-  if (!open) return null;
-  const rows = [
-    {
-      label: 'Цвет текста',
-      colors: TEXT_COLORS,
-      value: textColor,
-      onChange: onTextColor,
-    },
-    {
-      label: 'Цвет страницы',
-      colors: PAGE_COLORS,
-      value: pageColor,
-      onChange: onPageColor,
-    },
-    {
-      label: 'Цвет фона',
-      colors: BG_COLORS,
-      value: bgColor,
-      onChange: onBgColor,
-    },
-  ];
-  return createPortal(
-    <div className={styles['color-overlay']} onClick={onClose}>
-      <div
-        className={styles['color-modal']}
-        onClick={(e) => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Настройка цветов"
-      >
-        <div className={styles['color-modal-header']}>
-          <span className={styles['color-modal-title']}>Цвета оформления</span>
-          <button
-            className={styles['footnote-close']}
-            onClick={onClose}
-            aria-label="Закрыть"
-          >
-            ✕
-          </button>
-        </div>
-        <div className={styles['color-modal-body']}>
-          {rows.map((row) => (
-            <div key={row.label} className={styles['color-row']}>
-              <span className={styles['color-row-label']}>{row.label}</span>
-              <div className={styles['color-swatches']}>
-                {row.colors.map((c) => (
-                  <ColorSwatch
-                    key={c}
-                    color={c}
-                    selected={row.value === c}
-                    onSelect={() => row.onChange(c)}
-                    dark={row.label === 'Цвет текста'}
-                  />
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>,
-    document.body
-  );
-};
-
-interface ContextMenuProps {
-  x: number;
-  y: number;
-  paraIndex: number;
-  existingBookmark: BookmarkDetails | null;
-  onAddBookmark: (note: string) => void;
-  onEditBookmark: (bm: BookmarkDetails) => void;
-  onClose: () => void;
-}
-
-const ContextMenu: React.FC<ContextMenuProps> = ({
-  x,
-  y,
-  existingBookmark,
-  onAddBookmark,
-  onEditBookmark,
-  onClose,
-}) => {
-  const [phase, setPhase] = useState<'menu' | 'add'>('menu');
-  const [note, setNote] = useState('');
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    if (phase === 'add') setTimeout(() => textareaRef.current?.focus(), 30);
-  }, [phase]);
-
-  //Позиционирование — не вылезать за правый/нижний край
-  const style: React.CSSProperties = {
-    position: 'fixed',
-    left: Math.min(x, window.innerWidth - 260),
-    top: Math.min(y, window.innerHeight - 200),
-    zIndex: 4000,
-  };
-
-  return createPortal(
-    <div data-ctx-menu="true" className={styles['ctx-menu']} style={style}>
-      {phase === 'menu' ? (
-        <>
-          {existingBookmark ? (
-            <button
-              className={styles['ctx-item']}
-              onClick={() => {
-                onEditBookmark(existingBookmark);
-                onClose();
-              }}
-            >
-              <Bookmark color="red" /> Редактировать закладку
-            </button>
-          ) : (
-            <button
-              className={styles['ctx-item']}
-              onClick={() => setPhase('add')}
-            >
-              <Bookmark color="red" /> Добавить закладку
-            </button>
-          )}
-          <button
-            className={`${styles['ctx-item']} ${styles['ctx-item-cancel']}`}
-            onClick={onClose}
-          >
-            Отмена
-          </button>
-        </>
-      ) : (
-        <div className={styles['ctx-add-form']}>
-          <div className={styles['ctx-add-label']}>Заметка к закладке</div>
-          <textarea
-            ref={textareaRef}
-            className={styles['ctx-add-textarea']}
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            placeholder="Необязательно…"
-            rows={3}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-                onAddBookmark(note.trim());
-              }
-              if (e.key === 'Escape') onClose();
-            }}
-          />
-          <div className={styles['ctx-add-actions']}>
-            <button className={styles['ctx-cancel-btn']} onClick={onClose}>
-              Отмена
-            </button>
-            <button
-              className={styles['ctx-confirm-btn']}
-              onClick={() => onAddBookmark(note.trim())}
-            >
-              Добавить
-            </button>
-          </div>
-        </div>
-      )}
-    </div>,
-    document.body
-  );
-};
-
-interface BookmarkEditModalProps {
-  bookmark: BookmarkDetails;
-  onSave: (note?: string) => void;
-  onDelete: (id: number) => void;
-  onClose: () => void;
-}
-
-const BookmarkEditModal: React.FC<BookmarkEditModalProps> = ({
-  bookmark,
-  onSave,
-  onDelete,
-  onClose,
-}) => {
-  const [note, setNote] = useState(bookmark.note);
-  useEffect(() => setNote(bookmark.note), [bookmark.id]);
-
-  return createPortal(
-    <div className={styles['footnote-overlay']} onClick={onClose}>
-      <div
-        className={styles['bm-edit-modal']}
-        onClick={(e) => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
-      >
-        <div className={styles['bm-edit-header']}>
-          <span className={styles['bm-edit-title']}>
-            <Bookmark color="red" /> Закладка
-          </span>
-          <button className={styles['footnote-close']} onClick={onClose}>
-            <X />
-          </button>
-        </div>
-
-        <div className={styles['bm-edit-section']}>
-          <span className={styles['bm-edit-label']}>Заметка</span>
-          <textarea
-            className={styles['bm-edit-textarea']}
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            placeholder="Добавьте заметку…"
-            rows={4}
-            autoFocus
-          />
-        </div>
-
-        <div className={styles['bm-edit-position']}>
-          Абзац №{bookmark.paraIndex} {formatDate(bookmark.createdAt)}
-        </div>
-
-        <div className={styles['bm-edit-actions']}>
-          <button
-            className={styles['bm-delete-btn']}
-            onClick={() => onDelete(bookmark.id)}
-          >
-            Удалить
-          </button>
-          <button
-            className={styles['bm-save-btn']}
-            onClick={() => {
-              onSave(note?.trim());
-              onClose();
-            }}
-          >
-            Сохранить
-          </button>
-        </div>
-      </div>
-    </div>,
-    document.body
-  );
-};
-
-interface ImageLightboxProps {
-  src: string | null;
-  onClose: () => void;
-}
-
-const ImageLightbox: React.FC<ImageLightboxProps> = ({ src, onClose }) => {
-  if (!src) return null;
-  return createPortal(
-    <div
-      className={styles['lightbox-overlay']}
-      onClick={onClose}
-      role="button"
-      aria-label="Закрыть изображение"
-      tabIndex={0}
-      onKeyDown={(e) => e.key === 'Escape' && onClose()}
-    >
-      <img
-        src={src}
-        alt=""
-        className={styles['lightbox-img']}
-        onClick={(e) => e.stopPropagation()}
-      />
-    </div>,
-    document.body
-  );
-};
