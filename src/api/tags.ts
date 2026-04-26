@@ -65,7 +65,7 @@ export const useInfiniteRootTags = (
       tagsApi.getRootTags(
         tagTypeId,
         searchTerm,
-        pageParam as number | null,
+        pageParam,
         pageSize
       ),
     getNextPageParam: (lastPage) =>

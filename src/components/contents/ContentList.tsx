@@ -31,14 +31,29 @@ export const ContentList: React.FC<ContentListProps> = ({
   } = useInfiniteContents(
     filter ?? { limit: 20, lastId: null, searchQuery: null },
     {
-      enabled: !isStatic && !!filter,
+      enabled: !isStatic,
     }
   );
 
   const observerRef = useRef<HTMLDivElement | null>(null);
 
+  // useEffect(() => {
+  //   if (isStatic) return;
+  //   const observer = new IntersectionObserver(
+  //     (entries) => {
+  //       if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+  //         fetchNextPage();
+  //       }
+  //     },
+  //     { threshold: 0.5 }
+  //   );
+  //   if (observerRef.current) observer.observe(observerRef.current);
+  //   return () => observer.disconnect();
+  // }, [hasNextPage, isFetchingNextPage, fetchNextPage, isStatic]);
+
   useEffect(() => {
     if (isStatic) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
@@ -47,9 +62,11 @@ export const ContentList: React.FC<ContentListProps> = ({
       },
       { threshold: 0.5 }
     );
+
     if (observerRef.current) observer.observe(observerRef.current);
+
     return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage, isStatic]);
+  }, [hasNextPage, isFetchingNextPage, isStatic, fetchNextPage]);
 
   const allContents = isStatic
     ? staticItems

@@ -78,10 +78,10 @@ export const useInfiniteContents = (
         ...filter,
         lastId: pageParam,
       }),
-    //Что я здесь написал?
     initialPageParam: null as number | null,
 
-    getNextPageParam: (lastPage) => lastPage.lastId ?? null,
+    getNextPageParam: (lastPage) =>
+      lastPage.hasNext ? lastPage.lastId : undefined,
 
     staleTime: 2 * 60 * 1000,
     enabled: enabled && !!filter,

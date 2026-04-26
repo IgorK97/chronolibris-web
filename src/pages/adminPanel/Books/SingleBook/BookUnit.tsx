@@ -460,6 +460,7 @@ export const BookUnit: React.FC = () => {
     error,
   } = useBookDetails(id ?? 0, user?.userName ?? '', true, !!id);
   const { data: contents, refetch: refetchContents } = useBookContents(id);
+  console.log(contents);
   const unlinkMutation = useUnlinkBookFromContent();
   const linkMutation = useLinkBookToContent();
   const createMutation = useCreateBook();

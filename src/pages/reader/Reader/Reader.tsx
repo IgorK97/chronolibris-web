@@ -645,7 +645,7 @@ export const Reader: React.FC<ReaderProps> = ({
       bookmarks.find((bm) => {
         return bm.paraIndex === paraIndex && bm.bookFileId === bookFileId;
       }) ?? null;
-    console.log(paraBookmark);
+    // console.log(paraBookmark);
     const getContent = (): React.ReactNode => {
       if (typeof seg.c === 'string') return seg.c;
       if (Array.isArray(seg.c)) {
