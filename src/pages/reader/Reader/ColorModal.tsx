@@ -1,5 +1,5 @@
 import { createPortal } from 'react-dom';
-import styles from './Reader.module.scss';
+import styles from './Reader.module.css';
 import { BG_COLORS, PAGE_COLORS, TEXT_COLORS } from '@/utils/readerOpts';
 import { ColorSwatch } from './ColorSwatch';
 

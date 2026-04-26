@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { TocBodyItem, TocData } from '@/types';
-import styles from './Reader.module.scss';
+import styles from './Reader.module.css';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 interface TocSidebarProps {

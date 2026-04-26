@@ -1,6 +1,6 @@
 import type { Note } from '@/types';
 import { createPortal } from 'react-dom';
-import styles from './Reader.module.scss';
+import styles from './Reader.module.css';
 import { X } from 'lucide-react';
 interface FootnoteModalProps {
   note: Note | null;

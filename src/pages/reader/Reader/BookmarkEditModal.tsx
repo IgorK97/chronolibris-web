@@ -4,7 +4,7 @@ import { formatDate } from '@/utils';
 import { Bookmark, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import styles from './Reader.module.scss';
+import styles from './Reader.module.css';
 
 interface BookmarkEditModalProps {
   bookmark: BookmarkDetails;

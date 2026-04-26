@@ -1,5 +1,5 @@
 import { createPortal } from 'react-dom';
-import styles from './Reader.module.scss';
+import styles from './Reader.module.css';
 
 interface ImageLightboxProps {
   src: string | null;

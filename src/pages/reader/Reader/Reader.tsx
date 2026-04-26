@@ -711,29 +711,23 @@ export const Reader: React.FC<ReaderProps> = ({
     );
   };
 
-  if (isTocError) {
+  if (isTocError && !fetchedTocData) {
     return (
       <div className={styles['loading']}>
         <p>
           Ошибка загрузки книги.{' '}
-          <button onClick={() => refetchToc()}>Попробовать снова</button>
+          <button
+            style={{ cursor: 'pointer', color: '#f55a42' }}
+            onClick={() => refetchToc()}
+          >
+            Попробовать снова
+          </button>
         </p>
       </div>
     );
   }
 
-  //   if (isChunkError) {
-  //   return (
-  //     <div className={styles['loading']}>
-  //       <p>
-  //         Ошибка загрузки книги.{' '}
-  //         <button onClick={() => refetchChunk()}>Попробовать снова</button>
-  //       </p>
-  //     </div>
-  //   );
-  // }
-
-  if (isLoading || !fetchedTocData || !segments || segments.length === 0) {
+  if (!fetchedTocData) {
     return (
       <div className={styles['loading']}>
         <Puff stroke="#f55a42" strokeOpacity={0.5} speed={0.75} />
@@ -886,59 +880,70 @@ export const Reader: React.FC<ReaderProps> = ({
           </div>
         </div>
       </div>
-      {isChunkError ? (
-        <div className={styles['loading']}>
-          <p>
-            Ошибка загрузки фрагмента книги.{' '}
-            <button onClick={() => refetchChunk()}>Попробовать снова</button>
-          </p>
-        </div>
-      ) : (
-        <div className={styles['reading-container']}>
+
+      <div className={styles['reading-container']}>
+        <div
+          className={
+            twoPageMode ? styles['reading-area-two'] : styles['reading-area']
+          }
+        >
           <div
-            className={
-              twoPageMode ? styles['reading-area-two'] : styles['reading-area']
-            }
+            className={styles['pad-top']}
+            style={{ background: pageColor }}
+          />
+
+          <div
+            className={[styles['pad-left'], styles['nav-pad']].join(' ')}
+            style={{ background: pageColor }}
+            onClick={prevCol}
+          />
+          <div
+            className={styles['book-viewport']}
+            ref={viewportRef}
+            style={{ background: pageColor }}
           >
             <div
-              className={styles['pad-top']}
-              style={{ background: pageColor }}
-            />
-
-            <div
-              className={[styles['pad-left'], styles['nav-pad']].join(' ')}
-              style={{ background: pageColor }}
-              onClick={prevCol}
-            />
-            <div
-              className={styles['book-viewport']}
-              ref={viewportRef}
-              style={{ background: pageColor }}
+              className={
+                twoPageMode
+                  ? styles['book-content-two']
+                  : styles['book-content']
+              }
+              ref={contentRef}
             >
-              <div
-                className={
-                  twoPageMode
-                    ? styles['book-content-two']
-                    : styles['book-content']
-                }
-                ref={contentRef}
-              >
-                {segments.map((seg, idx) => renderSegment(seg, idx))}
-              </div>
+              {isLoading ? (
+                <div className={styles['chunk-loader']}>
+                  <Puff stroke="#f55a42" size={40} />
+                  <p>Загрузка фрагмента...</p>
+                </div>
+              ) : isChunkError ? (
+                <div className={styles['chunk-error']}>
+                  <p>Не удалось загрузить эту часть текста.</p>
+                  <button
+                    onClick={() => refetchChunk()}
+                    className={styles['nav-button']}
+                  >
+                    Повторить загрузку
+                  </button>
+                </div>
+              ) : (
+                // Рендерим сегменты, если всё ок
+                segments?.map((seg, idx) => renderSegment(seg, idx))
+              )}
+              {/* {segments.map((seg, idx) => renderSegment(seg, idx))} */}
             </div>
-            <div
-              className={[styles['pad-right'], styles['nav-pad']].join(' ')}
-              style={{ background: pageColor }}
-              onClick={nextCol}
-            />
-
-            <div
-              className={styles['pad-bottom']}
-              style={{ background: pageColor }}
-            />
           </div>
+          <div
+            className={[styles['pad-right'], styles['nav-pad']].join(' ')}
+            style={{ background: pageColor }}
+            onClick={nextCol}
+          />
+
+          <div
+            className={styles['pad-bottom']}
+            style={{ background: pageColor }}
+          />
         </div>
-      )}
+      </div>
 
       <div
         className={styles['progress-bar']}

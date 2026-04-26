@@ -98,7 +98,8 @@ export const useBookToc = (bookFileId: number) => {
     },
     staleTime: Infinity,
     gcTime: 60 * 60 * 1000,
-    retry: 2,
+    retry: 1,
+    networkMode: 'always',
   });
 };
 
@@ -123,6 +124,8 @@ export const useBookChunk = (
     enabled: !!fetchedTocData && currentPartIndex < fetchedTocData.Parts.length,
     staleTime: Infinity,
     gcTime: 60 * 60 * 1000,
+    retry: 1,
+    networkMode: 'always',
   });
 };
 

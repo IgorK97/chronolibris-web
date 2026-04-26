@@ -2,7 +2,7 @@ import type { Bookmark as BookmarkDetails } from '@/types';
 import { Bookmark } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import styles from './Reader.module.scss';
+import styles from './Reader.module.css';
 
 interface ContextMenuProps {
   x: number;
