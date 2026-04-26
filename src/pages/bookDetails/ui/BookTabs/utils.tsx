@@ -11,7 +11,7 @@ export const renderFormattedText = (text: string) => {
     if (part.startsWith('~~') && part.endsWith('~~')) {
       return <del key={index}>{part.slice(2, -2)}</del>;
     }
-    if (part.startsWith('_') && part.endsWith('_')) {
+    if (part.startsWith('__') && part.endsWith('__')) {
       return <em key={index}>{part.slice(1, -1)}</em>;
     }
     if (part.startsWith('>!') && part.endsWith('!<')) {

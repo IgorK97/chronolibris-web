@@ -48,7 +48,8 @@ export const useCreateBookmark = (userName: string) => {
       // });
       const newBookmark: Bookmark = {
         bookFileId: variables.bookFileId,
-        paraIndex: variables.paraIndex,
+        context: variables.context,
+        xpointer: variables.xpointer,
         note: variables.noteText,
         id: bookmarkDataFromServer.id,
         createdAt: bookmarkDataFromServer.createdAt,

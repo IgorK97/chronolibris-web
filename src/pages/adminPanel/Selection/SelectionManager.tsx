@@ -408,6 +408,7 @@ const SelectionEditView: React.FC<SelectionEditViewProps> = ({
                   />
                   <button
                     className={`${styles['btn']} ${styles['btn-danger']}`}
+                    style={{ marginTop: 5 }}
                     onClick={() => handleRemoveBook(book.id)}
                     disabled={removeBookMutation.isPending}
                   >

@@ -94,7 +94,7 @@ export function SmartTextBox({
 
           <button
             className={`${styles['toolbar-btn']} ${styles['italic']}`}
-            onClick={() => insertControl('_')}
+            onClick={() => insertControl('__')}
             title="Курсив"
           >
             i

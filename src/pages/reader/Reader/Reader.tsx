@@ -57,6 +57,30 @@ import { ContextMenu } from './ContextMenu';
 import { ImageLightbox } from './ImageLightbox';
 import { BookmarkEditModal } from './BookmarkEditModal';
 
+// Берём первые слова из текста абзаца, не более 15 символов суммарно
+const extractContext = (seg: TextSegment): string => {
+  // Собираем plain text из seg.c (строка или массив InlineNode)
+  let raw = '';
+  if (typeof seg.c === 'string') {
+    raw = seg.c;
+  } else if (Array.isArray(seg.c)) {
+    raw = seg.c
+      .map((item) =>
+        typeof item === 'string' ? item : ((item as { c?: string }).c ?? '')
+      )
+      .join('');
+  }
+
+  const words = raw.trim().split(/\s+/);
+  let result = '';
+  for (const word of words) {
+    const next = result ? result + ' ' + word : word;
+    if (next.length > 30) break;
+    result = next;
+  }
+  return result;
+};
+
 interface ReaderProps {
   bookFileId: number;
   initialChunkIndex?: number;
@@ -128,7 +152,8 @@ export const Reader: React.FC<ReaderProps> = ({
   const [editingBookmark, setEditingBookmark] =
     useState<BookmarkDetails | null>(null);
   const [contextMenu, setContextMenu] = useState<{
-    paraIndex: number;
+    xpointer: string;
+    context: string;
     x: number;
     y: number;
   } | null>(null);
@@ -215,6 +240,39 @@ export const Reader: React.FC<ReaderProps> = ({
     window.addEventListener('beforeunload', handleUnload);
     return () => window.removeEventListener('beforeunload', handleUnload);
   }, [user, bookFileId, captureVisibleParaIndex]);
+
+  // Сравнение xpointer-массивов лексикографически:
+  //   compareXp([1,1,3], [1,1,5])  → -1 (меньше)
+  //   compareXp([1,1,5], [1,1,5])  →  0 (равно)
+  //   compareXp([1,1,6], [1,1,5])  →  1 (больше)
+  // Более короткий массив «меньше» при равном префиксе: [1,1] < [1,1,1]
+  const compareXp = (a: number[], b: number[]): number => {
+    const len = Math.max(a.length, b.length);
+    for (let i = 0; i < len; i++) {
+      const av = a[i] ?? -Infinity;
+      const bv = b[i] ?? -Infinity;
+      if (av !== bv) return av < bv ? -1 : 1;
+    }
+    return 0;
+  };
+
+  // "/1/3/1" → [1, 3, 1]
+  const parseXpointer = (xp: string): number[] =>
+    xp.split('/').filter(Boolean).map(Number);
+
+  // Индекс Part, в диапазон [xps..xpe] которого попадает xpointer закладки
+  const findPartByXpointer = useCallback(
+    (xpointer: string): number => {
+      if (!fetchedTocData) return -1;
+      const xp = parseXpointer(xpointer);
+      return fetchedTocData.Parts.findIndex(
+        (p) => compareXp(xp, p.xps) >= 0 && compareXp(xp, p.xpe) <= 0
+      );
+    },
+    [fetchedTocData]
+  );
+
+  const pendingBookmarkXpRef = useRef<string | null>(null);
 
   const pendingBookmarkParaRef = useRef<number | null>(null);
 
@@ -450,12 +508,13 @@ export const Reader: React.FC<ReaderProps> = ({
   }, [contextMenu]);
 
   const createBookmark = useCallback(
-    (paraIndex: number, note: string) => {
+    (xpointer: string, context: string, note: string) => {
       if (!bookFileId || !user) return;
 
       const request: CreateBookmarkRequest = {
         bookFileId: bookFileId,
-        paraIndex,
+        xpointer,
+        context,
         noteText: note.trim() || undefined,
       };
 
@@ -485,50 +544,94 @@ export const Reader: React.FC<ReaderProps> = ({
     [deleteBookmarkMutation]
   );
 
+  const scrollToXpInDOM = useCallback(
+    (xpointer: string): boolean => {
+      const el = contentRef.current?.querySelector(
+        `[data-xpointer="${CSS.escape(xpointer)}"]`
+      ) as HTMLElement | null;
+      if (!el || !viewportRef.current) return false;
+
+      const ctRect = contentRef.current!.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      const elLeft = elRect.left - ctRect.left + contentRef.current!.scrollLeft;
+      const colWidth = twoPageMode
+        ? (contentRef.current!.clientWidth - pageGap) / 2 + pageGap
+        : viewportRef.current.clientWidth;
+      const targetCol = Math.max(0, Math.floor(elLeft / colWidth));
+
+      if (targetCol !== currentCol) {
+        setCurrentCol(targetCol);
+        contentRef.current!.scrollTo({
+          left: targetCol * colWidth,
+          behavior: 'smooth',
+        });
+      }
+      return true;
+    },
+    [twoPageMode, currentCol]
+  );
+
   const navigateToBookmark = useCallback(
     (bm: BookmarkDetails) => {
-      if (!fetchedTocData) return;
-      const globalIdx = bm.paraIndex; //-1
-      const partIdx = fetchedTocData.Parts.findIndex(
-        (p) => globalIdx >= p.s && globalIdx <= p.e
-      );
+      if (!fetchedTocData || !bm.xpointer) return;
+      const partIdx = findPartByXpointer(bm.xpointer);
       if (partIdx === -1) return;
       setBookmarkPanelOpen(false);
 
-      const scrollToParaInDOM = (paraIdx: number) => {
-        const el = contentRef.current?.querySelector(
-          `[data-para-index="${paraIdx}"]`
-        ) as HTMLElement | null;
-        if (!el || !viewportRef.current) return false;
-
-        const ctRect = contentRef.current!.getBoundingClientRect();
-        const elRect = el.getBoundingClientRect();
-        const elLeft =
-          elRect.left - ctRect.left + contentRef.current!.scrollLeft;
-        const colWidth = twoPageMode
-          ? (contentRef.current!.clientWidth - pageGap) / 2 + pageGap
-          : viewportRef.current.clientWidth;
-        const targetCol = Math.max(0, Math.floor(elLeft / colWidth));
-
-        if (targetCol !== currentCol) {
-          setCurrentCol(targetCol);
-          contentRef.current!.scrollTo({
-            // left: targetCol * (contentRef.current!.clientWidth - pageGap),
-            left: targetCol * colWidth,
-            behavior: 'smooth',
-          });
-        }
-        return true;
-      };
       if (partIdx === currentPartIndex) {
-        setTimeout(() => scrollToParaInDOM(bm.paraIndex), 50);
+        setTimeout(() => scrollToXpInDOM(bm.xpointer), 50);
       } else {
-        pendingBookmarkParaRef.current = bm.paraIndex;
+        pendingBookmarkXpRef.current = bm.xpointer;
         setCurrentPartIndex(partIdx);
       }
     },
-    [fetchedTocData, currentPartIndex, currentCol, twoPageMode]
+    [fetchedTocData, findPartByXpointer, currentPartIndex, scrollToXpInDOM]
   );
+
+  // const navigateToBookmark = useCallback(
+  //   (bm: BookmarkDetails) => {
+  //     if (!fetchedTocData) return;
+  //     const globalIdx = bm.paraIndex; //-1
+  //     const partIdx = fetchedTocData.Parts.findIndex(
+  //       (p) => globalIdx >= p.s && globalIdx <= p.e
+  //     );
+  //     if (partIdx === -1) return;
+  //     setBookmarkPanelOpen(false);
+
+  //     const scrollToParaInDOM = (paraIdx: number) => {
+  //       const el = contentRef.current?.querySelector(
+  //         `[data-para-index="${paraIdx}"]`
+  //       ) as HTMLElement | null;
+  //       if (!el || !viewportRef.current) return false;
+
+  //       const ctRect = contentRef.current!.getBoundingClientRect();
+  //       const elRect = el.getBoundingClientRect();
+  //       const elLeft =
+  //         elRect.left - ctRect.left + contentRef.current!.scrollLeft;
+  //       const colWidth = twoPageMode
+  //         ? (contentRef.current!.clientWidth - pageGap) / 2 + pageGap
+  //         : viewportRef.current.clientWidth;
+  //       const targetCol = Math.max(0, Math.floor(elLeft / colWidth));
+
+  //       if (targetCol !== currentCol) {
+  //         setCurrentCol(targetCol);
+  //         contentRef.current!.scrollTo({
+  //           // left: targetCol * (contentRef.current!.clientWidth - pageGap),
+  //           left: targetCol * colWidth,
+  //           behavior: 'smooth',
+  //         });
+  //       }
+  //       return true;
+  //     };
+  //     if (partIdx === currentPartIndex) {
+  //       setTimeout(() => scrollToParaInDOM(bm.paraIndex), 50);
+  //     } else {
+  //       pendingBookmarkParaRef.current = bm.paraIndex;
+  //       setCurrentPartIndex(partIdx);
+  //     }
+  //   },
+  //   [fetchedTocData, currentPartIndex, currentCol, twoPageMode]
+  // );
 
   useEffect(() => {
     if (pendingBookmarkParaRef.current === null) return;
@@ -638,12 +741,13 @@ export const Reader: React.FC<ReaderProps> = ({
       );
     }
 
-    const paraIndex = seg.xp?.[2] ?? 0;
-    console.log(paraIndex, bookFileId);
-    console.log(bookmarks[0]);
+    // const paraIndex = seg.xp?.[2] ?? 0;
+    const segXpointer = seg.xp ? '/' + seg.xp.join('/') : '';
+    // console.log(paraIndex, bookFileId);
+    // console.log(bookmarks[0]);
     const paraBookmark =
-      bookmarks.find((bm) => {
-        return bm.paraIndex === paraIndex && bm.bookFileId === bookFileId;
+      (bookmarks || []).find((bm) => {
+        return bm.xpointer === segXpointer && bm.bookFileId === bookFileId;
       }) ?? null;
     // console.log(paraBookmark);
     const getContent = (): React.ReactNode => {
@@ -667,7 +771,12 @@ export const Reader: React.FC<ReaderProps> = ({
     const handleContextMenu = (e: React.MouseEvent) => {
       e.preventDefault();
       if (user?.role !== 'reader') return;
-      setContextMenu({ paraIndex, x: e.clientX, y: e.clientY });
+      setContextMenu({
+        xpointer: segXpointer,
+        x: e.clientX,
+        y: e.clientY,
+        context: extractContext(seg),
+      });
     };
 
     const bookmarkIcon = paraBookmark ? (
@@ -689,7 +798,8 @@ export const Reader: React.FC<ReaderProps> = ({
           key={index}
           className={styles['title']}
           style={textStyle}
-          data-para-index={String(paraIndex)}
+          // data-para-index={String(paraIndex)}
+          data-xpointer={segXpointer}
           onContextMenu={handleContextMenu}
         >
           {bookmarkIcon}
@@ -702,7 +812,8 @@ export const Reader: React.FC<ReaderProps> = ({
         key={index}
         className={`${styles['paragraph']} ${paraBookmark ? styles['paragraph-bookmarked'] : ''}`}
         style={textStyle}
-        data-para-index={String(paraIndex)}
+        // data-para-index={String(paraIndex)}
+        data-xpointer={segXpointer}
         onContextMenu={handleContextMenu}
       >
         {bookmarkIcon}
@@ -856,12 +967,9 @@ export const Reader: React.FC<ReaderProps> = ({
                 onClick={() => setBookmarkPanelOpen((v) => !v)}
                 className={`${styles['color-button']} ${bookmarkPanelOpen ? styles['nav-button-active'] : ''}`}
                 aria-label="Закладки"
-                title={`Закладки (${bookmarks.filter((b) => b.bookFileId === bookFileId).length})`}
+                title={`Закладки (${(bookmarks || []).filter((b) => b.bookFileId === bookFileId).length})`}
               >
                 <Bookmark color="red" />{' '}
-                {/* {bookmarks.filter((b) => b.bookFileId === bookFileId).length > 0
-                  ? bookmarks.filter((b) => b.bookFileId === bookFileId).length
-                  : ''} */}
               </button>
             )}
             <button
@@ -982,7 +1090,7 @@ export const Reader: React.FC<ReaderProps> = ({
       <BookmarkPanel
         open={bookmarkPanelOpen}
         onClose={() => setBookmarkPanelOpen(false)}
-        bookmarks={bookmarks.filter((b) => b.bookFileId === bookFileId)}
+        bookmarks={(bookmarks || []).filter((b) => b.bookFileId === bookFileId)}
         onEdit={setEditingBookmark}
         isLoading={bookmarksLoading}
         onDelete={(id: number) => deleteBookmark(id, bookFileId)}
@@ -992,15 +1100,17 @@ export const Reader: React.FC<ReaderProps> = ({
         <ContextMenu
           x={contextMenu.x}
           y={contextMenu.y}
-          paraIndex={contextMenu.paraIndex}
+          xpointer={contextMenu.xpointer}
           existingBookmark={
-            bookmarks.find(
+            (bookmarks || []).find(
               (b) =>
-                b.paraIndex === contextMenu.paraIndex &&
+                b.xpointer === contextMenu.xpointer &&
                 b.bookFileId === bookFileId
             ) ?? null
           }
-          onAddBookmark={(note) => createBookmark(contextMenu.paraIndex, note)}
+          onAddBookmark={(note) =>
+            createBookmark(contextMenu.xpointer, contextMenu.context, note)
+          }
           onEditBookmark={(bm) => {
             setEditingBookmark(bm);
             setContextMenu(null);

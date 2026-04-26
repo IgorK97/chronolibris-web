@@ -7,7 +7,7 @@ import styles from './Reader.module.css';
 interface ContextMenuProps {
   x: number;
   y: number;
-  paraIndex: number;
+  xpointer: string;
   existingBookmark: BookmarkDetails | null;
   onAddBookmark: (note: string) => void;
   onEditBookmark: (bm: BookmarkDetails) => void;

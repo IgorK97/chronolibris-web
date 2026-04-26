@@ -34,9 +34,13 @@ export const BookmarkEditModal: React.FC<BookmarkEditModalProps> = ({
           <span className={styles['bm-edit-title']}>
             <Bookmark color="red" /> Закладка
           </span>
-          <button className={styles['footnote-close']} onClick={onClose}>
+          <button style={{ cursor: 'pointer' }} onClick={onClose}>
             <X />
           </button>
+        </div>
+
+        <div className={styles['bm-edit-position']}>
+          {bookmark.context} {formatDate(bookmark.createdAt)}
         </div>
 
         <div className={styles['bm-edit-section']}>
@@ -49,10 +53,6 @@ export const BookmarkEditModal: React.FC<BookmarkEditModalProps> = ({
             rows={4}
             autoFocus
           />
-        </div>
-
-        <div className={styles['bm-edit-position']}>
-          Абзац №{bookmark.paraIndex} {formatDate(bookmark.createdAt)}
         </div>
 
         <div className={styles['bm-edit-actions']}>

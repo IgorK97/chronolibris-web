@@ -145,7 +145,12 @@ export function ReportModal({
                 <button
                   className={styles['submit-btn']}
                   onClick={handleSubmit}
-                  disabled={!reasonTypeId || isPending}
+                  disabled={
+                    !reasonTypeId ||
+                    !description ||
+                    description.length < 20 ||
+                    isPending
+                  }
                 >
                   {isPending ? 'Отправка...' : 'Отправить жалобу'}
                 </button>
