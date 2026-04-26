@@ -55,6 +55,7 @@ const DOCUMENT_TYPES = [
   { id: 20, name: 'Монография', nature: 'Analysis' },
   { id: 21, name: 'Научная статья', nature: 'Analysis' },
   { id: 22, name: 'Неизвестно', nature: 'Unknown' },
+  { id: 23, name: 'Комментарий', nature: 'Analysis' },
 ];
 
 interface SelectedPerson {
@@ -85,8 +86,8 @@ const emptyForm = (): FormState => ({
 
 const VALIDATION_RULES = {
   title: { min: 1, max: 500 },
-  description: { min: 100, max: 2000 },
-  year: { min: -5000, max: 3000 },
+  description: { min: 100, max: 5000 },
+  year: { min: -10000, max: 3000 },
 };
 
 function PersonFilter({

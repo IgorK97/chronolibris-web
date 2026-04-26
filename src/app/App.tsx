@@ -183,6 +183,7 @@ export default function App() {
 
             <Route path="contents" element={<ContentManagement />} />
             <Route path="/contents/new" element={<ContentUnit />} />
+            <Route path="/contents/:contentId" element={<ContentUnit />} />
             <Route path="/contents/:contentId/edit" element={<ContentUnit />} />
 
             {/* <Route path="books" element={<BookManagement />} /> */}
