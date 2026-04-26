@@ -30,7 +30,7 @@ const SelectionSection = ({
 }: {
   id: number;
   title: string;
-  userId: number;
+  // userId: number;
   onNavigateToBook: (book: BookListItem) => void;
   onNavigateToList: (id: number, title: string) => void;
   onFavoriteToggle?: (bookId: number, currentIsFavorite: boolean) => void;
@@ -68,8 +68,8 @@ export const Library = ({
   onNavigateToBook,
   onNavigateToList,
 }: LibraryProps) => {
-  const { user, setCurrentBook } = useStore();
-  const { data: shelves } = useShelves(user?.userId || 0);
+  const { user, setCurrentBook, isReader } = useStore();
+  const { data: shelves } = useShelves(user?.userName || '', isReader());
   const favoritesShelfId = shelves?.find((s) => s.shelfType === 1)?.id;
   // const queryClient = useQueryClient();
   const { mutateAsync: addBookToShelf } = useAddBookToShelf();
@@ -147,7 +147,7 @@ export const Library = ({
             <SelectionSection
               id={section.id}
               title={section.name}
-              userId={user?.userId ?? 0}
+              // userId={user? ?? 0}
               onNavigateToBook={navigateToBookHandler}
               onNavigateToList={onNavigateToList}
               onFavoriteToggle={handleFavoriteToggle}

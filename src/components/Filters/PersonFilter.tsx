@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useRef, useEffect } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
 import { usePersonSuggestions } from '@api/searchReference';
@@ -38,7 +39,6 @@ export const PersonFilter: React.FC<PersonFilterProps> = ({
   useEffect(() => {
     if (value.length === 0 && selected.some((p) => p.roleId !== null)) {
       //И как их избегать?
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelected([]);
     }
   }, [value]);
