@@ -133,7 +133,11 @@ export const Reader: React.FC<ReaderProps> = ({
     y: number;
   } | null>(null);
 
-  const { data: fetchedTocData } = useBookToc(bookFileId);
+  const {
+    data: fetchedTocData,
+    isError: isTocError,
+    refetch: refetchToc,
+  } = useBookToc(bookFileId);
 
   useEffect(() => {
     console.log('TOC DATA: ', fetchedTocData);
@@ -221,11 +225,12 @@ export const Reader: React.FC<ReaderProps> = ({
 
   const [twoPageMode, setTwoPageMode] = useState(false);
 
-  const { data: segments, isLoading } = useBookChunk(
-    bookFileId,
-    currentPartIndex,
-    fetchedTocData
-  );
+  const {
+    data: segments,
+    isLoading,
+    isError: isChunkError,
+    refetch: refetchChunk,
+  } = useBookChunk(bookFileId, currentPartIndex, fetchedTocData);
   // const queryClient = useQueryClient();
 
   const recalcCols = () => {
@@ -706,6 +711,28 @@ export const Reader: React.FC<ReaderProps> = ({
     );
   };
 
+  if (isTocError) {
+    return (
+      <div className={styles['loading']}>
+        <p>
+          Ошибка загрузки книги.{' '}
+          <button onClick={() => refetchToc()}>Попробовать снова</button>
+        </p>
+      </div>
+    );
+  }
+
+  //   if (isChunkError) {
+  //   return (
+  //     <div className={styles['loading']}>
+  //       <p>
+  //         Ошибка загрузки книги.{' '}
+  //         <button onClick={() => refetchChunk()}>Попробовать снова</button>
+  //       </p>
+  //     </div>
+  //   );
+  // }
+
   if (isLoading || !fetchedTocData || !segments || segments.length === 0) {
     return (
       <div className={styles['loading']}>
@@ -859,50 +886,59 @@ export const Reader: React.FC<ReaderProps> = ({
           </div>
         </div>
       </div>
-      <div className={styles['reading-container']}>
-        <div
-          className={
-            twoPageMode ? styles['reading-area-two'] : styles['reading-area']
-          }
-        >
+      {isChunkError ? (
+        <div className={styles['loading']}>
+          <p>
+            Ошибка загрузки фрагмента книги.{' '}
+            <button onClick={() => refetchChunk()}>Попробовать снова</button>
+          </p>
+        </div>
+      ) : (
+        <div className={styles['reading-container']}>
           <div
-            className={styles['pad-top']}
-            style={{ background: pageColor }}
-          />
-
-          <div
-            className={[styles['pad-left'], styles['nav-pad']].join(' ')}
-            style={{ background: pageColor }}
-            onClick={prevCol}
-          />
-          <div
-            className={styles['book-viewport']}
-            ref={viewportRef}
-            style={{ background: pageColor }}
+            className={
+              twoPageMode ? styles['reading-area-two'] : styles['reading-area']
+            }
           >
             <div
-              className={
-                twoPageMode
-                  ? styles['book-content-two']
-                  : styles['book-content']
-              }
-              ref={contentRef}
-            >
-              {segments.map((seg, idx) => renderSegment(seg, idx))}
-            </div>
-          </div>
-          <div
-            className={[styles['pad-right'], styles['nav-pad']].join(' ')}
-            style={{ background: pageColor }}
-            onClick={nextCol}
-          />
+              className={styles['pad-top']}
+              style={{ background: pageColor }}
+            />
 
-          <div
-            className={styles['pad-bottom']}
-            style={{ background: pageColor }}
-          />
+            <div
+              className={[styles['pad-left'], styles['nav-pad']].join(' ')}
+              style={{ background: pageColor }}
+              onClick={prevCol}
+            />
+            <div
+              className={styles['book-viewport']}
+              ref={viewportRef}
+              style={{ background: pageColor }}
+            >
+              <div
+                className={
+                  twoPageMode
+                    ? styles['book-content-two']
+                    : styles['book-content']
+                }
+                ref={contentRef}
+              >
+                {segments.map((seg, idx) => renderSegment(seg, idx))}
+              </div>
+            </div>
+            <div
+              className={[styles['pad-right'], styles['nav-pad']].join(' ')}
+              style={{ background: pageColor }}
+              onClick={nextCol}
+            />
+
+            <div
+              className={styles['pad-bottom']}
+              style={{ background: pageColor }}
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       <div
         className={styles['progress-bar']}
