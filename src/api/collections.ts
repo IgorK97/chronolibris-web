@@ -85,23 +85,11 @@ export const collectionsApi = {
     apiClient.get<number[]>(`/Shelves/books/${bookId}`),
 };
 
-export const useAddBookToShelf = () => {
-  return useMutation({
-    mutationFn: ({ shelfId, bookId }: { shelfId: number; bookId: number }) =>
-      collectionsApi.addBookToShelf(shelfId, bookId),
-    onSuccess: (_, { bookId }) => {
-      queryClient.invalidateQueries({ queryKey: ['shelves', bookId] });
-    },
-  });
-};
-
-export const useRemoveBookFromShelf = () => {
-  return useMutation({
-    mutationFn: ({ shelfId, bookId }: { shelfId: number; bookId: number }) =>
-      collectionsApi.removeBookFromShelf(shelfId, bookId),
-    onSuccess: (_, { bookId }) => {
-      queryClient.invalidateQueries({ queryKey: ['shelves', bookId] });
-    },
+export const useShelves = (userLogin: string, reader: boolean) => {
+  return useQuery({
+    queryKey: ['shelves', userLogin],
+    queryFn: () => collectionsApi.getUserShelves(),
+    enabled: !!userLogin && reader,
   });
 };
 
@@ -110,6 +98,30 @@ export const useCreateShelf = () => {
     mutationFn: (name: string) => collectionsApi.createShelf(name),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['shelves'] });
+      queryClient.invalidateQueries({ queryKey: ['books', 'shelves'] });
+    },
+  });
+};
+
+export const useUpdateShelf = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, name }: { id: number; name: string }) =>
+      collectionsApi.updateShelf(id, name),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['shelves'] });
+      queryClient.invalidateQueries({ queryKey: ['books', 'shelves'] });
+    },
+  });
+};
+
+export const useDeleteShelf = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => collectionsApi.deleteShelf(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['shelves'] });
+      queryClient.invalidateQueries({ queryKey: ['books', 'shelves'] });
     },
   });
 };
@@ -119,7 +131,7 @@ export const useInfiniteShelfBooks = (
   shelfId: number | undefined
 ) =>
   useInfiniteQuery({
-    queryKey: ['books', 'shelf', shelfId, userLogin],
+    queryKey: ['books', 'shelves', shelfId],
     queryFn: ({ pageParam }) =>
       collectionsApi.getShelfBooks(shelfId!, pageParam, 10),
     initialPageParam: null as number | null,
@@ -127,6 +139,45 @@ export const useInfiniteShelfBooks = (
       lastPage.hasNext ? lastPage.lastId : undefined,
     enabled: !!userLogin && !!shelfId,
   });
+
+export const useSeekedShelves = (bookId: number, userLogin: string) => {
+  return useQuery({
+    queryKey: ['books', 'shelves', bookId],
+    queryFn: () => collectionsApi.seekBookInShelf(bookId),
+    enabled: !!userLogin && !!bookId,
+  });
+};
+
+export const useAddBookToShelf = () => {
+  return useMutation({
+    mutationFn: ({ shelfId, bookId }: { shelfId: number; bookId: number }) =>
+      collectionsApi.addBookToShelf(shelfId, bookId),
+    onSuccess: (_, { bookId, shelfId }) => {
+      queryClient.invalidateQueries({ queryKey: ['books', 'shelves', bookId] });
+      queryClient.invalidateQueries({ queryKey: ['books', bookId] });
+      queryClient.invalidateQueries({
+        queryKey: ['books', 'shelves', shelfId],
+      });
+    },
+  });
+};
+
+export const useRemoveBookFromShelf = () => {
+  return useMutation({
+    mutationFn: ({ shelfId, bookId }: { shelfId: number; bookId: number }) =>
+      collectionsApi.removeBookFromShelf(shelfId, bookId),
+    onSuccess: (_, { shelfId, bookId }) => {
+      queryClient.invalidateQueries({
+        queryKey: ['books', 'shelves', shelfId],
+      });
+      queryClient.invalidateQueries({ queryKey: ['books', bookId] });
+
+      queryClient.invalidateQueries({
+        queryKey: ['books', 'shelves', bookId],
+      });
+    },
+  });
+};
 
 export const useInfiniteSelectionBooks = (
   userId: number,
@@ -141,43 +192,6 @@ export const useInfiniteSelectionBooks = (
       lastPage.hasNext ? lastPage.lastId : undefined, //Нет ли здесь ошибки?
     enabled: !!userId && !!selectionId,
   });
-
-export const useUpdateShelf = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ id, name }: { id: number; name: string }) =>
-      collectionsApi.updateShelf(id, name),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['shelves'] });
-    },
-  });
-};
-
-export const useDeleteShelf = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (id: number) => collectionsApi.deleteShelf(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['shelves'] });
-    },
-  });
-};
-
-export const useSeekedShelves = (bookId: number) => {
-  return useQuery({
-    queryKey: ['shelves', bookId],
-    queryFn: () => collectionsApi.seekBookInShelf(bookId),
-    enabled: !!bookId,
-  });
-};
-
-export const useShelves = (userLogin: string, reader: boolean) => {
-  return useQuery({
-    queryKey: ['shelves', userLogin],
-    queryFn: () => collectionsApi.getUserShelves(),
-    enabled: !!userLogin && reader,
-  });
-};
 
 export const useSelectionsInfinite = (
   limit: number = 20,

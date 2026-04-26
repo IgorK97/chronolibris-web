@@ -24,7 +24,10 @@ export const ShelfSelectionModal = ({ bookId, onClose, onRefresh }: Props) => {
     user?.userName || '',
     isReader()
   );
-  const { data: seekedShelves } = useSeekedShelves(bookId);
+  const { data: seekedShelves } = useSeekedShelves(
+    bookId,
+    user?.userName || ''
+  );
   const [isCreating, setIsCreating] = useState(false);
 
   const { mutateAsync: createShelf } = useCreateShelf();
