@@ -14,15 +14,17 @@ describe('BookmarkPanel', () => {
   const mockBookmarks = [
     {
       id: 101,
-      paraIndex: 5,
+      xpointer: '5',
+      context: '',
       note: 'Заметка',
       createdAt: '2024-05-01',
       bookFileId: 1,
     },
     {
       id: 102,
-      paraIndex: 20,
+      xpointer: '20',
       note: '',
+      context: '',
       createdAt: '2024-05-02',
       bookFileId: 1,
     },

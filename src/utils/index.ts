@@ -43,9 +43,9 @@ export const getImageUrl = (path: string | null | undefined) => {
 };
 
 export function formatDate(iso: string): string {
-  console.log('DATE: ', iso);
+  // console.log('DATE: ', iso);
   if (iso === undefined) {
-    console.log('UNDEFINED');
+    // console.log('UNDEFINED');
     return '';
   }
 

@@ -57,15 +57,6 @@ export function SmartCommentItem({
     comment.repliesCount > 0
   );
 
-  // } = useInfiniteQuery({
-  //   queryKey: ['comments', 'replies', comment.id],
-  //   queryFn: ({ pageParam }) => commentsApi.getReplies(comment.id, pageParam),
-  //   initialPageParam: undefined as number | undefined,
-  //   getNextPageParam: (lastPage) =>
-  //     lastPage.length > 0 ? lastPage[lastPage.length - 1].id : undefined,
-  //   enabled: showMore,
-  //   staleTime: 0,
-  // });
   const allReplies = infiniteReplies?.pages.flat() || [];
 
   useEffect(() => {
@@ -77,13 +68,6 @@ export function SmartCommentItem({
       setRepliesCount(allReplies.length);
     }
   }, [allReplies.length, hasNextPage]);
-
-  // const repliesQueryKey = ['comments', 'replies', comment.id];
-
-  // const deleteMutation = useMutation({
-  //   mutationFn: () => commentsApi.delete(comment.id),
-  //   onSuccess: () => qc.invalidateQueries({ queryKey: ['comments', bookId] }),
-  // });
 
   const handleHideReplies = () => {
     setShowMore(false);
@@ -118,7 +102,7 @@ export function SmartCommentItem({
   const { mutateAsync: deleteComment } = useDeleteComment();
   const handleVote = async (type: 'like' | 'dislike') => {
     if (!isAuth) return;
-    console.log('VOTE');
+    // console.log('VOTE');
 
     const score = type === 'like' ? 1 : -1;
 
@@ -224,7 +208,7 @@ export function SmartCommentItem({
               count={votes.likes}
               active={votes.userVote === 'like'}
               onClick={() => {
-                console.log(!!comment.deletedAt);
+                // console.log(!!comment.deletedAt);
                 handleVote('like');
               }}
             />

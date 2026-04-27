@@ -54,11 +54,6 @@ function PersonFilter({
 }) {
   const { filterNamesCache, cachePersons } = useStore();
   const [input, setInput] = useState('');
-  // const [selected, setSelected] = useState<SelectedPerson[]>(() =>
-  //   value.flatMap((pf) =>
-  //     pf.personIds.map((id) => ({ id, name: `#${id}`, roleId: pf.roleId }))
-  //   )
-  // );
 
   const [showDropDown, setShowDropDown] = useState(false);
   const debouncedInput = useDebounce(input, 300);
@@ -78,13 +73,6 @@ function PersonFilter({
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
-
-  // useEffect(() => {
-  //   if (value.length === 0) {
-  //     // eslint-disable-next-line react-hooks/set-state-in-effect
-  //     setSelected([]);
-  //   }
-  // }, [value]);
 
   useEffect(() => {
     if (suggestions.length > 0) {
@@ -257,13 +245,6 @@ function TagFilter({
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  // useEffect(() => {
-  //   if (requiredTagIds.length === 0 && excludedTagIds.length === 0) {
-  //     // eslint-disable-next-line react-hooks/set-state-in-effect
-  //     setSelected([]);
-  //   }
-  // }, [requiredTagIds, excludedTagIds]);
-
   useEffect(() => {
     if (suggestions.length > 0) {
       cacheTags(
@@ -387,11 +368,6 @@ function TagFilter({
                 onMouseDown={() => handleSelect(s)}
               >
                 <span>{s.name}</span>
-                {/* {s.matchedName && (
-                  <span className={styles['synonym-hint']}>
-                    через «{s.matchedName}»
-                  </span>
-                )} */}
               </li>
             ))}
           </ul>

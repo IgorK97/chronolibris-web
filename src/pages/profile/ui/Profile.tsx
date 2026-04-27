@@ -140,10 +140,10 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
 
   const handleSaveProfile = async (e?: FormEvent) => {
     e?.preventDefault();
-    console.log(profileChanged);
+    // console.log(profileChanged);
 
     if (!user || !profileChanged || !validateProfile(profileForm)) return;
-    console.log('I AM HERE~~~');
+    // console.log('I AM HERE~~~');
     try {
       setProfileSuccess(false);
       const updatedProfile = await usersApi.updateProfile({

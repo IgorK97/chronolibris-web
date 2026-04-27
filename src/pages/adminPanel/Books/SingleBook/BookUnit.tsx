@@ -62,7 +62,7 @@ function PersonFilter({
   initialPersons?: SelectedPerson[];
   readOnly?: boolean;
 }) {
-  console.log('ITEM_TYPE: ', itemType);
+  // console.log('ITEM_TYPE: ', itemType);
   const [input, setInput] = useState('');
   const [selected, setSelected] = useState<SelectedPerson[]>(() => {
     if (initialPersons && initialPersons.length > 0)
@@ -157,7 +157,7 @@ function PersonFilter({
                 </option>
                 {roles
                   .filter((pr) => {
-                    console.log(pr.kind);
+                    // console.log(pr.kind);
                     if (itemType === 'book')
                       return pr.kind === 2 || pr.kind === 3;
                     if (itemType === 'content')
@@ -461,7 +461,7 @@ export const BookUnit: React.FC = () => {
     error,
   } = useBookDetails(id ?? 0, user?.userName ?? '', true, !!id);
   const { data: contents, refetch: refetchContents } = useBookContents(id);
-  console.log(contents);
+  // console.log(contents);
   const unlinkMutation = useUnlinkBookFromContent();
   const linkMutation = useLinkBookToContent();
   const createMutation = useCreateBook();
@@ -565,7 +565,7 @@ export const BookUnit: React.FC = () => {
 
   useEffect(() => {
     if (book) {
-      console.log('BOOK_PARTS: ', book.participants);
+      // console.log('BOOK_PARTS: ', book.participants);
       setForm({
         title: book.title ?? '',
         description: book.description ?? '',

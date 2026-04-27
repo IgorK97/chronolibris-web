@@ -189,18 +189,6 @@ export const useContentTags = (contentId: number | null) => {
   });
 };
 
-// export const useSearchTags = (
-//   searchTerm: string,
-//   tagTypeId?: number | null
-// ) => {
-//   return useQuery({
-//     queryKey: ['searchTags', searchTerm, tagTypeId],
-//     queryFn: () => contentsApi.searchTags(searchTerm, tagTypeId, 5),
-//     enabled: searchTerm.length >= 2,
-//     staleTime: 1 * 60 * 1000,
-//   });
-// };
-
 export const useAddTagToContent = () => {
   const queryClient = useQueryClient();
   return useMutation({

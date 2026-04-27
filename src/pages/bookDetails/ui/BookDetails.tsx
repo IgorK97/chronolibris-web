@@ -143,14 +143,6 @@ export const BookDetailsComponent = ({
   // const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const { mutateAsync: download, isPending: isDownloading } =
     useDownloadBookFile();
-  // const handleMouseLeave = () => {
-  //   if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
-
-  //   closeTimerRef.current = setTimeout(() => {
-  //     setIsRatingPopupOpen(false);
-  //     setHoverRating(0);
-  //   }, 300);
-  // };
   useEffect(() => {
     return () => {
       if (closeTimerRef.current) {

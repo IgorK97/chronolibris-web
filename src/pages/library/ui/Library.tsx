@@ -74,20 +74,6 @@ export const Library = ({
   // const queryClient = useQueryClient();
   const { mutateAsync: addBookToShelf } = useAddBookToShelf();
   const { mutateAsync: removeBookFromShelf } = useRemoveBookFromShelf();
-  // const favoriteMutation = useMutation({
-  //   mutationFn: ({ bookId, add }: { bookId: number; add: boolean }) => {
-  //     if (!favoritesShelfId)
-  //       return Promise.reject('Не указана полка избранного');
-  //     return add
-  //       ? await addBookToShelf({ shelfId: favoritesShelfId, bookId })
-  //       : await removeBookFromShelf({ shelfId: favoritesShelfId, bookId });
-  //   },
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries({ queryKey: ['selection'] });
-  //     queryClient.invalidateQueries({ queryKey: ['books'] });
-  //     // queryClient.invalidateQueries({ queryKey: ['shelfBooks'] });
-  //   },
-  // });
 
   const handleFavoriteToggle = async (
     bookId: number,

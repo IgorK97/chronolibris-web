@@ -57,9 +57,8 @@ import { ContextMenu } from './ContextMenu';
 import { ImageLightbox } from './ImageLightbox';
 import { BookmarkEditModal } from './BookmarkEditModal';
 
-// Берём первые слова из текста абзаца, не более 15 символов суммарно
+// первые слова из текста абзаца
 const extractContext = (seg: TextSegment): string => {
-  // Собираем plain text из seg.c (строка или массив InlineNode)
   let raw = '';
   if (typeof seg.c === 'string') {
     raw = seg.c;
@@ -132,7 +131,7 @@ export const Reader: React.FC<ReaderProps> = ({
     user?.userName ?? null
   );
   const progressLoaded = useRef(false);
-  console.log(bookmarks);
+  // console.log(bookmarks);
   const savedPercentRef = useRef<number>(0);
 
   const createBookmarkMutation = useCreateBookmark(user?.userName ?? '');
@@ -164,9 +163,9 @@ export const Reader: React.FC<ReaderProps> = ({
     refetch: refetchToc,
   } = useBookToc(bookFileId);
 
-  useEffect(() => {
-    console.log('TOC DATA: ', fetchedTocData);
-  }, [fetchedTocData]);
+  // useEffect(() => {
+  //   console.log('TOC DATA: ', fetchedTocData);
+  // }, [fetchedTocData]);
 
   // Находит индекс первого параграфа, который полностью виден в текущей вьюпорте
   const captureVisibleParaIndex = useCallback(() => {
@@ -204,7 +203,7 @@ export const Reader: React.FC<ReaderProps> = ({
       return 0;
     const part = fetchedTocData.Parts[currentPartIndex];
     if (!part) return 0;
-    console.log('TOC_END');
+    // console.log('TOC_END');
     const colRatio = totalCols > 1 ? currentCol / (totalCols - 1) : 1;
     const globalPos = part.s + (part.e - part.s) * colRatio;
     return Math.min(100, (globalPos / fetchedTocData.Body[0].e) * 100);
@@ -242,9 +241,9 @@ export const Reader: React.FC<ReaderProps> = ({
   }, [user, bookFileId, captureVisibleParaIndex]);
 
   // Сравнение xpointer-массивов лексикографически:
-  //   compareXp([1,1,3], [1,1,5])  → -1 (меньше)
-  //   compareXp([1,1,5], [1,1,5])  →  0 (равно)
-  //   compareXp([1,1,6], [1,1,5])  →  1 (больше)
+  //   compareXp([1,1,3], [1,1,5]) значит -1 (меньше)
+  //   compareXp([1,1,5], [1,1,5])  -  0 (равно)
+  //   compareXp([1,1,6], [1,1,5])  -  1 (больше)
   // Более короткий массив «меньше» при равном префиксе: [1,1] < [1,1,1]
   const compareXp = (a: number[], b: number[]): number => {
     const len = Math.max(a.length, b.length);
@@ -256,7 +255,7 @@ export const Reader: React.FC<ReaderProps> = ({
     return 0;
   };
 
-  // "/1/3/1" → [1, 3, 1]
+  // "/1/3/1" - [1, 3, 1]
   const parseXpointer = (xp: string): number[] =>
     xp.split('/').filter(Boolean).map(Number);
 
@@ -299,17 +298,17 @@ export const Reader: React.FC<ReaderProps> = ({
     const pageWidth = twoPageMode
       ? (ct.clientWidth - pageGap) / 2 + pageGap
       : vp.clientWidth;
-    console.log(
-      twoPageMode,
-      ' ',
-      ct.clientWidth,
-      ' ',
-      (ct.clientWidth - pageGap) / 2
-    );
-    console.log('PageSize: ', pageWidth);
+    // console.log(
+    //   twoPageMode,
+    //   ' ',
+    //   ct.clientWidth,
+    //   ' ',
+    //   (ct.clientWidth - pageGap) / 2
+    // );
+    // console.log('PageSize: ', pageWidth);
     const cols = Math.ceil(ct.scrollWidth / pageWidth);
     const newTotal = Math.max(1, cols);
-    console.log(newTotal);
+    // console.log(newTotal);
     setTotalCols(newTotal);
 
     if (restoreByElementRef.current && visibleParaIndexRef.current !== null) {
@@ -378,11 +377,6 @@ export const Reader: React.FC<ReaderProps> = ({
     const nextIdx = currentPartIndex + 1;
     if (nextIdx >= fetchedTocData.Parts.length) return;
     prefetchBookChunk(bookFileId, nextIdx, fetchedTocData);
-    // queryClient.prefetchQuery({
-    //   queryKey: ['chunk', bookFileId, nextIdx],
-    //   queryFn: () =>
-    //     booksApi.fetchChunk(bookFileId, fetchedTocData.Parts[nextIdx].url),
-    // });
   }, [
     bookFileId,
     currentCol,

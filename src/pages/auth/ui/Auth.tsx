@@ -125,7 +125,7 @@ export const Auth = ({ onNavigate }: AuthProps) => {
       e.email = 'Некорректный формат почты';
       ok = false;
     }
-    console.log(regForm.phone);
+    // console.log(regForm.phone);
     // const phoneNumber = parsePhoneNumber(regForm.phone, 'RU');
     if (!VALIDATION_RULES.phone.test(`+7` + regForm.phone)) {
       e.phone = 'Некорректный формат телефона';
@@ -173,7 +173,7 @@ export const Auth = ({ onNavigate }: AuthProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setServerError(null);
-    console.log('I AM TUTA');
+    // console.log('I AM TUTA');
     const valid = isRegister ? validateRegister() : validateLogin();
     if (!valid) return;
     // const phoneNumber = parsePhoneNumber(regForm.phone, 'RU');

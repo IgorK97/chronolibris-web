@@ -37,20 +37,6 @@ export const ContentList: React.FC<ContentListProps> = ({
 
   const observerRef = useRef<HTMLDivElement | null>(null);
 
-  // useEffect(() => {
-  //   if (isStatic) return;
-  //   const observer = new IntersectionObserver(
-  //     (entries) => {
-  //       if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-  //         fetchNextPage();
-  //       }
-  //     },
-  //     { threshold: 0.5 }
-  //   );
-  //   if (observerRef.current) observer.observe(observerRef.current);
-  //   return () => observer.disconnect();
-  // }, [hasNextPage, isFetchingNextPage, fetchNextPage, isStatic]);
-
   useEffect(() => {
     if (isStatic) return;
 
@@ -102,7 +88,15 @@ export const ContentList: React.FC<ContentListProps> = ({
                 {content.title}
               </td>
               <td>{content.authors.join(', ')}</td>
-              <td>{content.year ?? '-'}</td>
+              <td>
+                {content.yearFrom
+                  ? content.yearTo
+                    ? `${content.yearFrom}-${content.yearTo}`
+                    : content.yearFrom
+                  : content.yearTo
+                    ? content.yearTo
+                    : '-'}
+              </td>
               {additionalColumns.map((col, idx) => (
                 <td key={idx}>{col.render(content)}</td>
               ))}

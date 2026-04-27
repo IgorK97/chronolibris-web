@@ -14,7 +14,7 @@ interface BookmarkPanelProps {
   onNavigate: (bm: BookmarkDetails) => void;
 }
 
-// "/1/3/7" → [1, 3, 7]  (для сортировки)
+// из "/1/3/7" в [1, 3, 7]  (для сортировки)
 const parseXpointer = (xp: string): number[] =>
   xp.split('/').filter(Boolean).map(Number);
 
@@ -89,7 +89,6 @@ export const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
                       onClick={() => onNavigate(bm)}
                       title="Перейти к закладке"
                     >
-                      {/* Если есть context — показываем его, иначе xpointer */}
                       {bm.context ? `«${bm.context}»` : bm.xpointer}
                     </div>
                     {bm.note && (

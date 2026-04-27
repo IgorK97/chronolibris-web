@@ -108,7 +108,7 @@ function PersonFilter({
   initialPersons?: SelectedPerson[];
   readOnly?: boolean;
 }) {
-  console.log('VALUE: ', value);
+  // console.log('VALUE: ', value);
   const [input, setInput] = useState('');
   const [selected, setSelected] = useState<SelectedPerson[]>(() => {
     if (initialPersons && initialPersons.length > 0) return initialPersons;
@@ -200,7 +200,7 @@ function PersonFilter({
                 </option>
                 {roles
                   .filter((pr) => {
-                    console.log(pr.kind);
+                    // console.log(pr.kind);
                     if (itemType === 'book')
                       return pr.kind === 2 || pr.kind === 3;
                     if (itemType === 'content')
@@ -347,7 +347,7 @@ export const ContentUnit: React.FC = () => {
 
   useEffect(() => {
     if (content) {
-      console.log('CONTENT', content.participants);
+      // console.log('CONTENT', content.participants);
       setForm({
         title: content.title ?? '',
         description: content.description ?? '',

@@ -19,13 +19,6 @@ export function CommentsSection({ bookId }: { bookId: number }) {
   const { user } = useStore();
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useGetCommentsByBook(bookId);
-  // useInfiniteQuery({
-  //   queryKey: ['comments', bookId],
-  //   queryFn: ({ pageParam }) => commentsApi.getByBookId(bookId, pageParam),
-  //   initialPageParam: undefined as number | undefined,
-  //   getNextPageParam: (lastPage) =>
-  //     lastPage.length > 0 ? lastPage[lastPage.length - 1].id : undefined,
-  // });
 
   const allComments = data?.pages.flat() || [];
   const { mutateAsync: createComment } = useCreateComment();
