@@ -588,51 +588,6 @@ export const Reader: React.FC<ReaderProps> = ({
     [fetchedTocData, findPartByXpointer, currentPartIndex, scrollToXpInDOM]
   );
 
-  // const navigateToBookmark = useCallback(
-  //   (bm: BookmarkDetails) => {
-  //     if (!fetchedTocData) return;
-  //     const globalIdx = bm.paraIndex; //-1
-  //     const partIdx = fetchedTocData.Parts.findIndex(
-  //       (p) => globalIdx >= p.s && globalIdx <= p.e
-  //     );
-  //     if (partIdx === -1) return;
-  //     setBookmarkPanelOpen(false);
-
-  //     const scrollToParaInDOM = (paraIdx: number) => {
-  //       const el = contentRef.current?.querySelector(
-  //         `[data-para-index="${paraIdx}"]`
-  //       ) as HTMLElement | null;
-  //       if (!el || !viewportRef.current) return false;
-
-  //       const ctRect = contentRef.current!.getBoundingClientRect();
-  //       const elRect = el.getBoundingClientRect();
-  //       const elLeft =
-  //         elRect.left - ctRect.left + contentRef.current!.scrollLeft;
-  //       const colWidth = twoPageMode
-  //         ? (contentRef.current!.clientWidth - pageGap) / 2 + pageGap
-  //         : viewportRef.current.clientWidth;
-  //       const targetCol = Math.max(0, Math.floor(elLeft / colWidth));
-
-  //       if (targetCol !== currentCol) {
-  //         setCurrentCol(targetCol);
-  //         contentRef.current!.scrollTo({
-  //           // left: targetCol * (contentRef.current!.clientWidth - pageGap),
-  //           left: targetCol * colWidth,
-  //           behavior: 'smooth',
-  //         });
-  //       }
-  //       return true;
-  //     };
-  //     if (partIdx === currentPartIndex) {
-  //       setTimeout(() => scrollToParaInDOM(bm.paraIndex), 50);
-  //     } else {
-  //       pendingBookmarkParaRef.current = bm.paraIndex;
-  //       setCurrentPartIndex(partIdx);
-  //     }
-  //   },
-  //   [fetchedTocData, currentPartIndex, currentCol, twoPageMode]
-  // );
-
   useEffect(() => {
     if (pendingBookmarkParaRef.current === null) return;
     if (isLoading || totalCols === 0) return;
@@ -885,7 +840,7 @@ export const Reader: React.FC<ReaderProps> = ({
           <div className={styles['controls']}>
             {onBack && (
               <button
-                className={styles['back-btn']}
+                className={styles['nav-button']}
                 onClick={() => window.history.back()}
               >
                 <ChevronLeft size={20} />
@@ -894,7 +849,7 @@ export const Reader: React.FC<ReaderProps> = ({
             )}
             {fetchedTocData && (
               <button
-                className={styles['toolbar-btn']}
+                className={styles['nav-button']}
                 onClick={() => setTocOpen(true)}
               >
                 <TableOfContents size={20} />
