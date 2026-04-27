@@ -34,6 +34,7 @@ import { BookFileManagement } from './BookFileManagement';
 import { ErrorMsg } from '@/components';
 import { AlertDialog } from '@/components/dialogs/AlertDialog';
 import { useLinkBookToContent, useUnlinkBookFromContent } from '@/api/contents';
+import { createPortal } from 'react-dom';
 
 interface SelectedPerson {
   id: number;
@@ -1170,13 +1171,15 @@ export const BookUnit: React.FC = () => {
         </div>
       )}
 
-      {showContentSearch && (
-        <ContentSearchPopup
-          onClose={() => setShowContentSearch(false)}
-          onSelectContent={handleAddContent}
-          currentBookId={id!}
-        />
-      )}
+      {showContentSearch &&
+        createPortal(
+          <ContentSearchPopup
+            onClose={() => setShowContentSearch(false)}
+            onSelectContent={handleAddContent}
+            currentBookId={id!}
+          />,
+          document.body
+        )}
     </div>
   );
 };

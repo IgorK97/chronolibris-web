@@ -15,7 +15,8 @@ export interface ContentDto {
   contentType?: string | null;
   languageId: number;
   languageName?: string | null;
-  year?: number | null;
+  yearFrom?: number | null;
+  yearTo?: number | null;
   parentContentId?: number | null;
   position?: number | null;
   createdAt: string;
@@ -47,7 +48,8 @@ export interface CreateContentRequest {
   countryId: number;
   contentTypeId: number;
   languageId: number;
-  year?: number | null;
+  yearFrom?: number | null;
+  yearTo?: number | null;
   parentContentId?: number | null;
   position?: number | null;
   personIds?: number[];
@@ -61,7 +63,8 @@ export interface UpdateContentRequest {
   countryId: number;
   contentTypeId: number;
   languageId: number;
-  year?: number | null;
+  yearFrom?: number | null;
+  yearTo?: number | null;
   yearProvided: boolean;
   parentContentId?: number | null;
   position?: number | null;

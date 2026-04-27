@@ -71,7 +71,8 @@ interface FormState {
   contentTypeId: number;
   languageId: number;
   countryId: number;
-  year: string;
+  yearFrom: string;
+  yearTo: string;
   personFilters: PersonRoleFilterRequest[];
 }
 
@@ -81,14 +82,15 @@ const emptyForm = (): FormState => ({
   contentTypeId: 0,
   languageId: 0,
   countryId: 0,
-  year: '',
+  yearFrom: '',
+  yearTo: '',
   personFilters: [],
 });
 
 const VALIDATION_RULES = {
-  title: { min: 1, max: 500 },
-  description: { min: 100, max: 5000 },
-  year: { min: -10000, max: 3000 },
+  title: /^[\p{L}\d\p{P}\s№§]{1,500}$/u,
+  description: /^[^]{120,5000}$/u,
+  year: { min: -10000, max: new Date().getFullYear() + 1 },
 };
 
 function PersonFilter({
@@ -285,25 +287,33 @@ export const ContentUnit: React.FC = () => {
   const validate = useCallback((data: FormState) => {
     const newErrors: Record<string, string> = {};
 
-    if (!data.title.trim() || data.title.length > VALIDATION_RULES.title.max) {
-      newErrors.title = `Не более ${VALIDATION_RULES.title.max} символов`;
+    if (!VALIDATION_RULES.title.test(data.title)) {
+      newErrors.title = `Не более 500 символов, буквы, цифры, пунктуация, пробелы, символы №§`;
     }
 
-    if (
-      data.description.length < VALIDATION_RULES.description.min ||
-      data.description.length > VALIDATION_RULES.description.max
-    ) {
-      newErrors.description = `От ${VALIDATION_RULES.description.min} до ${VALIDATION_RULES.description.max} символов`;
+    if (!VALIDATION_RULES.description.test(data.description)) {
+      newErrors.description = `Не более 5000 символов и не менее 120`;
     }
 
-    if (data.year) {
-      const y = parseInt(data.year, 10);
+    if (data.yearFrom) {
+      const y = parseInt(data.yearFrom, 10);
       if (
         isNaN(y) ||
         y < VALIDATION_RULES.year.min ||
         y > VALIDATION_RULES.year.max
       ) {
-        newErrors.year = `Год от ${VALIDATION_RULES.year.min} до ${VALIDATION_RULES.year.max}`;
+        newErrors.yearFrom = `Год от ${VALIDATION_RULES.year.min} до ${VALIDATION_RULES.year.max}`;
+      }
+    }
+
+    if (data.yearTo) {
+      const y = parseInt(data.yearTo, 10);
+      if (
+        isNaN(y) ||
+        y < VALIDATION_RULES.year.min ||
+        y > VALIDATION_RULES.year.max
+      ) {
+        newErrors.yearTo = `Год от ${VALIDATION_RULES.year.min} до ${VALIDATION_RULES.year.max}`;
       }
     }
 
@@ -344,7 +354,8 @@ export const ContentUnit: React.FC = () => {
         contentTypeId: content.contentTypeId ?? 0,
         languageId: content.languageId ?? 0,
         countryId: content.countryId ?? 0,
-        year: content.year != null ? String(content.year) : '',
+        yearFrom: content.yearFrom != null ? String(content.yearFrom) : '',
+        yearTo: content.yearTo != null ? String(content.yearTo) : '',
         personFilters: (content.participants ?? []).map(
           (pf: PersonRoleFilter) => ({
             roleId: pf.roleId,
@@ -382,7 +393,9 @@ export const ContentUnit: React.FC = () => {
     return (
       form.title !== (content.title ?? '') ||
       form.description !== (content.description ?? '') ||
-      form.year !== (content.year != null ? String(content.year) : '') ||
+      form.yearFrom !==
+        (content.yearFrom != null ? String(content.yearFrom) : '') ||
+      form.yearTo !== (content.yearTo != null ? String(content.yearTo) : '') ||
       form.languageId !== (content.languageId ?? null) ||
       form.countryId !== (content.countryId ?? null) ||
       form.contentTypeId !== (content.contentTypeId ?? null) ||
@@ -417,7 +430,8 @@ export const ContentUnit: React.FC = () => {
       contentTypeId: form.contentTypeId || null,
       languageId: form.languageId || null,
       countryId: form.countryId || null,
-      year: form.year ? parseInt(form.year) : null,
+      yearFrom: form.yearFrom ? parseInt(form.yearFrom) : null,
+      yearTo: form.yearTo ? parseInt(form.yearTo) : null,
       themeIds: selectedThemes.map((t) => t.id),
       personFilters: clearPersonFilters,
     };
@@ -446,7 +460,8 @@ export const ContentUnit: React.FC = () => {
           contentTypeId: content.contentTypeId ?? 0,
           languageId: content.languageId ?? 0,
           countryId: content.countryId ?? 0,
-          year: content.year != null ? String(content.year) : '',
+          yearFrom: content.yearFrom != null ? String(content.yearFrom) : '',
+          yearTo: content.yearTo != null ? String(content.yearTo) : '',
           personFilters: (content.participants ?? []).map((group: any) => ({
             roleId: group.role,
             personIds: (group.persons ?? []).map((p: any) => p.id),
@@ -559,15 +574,27 @@ export const ContentUnit: React.FC = () => {
               </div>
 
               <div className={styles['field-group']}>
-                <label className={styles['field-label']}>Год</label>
+                <label className={styles['field-label']}>Год от</label>
                 <input
                   className={styles['field-input']}
                   type="number"
-                  value={form.year}
-                  onChange={(e) => set('year', e.target.value)}
-                  placeholder="Год"
+                  value={form.yearFrom}
+                  onChange={(e) => set('yearFrom', e.target.value)}
+                  placeholder="Год от"
                 />
-                <ErrorMsg text={errors.year} />
+                <ErrorMsg text={errors.yearFrom} />
+              </div>
+
+              <div className={styles['field-group']}>
+                <label className={styles['field-label']}>Год до</label>
+                <input
+                  className={styles['field-input']}
+                  type="number"
+                  value={form.yearTo}
+                  onChange={(e) => set('yearTo', e.target.value)}
+                  placeholder="Год до"
+                />
+                <ErrorMsg text={errors.yearTo} />
               </div>
 
               <div className={styles['field-group']}>
@@ -659,10 +686,20 @@ export const ContentUnit: React.FC = () => {
                 />
               </div>
               <div className={styles['field-group']}>
-                <label className={styles['field-label']}>Год</label>
+                <label className={styles['field-label']}>Год от</label>
                 <input
                   className={styles['field-input']}
-                  value={form.year}
+                  value={form.yearFrom}
+                  readOnly
+                  placeholder="Год"
+                />
+              </div>
+
+              <div className={styles['field-group']}>
+                <label className={styles['field-label']}>Год до</label>
+                <input
+                  className={styles['field-input']}
+                  value={form.yearTo}
                   readOnly
                   placeholder="Год"
                 />
