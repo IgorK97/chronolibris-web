@@ -26,6 +26,7 @@ interface Props {
 
 interface SelectedPerson {
   id: number;
+  uid: string;
   name: string;
   roleId: number | null;
 }
@@ -39,6 +40,7 @@ function buildSelectedPersons(
       id,
       name: cache[id]?.name ?? `#${id}`,
       roleId: pf.roleId,
+      uid: `${id}-${pf.roleId}`,
     }))
   );
 }
@@ -100,26 +102,41 @@ function PersonFilter({
   };
 
   const handleSelect = (person: PersonSuggestionDto) => {
-    if (selected.some((p) => p.id === person.id)) {
+    if (selected.some((p) => p.id === person.id && p.roleId === null)) {
       setInput('');
       setShowDropDown(false);
       return;
     }
-
-    cachePersons([{ id: person.id, name: person.name }]);
-
+    if (!selected.some((p) => p.id === person.id)) {
+      cachePersons([{ id: person.id, name: person.name }]);
+    }
     emitChange([
       ...selected,
-      { id: person.id, name: person.name, roleId: null },
+      {
+        id: person.id,
+        name: person.name,
+        roleId: null,
+        uid: `${person.id}-null`,
+      },
     ]);
     setInput('');
     setShowDropDown(false);
   };
-  const handleRoleChange = (personId: number, roleId: number) => {
-    emitChange(selected.map((p) => (p.id === personId ? { ...p, roleId } : p)));
+  const handleRoleChange = (uid: string, personId: number, roleId: number) => {
+    // emitChange(selected.map((p) => (p.id === personId ? { ...p, roleId } : p)));
+    const duplicate = selected.find(
+      (p) => p.id === personId && p.roleId === roleId
+    );
+    if (duplicate) {
+      return;
+    }
+    emitChange(selected.map((p) => (p.uid === uid ? { ...p, roleId } : p)));
   };
-  const handleRemove = (personId: number) => {
-    emitChange(selected.filter((p) => p.id !== personId));
+  // const handleRemove = (personId: number) => {
+  //   emitChange(selected.filter((p) => p.id !== personId));
+  // };
+  const handleRemove = (uid: string) => {
+    emitChange(selected.filter((p) => p.uid !== uid));
   };
 
   return (
@@ -128,12 +145,14 @@ function PersonFilter({
       {selected.length > 0 && (
         <div className={styles['person-list']}>
           {selected.map((p) => (
-            <div key={p.id} className={styles['person-row']}>
+            <div key={p.uid} className={styles['person-row']}>
               <span className={styles['person-name']}>{p.name}</span>
               <select
                 className={styles['role-select']}
                 value={p.roleId ?? ''}
-                onChange={(e) => handleRoleChange(p.id, Number(e.target.value))}
+                onChange={(e) =>
+                  handleRoleChange(p.uid, p.id, Number(e.target.value))
+                }
               >
                 <option value="" disabled>
                   Выберите роль
@@ -146,7 +165,7 @@ function PersonFilter({
               </select>
               <button
                 className={styles['remove-btn']}
-                onClick={() => handleRemove(p.id)}
+                onClick={() => handleRemove(p.uid)}
                 aria-label="Удалить"
               >
                 <X style={{ cursor: 'pointer' }} />
