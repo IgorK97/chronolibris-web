@@ -87,9 +87,9 @@ function PersonFilter({
   useEffect(() => {
     if (initialPersons && initialPersons.length > 0) {
       setSelected(
-        initialPersons.filter(
-          (p) => roles.find((r) => r.id == p.roleId)?.kind == 2
-        )
+        initialPersons
+          .filter((p) => roles.find((r) => r.id == p.roleId)?.kind == 2)
+          .map((p) => ({ ...p, uid: `${p.id}-${p.roleId}` }))
       );
     }
   }, [initialPersons]);

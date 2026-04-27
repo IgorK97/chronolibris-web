@@ -60,6 +60,7 @@ const DOCUMENT_TYPES = [
 ];
 
 interface SelectedPerson {
+  uid: string;
   id: number;
   name: string;
   roleId: number | null;
@@ -111,12 +112,14 @@ function PersonFilter({
   // console.log('VALUE: ', value);
   const [input, setInput] = useState('');
   const [selected, setSelected] = useState<SelectedPerson[]>(() => {
-    if (initialPersons && initialPersons.length > 0) return initialPersons;
+    if (initialPersons && initialPersons.length > 0)
+      return initialPersons.map((p) => ({ ...p, uid: `${p.id}-${p.roleId}` }));
     return value.flatMap((pf) =>
       (pf.personIds ?? []).map((id) => ({
         id,
         name: `#${id}`,
         roleId: pf.roleId,
+        uid: `${id}-${pf.roleId}`,
       }))
     );
   });
@@ -127,7 +130,9 @@ function PersonFilter({
 
   useEffect(() => {
     if (initialPersons && initialPersons.length > 0) {
-      setSelected(initialPersons);
+      setSelected(
+        initialPersons.map((p) => ({ ...p, uid: `${p.id}-${p.roleId}` }))
+      );
     }
   }, [initialPersons]);
 
@@ -157,25 +162,38 @@ function PersonFilter({
   };
 
   const handleSelect = (person: PersonSuggestionDto) => {
-    if (selected.some((p) => p.id === person.id)) {
+    if (selected.some((p) => p.id === person.id && p.roleId === null)) {
       setInput('');
       setShowDropDown(false);
       return;
     }
     emitChange([
       ...selected,
-      { id: person.id, name: person.name, roleId: null },
+      {
+        id: person.id,
+        name: person.name,
+        roleId: null,
+        uid: `${person.id}-null`,
+      },
     ]);
     setInput('');
     setShowDropDown(false);
   };
 
-  const handleRoleChange = (personId: number, roleId: number) => {
-    emitChange(selected.map((p) => (p.id === personId ? { ...p, roleId } : p)));
+  const handleRoleChange = (uid: string, personId: number, roleId: number) => {
+    const duplicate = selected.find(
+      (p) => p.id === personId && p.roleId === roleId
+    );
+    if (duplicate) {
+      return;
+    }
+    emitChange(selected.map((p) => (p.uid === uid ? { ...p, roleId } : p)));
+
+    // emitChange(selected.map((p) => (p.id === personId ? { ...p, roleId } : p)));
   };
 
-  const handleRemove = (personId: number) => {
-    emitChange(selected.filter((p) => p.id !== personId));
+  const handleRemove = (uid: string) => {
+    emitChange(selected.filter((p) => p.uid !== uid));
   };
 
   return (
@@ -185,13 +203,14 @@ function PersonFilter({
       {selected.length > 0 && (
         <div className={styles['person-list']}>
           {selected.map((p) => (
-            <div key={p.id} className={styles['person-row']}>
+            <div key={p.uid} className={styles['person-row']}>
               <span className={styles['person-name']}>{p.name}</span>
               <select
                 className={styles['role-select']}
                 value={p.roleId ?? ''}
                 onChange={(e) =>
-                  !readOnly && handleRoleChange(p.id, Number(e.target.value))
+                  !readOnly &&
+                  handleRoleChange(p.uid, p.id, Number(e.target.value))
                 }
                 disabled={readOnly}
               >
@@ -217,7 +236,7 @@ function PersonFilter({
                 <button
                   type="button"
                   className={styles['remove-btn']}
-                  onClick={() => handleRemove(p.id)}
+                  onClick={() => handleRemove(p.uid)}
                   aria-label="Удалить"
                 >
                   <X style={{ cursor: 'pointer' }} />
@@ -374,6 +393,7 @@ export const ContentUnit: React.FC = () => {
                 ? group.personNames[index]
                 : '',
             roleId: group.roleId,
+            uid: `${p}-${group.roleId}`,
           }))
       );
       setInitialPersons(persons);
