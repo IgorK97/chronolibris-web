@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Puff } from 'react-loading-icons';
 import React, {
@@ -217,10 +218,6 @@ export const Reader: React.FC<ReaderProps> = ({
   }, [readPercent]);
 
   useEffect(() => {
-    setTimeout(() => scrollToXpInDOM(xpointer), 50);
-  }, [xpointer]);
-
-  useEffect(() => {
     if (!user) return;
 
     const handleUnload = () => {
@@ -280,6 +277,7 @@ export const Reader: React.FC<ReaderProps> = ({
   );
 
   const pendingBookmarkXpRef = useRef<string | null>(null);
+  const pendingXpointerRef = useRef<string | null>(null);
 
   const pendingBookmarkParaRef = useRef<number | null>(null);
 
@@ -372,6 +370,32 @@ export const Reader: React.FC<ReaderProps> = ({
     window.addEventListener('resize', recalcCols);
     return () => window.removeEventListener('resize', recalcCols);
   }, []);
+
+  useEffect(() => {
+    if (isLoading || totalCols === 0) return;
+    if (pendingBookmarkXpRef.current === null) return;
+    const xp = pendingBookmarkXpRef.current;
+    pendingBookmarkXpRef.current = null;
+    setTimeout(() => scrollToXpInDOM(xp), 100);
+  }, [isLoading, totalCols, segments]);
+
+  // useEffect(() => {
+  //   if (pendingXpointerRef.current !== null) {
+  //     pendingBookmarkXpRef.current = xpointer;
+  //     pendingXpointerRef.current = null;
+  //     setTimeout(() => scrollToXpInDOM(xpointer), 100);
+  //   }
+  //   // scrollToXpInDOM(xpointer);
+  // }, [segments]);
+
+  // useEffect(() => {
+  //   if (pendingXpointerRef.current !== null) {
+  //     pendingBookmarkXpRef.current = xpointer;
+  //     pendingXpointerRef.current = null;
+  //     setTimeout(() => scrollToXpInDOM(xpointer), 100);
+  //   }
+  //   // scrollToXpInDOM(xpointer);
+  // }, [xpointer]);
 
   //Подзагрузка следующего фрагмента
   useEffect(() => {
@@ -820,26 +844,30 @@ export const Reader: React.FC<ReaderProps> = ({
         currentPartIndex={currentPartIndex}
         onSelectPart={(idx, xps) => {
           const xp = stringifyXpointer(xps ?? []);
-          if (idx === currentPartIndex) {
-            if (xp) {
-              pendingBookmarkXpRef.current = xp;
-              setXpointer(xp);
-              // setTimeout(() => scrollToXpInDOM(xp), 50);
-            }
-          } else {
-            console.log(xp);
-            if (xp) {
-              pendingBookmarkXpRef.current = xp;
-              setXpointer(xp);
-
-              // setTimeout(() => scrollToXpInDOM(xp), 50); //потом если бцдет время
-              //перепишу через useeffect и логику состояний, пока так
-            } else {
-              pendingColRef.current = 0;
-            }
-          }
-          setCurrentPartIndex(idx);
           setTocOpen(false);
+
+          if (idx === currentPartIndex) {
+            // Тот же фрагмент — сразу скроллим
+            if (xp) setTimeout(() => scrollToXpInDOM(xp), 50);
+          } else {
+            // Другой фрагмент — ставим pending и меняем фрагмент
+            if (xp) {
+              pendingBookmarkXpRef.current = xp;
+            } else {
+              pendingColRef.current = 0; // без xp — просто на начало
+            }
+            setCurrentPartIndex(idx);
+          }
+
+          // const xp = stringifyXpointer(xps ?? []);
+          // if (idx === currentPartIndex) {
+          //   if (xp) {
+          //     pendingBookmarkXpRef.current = xp;
+          //     setTimeout(() => scrollToXpInDOM(xp), 50);
+          //   }
+          // } else pendingColRef.current = 0;
+          // setCurrentPartIndex(idx);
+          // setTocOpen(false);
         }}
       />
 
