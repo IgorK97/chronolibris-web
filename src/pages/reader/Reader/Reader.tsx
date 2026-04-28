@@ -120,6 +120,7 @@ export const Reader: React.FC<ReaderProps> = ({
 
   const [activeNote, setActiveNote] = useState<Note | null>(null);
   const [activeImage, setActiveImage] = useState<string | null>(null);
+  const [xpointer, setXpointer] = useState('');
 
   const [currentCol, setCurrentCol] = useState(0);
   const [totalCols, setTotalCols] = useState(0);
@@ -214,6 +215,10 @@ export const Reader: React.FC<ReaderProps> = ({
   useEffect(() => {
     readPercentRef.current = readPercent;
   }, [readPercent]);
+
+  useEffect(() => {
+    setTimeout(() => scrollToXpInDOM(xpointer), 50);
+  }, [xpointer]);
 
   useEffect(() => {
     if (!user) return;
@@ -818,13 +823,16 @@ export const Reader: React.FC<ReaderProps> = ({
           if (idx === currentPartIndex) {
             if (xp) {
               pendingBookmarkXpRef.current = xp;
-              setTimeout(() => scrollToXpInDOM(xp), 50);
+              setXpointer(xp);
+              // setTimeout(() => scrollToXpInDOM(xp), 50);
             }
           } else {
             console.log(xp);
             if (xp) {
               pendingBookmarkXpRef.current = xp;
-              setTimeout(() => scrollToXpInDOM(xp), 100); //потом если бцдет время
+              setXpointer(xp);
+
+              // setTimeout(() => scrollToXpInDOM(xp), 50); //потом если бцдет время
               //перепишу через useeffect и логику состояний, пока так
             } else {
               pendingColRef.current = 0;
