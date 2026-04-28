@@ -42,6 +42,7 @@ export interface TocBodyItem {
   e: number;
   t: string;
   c?: TocBodyItem[];
+  xps?: number[];
 }
 
 export interface TocMeta {

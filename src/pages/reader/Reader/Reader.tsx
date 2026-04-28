@@ -259,6 +259,9 @@ export const Reader: React.FC<ReaderProps> = ({
   const parseXpointer = (xp: string): number[] =>
     xp.split('/').filter(Boolean).map(Number);
 
+  const stringifyXpointer = (path: number[]): string =>
+    path.length > 0 ? `/${path.join('/')}` : '/';
+
   // Индекс Part, в диапазон [xps..xpe] которого попадает xpointer закладки
   const findPartByXpointer = useCallback(
     (xpointer: string): number => {
@@ -810,8 +813,23 @@ export const Reader: React.FC<ReaderProps> = ({
         onClose={() => setTocOpen(false)}
         tocData={fetchedTocData}
         currentPartIndex={currentPartIndex}
-        onSelectPart={(idx) => {
-          pendingColRef.current = 0;
+        onSelectPart={(idx, xps) => {
+          const xp = stringifyXpointer(xps ?? []);
+          if (idx === currentPartIndex) {
+            if (xp) {
+              pendingBookmarkXpRef.current = xp;
+              setTimeout(() => scrollToXpInDOM(xp), 50);
+            }
+          } else {
+            console.log(xp);
+            if (xp) {
+              pendingBookmarkXpRef.current = xp;
+              setTimeout(() => scrollToXpInDOM(xp), 100); //потом если бцдет время
+              //перепишу через useeffect и логику состояний, пока так
+            } else {
+              pendingColRef.current = 0;
+            }
+          }
           setCurrentPartIndex(idx);
           setTocOpen(false);
         }}

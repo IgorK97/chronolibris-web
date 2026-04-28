@@ -8,7 +8,7 @@ interface TocSidebarProps {
   onClose: () => void;
   tocData: TocData | null;
   currentPartIndex: number;
-  onSelectPart: (idx: number) => void;
+  onSelectPart: (idx: number, xpointer?: number[]) => void;
 }
 
 export const TocSidebar: React.FC<TocSidebarProps> = ({
@@ -25,7 +25,6 @@ export const TocSidebar: React.FC<TocSidebarProps> = ({
     depth = 0
   ): React.ReactNode => {
     return items.map((item, i) => {
-      // Нормализуем получение вложенных элементов (поддержка 'c' и 'C')
       const children = item.c || (item as any).C;
 
       const partIdx = tocData.Parts.findIndex(
@@ -39,14 +38,13 @@ export const TocSidebar: React.FC<TocSidebarProps> = ({
           <button
             className={`${styles['toc-item']} ${isActive ? styles['toc-item-active'] : ''}`}
             style={{
-              paddingLeft: `${16 + depth * 12}px`, // Уменьшил шаг отступа для компактности
+              paddingLeft: `${16 + depth * 12}px`,
               fontSize: depth === 0 ? '1rem' : '0.9rem',
               fontWeight: depth === 0 ? '600' : '400',
             }}
             onClick={() => {
               if (partIdx !== -1) {
-                onSelectPart(partIdx);
-                // Можно добавить onClose(), если нужно закрывать меню при клике
+                onSelectPart(partIdx, item.xps);
               }
             }}
           >
