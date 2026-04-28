@@ -69,7 +69,7 @@ export const prefetchBookChunk = (
         // Если URL нет, отклонить промис с ошибкой
         return Promise.reject(new Error('URL не доступен для следующей части'));
       }
-      booksApi.fetchChunk(bookFileId, fetchedTocData.Parts[nextIdx].url);
+      return booksApi.fetchChunk(bookFileId, fetchedTocData.Parts[nextIdx].url);
     },
     staleTime: Infinity, //повторный запрос к серверу,
     //если данные есть в кэшэ, делаться не будет никогда

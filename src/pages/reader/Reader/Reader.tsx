@@ -376,6 +376,7 @@ export const Reader: React.FC<ReaderProps> = ({
 
     const nextIdx = currentPartIndex + 1;
     if (nextIdx >= fetchedTocData.Parts.length) return;
+    // console.log(fetchedTocData);
     prefetchBookChunk(bookFileId, nextIdx, fetchedTocData);
   }, [
     bookFileId,
