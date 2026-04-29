@@ -37,7 +37,7 @@ const SelectionSection = ({
 }) => {
   const { data, isLoading } = useSelectionBooksDefault(id);
 
-  const displayBooks = (data?.items ?? []).slice(0, 6);
+  const displayBooks = (data?.items ?? []).slice(0, 5);
 
   if (isLoading && !data) {
     return <div className={styles['loading-wrapper']}>Загрузка {title}…</div>;
