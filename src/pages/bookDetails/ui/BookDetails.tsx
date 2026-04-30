@@ -431,7 +431,7 @@ export const BookDetailsComponent = ({
             )}
           </div>
 
-          <div className={styles['book-meta']}>
+          <div style={{ maxWidth: '60%' }} className={styles['book-meta']}>
             <div className={styles['short-info-container']}>
               <h1 className={styles['title']}>{fullBookDetails.title}</h1>
               <p className={styles['author']}>{authors}</p>
@@ -483,7 +483,10 @@ export const BookDetailsComponent = ({
 
             <section className={styles['genres-section']}>
               <h2 className={styles['section-title']}>{t('book.themes')}</h2>
-              <div className={styles['genres-container']}>
+              <div
+                style={{ maxWidth: '100%', display: 'flex', flexWrap: 'wrap' }}
+                className={styles['genres-container']}
+              >
                 {fullBookDetails.themes?.map((theme, index) => (
                   <GenreChip
                     key={index}
@@ -499,9 +502,15 @@ export const BookDetailsComponent = ({
               </div>
             </section>
 
-            <section className={styles['genres-section']}>
+            <section
+              style={{ maxWidth: '100%' }}
+              className={styles['genres-section']}
+            >
               <h2 className={styles['section-title']}>Теги</h2>
-              <div className={styles['genres-container']}>
+              <div
+                style={{ maxWidth: '100%', display: 'flex', flexWrap: 'wrap' }}
+                className={styles['genres-container']}
+              >
                 {fullBookDetails.tags?.map((tag, index) => (
                   <TagChip
                     key={index}

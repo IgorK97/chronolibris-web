@@ -69,16 +69,26 @@ function PersonFilter({
   const [selected, setSelected] = useState<SelectedPerson[]>(() => {
     if (initialPersons && initialPersons.length > 0)
       return initialPersons
-        .filter((p) => roles.find((r) => r.id == p.roleId)?.kind == 2)
+        .filter((p) => {
+          const role = roles.find((r) => r.id == p.roleId);
+          if (!role) return false;
+          if (itemType === 'book')
+            return Number(role.kind) === 2 || Number(role.kind) === 3;
+          if (itemType === 'content')
+            return Number(role.kind) === 1 || Number(role.kind) === 3;
+          return true;
+        })
         .map((p) => ({ ...p, uid: `${p.id}-${p.roleId}` }));
-    return value.flatMap((pf) =>
-      pf.personIds.map((id) => ({
-        id,
-        name: `#${id}`,
-        roleId: pf.roleId,
-        uid: `${id}-${pf.roleId}`,
-      }))
-    );
+    else if (value && value.length > 0)
+      return value.flatMap((pf) =>
+        pf.personIds.map((id) => ({
+          id,
+          name: `#${id}`,
+          roleId: pf.roleId,
+          uid: `${id}-${pf.roleId}`,
+        }))
+      );
+    else return [];
   });
   const [showDropDown, setShowDropDown] = useState(false);
   const debouncedInput = useDebounce(input, 300);
@@ -86,14 +96,39 @@ function PersonFilter({
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (initialPersons && initialPersons.length > 0) {
-      setSelected(
-        initialPersons
-          .filter((p) => roles.find((r) => r.id == p.roleId)?.kind == 2)
-          .map((p) => ({ ...p, uid: `${p.id}-${p.roleId}` }))
-      );
+    console.log('USEEFFECT - INITIAL PERSONS', initialPersons);
+    console.log('USEEFFECT - ROLES', roles);
+
+    if (initialPersons && initialPersons.length > 0 && roles.length > 0) {
+      // setSelected(
+      //   initialPersons
+      //     .filter((p) => roles.find((r) => r.id == p.roleId)?.kind == 2)
+      //     .map((p) => ({ ...p, uid: `${p.id}-${p.roleId}` }))
+      // );
+
+      const filtered = initialPersons
+        .filter((p) => {
+          const role = roles.find((r) => r.id == p.roleId);
+          if (!role) return false;
+          console.log(
+            'FILTERING PERSON',
+            p.name,
+            'WITH ROLE',
+            role.name,
+            'AND KIND',
+            role.kind
+          );
+          if (itemType === 'book')
+            return Number(role.kind) === 2 || Number(role.kind) === 3;
+          if (itemType === 'content')
+            return Number(role.kind) === 1 || Number(role.kind) === 3;
+          return true;
+        })
+        .map((p) => ({ ...p, uid: `${p.id}-${p.roleId}` }));
+      console.log('USEEFFECT - FILTERED PERSONS', filtered);
+      setSelected(filtered);
     }
-  }, [initialPersons]);
+  }, [initialPersons, roles, itemType]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -152,7 +187,7 @@ function PersonFilter({
   const handleRemove = (uid: string) => {
     emitChange(selected.filter((p) => p.uid !== uid));
   };
-
+  console.log('PERSON FILTER - RENDER', selected.length);
   return (
     <div className={styles['field-group']}>
       <label className={styles['field-label']}>Персоналии</label>

@@ -91,7 +91,9 @@ export const ContentList: React.FC<ContentListProps> = ({
               <td>
                 {content.yearFrom
                   ? content.yearTo
-                    ? `${content.yearFrom}-${content.yearTo}`
+                    ? content.yearTo == content.yearFrom
+                      ? `${content.yearFrom}`
+                      : `${content.yearFrom}-${content.yearTo}`
                     : content.yearFrom
                   : content.yearTo
                     ? content.yearTo

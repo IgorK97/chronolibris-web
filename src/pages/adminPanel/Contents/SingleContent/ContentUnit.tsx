@@ -459,6 +459,8 @@ export const ContentUnit: React.FC = () => {
     try {
       if (isNew) {
         const newId = await createMutation.mutateAsync(requestData as any);
+        setMode('view');
+        setForm(emptyForm());
         navigate(`/contents/${newId}`);
       } else {
         await patchMutation.mutateAsync({ id: id!, ...requestData } as any);
