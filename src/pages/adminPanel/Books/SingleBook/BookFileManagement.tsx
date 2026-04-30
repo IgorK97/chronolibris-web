@@ -69,9 +69,9 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
       );
       return;
     }
-    const MAX_SIZE = 100 * 1024 * 1024;
+    const MAX_SIZE = 50 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
-      alert('Размер файла не должен превышать 100 MB');
+      alert('Размер файла не должен превышать 50 MB');
       return;
     }
 
@@ -91,7 +91,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
 
       refetch();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Ошибка загрузки файла');
+      // alert(err.response?.data?.message || 'Ошибка загрузки файла');
     }
   };
 
@@ -203,16 +203,20 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
             className={styles['file-input']}
             disabled={selectedFormat < 1}
           />
-          <span className={styles['hint']}>Макс. 100 MB</span>
+          <span className={styles['hint']}>Макс. 50 MB</span>
         </div>
 
-        <button
-          onClick={handleUpload}
-          disabled={uploadMutation.isPending || selectedFormat <= 0}
-          className={`${styles['btn']}`}
-        >
-          {uploadMutation.isPending ? 'Загрузка...' : 'Загрузить'}
-        </button>
+        <div>
+          <button
+            onClick={handleUpload}
+            style={{ marginRight: '10px' }}
+            disabled={uploadMutation.isPending || selectedFormat <= 0}
+            className={`${styles['btn']}`}
+          >
+            {uploadMutation.isPending ? 'Загрузка...' : 'Загрузить'}
+          </button>
+          {uploadMutation.isPending && <Circles fill="#d32f2f" />}
+        </div>
       </div>
       <AlertDialog
         description={`Это действие нельзя будет отменить, все сопутствующие фрагменты и данные будут также удалены`}
