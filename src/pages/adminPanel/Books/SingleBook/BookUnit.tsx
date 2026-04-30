@@ -1018,10 +1018,12 @@ export const BookUnit: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                <div className={styles['image-placeholder']}>
-                  <span className={styles['image-placeholder-title']}>
-                    {book?.title}
-                  </span>
+                <div className={styles['cover-placeholder']}>
+                  <div className={styles['image-placeholder']}>
+                    <span className={styles['image-placeholder-title']}>
+                      {book?.title}
+                    </span>
+                  </div>
                 </div>
               )}
 
