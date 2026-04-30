@@ -126,6 +126,7 @@ export interface UpdateBookRequest {
   publisherId?: number | null;
   publisherIdProvided: boolean;
   personFilters?: PersonRoleFilter[];
+  deleteCoverCommand: boolean;
 }
 
 export interface BookDetails {

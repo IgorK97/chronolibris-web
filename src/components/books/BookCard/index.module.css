@@ -141,7 +141,8 @@
   display: -webkit-box;
   -webkit-line-clamp: 2; /* до 2 строк максимум */
   -webkit-box-orient: vertical;
-  word-break: break-all;
+  text-wrap: balance;
+  text-align: left;
 }
 
 .menu-container {

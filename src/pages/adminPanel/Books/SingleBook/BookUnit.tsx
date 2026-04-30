@@ -357,14 +357,17 @@ const validateRealFileType = async (file: File): Promise<boolean> => {
 function CoverUpload({
   currentCoverPath,
   onFileChange,
+  onDeleteCover,
 }: {
   currentCoverPath?: string | null;
   onFileChange: (file: File | null) => void;
+  onDeleteCover: () => void;
 }) {
   const [preview, setPreview] = useState(storageUrl(currentCoverPath));
   const handleRemove = () => {
     setPreview(null);
     onFileChange(null);
+    onDeleteCover();
     if (preview) {
       URL.revokeObjectURL(preview);
     }
@@ -432,6 +435,7 @@ interface FormState {
   publisherName: string;
   coverFile: File | null;
   personFilters: PersonRoleFilterRequest[];
+  deleteCoverCommand: boolean;
 }
 
 const emptyForm = (): FormState => ({
@@ -452,6 +456,7 @@ const emptyForm = (): FormState => ({
   publisherName: '',
   coverFile: null,
   personFilters: [],
+  deleteCoverCommand: false,
 });
 
 const VALIDATION_RULES = {
@@ -543,8 +548,12 @@ export const BookUnit: React.FC = () => {
   );
 
   const isChanged = useMemo(() => {
+    console.log('USEEFFECT - ISCHANGED - 1');
     if (isNew) return true;
+    console.log('USEEFFECT - ISCHANGED - 2');
+
     if (!book) return false;
+    console.log('USEEFFECT - ISCHANGED - 3', form.deleteCoverCommand);
 
     return (
       form.title !== (book.title ?? '') ||
@@ -558,6 +567,7 @@ export const BookUnit: React.FC = () => {
       form.isAvailable !== book.isAvailable ||
       form.isReviewable !== book.isReviewable ||
       form.coverFile !== null ||
+      form.deleteCoverCommand === true ||
       JSON.stringify(form.personFilters) !==
         JSON.stringify(
           (book.participants ?? []).map((p) => ({
@@ -569,10 +579,15 @@ export const BookUnit: React.FC = () => {
   }, [form, book, isNew]);
 
   useEffect(() => {
+    console.log('useEffect: TUTA-1');
+
     if (mode === 'edit') {
+      console.log('useEffect: TUTA-2');
+
       validate(form);
     }
-  }, [form, mode, validate]);
+    console.log('useEffect: TUTA-3');
+  }, [form, mode, validate]); //??? может, здесь? При изменении атрибутов изменится сам объект?
 
   useEffect(() => {
     if (isNew) {
@@ -601,6 +616,7 @@ export const BookUnit: React.FC = () => {
         publisherId: book.publisher?.id ?? null,
         publisherName: book.publisher?.name ?? '',
         coverFile: null,
+        deleteCoverCommand: false,
         personFilters: (book.participants ?? []).map((group) => ({
           roleId: group.role,
           personIds: group.persons.map((p) => p.id),
@@ -684,6 +700,7 @@ export const BookUnit: React.FC = () => {
           coverBase64,
           coverContentType: form.coverFile?.type ?? null,
           personFilters: clearPersonFilters,
+          deleteCoverCommand: form.deleteCoverCommand,
         };
 
         await updateMutation.mutateAsync({ id: id!, data: payload });
@@ -716,6 +733,7 @@ export const BookUnit: React.FC = () => {
           publisherId: book.publisher?.id ?? null,
           publisherName: book.publisher?.name ?? '',
           coverFile: null,
+          deleteCoverCommand: false,
           personFilters: (book.participants ?? []).map((group) => ({
             roleId: group.role,
             personIds: group.persons.map((p) => p.id),
@@ -758,7 +776,8 @@ export const BookUnit: React.FC = () => {
     return <div className={styles['error']}>Книга не найдена</div>;
 
   const isEditing = mode === 'edit';
-
+  console.log('DATA: ', isSaving, !isValid, !isChanged);
+  console.log('ERRORS: ', errors);
   return (
     <div className={styles['book-unit']}>
       <div className={styles['book-unit-header']}>
@@ -817,6 +836,10 @@ export const BookUnit: React.FC = () => {
               <CoverUpload
                 currentCoverPath={book?.coverUri ?? null}
                 onFileChange={(file) => set('coverFile', file)}
+                onDeleteCover={() => {
+                  console.log('qwerty');
+                  set('deleteCoverCommand', true);
+                }}
               />
               <ErrorMsg text={errors.cover} />
 
