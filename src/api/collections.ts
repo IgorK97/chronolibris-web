@@ -179,19 +179,19 @@ export const useRemoveBookFromShelf = () => {
   });
 };
 
-export const useInfiniteSelectionBooks = (
-  userId: number,
-  selectionId: number
-) =>
-  useInfiniteQuery({
-    queryKey: ['books', 'selection', selectionId, userId],
-    queryFn: ({ pageParam }) =>
-      collectionsApi.getSelectionBooks(selectionId, pageParam ?? 0, 10),
-    initialPageParam: null as number | null,
-    getNextPageParam: (lastPage) =>
-      lastPage.hasNext ? lastPage.lastId : undefined, //Нет ли здесь ошибки?
-    enabled: !!userId && !!selectionId,
-  });
+// export const useInfiniteSelectionBooks = (
+//   userId: number,
+//   selectionId: number
+// ) =>
+//   useInfiniteQuery({
+//     queryKey: ['books', 'selection', selectionId, userId],
+//     queryFn: ({ pageParam }) =>
+//       collectionsApi.getSelectionBooks(selectionId, pageParam ?? 0, 10),
+//     initialPageParam: null as number | null,
+//     getNextPageParam: (lastPage) =>
+//       lastPage.hasNext ? lastPage.lastId : undefined, //Нет ли здесь ошибки?
+//     enabled: !!userId && !!selectionId,
+//   });
 
 export const useSelectionsInfinite = (
   limit: number = 20,
@@ -212,21 +212,21 @@ export const useSelectionsInfinite = (
   });
 };
 
-export const useSelections = (
-  lastId?: number | null,
-  limit: number = 20,
-  onlyActive: boolean = true
-) => {
-  return useQuery({
-    queryKey: ['selections', 'paged', lastId, limit, onlyActive],
-    queryFn: () => collectionsApi.getSelections(lastId, limit, onlyActive),
-    staleTime: 5 * 60 * 1000,
-  });
-};
+// export const useSelections = (
+//   lastId?: number | null,
+//   limit: number = 20,
+//   onlyActive: boolean = true
+// ) => {
+//   return useQuery({
+//     queryKey: ['selections', 'paged', lastId, limit, onlyActive],
+//     queryFn: () => collectionsApi.getSelections(lastId, limit, onlyActive),
+//     staleTime: 5 * 60 * 1000,
+//   });
+// };
 
 export const useSelectionBooksDefault = (selectionId: number) =>
   useQuery({
-    queryKey: ['selection', selectionId],
+    queryKey: ['selections', selectionId],
     queryFn: () => collectionsApi.getSelectionBooks(selectionId, 0, 10),
     enabled: !!selectionId,
   });
@@ -237,7 +237,7 @@ export const useSelectionBooks = (
   limit: number = 10
 ) => {
   return useQuery({
-    queryKey: ['selectionBooks', selectionId, lastId, limit],
+    queryKey: ['selections', selectionId, lastId, limit],
     queryFn: () => collectionsApi.getSelectionBooks(selectionId, lastId, limit),
     enabled: !!selectionId,
     //На всякий случай, пока идет рефетч после инвалидации, вернуть старые данные вместо undefined
@@ -309,9 +309,8 @@ export const useAddBookToSelection = () => {
       bookId: number;
     }) => collectionsApi.addBookToSelection(selectionId, bookId),
     onSuccess: (_, { selectionId }) => {
-      queryClient.invalidateQueries({
-        queryKey: ['selectionBooks', selectionId],
-      });
+      queryClient.invalidateQueries({ queryKey: ['selection', selectionId] });
+      queryClient.invalidateQueries({ queryKey: ['selections'] });
     },
   });
 };
@@ -327,9 +326,8 @@ export const useRemoveBookFromSelection = () => {
       bookId: number;
     }) => collectionsApi.removeBookFromSelection(selectionId, bookId),
     onSuccess: (_, { selectionId }) => {
-      queryClient.invalidateQueries({
-        queryKey: ['selectionBooks', selectionId],
-      });
+      queryClient.invalidateQueries({ queryKey: ['selection', selectionId] });
+      queryClient.invalidateQueries({ queryKey: ['selections'] });
     },
   });
 };
