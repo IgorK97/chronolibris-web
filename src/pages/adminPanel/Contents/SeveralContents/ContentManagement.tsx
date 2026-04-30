@@ -57,6 +57,7 @@ export const ContentManagement = () => {
         title={`Вы действительно хотите удалить этот контент?`}
         handleAccept={() => {
           handleDelete();
+          setDeleteModalOpen(false);
         }}
         handleReject={() => {
           setDeleteModalOpen(false);
