@@ -8,14 +8,16 @@ import {
   Globe,
   Layers,
   // List,
-  Tag,
+  // Tag,
   Users,
   ShieldCheck,
   X,
   BookMarked,
   Building2,
   User,
-  Palette,
+  // Palette,
+  FerrisWheel,
+  Landmark,
 } from 'lucide-react';
 
 interface AdminSidebarProps {
@@ -40,8 +42,8 @@ const SECTIONS = [
       // { label: 'Форматы', path: '/format', icon: List },
       { label: 'Издатели', path: '/publisher', icon: Building2 },
       { label: 'Персоны', path: '/person', icon: User },
-      { label: 'Темы', path: '/themes', icon: Palette },
-      { label: 'Теги', path: '/tags', icon: Tag },
+      { label: 'Темы', path: '/themes', icon: FerrisWheel },
+      { label: 'Теги', path: '/tags', icon: Landmark },
     ],
   },
   {

@@ -51,11 +51,17 @@ export function SelectionPanel({
                 const isSelected = sel.id === selectedSelectionId;
                 return (
                   <li
+                    title={sel.name}
                     key={sel.id}
                     className={`${styles['selection-item']} ${isSelected ? styles['selection-item-selected'] : ''}`}
                     onClick={() => onSelect(isSelected ? null : sel.id)}
                   >
-                    <span className={styles['selection-name']}>{sel.name}</span>
+                    <span
+                      style={{ overflowWrap: 'break-word' }}
+                      className={styles['selection-name']}
+                    >
+                      {sel.name}
+                    </span>
                   </li>
                 );
               })}

@@ -225,6 +225,10 @@ export const RELATION_TYPES = [
     id: 1,
     name: 'Синоним',
   },
+  {
+    id: 2,
+    name: 'Часть/целое',
+  },
 ] as const;
 
 export type RelationType = (typeof RELATION_TYPES)[number];

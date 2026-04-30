@@ -381,7 +381,17 @@ const SelectionEditView: React.FC<SelectionEditViewProps> = ({
           <input
             type="number"
             value={bookId}
-            onChange={(e) => setBookId(e.target.value)}
+            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+              if (['-', '+', 'e', 'E', '.', ','].includes(e.key)) {
+                e.preventDefault();
+              }
+            }}
+            onChange={(e) => {
+              const val = e.target.value;
+              const sanitized = val.replace(/\D/g, '');
+              if (sanitized === '0') return;
+              setBookId(sanitized);
+            }}
             className={styles['input']}
             placeholder="ID книги"
           />

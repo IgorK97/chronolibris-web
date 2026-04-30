@@ -147,9 +147,10 @@
   font-size: 13px;
   color: #333;
   user-select: none;
-  white-space: nowrap;
+
+  /* white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: ellipsis; */
 }
 
 .drill-btn {

@@ -35,6 +35,8 @@ function ThemeLevel({
             className={`${styles['theme-item']} ${isSelected ? styles['theme-item-selected'] : ''} ${isPending ? styles['theme-item-pending'] : ''}`}
           >
             <span
+              title={theme.name}
+              style={{ overflowWrap: 'break-word' }}
               className={styles['theme-name']}
               onClick={() =>
                 onPendingSelect(isPending && !isSelected ? null : theme.id)
@@ -148,7 +150,10 @@ export function ThemePanel({ selectedThemeId, onSelect }: ThemePanelProps) {
                 )
               }
             >
-              <span className={styles['current-parent-name']}>
+              <span
+                title={currentParentTheme.data.name}
+                className={styles['current-parent-name']}
+              >
                 {currentParentTheme.data.name}
               </span>
             </div>

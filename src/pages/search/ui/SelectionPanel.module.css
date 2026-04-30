@@ -59,6 +59,7 @@
   padding: 6px 0;
   overflow-y: auto;
   flex: 1;
+  width: 100%;
 }
 
 .selection-item {
@@ -72,6 +73,7 @@
     background 0.13s,
     border-color 0.13s;
   gap: 6px;
+  width: 100%;
 }
 
 .selection-item:hover {
@@ -88,9 +90,10 @@
 .selection-name {
   font-size: 0.875rem;
   color: #111;
-  white-space: nowrap;
+
+  /* white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: ellipsis; */
   flex: 1;
 }
 
