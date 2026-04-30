@@ -35,6 +35,7 @@ import { ErrorMsg } from '@/components';
 import { AlertDialog } from '@/components/dialogs/AlertDialog';
 import { useLinkBookToContent, useUnlinkBookFromContent } from '@/api/contents';
 import { createPortal } from 'react-dom';
+import { usePublishers } from '@/api/publishers';
 
 interface SelectedPerson {
   uid: string;
@@ -309,7 +310,7 @@ function AutocompleteField({
         </div>
         {open && input.length > 0 && filtered.length > 0 && (
           <ul className={styles['autocomplete-dropdown']}>
-            {filtered.slice(0, 20).map((item) => (
+            {filtered.slice(0, 10).map((item) => (
               <li
                 key={item.id}
                 className={`${styles['autocomplete-item']} ${
@@ -477,7 +478,13 @@ export const BookUnit: React.FC = () => {
   const id = bookId && !isNew ? parseInt(bookId, 10) : null;
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState('');
+  const { data: publishersData = [] } = usePublishers(); //
 
+  // Преобразуем данные в формат AutocompleteItem
+  const publishers = useMemo(
+    () => publishersData.map((p) => ({ id: p.id, name: p.name })),
+    [publishersData]
+  ); //
   const {
     data: book,
     isLoading,
@@ -498,7 +505,6 @@ export const BookUnit: React.FC = () => {
   // const [addingContentId, setAddingContentId] = useState(0);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
-  const publishers: AutocompleteItem[] = [];
   const [initialPersons, setInitialPersons] = useState<SelectedPerson[]>([]);
 
   const [mode, setMode] = useState<'view' | 'edit'>('view');

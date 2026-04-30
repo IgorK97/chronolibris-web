@@ -28,7 +28,8 @@ export const usePublishers = () => {
     queryKey: ['publishers'],
     queryFn: publishersApi.getPublishers,
     staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,
+    refetchInterval: 10 * 60 * 1000,
   });
 };
 
