@@ -207,8 +207,8 @@ export const ThemeManager: React.FC = () => {
               onStartEditing={startEditing}
               onCancelEditing={cancelEditing}
               onUpdate={handleUpdate}
-              onDelete={() => {
-                setDeletingThemeId(theme.id);
+              onDelete={(id) => {
+                setDeletingThemeId(id);
                 setDeleteModalOpen(true);
               }}
               onToggleExpand={toggleExpand}

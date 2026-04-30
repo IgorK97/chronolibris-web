@@ -34,6 +34,7 @@ type SelectionManagerProps =
 
 const BOOKS_LIMIT = 10;
 
+//вынести потом в отдельный файл, кроме того, можно (нужно) оптимизировать, заменив на возможности react query
 function useInfiniteBooks(selectionId: number) {
   const [lastId, setLastId] = useState<number | null>(null);
   const [allBooks, setAllBooks] = useState<BookListItem[]>([]);
