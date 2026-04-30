@@ -390,26 +390,36 @@ export const BookDetailsComponent = ({
 
       <div className={styles['scroll-container']}>
         <div className={styles['book-body']}>
-          <div className={styles['cover-container']}>
-            {fullBookDetails.coverUri ? (
-              <img
-                src={getImageUrl(fullBookDetails.coverUri)}
-                alt={fullBookDetails.title}
-                className={styles['cover']}
-              />
-            ) : (
-              <div className={styles['image-placeholder']}>
-                <span className={styles['image-placeholder-title']}>
-                  {fullBookDetails.title}
-                </span>
-              </div>
-            )}
+          <div
+            style={{
+              borderRadius: '8px',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <div className={styles['cover-container']}>
+              {fullBookDetails.coverUri ? (
+                <img
+                  src={getImageUrl(fullBookDetails.coverUri)}
+                  alt={fullBookDetails.title}
+                  className={styles['cover']}
+                />
+              ) : (
+                <div className={styles['image-placeholder']}>
+                  <span className={styles['image-placeholder-title']}>
+                    {fullBookDetails.title}
+                  </span>
+                </div>
+              )}
+            </div>
             {fullBookDetails.year && (
-              <span className={styles['meta-text']}>
+              <span
+                style={{ textAlign: 'center', paddingTop: '5px' }}
+                className={styles['meta-text']}
+              >
                 {fullBookDetails.year} {t('book.year')}
               </span>
             )}
-
             {isReader() && (
               <button
                 className={styles['report-book-btn']}

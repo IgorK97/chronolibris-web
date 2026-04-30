@@ -68,7 +68,9 @@ export const BookCard: React.FC<BookCardProps> = ({
         )}
       </div>
 
-      <h3 className={styles['book-title']}>{bookInfo.title}</h3>
+      <h3 title={bookInfo.title} className={styles['book-title']}>
+        {bookInfo.title}
+      </h3>
       {bookInfo.authors.length > 0 && (
         <div className={styles['authors']} title={bookInfo.authors.join(', ')}>
           {bookInfo.authors.join(', ')}

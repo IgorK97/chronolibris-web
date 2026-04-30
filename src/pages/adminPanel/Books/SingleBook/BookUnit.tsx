@@ -671,7 +671,9 @@ export const BookUnit: React.FC = () => {
         };
 
         const newId = await createMutation.mutateAsync(payload);
-        navigate(`/books/${newId}`);
+        setForm(emptyForm());
+        setMode('view');
+        navigate(`/books/${newId}`); //почему то в итоге сразу в состояние редактирования перехожу
       } else {
         const coverBase64 = form.coverFile
           ? await fileToBase64(form.coverFile)
