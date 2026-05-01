@@ -1,16 +1,23 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  // useCallback,
+  useMemo,
+} from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   useSelection,
-  useSelectionBooks,
+  // useSelectionBooks,
   useUpdateSelection,
   useDeleteSelection,
   useAddBookToSelection,
   useRemoveBookFromSelection,
   useCreateSelection,
+  useInfiniteSelectionBooks,
 } from '@/api/collections';
 import { BookCard } from '@/components/Books';
-import type { BookListItem } from '@/types';
+// import type { BookListItem } from '@/types';
 import styles from './SelectionManager.module.css';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -31,50 +38,6 @@ interface SelectionManagerCreateProps {
 type SelectionManagerProps =
   | SelectionManagerEditProps
   | SelectionManagerCreateProps;
-
-const BOOKS_LIMIT = 10;
-
-//вынести потом в отдельный файл, кроме того, можно (нужно) оптимизировать, заменив на возможности react query
-function useInfiniteBooks(selectionId: number) {
-  const [lastId, setLastId] = useState<number | null>(null);
-  const [allBooks, setAllBooks] = useState<BookListItem[]>([]);
-
-  const { data, isLoading, isFetching } = useSelectionBooks(
-    selectionId,
-    lastId,
-    BOOKS_LIMIT
-  );
-
-  useEffect(() => {
-    if (data?.items && data.items.length > 0) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setAllBooks((prev) => {
-        const existingIds = new Set(prev.map((b) => b.id));
-        const fresh = data.items.filter((b) => !existingIds.has(b.id));
-        return fresh.length > 0 ? [...prev, ...fresh] : prev;
-      });
-    }
-  }, [data]);
-
-  const loadMore = useCallback(() => {
-    if (data?.hasNext && data.items.length > 0) {
-      setLastId(data.items[data.items.length - 1].id);
-    }
-  }, [data]);
-
-  const removeFromList = useCallback((bookId: number) => {
-    setAllBooks((prev) => prev.filter((b) => b.id !== bookId));
-  }, []);
-
-  return {
-    books: allBooks,
-    hasMore: data?.hasNext ?? false,
-    isLoading,
-    isFetching,
-    loadMore,
-    removeFromList,
-  };
-}
 
 interface CreateFormProps {
   onBack: () => void;
@@ -195,13 +158,17 @@ const SelectionEditView: React.FC<SelectionEditViewProps> = ({
     useSelection(selectionId);
 
   const {
-    books,
-    hasMore,
+    data: infiniteData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
     isLoading: booksLoading,
-    isFetching,
-    loadMore,
-    removeFromList,
-  } = useInfiniteBooks(selectionId);
+  } = useInfiniteSelectionBooks(selectionId);
+
+  const books = useMemo(
+    () => infiniteData?.pages.flatMap((page) => page.items) ?? [],
+    [infiniteData]
+  );
 
   const updateMutation = useUpdateSelection();
   const deleteMutation = useDeleteSelection();
@@ -210,24 +177,19 @@ const SelectionEditView: React.FC<SelectionEditViewProps> = ({
 
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-  const handleIntersection = useCallback(
-    (entries: IntersectionObserverEntry[]) => {
-      if (entries[0].isIntersecting && hasMore && !isFetching) {
-        loadMore();
-      }
-    },
-    [hasMore, isFetching, loadMore]
-  );
-
   useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(handleIntersection, {
-      rootMargin: '150px',
-    });
-    observer.observe(el);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: '100px' }
+    );
+
+    if (sentinelRef.current) observer.observe(sentinelRef.current);
     return () => observer.disconnect();
-  }, [handleIntersection]);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleEdit = () => {
     if (selection) {
@@ -272,7 +234,7 @@ const SelectionEditView: React.FC<SelectionEditViewProps> = ({
       { selectionId, bookId },
       {
         onSuccess: () => {
-          removeFromList(bookId);
+          // removeFromList(bookId);
           queryClient.invalidateQueries({
             queryKey: ['selection', selectionId],
           });
@@ -429,9 +391,12 @@ const SelectionEditView: React.FC<SelectionEditViewProps> = ({
               ))}
             </div>
 
-            <div ref={sentinelRef} style={{ height: 1 }} />
+            <div
+              ref={sentinelRef}
+              style={{ height: 20, background: 'transparent' }}
+            />
 
-            {isFetching && books.length > 0 && (
+            {isFetchingNextPage && books.length > 0 && (
               <div className={styles['loading']}>Загрузка книг...</div>
             )}
           </>

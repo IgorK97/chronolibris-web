@@ -179,20 +179,6 @@ export const useRemoveBookFromShelf = () => {
   });
 };
 
-// export const useInfiniteSelectionBooks = (
-//   userId: number,
-//   selectionId: number
-// ) =>
-//   useInfiniteQuery({
-//     queryKey: ['books', 'selection', selectionId, userId],
-//     queryFn: ({ pageParam }) =>
-//       collectionsApi.getSelectionBooks(selectionId, pageParam ?? 0, 10),
-//     initialPageParam: null as number | null,
-//     getNextPageParam: (lastPage) =>
-//       lastPage.hasNext ? lastPage.lastId : undefined, //Нет ли здесь ошибки?
-//     enabled: !!userId && !!selectionId,
-//   });
-
 export const useSelectionsInfinite = (
   limit: number = 20,
   onlyActive: boolean = true
@@ -212,17 +198,23 @@ export const useSelectionsInfinite = (
   });
 };
 
-// export const useSelections = (
-//   lastId?: number | null,
-//   limit: number = 20,
-//   onlyActive: boolean = true
-// ) => {
-//   return useQuery({
-//     queryKey: ['selections', 'paged', lastId, limit, onlyActive],
-//     queryFn: () => collectionsApi.getSelections(lastId, limit, onlyActive),
-//     staleTime: 5 * 60 * 1000,
-//   });
-// };
+export const useInfiniteSelectionBooks = (
+  selectionId: number,
+  limit: number = 10
+) =>
+  useInfiniteQuery({
+    queryKey: ['selection', 'infinite', selectionId],
+    queryFn: ({ pageParam }) =>
+      collectionsApi.getSelectionBooks(
+        selectionId,
+        pageParam as number | null,
+        limit
+      ),
+    initialPageParam: null as number | null,
+    getNextPageParam: (lastPage) =>
+      lastPage.hasNext ? lastPage.lastId : undefined,
+    enabled: !!selectionId,
+  });
 
 export const useSelectionBooksDefault = (selectionId: number) =>
   useQuery({
