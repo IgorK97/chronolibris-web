@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 // import { useContents } from '@/api/contents';
 import type { ContentDto, ContentFilterRequest } from '@/types';
 import styles from './ContentSearchPopup.module.css';
@@ -21,11 +21,17 @@ export const ContentSearchPopup: React.FC<ContentSearchPopupProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearch = useDebounce(searchQuery, 500);
 
-  const [filter, setFilter] = useState<ContentFilterRequest>({
+  // const [filter, setFilter] = useState<ContentFilterRequest>({
+  //   searchQuery: debouncedSearch,
+  //   limit: 20,
+  //   lastId: null,
+  // });
+
+  const filter: ContentFilterRequest = {
     searchQuery: debouncedSearch,
     limit: 20,
     lastId: null,
-  });
+  };
 
   return (
     <div className={styles['modal-overlay']}>

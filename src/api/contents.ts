@@ -83,7 +83,7 @@ export const useInfiniteContents = (
     getNextPageParam: (lastPage) =>
       lastPage.hasNext ? lastPage.lastId : undefined,
 
-    staleTime: 2 * 60 * 1000,
+    staleTime: 0,
     enabled: enabled && !!filter,
   });
 };

@@ -214,6 +214,7 @@ export const SimpleEntityManager: React.FC<SimpleEntityManagerProps> = ({
         title={`Вы действительно хотите это удалить?`}
         handleAccept={() => {
           handleDelete();
+          setDeleteModalOpen(false);
         }}
         handleReject={() => {
           setDeleteModalOpen(false);
