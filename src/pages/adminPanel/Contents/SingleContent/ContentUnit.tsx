@@ -48,15 +48,18 @@ const DOCUMENT_TYPES = [
   { id: 13, name: 'Религиозный трактат', nature: 'Work' },
   { id: 14, name: 'Политический трактат', nature: 'Work' },
   { id: 15, name: 'Биография', nature: 'Work' },
-  { id: 16, name: 'Путевые заметки', nature: 'Work' },
+  { id: 16, name: 'Путевые заметки', nature: 'Document' },
   { id: 17, name: 'Сборник', nature: 'Work' },
   { id: 18, name: 'Учебник', nature: 'Work' },
-  { id: 19, name: 'Историческое исследование', nature: 'Analysis' },
-  { id: 20, name: 'Монография', nature: 'Analysis' },
-  { id: 21, name: 'Научная статья', nature: 'Analysis' },
-  { id: 22, name: 'Неизвестно', nature: 'Unknown' },
-  { id: 23, name: 'Комментарий', nature: 'Analysis' },
+  { id: 19, name: 'Историческое исследование', nature: 'Work' },
+  { id: 20, name: 'Монография', nature: 'Work' },
+  { id: 21, name: 'Научная статья', nature: 'Work' },
+  { id: 22, name: 'Другое', nature: 'Unknown' },
+  { id: 23, name: 'Комментарий', nature: 'Work' },
   { id: 24, name: 'Священный текст', nature: 'Document' },
+  { id: 25, name: 'Стенограмма', nature: 'Document' },
+  { id: 26, name: 'Публицистика', nature: 'Work' },
+
 ];
 
 interface SelectedPerson {

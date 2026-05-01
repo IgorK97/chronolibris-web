@@ -1,6 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from 'react';
-import { useNavigate, Routes, Route, Navigate } from 'react-router-dom';
+import {
+  useNavigate,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from 'react-router-dom';
 import { USER_ROLES, useStore } from '../stores/globalStore';
 import MainLayout from './layouts/MainLayout';
 import { BookDetailsComponent } from '../pages/BookDetails';
@@ -60,6 +66,37 @@ export default function App() {
 
     initApp();
   }, []);
+
+  const location = useLocation();
+
+  useEffect(() => {
+    const titles: Record<string, string> = {
+      '/library': 'Библиотека | Chronolibris',
+      '/auth': 'Вход | Chronolibris',
+      '/profile': 'Мой профиль | Chronolibris',
+      '/mybooks': 'Мои книги | Chronolibris',
+      '/moderation': 'Панель модерации | Chronolibris',
+      '/search': 'Поиск книг | Chronolibris',
+      '/lang': 'Управление языками | Chronolibris',
+      '/country': 'Управление странами | Chronolibris',
+      '/publisher': 'Управление издателями | Chronolibris',
+      '/person': 'Управление персоналиями | Chronolibris',
+      '/selections': 'Управление подборками | Chronolibris',
+      '/themes': 'Управление темами | Chronolibris',
+      '/tags': 'Управление тегами | Chronolibris',
+      '/contents': 'Управление содержимым | Chronolibris',
+      '/register-staff': 'Регистрация сотрудников | Chronolibris',
+    };
+
+    const matchedKey = Object.keys(titles).find((path) =>
+      location.pathname.startsWith(path)
+    );
+
+    if (matchedKey) {
+      document.title = titles[matchedKey];
+      return;
+    }
+  }, [location]);
 
   if (!isInitialized) {
     return <div>Загрузка...</div>;

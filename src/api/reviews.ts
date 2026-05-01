@@ -44,7 +44,7 @@ export const useRateReview = () => {
 
 export const useInfiniteReviews = (bookId: number, isAuth: boolean) => {
   return useInfiniteQuery({
-    queryKey: [...reviewKeys.lists(bookId), 'reviews', bookId, isAuth],
+    queryKey: ['reviews', bookId, isAuth],
     queryFn: ({ pageParam }) => reviewsApi.getByBookId(bookId, pageParam),
     enabled: !!bookId,
     initialPageParam: undefined as number | undefined,
@@ -53,17 +53,17 @@ export const useInfiniteReviews = (bookId: number, isAuth: boolean) => {
   });
 };
 
-export const reviewKeys = {
-  all: ['reviews'] as const,
-  lists: (bookId: number) => [...reviewKeys.all, 'list', bookId] as const,
-  my: (bookId: number) => [...reviewKeys.all, 'my', bookId] as const,
-};
+// export const reviewKeys = {
+//   all: ['reviews'] as const,
+//   lists: (bookId: number) => [...reviewKeys.all, 'list', bookId] as const,
+//   my: (bookId: number) => [...reviewKeys.all, 'my', bookId] as const,
+// };
 
-export const useCreateReview = (bookId: number) => {
+export const useCreateReview = () => {
   return useMutation({
     mutationFn: (req: CreateReviewRequest) => reviewsApi.create(req),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: reviewKeys.all });
+    onSuccess: (_, { bookId }) => {
+      queryClient.invalidateQueries({ queryKey: ['reviews', bookId] });
       //Обновляются данные самой книги (из-за рейтинга)
       queryClient.invalidateQueries({ queryKey: ['books', bookId] });
     },
@@ -79,8 +79,8 @@ export const useUpdateReview = (bookId: number) => {
       reviewsApi.update(reviewId, req),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['books', bookId] });
-      queryClient.invalidateQueries({ queryKey: reviewKeys.lists(bookId) });
-      queryClient.invalidateQueries({ queryKey: reviewKeys.my(bookId) });
+      queryClient.invalidateQueries({ queryKey: ['reviews', bookId] });
+      // queryClient.invalidateQueries({ queryKey: ['reviews', 'my'] });
     },
   });
 };
@@ -90,15 +90,15 @@ export const useDeleteReview = (bookId: number) => {
     mutationFn: (reviewId: number) => reviewsApi.delete(reviewId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['books', bookId] });
-      queryClient.invalidateQueries({ queryKey: reviewKeys.lists(bookId) });
-      queryClient.invalidateQueries({ queryKey: reviewKeys.my(bookId) });
+      queryClient.invalidateQueries({ queryKey: ['reviews', bookId] });
+      // queryClient.invalidateQueries({ queryKey: reviewKeys.my(bookId) });
     },
   });
 };
 
 export const useMyReview = (bookId: number, isAuth: boolean) => {
   return useQuery({
-    queryKey: ['reviews', 'my', bookId],
+    queryKey: ['reviews', bookId, 'my'],
     queryFn: () => reviewsApi.getMyReview(bookId),
     enabled: isAuth && !!bookId,
     retry: false, // Если отзыва нет, то не надо повторять запросы вообще (пока не инвалидирован кэш)

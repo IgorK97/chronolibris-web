@@ -6,7 +6,7 @@ import type {
   PagedResult,
 } from '../types';
 import {
-  keepPreviousData,
+  // keepPreviousData,
   useInfiniteQuery,
   useMutation,
   useQuery,
@@ -223,19 +223,19 @@ export const useSelectionBooksDefault = (selectionId: number) =>
     enabled: !!selectionId,
   });
 
-export const useSelectionBooks = (
-  selectionId: number,
-  lastId: number | null,
-  limit: number = 10
-) => {
-  return useQuery({
-    queryKey: ['selections', selectionId, lastId, limit],
-    queryFn: () => collectionsApi.getSelectionBooks(selectionId, lastId, limit),
-    enabled: !!selectionId,
-    //На всякий случай, пока идет рефетч после инвалидации, вернуть старые данные вместо undefined
-    placeholderData: keepPreviousData,
-  });
-};
+// export const useSelectionBooks = (
+//   selectionId: number,
+//   lastId: number | null,
+//   limit: number = 10
+// ) => {
+//   return useQuery({
+//     queryKey: ['selections', selectionId, lastId, limit],
+//     queryFn: () => collectionsApi.getSelectionBooks(selectionId, lastId, limit),
+//     enabled: !!selectionId,
+//     //На всякий случай, пока идет рефетч после инвалидации, вернуть старые данные вместо undefined
+//     placeholderData: keepPreviousData,
+//   });
+// };
 
 export const useAllSelections = () => {
   return useQuery({

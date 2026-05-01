@@ -119,6 +119,14 @@ export const BookDetailsComponent = ({
     !!Number(bookId)
   );
 
+  useEffect(() => {
+    if (fullBookDetails) {
+      document.title = `${fullBookDetails.title} — Читать онлайн`;
+    }
+
+    // return () => { document.title = 'Chronolibris'; };
+  }, [fullBookDetails]);
+
   const { data: bookFiles } = useBookFiles(Number(bookId) || 0);
   const navigate = useNavigate();
 

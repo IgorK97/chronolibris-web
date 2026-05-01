@@ -379,23 +379,13 @@ export const Reader: React.FC<ReaderProps> = ({
     setTimeout(() => scrollToXpInDOM(xp), 100);
   }, [isLoading, totalCols, segments]);
 
-  // useEffect(() => {
-  //   if (pendingXpointerRef.current !== null) {
-  //     pendingBookmarkXpRef.current = xpointer;
-  //     pendingXpointerRef.current = null;
-  //     setTimeout(() => scrollToXpInDOM(xpointer), 100);
-  //   }
-  //   // scrollToXpInDOM(xpointer);
-  // }, [segments]);
+  useEffect(() => {
+    if (fetchedTocData) {
+      document.title = `${fetchedTocData.Meta.Title} — Читать онлайн`;
+    }
 
-  // useEffect(() => {
-  //   if (pendingXpointerRef.current !== null) {
-  //     pendingBookmarkXpRef.current = xpointer;
-  //     pendingXpointerRef.current = null;
-  //     setTimeout(() => scrollToXpInDOM(xpointer), 100);
-  //   }
-  //   // scrollToXpInDOM(xpointer);
-  // }, [xpointer]);
+    // return () => { document.title = 'Chronolibris'; };
+  }, [fetchedTocData]);
 
   //Подзагрузка следующего фрагмента
   useEffect(() => {
