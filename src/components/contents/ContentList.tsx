@@ -81,11 +81,29 @@ export const ContentList: React.FC<ContentListProps> = ({
           {allContents.map((content) => (
             <tr key={content.id}>
               <td>{content.id}</td>
-              <td
+              {/* <td
                 className={onTitleClick ? styles['clickable'] : undefined}
                 onClick={onTitleClick ? () => onTitleClick(content) : undefined}
               >
                 {content.title}
+              </td> */}
+              <td className={onTitleClick ? styles['clickable'] : undefined}>
+                {onTitleClick ? (
+                  <a
+                    href={`/contents/${content.id}`}
+                    onClick={(e) => {
+                      if (!e.ctrlKey && !e.metaKey) {
+                        e.preventDefault();
+                        onTitleClick(content);
+                      }
+                    }}
+                    className={styles['title-link']}
+                  >
+                    {content.title}
+                  </a>
+                ) : (
+                  content.title
+                )}
               </td>
               <td>{content.authors.join(', ')}</td>
               <td>

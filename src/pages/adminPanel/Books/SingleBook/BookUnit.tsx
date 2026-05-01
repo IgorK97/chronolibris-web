@@ -500,9 +500,9 @@ const VALIDATION_RULES = {
   description: /^[^]{120,5000}$/u,
   year: { min: -10000, max: new Date().getFullYear() + 1 },
   isbn: /(?:(?=(?:[^0-9]*[0-9]){10}(?:(?:[^0-9]*[0-9]){3})?$)[\d-]+)?$/,
-  bbk: /^[\d\p{L}[\]()+:/="'*.]{0,500}$/u,
-  udk: /^[\d\p{L}[\]()+:/="'*.]{0,500}$/u,
-  source: /^[\d\s\p{L};/\\:?&=%#[\]\-._,—№§]{0,500}$/u,
+  bbk: /^[\d\p{L}[\]()+:/="'*.]{0,255}$/u,
+  udk: /^[\d\p{L}[\]()+:/="'*.]{0,255}$/u,
+  source: /^[\d\s\p{L};/\\:?&=%#[\]()._,—№§-]{0,500}$/u,
 };
 
 export const BookUnit: React.FC = () => {
@@ -525,6 +525,13 @@ export const BookUnit: React.FC = () => {
     isLoading,
     error,
   } = useBookDetails(id ?? 0, user?.userName ?? '', true, !!id);
+  useEffect(() => {
+    if (book) {
+      document.title = `${book.title} — Редактирование`;
+    }
+
+    // return () => { document.title = 'Chronolibris'; };
+  }, [book]);
   const { data: contents, refetch: refetchContents } = useBookContents(id);
   // console.log(contents);
   const unlinkMutation = useUnlinkBookFromContent();
@@ -607,6 +614,8 @@ export const BookUnit: React.FC = () => {
       form.publisherId !== (book.publisher?.id ?? null) ||
       form.isAvailable !== book.isAvailable ||
       form.isReviewable !== book.isReviewable ||
+      form.bbk !== book.bbk ||
+      form.udk !== book.udk ||
       form.coverFile !== null ||
       form.deleteCoverCommand === true ||
       JSON.stringify(form.personFilters) !==
@@ -715,6 +724,7 @@ export const BookUnit: React.FC = () => {
         setForm(emptyForm());
         setMode('view');
         navigate(`/books/${newId}`); //почему то в итоге сразу в состояние редактирования перехожу
+        setGlobalError('');
       } else {
         const coverBase64 = form.coverFile
           ? await fileToBase64(form.coverFile)
@@ -748,6 +758,7 @@ export const BookUnit: React.FC = () => {
 
         await updateMutation.mutateAsync({ id: id!, data: payload });
         setMode('view');
+        setGlobalError('');
       }
     } catch (err: any) {
       setGlobalError(err.response?.data?.message || 'Ошибка!');
