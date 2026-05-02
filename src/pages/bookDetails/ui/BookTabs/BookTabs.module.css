@@ -492,10 +492,10 @@
 }
 
 .review-text-wrap {
-  overflow: hidden;
+  /* overflow: hidden;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: var(--lines, 5);
+  -webkit-line-clamp: var(--lines, 5); */
 }
 
 .review-text-wrap-expanded {

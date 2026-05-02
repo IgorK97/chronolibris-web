@@ -24,6 +24,8 @@ interface BookFileManagementProps {
 
 const FORMAT_EXTENSIONS: Record<number, string> = {
   1: 'fb2',
+  2: 'epub',
+  3: 'pdf',
 };
 
 export const BookFileManagement: React.FC<BookFileManagementProps> = ({
@@ -39,7 +41,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const [deletingBookfile, setDeletingBookfile] = useState<number>(0);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-
+  const [hasFile, setHasFile] = useState<boolean>(false);
   const [selectedFormat, setSelectedFormat] = useState<number>(0);
   const [isReadable, setIsReadable] = useState<boolean>(false);
   const [editingFile, setEditingFile] = useState<BookFileDto | null>(null);
@@ -69,7 +71,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
       );
       return;
     }
-    const MAX_SIZE = 50 * 1024 * 1024;
+    const MAX_SIZE = 100 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
       alert('Размер файла не должен превышать 50 MB');
       return;
@@ -88,7 +90,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
-
+      setHasFile(false);
       refetch();
     } catch (err: any) {
       // alert(err.response?.data?.message || 'Ошибка загрузки файла');
@@ -96,9 +98,9 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
   };
 
   const handleDelete = async () => {
+    setDeleteModalOpen(false);
     await deleteMutation.mutateAsync(deletingBookfile);
     refetch();
-    setDeleteModalOpen(false);
   };
 
   const handleDownload = async (bookFileId: number, formatId: number) => {
@@ -112,7 +114,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      const extension = FORMAT_EXTENSIONS[formatId - 1];
+      const extension = FORMAT_EXTENSIONS[formatId] || '';
       a.download = `${bookTitle}.${extension}`;
       document.body.appendChild(a);
       a.click();
@@ -160,7 +162,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
       <h4>Загрузить новый файл</h4>
       <div className={styles['form-grid']}>
         <div className={styles['form-group']}>
-          <label>Формат *</label>
+          <label>Формат</label>
           <select
             value={selectedFormat}
             onChange={(e) => {
@@ -179,7 +181,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
           </select>
         </div>
 
-        <div className={styles['form-group']}>
+        {/* <div className={styles['form-group']}>
           <label>Основной файл</label>
           <input
             type="checkbox"
@@ -188,10 +190,10 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
             disabled={selectedFormat !== 1}
             className={styles['checkbox-field']}
           />
-        </div>
+        </div> */}
 
         <div className={styles['form-group']}>
-          <label>Файл *</label>
+          <label>Файл</label>
           <input
             ref={fileInputRef}
             type="file"
@@ -200,22 +202,25 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
                 ? `.${FORMAT_EXTENSIONS[selectedFormat]}`
                 : '.fb2'
             }
+            onChange={(e) => setHasFile((e.target.files?.length ?? 0) > 0)}
             className={styles['file-input']}
             disabled={selectedFormat < 1}
           />
-          <span className={styles['hint']}>Макс. 50 MB</span>
+          <span className={styles['hint']}>Макс. 100 MB</span>
         </div>
 
         <div>
           <button
             onClick={handleUpload}
             style={{ marginRight: '10px' }}
-            disabled={uploadMutation.isPending || selectedFormat <= 0}
+            disabled={
+              uploadMutation.isPending || selectedFormat <= 0 || !hasFile
+            }
             className={`${styles['btn']}`}
           >
             {uploadMutation.isPending ? 'Загрузка...' : 'Загрузить'}
           </button>
-          {uploadMutation.isPending && <Circles fill="#d32f2f" />}
+          {uploadMutation.isPending && <Circles width={50} fill="#d32f2f" />}
         </div>
       </div>
       <AlertDialog
@@ -230,6 +235,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
       />
       <div className={styles['files-list']}>
         <h4>Существующие файлы ({bookFiles?.length || 0})</h4>
+        {isDownloading && <Circles width={50} fill="#d32f2f" />}
         <table className={styles['files-table']}>
           <thead>
             <tr>
@@ -259,7 +265,6 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
                     }
                   >
                     <Download style={{ cursor: 'pointer' }} />
-                    {isDownloading && <Circles fill="#d32f2f" />}
                   </button>
                   <button
                     onClick={() => {

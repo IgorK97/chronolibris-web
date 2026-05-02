@@ -481,6 +481,24 @@
   }
 }
 
+@media (width <= 1200px) {
+  .reading-area {
+    grid-template-columns: 1fr 350px 1fr;
+  }
+
+  .book-content {
+    width: 100%;
+    columns: auto;
+    column-width: 350px;
+    column-fill: auto;
+    column-gap: 0;
+    height: 100%;
+    line-height: 1.6;
+    text-align: justify;
+    overflow: hidden;
+  }
+}
+
 @media (width <= 768px) {
   .reading-area {
     display: grid;

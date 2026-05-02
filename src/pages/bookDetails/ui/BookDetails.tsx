@@ -63,7 +63,10 @@ const formatFileSize = (bytes: number): string => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} МБ`;
 };
 
-const FORMAT_EXTENSIONS: Record<number, string> = ['fb2'];
+const FORMAT_EXTENSIONS: Record<number, string> = {
+  1: 'fb2',
+  2: 'epub',
+};
 
 function getAuthorsString(
   authorRoleId: number,
@@ -142,7 +145,7 @@ export const BookDetailsComponent = ({
   );
   const { data: userReview } = useMyReview(Number(bookId) || 0, isReader());
 
-  const createReview = useCreateReview(Number(bookId) || 0);
+  const createReview = useCreateReview();
   const updateReview = useUpdateReview(Number(bookId) || 0);
   const deleteReview = useDeleteReview(Number(bookId) || 0);
   const [downloadError, setDownloadError] = useState<string | null>(null);
@@ -220,7 +223,7 @@ export const BookDetailsComponent = ({
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      const extension = FORMAT_EXTENSIONS[formatId - 1];
+      const extension = FORMAT_EXTENSIONS[formatId];
       a.download = `${fullBookDetails.title}.${extension}`;
       document.body.appendChild(a);
       a.click();
@@ -337,6 +340,7 @@ export const BookDetailsComponent = ({
                         <X style={{ cursor: 'pointer' }} />
                       </button>
                     </div>
+                    {isDownloading && <Circles fill="#d32f2f" width={50} />}
 
                     {!bookFiles || bookFiles.length === 0 ? (
                       <p className={styles['download-panel-empty']}>
@@ -354,18 +358,12 @@ export const BookDetailsComponent = ({
                           >
                             <span className={styles['download-file-format']}>
                               {FORMAT_EXTENSIONS[
-                                (file.formatId ?? 1) - 1
+                                file.formatId ?? 1
                               ]?.toUpperCase() ?? ''}
                             </span>
                             <span className={styles['download-file-size']}>
                               {formatFileSize(file.fileSizeBytes)}
                             </span>
-                            {isDownloading && (
-                              <Circles
-                                fill="#d32f2f"
-                                // style={{ color: '#fff3e0' }}
-                              />
-                            )}
                           </li>
                         ))}
                       </ul>

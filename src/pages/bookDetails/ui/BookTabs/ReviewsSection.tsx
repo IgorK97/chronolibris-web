@@ -110,23 +110,23 @@ function ReviewItem({
     dislikes: number;
     userVote: 'like' | 'dislike' | null;
   });
-  const [expanded, setExpanded] = useState(false);
-  const [isOverflowing, setIsOverflowing] = useState(false);
-  const textRef = useRef<HTMLDivElement>(null);
+  // const [expanded, setExpanded] = useState(false);
+  // const [isOverflowing, setIsOverflowing] = useState(false);
+  // const textRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const checkOverflow = () => {
-      if (textRef.current) {
-        const overflowing =
-          textRef.current.scrollHeight > textRef.current.clientHeight;
-        setIsOverflowing(overflowing);
-      }
-    };
+  // useEffect(() => {
+  //   const checkOverflow = () => {
+  //     if (textRef.current) {
+  //       const overflowing =
+  //         textRef.current.scrollHeight > textRef.current.clientHeight;
+  //       setIsOverflowing(overflowing);
+  //     }
+  //   };
 
-    checkOverflow();
-    window.addEventListener('resize', checkOverflow);
-    return () => window.removeEventListener('resize', checkOverflow);
-  }, [review.text]);
+  //   checkOverflow();
+  //   window.addEventListener('resize', checkOverflow);
+  //   return () => window.removeEventListener('resize', checkOverflow);
+  // }, [review.text]);
   const { mutateAsync: rateReview } = useRateReview();
   const handleVote = async (type: 'like' | 'dislike') => {
     if (!isAuth) return;
@@ -186,14 +186,14 @@ function ReviewItem({
           </div>
 
           <div
-            className={`${styles['review-text-wrap']} ${expanded ? styles['review-text-wrap-expanded'] : ''}`}
+            className={styles['review-text-wrap']}
             style={{ ['--lines' as string]: TRUNCATE_LINES }}
           >
             {/* <p className={styles['comment-text']}>{review.text}</p> */}
             {renderFormattedText(review.text!)}
           </div>
 
-          {isOverflowing && (
+          {/* {isOverflowing && (
             <button
               className={styles['review-toggle-btn']}
               onClick={() => setExpanded((v) => !v)}
@@ -208,7 +208,7 @@ function ReviewItem({
                 </>
               )}
             </button>
-          )}
+          )} */}
 
           <div className={styles['comment-footer']}>
             <div className={styles['vote-group']}>
@@ -278,7 +278,7 @@ export function ReviewsSection({
 
   const allReviews: ReviewDetails[] = data?.pages.flatMap((p) => p.items) ?? [];
   const { user } = useStore();
-  const createReview = useCreateReview(bookId);
+  const createReview = useCreateReview();
   const updateReview = useUpdateReview(bookId);
   const deleteReview = useDeleteReview(bookId);
 

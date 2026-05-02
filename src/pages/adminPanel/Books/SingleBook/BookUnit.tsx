@@ -824,8 +824,8 @@ export const BookUnit: React.FC = () => {
     return <div className={styles['error']}>Книга не найдена</div>;
 
   const isEditing = mode === 'edit';
-  console.log('DATA: ', isSaving, !isValid, !isChanged);
-  console.log('ERRORS: ', errors);
+  // console.log('DATA: ', isSaving, !isValid, !isChanged);
+  // console.log('ERRORS: ', errors);
   return (
     <div className={styles['book-unit']}>
       <div className={styles['book-unit-header']}>

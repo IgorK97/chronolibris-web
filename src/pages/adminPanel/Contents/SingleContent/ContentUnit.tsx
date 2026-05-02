@@ -515,8 +515,8 @@ export const ContentUnit: React.FC = () => {
   return (
     <div className={styles['book-unit']}>
       <div className={styles['book-unit-header']}>
-        <button onClick={() => navigate('/contents')}>
-          <ArrowLeft style={{ cursor: 'pointer' }} /> Назад к списку
+        <button onClick={() => navigate(-1)}>
+          <ArrowLeft style={{ cursor: 'pointer' }} /> Назад
         </button>
         <h2>{isNew ? 'Новый контент' : content?.title}</h2>
         <ErrorMsg text={globalError} />

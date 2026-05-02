@@ -146,7 +146,7 @@ export const Reader: React.FC<ReaderProps> = ({
   const pageGap = 40;
 
   //Индекс первого видимого на странице параграфа до изменений
-  const visibleParaIndexRef = useRef<number | null>(null);
+  const visibleParaIndexRef = useRef<string | null>(null);
   //Флаг того, что после изменения нужно восстановить позицию по элементу
   const restoreByElementRef = useRef<boolean>(false);
 
@@ -178,7 +178,7 @@ export const Reader: React.FC<ReaderProps> = ({
     const contentLeft = ct.scrollLeft;
     // const contentRight = contentLeft + ct.clientWidth;
     const paragraphs = ct.querySelectorAll(
-      '[data-para-index]'
+      '[data-xpointer]'
     ) as NodeListOf<HTMLElement>;
 
     for (const p of paragraphs) {
@@ -188,7 +188,7 @@ export const Reader: React.FC<ReaderProps> = ({
       //параграф полностью внутри видимой области
       // (можно ослабить условие до pLeft >= viewportLeft, если нужно начало параграфа)
       if (pLeft >= contentLeft) {
-        return parseInt(p.getAttribute('data-para-index') || '0', 10);
+        return p.getAttribute('data-xpointer') || '/1';
       }
     }
     // Если полностью видимых нет, нужен тот, чье начало ближе всего к началу вьюпорта
@@ -196,7 +196,7 @@ export const Reader: React.FC<ReaderProps> = ({
       (p) => p.offsetLeft + p.offsetWidth > contentLeft
     );
     return firstVisible
-      ? parseInt(firstVisible.getAttribute('data-para-index') || '0', 10)
+      ? firstVisible.getAttribute('data-xpointer') || '/1'
       : null;
   }, []);
 
@@ -279,7 +279,7 @@ export const Reader: React.FC<ReaderProps> = ({
   const pendingBookmarkXpRef = useRef<string | null>(null);
   const pendingXpointerRef = useRef<string | null>(null);
 
-  const pendingBookmarkParaRef = useRef<number | null>(null);
+  const pendingBookmarkParaRef = useRef<string | null>(null);
 
   const pendingColRef = useRef<number | null>(null);
 
@@ -304,14 +304,6 @@ export const Reader: React.FC<ReaderProps> = ({
     const pageWidth = twoPageMode
       ? (ct.clientWidth - pageGap) / 2 + pageGap
       : vp.clientWidth;
-    // console.log(
-    //   twoPageMode,
-    //   ' ',
-    //   ct.clientWidth,
-    //   ' ',
-    //   (ct.clientWidth - pageGap) / 2
-    // );
-    // console.log('PageSize: ', pageWidth);
     const cols = Math.ceil(ct.scrollWidth / pageWidth);
     const newTotal = Math.max(1, cols);
     // console.log(newTotal);
@@ -320,7 +312,7 @@ export const Reader: React.FC<ReaderProps> = ({
     if (restoreByElementRef.current && visibleParaIndexRef.current !== null) {
       const targetParaIndex = visibleParaIndexRef.current;
       const targetEl = ct.querySelector(
-        `[data-para-index="${targetParaIndex}"]`
+        `[data-xpointer="${targetParaIndex}"]`
       ) as HTMLElement;
 
       if (targetEl) {
@@ -613,7 +605,7 @@ export const Reader: React.FC<ReaderProps> = ({
     // На всякий случай задержку поставил, устал уже от всего
     setTimeout(() => {
       const el = contentRef.current?.querySelector(
-        `[data-para-index="${paraIdx}"]`
+        `[data-xpointer="${paraIdx}"]` //data-para-index
       ) as HTMLElement | null;
       if (!el || !viewportRef.current) return;
       const vpRect = viewportRef.current.getBoundingClientRect();
@@ -848,16 +840,6 @@ export const Reader: React.FC<ReaderProps> = ({
             }
             setCurrentPartIndex(idx);
           }
-
-          // const xp = stringifyXpointer(xps ?? []);
-          // if (idx === currentPartIndex) {
-          //   if (xp) {
-          //     pendingBookmarkXpRef.current = xp;
-          //     setTimeout(() => scrollToXpInDOM(xp), 50);
-          //   }
-          // } else pendingColRef.current = 0;
-          // setCurrentPartIndex(idx);
-          // setTocOpen(false);
         }}
       />
 
@@ -879,7 +861,7 @@ export const Reader: React.FC<ReaderProps> = ({
           <div className={styles['controls']}>
             {onBack && (
               <button
-                className={styles['nav-button']}
+                className={styles['font-button']}
                 onClick={() => window.history.back()}
               >
                 <ChevronLeft size={20} />
