@@ -313,3 +313,58 @@
   font-size: 13px;
   align-self: center;
 }
+
+/* Modal tabs */
+.modal-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px 20px 0;
+  border-bottom: 1px solid #e8e8f0;
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+
+.tab-btn {
+  padding: 6px 14px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  font-size: 13px;
+  color: #666;
+  cursor: pointer;
+  white-space: nowrap;
+  border-radius: 4px 4px 0 0;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.tab-btn:hover {
+  color: var(--color-dark-blue);
+}
+
+.tab-btn-active {
+  color: var(--color-dark-blue);
+  border-bottom-color: var(--color-dark-blue);
+  font-weight: 600;
+}
+
+/* Tab content area */
+.tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Content status badges (used in TargetInfoPanel) */
+.status-active {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+.status-hidden {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}

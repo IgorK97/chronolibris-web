@@ -98,7 +98,7 @@ function ReasonTab({ targetId, targetTypeId, reasonTypeId }: ReasonTabProps) {
           <div className={styles['report-meta']}>
             <span className={styles.chip}>#{report.id}</span>
             <span className={styles.muted}>
-              {`${report.id} Пользователь ${report.reporterId}`}
+              {`Пользователь ${report.reporterId}`}
             </span>
             <span className={styles.muted}>{formatDate(report.createdAt)}</span>
           </div>
@@ -155,7 +155,7 @@ function ReportsModal({
                 <button
                   key={reasonId}
                   className={`${styles['tab-btn']} ${
-                    activeTab === reasonId ? styles['tab-btn--active'] : ''
+                    activeTab === reasonId ? styles['tab-btn-active'] : ''
                   }`}
                   onClick={() => setActiveTab(reasonId)}
                 >
