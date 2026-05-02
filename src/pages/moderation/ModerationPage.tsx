@@ -23,13 +23,11 @@ type StatusFilter = 'free' | 'inProgress' | 'accepted' | 'rejected';
 interface Filters {
   statusFilter: StatusFilter;
   targetTypeId: number | null;
-  reasonTypeId: number | null;
 }
 
 const DEFAULT_FILTERS: Filters = {
   statusFilter: 'free',
   targetTypeId: null,
-  reasonTypeId: null,
 };
 
 const REASON_TYPES: { id: number; label: string }[] = [
@@ -67,31 +65,73 @@ function buildFiltersRequest(filters: Filters) {
 
   return {
     targetTypeFilter: filters.targetTypeId !== null,
-    reportTypeFilter: filters.reasonTypeId !== null,
     reportStatusFilter: statusFilter,
     reportStatusId: reportStatusId ?? undefined,
     lastTargetTypeId: filters.targetTypeId ?? undefined,
-    lastReportTypeId: filters.reasonTypeId ?? undefined,
   };
 }
 
 interface ReportsModalProps {
   targetId: number;
   targetTypeId: number;
-  reasonTypeId: number;
+  reasonTypeIds: number[];
   onClose: () => void;
+}
+
+interface ReasonTabProps {
+  targetId: number;
+  targetTypeId: number;
+  reasonTypeId: number;
+}
+
+function ReasonTab({ targetId, targetTypeId, reasonTypeId }: ReasonTabProps) {
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+    useInfiniteTargetReports({ targetId, targetTypeId, reasonTypeId }, true);
+
+  const allReports = data?.pages.flatMap((p) => p.reports) ?? [];
+  return (
+    <div className={styles['tab-content']}>
+      {isLoading && <div className={styles.hint}>Загрузка...</div>}
+
+      {allReports.map((report) => (
+        <div key={report.id} className={styles['report-item']}>
+          <div className={styles['report-meta']}>
+            <span className={styles.chip}>#{report.id}</span>
+            <span className={styles.muted}>
+              {`${report.id} Пользователь ${report.reporterId}`}
+            </span>
+            <span className={styles.muted}>{formatDate(report.createdAt)}</span>
+          </div>
+          <p className={styles['report-text']}>
+            {report.text || <em className={styles.muted}>Без текста</em>}
+          </p>
+        </div>
+      ))}
+      {allReports.length === 0 && !isLoading && (
+        <div className={styles.hint}>Жалобы не найдены</div>
+      )}
+
+      {hasNextPage && (
+        <button
+          className={styles['load-more-btn']}
+          onClick={() => fetchNextPage()}
+          disabled={isFetchingNextPage}
+        >
+          {isFetchingNextPage ? 'Загрузка...' : 'Загрузить ещё'}
+        </button>
+      )}
+    </div>
+  );
 }
 
 function ReportsModal({
   targetId,
   targetTypeId,
-  reasonTypeId,
+  reasonTypeIds,
   onClose,
 }: ReportsModalProps) {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useInfiniteTargetReports({ targetId, targetTypeId, reasonTypeId }, true);
-
-  const allReports = data?.pages.flatMap((p) => p.reports) ?? [];
+  const [activeTab, setActiveTab] = useState(reasonTypeIds[0] ?? 1);
+  const tabs = reasonTypeIds.length > 0 ? reasonTypeIds : [1];
 
   return (
     <div className={styles['modal-overlay']} onClick={onClose}>
@@ -105,39 +145,34 @@ function ReportsModal({
           </button>
         </div>
 
+        {tabs.length > 1 && (
+          <div className={styles['modal-tabs']}>
+            {tabs.map((reasonId) => {
+              const label =
+                REASON_TYPES.find((r) => r.id === reasonId)?.label ??
+                `Тип ${reasonId}`;
+              return (
+                <button
+                  key={reasonId}
+                  className={`${styles['tab-btn']} ${
+                    activeTab === reasonId ? styles['tab-btn--active'] : ''
+                  }`}
+                  onClick={() => setActiveTab(reasonId)}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         <div className={styles['modal-body']}>
-          {isLoading && <div className={styles.hint}>Загрузка...</div>}
-
-          {allReports.map((report) => (
-            <div key={report.id} className={styles['report-item']}>
-              <div className={styles['report-meta']}>
-                <span className={styles.chip}>#{report.id}</span>
-                <span className={styles.muted}>
-                  Пользователь {report.reporterId}
-                </span>
-                <span className={styles.muted}>
-                  {formatDate(report.createdAt)}
-                </span>
-              </div>
-              <p className={styles['report-text']}>
-                {report.text || <em className={styles.muted}>Без текста</em>}
-              </p>
-            </div>
-          ))}
-
-          {allReports.length === 0 && !isLoading && (
-            <div className={styles.hint}>Жалобы не найдены</div>
-          )}
-
-          {hasNextPage && (
-            <button
-              className={styles['load-more-btn']}
-              onClick={() => fetchNextPage()}
-              disabled={isFetchingNextPage}
-            >
-              {isFetchingNextPage ? 'Загрузка...' : 'Загрузить ещё'}
-            </button>
-          )}
+          <ReasonTab
+            key={activeTab}
+            targetId={targetId}
+            targetTypeId={targetTypeId}
+            reasonTypeId={activeTab}
+          />
         </div>
       </div>
     </div>
@@ -165,8 +200,31 @@ function TargetInfoPanel({ targetId, targetTypeId }: TargetInfoPanelProps) {
 
   const isBook = targetTypeId === TARGET_TYPE.BOOK;
 
+  const contentStatusLabel = data.isActive ? 'Активен' : 'Скрыт / удалён';
+  const contentStatusClass = data.isActive
+    ? styles['status-active']
+    : styles['status-hidden'];
+
+  const lastUpdatedLabel = isBook
+    ? 'Обновлён'
+    : data.isActive
+      ? 'Создан'
+      : 'Удалён';
+
   return (
     <div className={styles['target-panel']}>
+      {/* Блок статуса контента */}
+      <div className={styles['target-field']}>
+        <span className={styles['field-label']}>Статус контента:</span>
+        <span className={`${styles['status-chip']} ${contentStatusClass}`}>
+          {contentStatusLabel}
+        </span>
+        {data.lastUpdatedAt && (
+          <span className={styles.muted}>
+            {lastUpdatedLabel}: {formatDate(data.lastUpdatedAt)}
+          </span>
+        )}
+      </div>
       {isBook ? (
         <>
           <div className={styles['target-field']}>
@@ -194,7 +252,11 @@ function TargetInfoPanel({ targetId, targetTypeId }: TargetInfoPanelProps) {
         <>
           <div className={styles['target-field']}>
             <span className={styles['field-label']}>Автор:</span>
-            <span>Пользователь {data.readerId ?? '—'}</span>
+            <span>
+              {data.readerName
+                ? `@${data.readerName}`
+                : `Пользователь ${data.readerId ?? '—'}`}
+            </span>
           </div>
           {data.text && (
             <div className={styles['target-field']}>
@@ -225,7 +287,6 @@ function TargetInfoPanel({ targetId, targetTypeId }: TargetInfoPanelProps) {
     </div>
   );
 }
-
 interface ReportRowProps {
   report: ReportShortDto;
   onUpdated: () => void;
@@ -238,17 +299,16 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
   const createTask = useCreateModerationTask();
   const resolveTask = useResolveTask();
   const [error, setError] = useState(
-    report.comment.length < 20 ? 'Напишие комментарий к решению' : ''
+    report.comment.length < 20 ? 'Напишите комментарий к решению' : ''
   );
-
-  const reasonLabel =
-    REASON_TYPES.find((r) => r.id === report.reasonTypeId)?.label ??
-    `Тип ${report.reasonTypeId}`;
+  // Метки типов жалоб через запятую для отображения в заголовке строки
+  const reasonLabels = (report.reasonTypeIds ?? [])
+    .map((id) => REASON_TYPES.find((r) => r.id === id)?.label ?? `Тип ${id}`)
+    .join(', ');
 
   const isInProgress =
     report.taskStatusId === TASK_STATUS.IN_PROGRESS &&
     report.moderationTaskId !== null;
-
   const isResolved =
     report.taskStatusId === TASK_STATUS.ACCEPTED ||
     report.taskStatusId === TASK_STATUS.REJECTED;
@@ -257,18 +317,17 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
   const isActionLoading = createTask.isPending || resolveTask.isPending;
 
   useEffect(() => {
-    setError(reportText.length < 20 ? 'Напишие комментарий к решению' : '');
+    setError(reportText.length < 20 ? 'Напишите комментарий к решению' : '');
   }, [reportText]);
 
   const handleTakeTask = async () => {
     await createTask.mutateAsync({
       targetId: report.targetId,
       targetTypeId: report.targetTypeId,
-      reportTypeId: report.reasonTypeId,
+      // reportTypeId убран
     });
     onUpdated();
   };
-
   const handleResolve = async (resolution: boolean) => {
     try {
       if (!report.moderationTaskId) return;
@@ -283,7 +342,6 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
       setError(`Ошибка: ${e.response.data?.detail}`);
     }
   };
-
   return (
     <>
       <div className={styles.row}>
@@ -293,19 +351,21 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
               Жалоба на {TARGET_TYPE_LABEL[report.targetTypeId]} #
               {report.targetId}
             </span>
-            <span className={styles['reason-chip']}>{reasonLabel}</span>
+            {reasonLabels && (
+              <span className={styles['reason-chip']}>{reasonLabels}</span>
+            )}
             {report.taskStatusId !== null && (
               <span
                 className={`${styles['status-chip']} ${
-                  isInProgress ? styles['status-in-progress'] : {}
+                  isInProgress ? styles['status-in-progress'] : ''
                 } ${
                   report.taskStatusId === TASK_STATUS.ACCEPTED
                     ? styles['status-accepted']
-                    : {}
+                    : ''
                 }${
                   report.taskStatusId === TASK_STATUS.REJECTED
                     ? styles['status-rejected']
-                    : {}
+                    : ''
                 }`}
               >
                 {TASK_STATUS_LABEL[report.taskStatusId]}
@@ -315,8 +375,8 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
 
           <div className={styles['row-meta']}>
             <span className={styles.muted}>
-              {report.count} жал. · первая {formatDate(report.firstReportDate)}{' '}
-              · последняя {formatDate(report.lastReportDate)}
+              {report.count} жал. — первая {formatDate(report.firstReportDate)}{' '}
+              — последняя {formatDate(report.lastReportDate)}
             </span>
           </div>
         </div>
@@ -328,7 +388,6 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
           >
             {expanded ? 'Скрыть инфо' : 'Показать инфо'}
           </button>
-
           <button
             className={styles['action-btn']}
             onClick={() => setModalOpen(true)}
@@ -398,19 +457,17 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
           />
         )}
       </div>
-
       {modalOpen && (
         <ReportsModal
           targetId={report.targetId}
           targetTypeId={report.targetTypeId}
-          reasonTypeId={report.reasonTypeId}
+          reasonTypeIds={report.reasonTypeIds ?? []}
           onClose={() => setModalOpen(false)}
         />
       )}
     </>
   );
 }
-
 export function ModerationPage() {
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [appliedFilters, setAppliedFilters] =
@@ -496,26 +553,7 @@ export function ModerationPage() {
           </select>
         </div>
 
-        <div className={styles['filter-group']}>
-          <label className={styles['filter-label']}>Тип жалобы</label>
-          <select
-            className={styles.select}
-            value={filters.reasonTypeId ?? ''}
-            onChange={(e) =>
-              setFilters((f) => ({
-                ...f,
-                reasonTypeId: e.target.value ? Number(e.target.value) : null,
-              }))
-            }
-          >
-            <option value="">Все</option>
-            {REASON_TYPES.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        {/* Фильтр по типу жалобы убран */}
 
         <button
           className={`${styles['action-btn']} ${styles['primary-btn']}`}
@@ -530,9 +568,7 @@ export function ModerationPage() {
 
       <div className={styles.list}>
         {isLoading && <div className={styles.hint}>Загрузка...</div>}
-        {isError && (
-          <div className={styles['error-hint']}>Ошибка загрузки </div>
-        )}
+        {isError && <div className={styles['error-hint']}>Ошибка загрузки</div>}
 
         {!isLoading && allReports.length === 0 && (
           <div className={styles.hint}>Жалоб не найдено</div>
@@ -540,7 +576,8 @@ export function ModerationPage() {
 
         {allReports.map((report) => (
           <ReportRow
-            key={`${report.targetId}-${report.targetTypeId}-${report.reasonTypeId}`}
+            // ключ теперь только по контенту, без reasonTypeId
+            key={`${report.targetId}-${report.targetTypeId}`}
             report={report}
             onUpdated={refetch}
           />

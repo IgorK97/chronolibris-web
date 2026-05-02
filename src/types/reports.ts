@@ -1,7 +1,7 @@
 export interface ReportShortDto {
   targetId: number;
   targetTypeId: number;
-  reasonTypeId: number;
+  reasonTypeIds: number[];
   count: number;
   firstReportDate: string;
   lastReportDate: string;
@@ -25,10 +25,10 @@ export interface GetReportsResponse {
 export interface GetReportsRequest {
   lastTargetId?: number;
   lastTargetTypeId?: number;
-  lastReportTypeId?: number;
+  // lastReportTypeId?: number;
   count: number;
   targetTypeFilter: boolean;
-  reportTypeFilter: boolean;
+  // reportTypeFilter: boolean;
   reportStatusFilter: boolean;
   reportStatusId?: number | null;
   lastDate?: string;
@@ -39,10 +39,13 @@ export interface TargetInfoResponse {
   targetTypeId: number;
   text: string | null;
   readerId: number | null;
+  readerName: string | null;
   bookTitle: string | null;
   bookDescription: string | null;
   bookId: number | null;
   parentCommentText: string | null;
+  isActive: boolean;
+  lastUpdatedAt: string | null;
 }
 
 export interface ReportDto {

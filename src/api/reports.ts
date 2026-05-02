@@ -43,11 +43,7 @@ export const reportsApi = {
       params
     ),
 
-  createModerationTask: (data: {
-    targetId: number;
-    targetTypeId: number;
-    reportTypeId: number;
-  }) =>
+  createModerationTask: (data: { targetId: number; targetTypeId: number }) =>
     apiClient.post<CreateModerationTaskResponse, typeof data>(
       '/reports/tasks',
       data
@@ -75,7 +71,6 @@ export const useInfiniteReports = (
       'reports',
       filters.reportStatusId,
       filters.targetTypeFilter,
-      filters.reportTypeFilter,
     ],
     queryFn: ({ pageParam }) =>
       reportsApi.getReports({
