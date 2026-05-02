@@ -408,7 +408,7 @@ function CoverUpload({
       'image/png': [],
       'image/webp': [],
     },
-    maxSize: 5 * 1024 * 1024,
+    maxSize: 1.5 * 1024 * 1024,
     maxFiles: 1,
     onDrop: async ([file]) => {
       if (!file) return;
@@ -434,7 +434,7 @@ function CoverUpload({
           <span>
             {isDragActive
               ? 'Отпустите файл...'
-              : 'Нажмите или перетащите (jpeg, png, webp, до 5 МБ)'}
+              : 'Нажмите или перетащите (jpeg, png, webp, до 1 МБ)'}
           </span>
         )}
       </div>
@@ -496,7 +496,7 @@ const VALIDATION_RULES = {
   isbn: /(?:(?=(?:[^0-9]*[0-9]){10}(?:(?:[^0-9]*[0-9]){3})?$)[\d-]+)?$/,
   bbk: /^[\d\p{L}[\]()+:/="'*.]{0,255}$/u,
   udk: /^[\d\p{L}[\]()+:/="'*.]{0,255}$/u,
-  source: /^[\d\s\p{L};/\\:?&=%#[\]()._,—№§-]{0,500}$/u,
+  source: /^[\d\s\p{L};/\\:?&=%#[\]()._,—–№§-]{0,2000}$/u,
 };
 
 export const BookUnit: React.FC = () => {
