@@ -158,6 +158,8 @@ export const useAddBookToShelf = () => {
       queryClient.invalidateQueries({
         queryKey: ['books', 'shelves', shelfId],
       });
+      queryClient.invalidateQueries({ queryKey: ['selections'] });
+      queryClient.invalidateQueries({ queryKey: ['search'] });
     },
   });
 };
@@ -175,6 +177,8 @@ export const useRemoveBookFromShelf = () => {
       queryClient.invalidateQueries({
         queryKey: ['books', 'shelves', bookId],
       });
+      queryClient.invalidateQueries({ queryKey: ['selections'] });
+      queryClient.invalidateQueries({ queryKey: ['search'] });
     },
   });
 };

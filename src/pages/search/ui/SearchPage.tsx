@@ -36,6 +36,11 @@ import { AdvancedSearchPanel } from './AdvancedSearchPanel';
 import { ThemePanel } from './ThemePanel';
 import { SelectionPanel } from './SelectionPanel';
 import { useResolveFilterNames } from '@/hooks/useResolveFilterNames';
+import {
+  useAddBookToShelf,
+  useRemoveBookFromShelf,
+  useShelves,
+} from '@/api/collections';
 // import { Circles } from 'react-loading-icons';
 
 interface SearchPageProps {
@@ -60,7 +65,6 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const urlQuery = searchParams.get('q') ?? '';
-  const { setCurrentBook } = useStore();
   const filters: AdvancedFilters = useMemo(
     () => filtersFromParams(searchParams),
     [searchParams.toString()]
@@ -124,12 +128,16 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
     filters.excludedTagIds.length > 0 ||
     themeId > 0 ||
     selectionId > 0;
+  const { user, setCurrentBook, isReader } = useStore();
 
-  const { user } = useStore();
   const isAdmin = user?.role === 'admin';
 
   const queryReady = urlQuery.trim().length > 0;
 
+  const { data: shelves } = useShelves(user?.userName || '', isReader());
+  const favoritesShelfId = shelves?.find((s) => s.shelfType === 1)?.id;
+  const { mutateAsync: addBookToShelf } = useAddBookToShelf();
+  const { mutateAsync: removeBookFromShelf } = useRemoveBookFromShelf();
   const simpleSearch = useInfiniteSimpleSearch(
     urlQuery,
     20,
@@ -252,6 +260,19 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
                     onPress={() => {
                       setCurrentBook(toBookListItem(book));
                       onNavigateToBook(book.id);
+                    }}
+                    onFavoriteToggle={async () => {
+                      if (!favoritesShelfId) return;
+                      if (book.isFavorite)
+                        await removeBookFromShelf({
+                          shelfId: favoritesShelfId,
+                          bookId: book.id,
+                        });
+                      else
+                        await addBookToShelf({
+                          shelfId: favoritesShelfId,
+                          bookId: book.id,
+                        });
                     }}
                   />
                 ))}
