@@ -59,7 +59,6 @@ const DOCUMENT_TYPES = [
   { id: 24, name: 'Священный текст', nature: 'Document' },
   { id: 25, name: 'Стенограмма', nature: 'Document' },
   { id: 26, name: 'Публицистика', nature: 'Work' },
-
 ];
 
 interface SelectedPerson {
@@ -559,7 +558,7 @@ export const ContentUnit: React.FC = () => {
           {isEditing ? (
             <div className={styles['edit-form']}>
               <div className={styles['field-group']}>
-                <label className={styles['field-label']}>Название *</label>
+                <label className={styles['field-label']}>Название</label>
                 <input
                   className={styles['field-input']}
                   value={form.title}
@@ -681,7 +680,7 @@ export const ContentUnit: React.FC = () => {
           ) : (
             <div className={styles['edit-form']}>
               <div className={styles['field-group']}>
-                <label className={styles['field-label']}>Название *</label>
+                <label className={styles['field-label']}>Название</label>
                 <input
                   className={styles['field-input']}
                   value={form.title}

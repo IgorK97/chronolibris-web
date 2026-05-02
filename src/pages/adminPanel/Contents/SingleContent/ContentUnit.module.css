@@ -39,7 +39,7 @@
 }
 
 .btn:disabled {
-  background: #95a5a6;
+  opacity: 0.6;
   cursor: default;
 }
 

@@ -132,7 +132,7 @@ export const PersonManager: React.FC = () => {
         <h3>Добавить новую персону</h3>
         <div className={styles['form-grid']}>
           <div className={styles['form-group']}>
-            <label>Имя *</label>
+            <label>Имя</label>
             <input
               type="text"
               placeholder="Имя персоны (например: Лев Толстой)"
@@ -146,7 +146,7 @@ export const PersonManager: React.FC = () => {
           </div>
 
           <div className={styles['form-group']}>
-            <label>Описание *</label>
+            <label>Описание</label>
             <textarea
               placeholder="Краткое описание персоны"
               value={formData.description}
@@ -164,7 +164,7 @@ export const PersonManager: React.FC = () => {
               createMutation.isPending ||
               !formData.name.trim() ||
               !formData.description.trim() ||
-              formData.description.length < 100
+              formData.description.length < 20
             }
             className={styles['btn']}
           >
@@ -214,7 +214,7 @@ export const PersonManager: React.FC = () => {
                         className={styles['input-field textarea']}
                         rows={2}
                         maxLength={2000}
-                        minLength={100}
+                        minLength={20}
                       />
                     </td>
                     <td>
@@ -230,7 +230,7 @@ export const PersonManager: React.FC = () => {
                         disabled={
                           updateMutation.isPending ||
                           !editFormData?.description ||
-                          editFormData?.description.length < 100 ||
+                          editFormData?.description.length < 20 ||
                           !editFormData.name.trim()
                         }
                       >

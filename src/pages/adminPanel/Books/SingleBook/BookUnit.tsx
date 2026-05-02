@@ -96,28 +96,22 @@ function PersonFilter({
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    console.log('USEEFFECT - INITIAL PERSONS', initialPersons);
-    console.log('USEEFFECT - ROLES', roles);
+    // console.log('USEEFFECT - INITIAL PERSONS', initialPersons);
+    // console.log('USEEFFECT - ROLES', roles);
 
     if (initialPersons && initialPersons.length > 0 && roles.length > 0) {
-      // setSelected(
-      //   initialPersons
-      //     .filter((p) => roles.find((r) => r.id == p.roleId)?.kind == 2)
-      //     .map((p) => ({ ...p, uid: `${p.id}-${p.roleId}` }))
-      // );
-
       const filtered = initialPersons
         .filter((p) => {
           const role = roles.find((r) => r.id == p.roleId);
           if (!role) return false;
-          console.log(
-            'FILTERING PERSON',
-            p.name,
-            'WITH ROLE',
-            role.name,
-            'AND KIND',
-            role.kind
-          );
+          // console.log(
+          //   'FILTERING PERSON',
+          //   p.name,
+          //   'WITH ROLE',
+          //   role.name,
+          //   'AND KIND',
+          //   role.kind
+          // );
           if (itemType === 'book')
             return Number(role.kind) === 2 || Number(role.kind) === 3;
           if (itemType === 'content')
@@ -125,7 +119,7 @@ function PersonFilter({
           return true;
         })
         .map((p) => ({ ...p, uid: `${p.id}-${p.roleId}` }));
-      console.log('USEEFFECT - FILTERED PERSONS', filtered);
+      // console.log('USEEFFECT - FILTERED PERSONS', filtered);
       setSelected(filtered);
     }
   }, [initialPersons, roles, itemType]);
@@ -596,26 +590,26 @@ export const BookUnit: React.FC = () => {
   );
 
   const isChanged = useMemo(() => {
-    console.log('USEEFFECT - ISCHANGED - 1');
+    // console.log('USEEFFECT - ISCHANGED - 1');
     if (isNew) return true;
-    console.log('USEEFFECT - ISCHANGED - 2');
+    // console.log('USEEFFECT - ISCHANGED - 2');
 
     if (!book) return false;
-    console.log('USEEFFECT - ISCHANGED - 3', form.deleteCoverCommand);
+    // console.log('USEEFFECT - ISCHANGED - 3', form.deleteCoverCommand);
 
     return (
-      form.title !== (book.title ?? '') ||
-      form.description !== (book.description ?? '') ||
+      form.title.trim() !== (book.title ?? '') ||
+      form.description.trim() !== (book.description ?? '') ||
       form.isbn !== (book.isbn ?? '') ||
       form.year !== (book.year != null ? String(book.year) : '') ||
-      form.source !== (book.source ?? '') ||
+      form.source.trim() !== (book.source ?? '') ||
       form.languageId !== (book.language?.id ?? null) ||
       form.countryId !== (book.country?.id ?? null) ||
       form.publisherId !== (book.publisher?.id ?? null) ||
       form.isAvailable !== book.isAvailable ||
       form.isReviewable !== book.isReviewable ||
-      form.bbk !== book.bbk ||
-      form.udk !== book.udk ||
+      form.bbk !== (book.bbk ?? '') ||
+      form.udk !== (book.udk ?? '') ||
       form.coverFile !== null ||
       form.deleteCoverCommand === true ||
       JSON.stringify(form.personFilters) !==
@@ -629,14 +623,14 @@ export const BookUnit: React.FC = () => {
   }, [form, book, isNew]);
 
   useEffect(() => {
-    console.log('useEffect: TUTA-1');
+    // console.log('useEffect: TUTA-1');
 
     if (mode === 'edit') {
-      console.log('useEffect: TUTA-2');
+      // console.log('useEffect: TUTA-2');
 
       validate(form);
     }
-    console.log('useEffect: TUTA-3');
+    // console.log('useEffect: TUTA-3');
   }, [form, mode, validate]); //??? может, здесь? При изменении атрибутов изменится сам объект?
 
   useEffect(() => {
@@ -703,12 +697,12 @@ export const BookUnit: React.FC = () => {
           ? await fileToBase64(form.coverFile)
           : null;
         const payload: CreateBookRequest = {
-          title: form.title,
-          description: form.description,
+          title: form.title.trim(),
+          description: form.description.trim(),
           isbn: form.isbn || null,
           bbk: form.bbk || null,
           udk: form.udk || null,
-          source: form.source || null,
+          source: form.source.trim() || null,
           year: form.year ? parseInt(form.year) : null,
           isAvailable: form.isAvailable,
           isReviewable: form.isReviewable,
@@ -898,7 +892,7 @@ export const BookUnit: React.FC = () => {
               <ErrorMsg text={errors.cover} />
 
               <div className={styles['field-group']}>
-                <label className={styles['field-label']}>Название *</label>
+                <label className={styles['field-label']}>Название</label>
                 <input
                   className={styles['field-input']}
                   value={form.title}

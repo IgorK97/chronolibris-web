@@ -186,7 +186,7 @@ export const PublisherManager: React.FC = () => {
             <textarea
               placeholder="Описание издательства"
               maxLength={2000}
-              minLength={100}
+              minLength={20}
               value={formData.description}
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
@@ -201,7 +201,7 @@ export const PublisherManager: React.FC = () => {
             disabled={
               createMutation.isPending ||
               !formData.name.trim() ||
-              formData.description.length < 100 ||
+              formData.description.length < 20 ||
               formData.countryId <= 0
             }
             className={styles['btn']}
@@ -253,7 +253,7 @@ export const PublisherManager: React.FC = () => {
                         }
                         className={styles['input-field textarea']}
                         rows={2}
-                        minLength={100}
+                        minLength={20}
                         maxLength={2000}
                       />
                     </td>
@@ -291,7 +291,7 @@ export const PublisherManager: React.FC = () => {
                         disabled={
                           updateMutation.isPending ||
                           !editFormData?.name.trim() ||
-                          editFormData.description.length < 100 ||
+                          editFormData.description.length < 20 ||
                           editFormData.countryId <= 0
                         }
                       >
