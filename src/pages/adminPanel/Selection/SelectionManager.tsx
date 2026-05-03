@@ -17,33 +17,11 @@ import {
   useInfiniteSelectionBooks,
 } from '@/api/collections';
 import { BookCard } from '@/components/Books';
-// import type { BookListItem } from '@/types';
 import styles from './SelectionManager.module.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { AlertDialog } from '@/components/dialogs/AlertDialog';
 import { SelectionPickerModal } from '@/components/selections';
-
-// interface SelectionManagerEditProps {
-//   mode: 'edit';
-//   selectionId: number;
-//   onBack: () => void;
-// }
-
-// interface SelectionManagerCreateProps {
-//   mode: 'create';
-//   onBack: () => void;
-//   onCreate?: (selectionId: number) => void;
-// }
-
-// type SelectionManagerProps =
-//   | SelectionManagerEditProps
-//   | SelectionManagerCreateProps;
-
-// interface CreateFormProps {
-//   onBack: () => void;
-//   onCreate?: (selectionId: number) => void;
-// }
 
 export const SelectionCreatePage: React.FC = () => {
   const navigate = useNavigate();
@@ -133,21 +111,6 @@ export const SelectionCreatePage: React.FC = () => {
   );
 };
 
-// export const SelectionEditPage: React.FC<SelectionManagerProps> = (props) => {
-//   if (props.mode === 'create') {
-//     return <CreateForm onBack={props.onBack} onCreate={props.onCreate} />;
-//   }
-
-//   return (
-//     <SelectionEditView selectionId={props.selectionId} onBack={props.onBack} />
-//   );
-// };
-
-// interface SelectionEditViewProps {
-//   selectionId: number;
-//   onBack: () => void;
-// }
-
 export const SelectionEditPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const selectionId = Number(id);
@@ -160,6 +123,12 @@ export const SelectionEditPage: React.FC = () => {
   >(null);
   const { data: selection, isLoading: selectionLoading } =
     useSelection(selectionId);
+
+  useEffect(() => {
+    if (selection) {
+      document.title = `${selection.name} — Управление подборкой`;
+    }
+  }, [selection]);
 
   const {
     data: infiniteData,

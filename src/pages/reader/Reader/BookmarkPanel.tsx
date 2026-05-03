@@ -14,7 +14,7 @@ interface BookmarkPanelProps {
   onNavigate: (bm: BookmarkDetails) => void;
 }
 
-// из "/1/3/7" в [1, 3, 7]  (для сортировки)
+//из "/1/3/7" в [1,3,7]  (для сортировки)
 const parseXpointer = (xp: string): number[] =>
   xp.split('/').filter(Boolean).map(Number);
 

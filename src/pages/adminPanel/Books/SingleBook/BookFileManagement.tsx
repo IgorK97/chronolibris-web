@@ -31,7 +31,6 @@ interface BookFileManagementProps {
 const FORMAT_EXTENSIONS: Record<number, string> = {
   1: 'fb2',
   2: 'epub',
-  3: 'pdf',
 };
 
 export const BookFileManagement: React.FC<BookFileManagementProps> = ({
@@ -188,17 +187,6 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
             ))}
           </select>
         </div>
-
-        {/* <div className={styles['form-group']}>
-          <label>Основной файл</label>
-          <input
-            type="checkbox"
-            checked={isReadable}
-            onChange={(e) => setIsReadable(e.target.checked)}
-            disabled={selectedFormat !== 1}
-            className={styles['checkbox-field']}
-          />
-        </div> */}
 
         <div className={styles['form-group']}>
           <label>Файл</label>

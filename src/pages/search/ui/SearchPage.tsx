@@ -101,32 +101,8 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
 
   const themeId: number = Number(searchParams.get('themeId') ?? '0') || 0;
 
-  // const setThemeId = (id: number | null) => {
-  //   setSearchParams((prev) => {
-  //     const updated = new URLSearchParams(prev);
-  //     if (id == null || id === 0) {
-  //       updated.delete('themeId');
-  //     } else {
-  //       updated.set('themeId', String(id));
-  //     }
-  //     return updated;
-  //   });
-  // };
-
   const selectionId: number =
     Number(searchParams.get('selectionId') ?? '0') || 0;
-
-  // const setSelectionId = (id: number | null) => {
-  //   setSearchParams((prev) => {
-  //     const updated = new URLSearchParams(prev);
-  //     if (id == null || id === 0) {
-  //       updated.delete('selectionId');
-  //     } else {
-  //       updated.set('selectionId', String(id));
-  //     }
-  //     return updated;
-  //   });
-  // };
 
   const hasFilters =
     filters.personFilters.length > 0 ||

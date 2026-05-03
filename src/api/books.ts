@@ -1,34 +1,16 @@
-import {
-  useQuery,
-  // useInfiniteQuery,
-  useQueryClient,
-  useMutation,
-} from '@tanstack/react-query';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { apiClient } from './apiClient';
 import type {
-  // BookContentLinkRequest,
   BookDetails,
-  // BookDto,
-  // BookFilterRequest,
-  // BookFilters,
-  // BookListItem,
-  // BookListResponse,
   ContentDto,
   CreateBookRequest,
   TextSegment,
   TocData,
-  // PagedResult,
-  // SearchParams,
   UpdateBookRequest,
 } from '../types';
-// import { useDebounce } from '../hooks/useDebounce';
-// import { collectionsApi } from './collections';
 import { queryClient } from './queryClient';
 
 export const booksApi = {
-  // getBookById: (id: number): Promise<BookDto> =>
-  //   apiClient.get<BookDto>(`/Books/${id}`),
-
   createBook: (data: CreateBookRequest): Promise<number> =>
     apiClient.post<number, CreateBookRequest>('/Books', data),
 

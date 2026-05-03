@@ -99,18 +99,9 @@ export const BookDetailsComponent = ({
   const READ_SHELF_ID = shelves?.find((s) => s.shelfType === 2)?.id;
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-
-  // const [hoverRating, setHoverRating] = useState<number>(0);
-  // const [isRatingPopupOpen, setIsRatingPopupOpen] = useState(false);
-  // const ratingRef = useRef<HTMLDivElement>(null);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isShelfPanelOpen, setIsShelfPanelOpen] = useState(false);
 
-  // const handleMouseEnter = () => {
-  //   if (user?.role !== 'reader') return;
-  //   if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
-  //   setIsRatingPopupOpen(true);
-  // };
   const {
     data: fullBookDetails,
     refetch: refetchBook,
@@ -127,8 +118,6 @@ export const BookDetailsComponent = ({
     if (fullBookDetails) {
       document.title = `${fullBookDetails.title} — Читать онлайн`;
     }
-
-    // return () => { document.title = 'Chronolibris'; };
   }, [fullBookDetails]);
 
   const { data: bookFiles } = useBookFiles(Number(bookId) || 0);
@@ -376,14 +365,6 @@ export const BookDetailsComponent = ({
                                 file.formatId ?? 1
                               ]?.toUpperCase() ?? ''}
                             </span>
-                            {/* <span className={styles['download-file-size']}>
-                              {`${formatFileSize(file.storedSizeBytes)} ${
-                                file.formatId === 1
-                                  ? `(zip) 
-                                  ${formatFileSize(file.fileSizeBytes)} (оригинал)`
-                                  : ''
-                              }`}
-                            </span> */}
                             <span className={styles['download-file-size']}>
                               <span style={{ whiteSpace: 'nowrap' }}>
                                 {formatFileSize(file.storedSizeBytes)} (zip)

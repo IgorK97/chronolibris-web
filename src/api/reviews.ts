@@ -53,12 +53,6 @@ export const useInfiniteReviews = (bookId: number, isAuth: boolean) => {
   });
 };
 
-// export const reviewKeys = {
-//   all: ['reviews'] as const,
-//   lists: (bookId: number) => [...reviewKeys.all, 'list', bookId] as const,
-//   my: (bookId: number) => [...reviewKeys.all, 'my', bookId] as const,
-// };
-
 export const useCreateReview = () => {
   return useMutation({
     mutationFn: (req: CreateReviewRequest) => reviewsApi.create(req),

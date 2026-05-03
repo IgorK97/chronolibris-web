@@ -181,7 +181,7 @@ function PersonFilter({
   const handleRemove = (uid: string) => {
     emitChange(selected.filter((p) => p.uid !== uid));
   };
-  console.log('PERSON FILTER - RENDER', selected.length);
+  // console.log('PERSON FILTER - RENDER', selected.length);
   return (
     <div className={styles['field-group']}>
       <label className={styles['field-label']}>Персоналии</label>

@@ -81,12 +81,6 @@ export const ContentList: React.FC<ContentListProps> = ({
           {allContents.map((content) => (
             <tr key={content.id}>
               <td>{content.id}</td>
-              {/* <td
-                className={onTitleClick ? styles['clickable'] : undefined}
-                onClick={onTitleClick ? () => onTitleClick(content) : undefined}
-              >
-                {content.title}
-              </td> */}
               <td className={onTitleClick ? styles['clickable'] : undefined}>
                 {onTitleClick ? (
                   <a

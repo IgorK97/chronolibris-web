@@ -28,7 +28,7 @@ export const BookCard: React.FC<BookCardProps> = ({
 }) => {
   // const [isFavorite, setIsFavorite] = useState(bookInfo.isFavorite);
   // const { shelves } = useStore();
-  const { user, isAdmin, isReader } = useStore();
+  const { isAdmin, isReader } = useStore();
   const coverUrl = import.meta.env.VITE_STORAGE_URL;
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -78,7 +78,7 @@ export const BookCard: React.FC<BookCardProps> = ({
         {isAdmin() && onSelectionToggle && (
           <button
             type="button"
-            className={styles['favorite-button']} // переиспользуем тот же класс позиционирования
+            className={styles['favorite-button']}
             onClick={handleSelectionClick}
             aria-label="Добавить в подборку"
           >
