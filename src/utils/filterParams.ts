@@ -5,6 +5,7 @@ export interface AdvancedFilters {
   requiredTagIds: number[];
   excludedTagIds: number[];
   themeId: number;
+  selectionId: number;
 }
 
 export const EMPTY_FILTERS: AdvancedFilters = {
@@ -12,15 +13,20 @@ export const EMPTY_FILTERS: AdvancedFilters = {
   excludedTagIds: [],
   requiredTagIds: [],
   themeId: 0,
+  selectionId: 0,
 };
 
 export function filtersToParams(
   filters: AdvancedFilters,
   params: URLSearchParams
 ): void {
-  ['tagIncl', 'tagExcl', 'person', 'theme'].forEach((k) => params.delete(k));
+  ['tagIncl', 'tagExcl', 'person', 'themeId', 'selectionId'].forEach((k) =>
+    params.delete(k)
+  );
 
-  if (filters.themeId > 0) params.set('theme', String(filters.themeId));
+  if (filters.themeId > 0) params.set('themeId', String(filters.themeId));
+  if (filters.selectionId > 0)
+    params.set('selectionId', String(filters.selectionId));
 
   if (filters.requiredTagIds.length > 0)
     params.set('tagIncl', filters.requiredTagIds.join(','));
@@ -66,6 +72,7 @@ export function filtersFromParams(params: URLSearchParams): AdvancedFilters {
     requiredTagIds: parseIds('tagIncl'),
     excludedTagIds: parseIds('tagExcl'),
     personFilters: parsePersonFilters(),
-    themeId: parseInt(params.get('theme') ?? '0', 10) || 0,
+    themeId: parseInt(params.get('themeId') ?? '0', 10) || 0,
+    selectionId: parseInt(params.get('selectionId') ?? '0', 10) || 0,
   };
 }

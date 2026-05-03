@@ -408,12 +408,15 @@ export function AdvancedSearchPanel({
 }: Props) {
   const { data: roles = [] } = usePersonRoles();
   const [draft, setDraft] = useState<AdvancedFilters>(filters);
+  console.log('SELECTION', filters.selectionId);
+  console.log('THEME', filters.themeId);
   const handleApply = () => {
     const resDraft: AdvancedFilters = {
       personFilters: draft.personFilters.filter((pf) => pf.roleId),
       excludedTagIds: draft.excludedTagIds,
       requiredTagIds: draft.requiredTagIds,
-      themeId: draft.themeId,
+      themeId: filters.themeId,
+      selectionId: filters.selectionId,
     };
     onChange(resDraft);
   };
