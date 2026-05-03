@@ -110,23 +110,7 @@ function ReviewItem({
     dislikes: number;
     userVote: 'like' | 'dislike' | null;
   });
-  // const [expanded, setExpanded] = useState(false);
-  // const [isOverflowing, setIsOverflowing] = useState(false);
-  // const textRef = useRef<HTMLDivElement>(null);
 
-  // useEffect(() => {
-  //   const checkOverflow = () => {
-  //     if (textRef.current) {
-  //       const overflowing =
-  //         textRef.current.scrollHeight > textRef.current.clientHeight;
-  //       setIsOverflowing(overflowing);
-  //     }
-  //   };
-
-  //   checkOverflow();
-  //   window.addEventListener('resize', checkOverflow);
-  //   return () => window.removeEventListener('resize', checkOverflow);
-  // }, [review.text]);
   const { mutateAsync: rateReview } = useRateReview();
   const handleVote = async (type: 'like' | 'dislike') => {
     if (!isAuth) return;
@@ -193,23 +177,6 @@ function ReviewItem({
             {renderFormattedText(review.text!)}
           </div>
 
-          {/* {isOverflowing && (
-            <button
-              className={styles['review-toggle-btn']}
-              onClick={() => setExpanded((v) => !v)}
-            >
-              {expanded ? (
-                <>
-                  <ChevronUp size={13} /> Свернуть
-                </>
-              ) : (
-                <>
-                  <ChevronDown size={13} /> Читать полностью
-                </>
-              )}
-            </button>
-          )} */}
-
           <div className={styles['comment-footer']}>
             <div className={styles['vote-group']}>
               <VoteButton
@@ -258,9 +225,9 @@ export function ReviewsSection({
   const [pickedRating, setPickedRating] = useState<number>(userCurrentScore);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const handleDeleteReview = async () => {
+    setDeleteModalOpen(false);
     await deleteReview.mutateAsync(userReviewId!);
     onRatingChanged();
-    setDeleteModalOpen(false);
   };
 
   useEffect(() => {
@@ -333,7 +300,7 @@ export function ReviewsSection({
           placeholder="Поделитесь своим впечатлением о книге..."
           onSubmit={handleSubmit}
           type="review"
-          onDelete={() => userReviewId && setDeleteModalOpen(true)}
+          onDelete={() => setDeleteModalOpen(true)}
           initialText={userReviewText || ''}
           isReadOnly={!!userReviewText}
         >

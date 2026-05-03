@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { CornerDownRight, X } from 'lucide-react';
 import styles from './BookTabs.module.css';
-import { AlertDialog } from '@/components/dialogs/AlertDialog';
+// import { AlertDialog } from '@/components/dialogs/AlertDialog';
 
 export function SmartTextBox({
   placeholder,
@@ -25,7 +25,7 @@ export function SmartTextBox({
   isReadOnly?: boolean;
 }) {
   const [text, setText] = useState(initialText);
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  // const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const MAX = 5000;
   const MIN = 120;
@@ -69,7 +69,7 @@ export function SmartTextBox({
           </button>
         </div>
       )}
-      {
+      {/* {
         <AlertDialog
           description="Это действие нельзя будет отменить. После удаления можно написать новый отзыв"
           open={deleteModalOpen}
@@ -80,7 +80,7 @@ export function SmartTextBox({
           }}
           handleReject={() => setDeleteModalOpen(false)}
         />
-      }
+      } */}
       {children}
       <div>
         <div className={styles['toolbar']}>
@@ -138,7 +138,9 @@ export function SmartTextBox({
           {initialText ? (
             <button
               className={`${styles['compose-submit']} ${styles['compose-delete']}`}
-              onClick={() => setDeleteModalOpen(true)}
+              onClick={() => {
+                if (onDelete) onDelete();
+              }}
               style={{ backgroundColor: '#dc2626' }}
             >
               Удалить отзыв
