@@ -19,33 +19,34 @@ import {
 import { BookCard } from '@/components/Books';
 // import type { BookListItem } from '@/types';
 import styles from './SelectionManager.module.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { AlertDialog } from '@/components/dialogs/AlertDialog';
 import { SelectionPickerModal } from '@/components/selections';
 
-interface SelectionManagerEditProps {
-  mode: 'edit';
-  selectionId: number;
-  onBack: () => void;
-}
+// interface SelectionManagerEditProps {
+//   mode: 'edit';
+//   selectionId: number;
+//   onBack: () => void;
+// }
 
-interface SelectionManagerCreateProps {
-  mode: 'create';
-  onBack: () => void;
-  onCreate?: (selectionId: number) => void;
-}
+// interface SelectionManagerCreateProps {
+//   mode: 'create';
+//   onBack: () => void;
+//   onCreate?: (selectionId: number) => void;
+// }
 
-type SelectionManagerProps =
-  | SelectionManagerEditProps
-  | SelectionManagerCreateProps;
+// type SelectionManagerProps =
+//   | SelectionManagerEditProps
+//   | SelectionManagerCreateProps;
 
-interface CreateFormProps {
-  onBack: () => void;
-  onCreate?: (selectionId: number) => void;
-}
+// interface CreateFormProps {
+//   onBack: () => void;
+//   onCreate?: (selectionId: number) => void;
+// }
 
-const CreateForm: React.FC<CreateFormProps> = ({ onBack, onCreate }) => {
+export const SelectionCreatePage: React.FC = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -60,7 +61,8 @@ const CreateForm: React.FC<CreateFormProps> = ({ onBack, onCreate }) => {
       { name: formData.name, description: formData.description },
       {
         onSuccess: (newSelectionId) => {
-          onCreate?.(newSelectionId);
+          // onCreate?.(newSelectionId);
+          navigate(`/selections/${newSelectionId}`, { replace: true });
         },
       }
     );
@@ -68,7 +70,7 @@ const CreateForm: React.FC<CreateFormProps> = ({ onBack, onCreate }) => {
 
   return (
     <div className={styles['container']}>
-      <button onClick={onBack}>
+      <button onClick={() => navigate('/selections')}>
         <ArrowLeft style={{ cursor: 'pointer' }} /> Назад
       </button>
 
@@ -115,7 +117,7 @@ const CreateForm: React.FC<CreateFormProps> = ({ onBack, onCreate }) => {
               {createMutation.isPending ? 'Создание…' : 'Создать подборку'}
             </button>
             <button
-              onClick={onBack}
+              onClick={() => navigate('/selections')}
               className={`${styles['btn']} ${styles['btn-danger']}`}
             >
               Отмена
@@ -131,25 +133,24 @@ const CreateForm: React.FC<CreateFormProps> = ({ onBack, onCreate }) => {
   );
 };
 
-export const SelectionManager: React.FC<SelectionManagerProps> = (props) => {
-  if (props.mode === 'create') {
-    return <CreateForm onBack={props.onBack} onCreate={props.onCreate} />;
-  }
+// export const SelectionEditPage: React.FC<SelectionManagerProps> = (props) => {
+//   if (props.mode === 'create') {
+//     return <CreateForm onBack={props.onBack} onCreate={props.onCreate} />;
+//   }
 
-  return (
-    <SelectionEditView selectionId={props.selectionId} onBack={props.onBack} />
-  );
-};
+//   return (
+//     <SelectionEditView selectionId={props.selectionId} onBack={props.onBack} />
+//   );
+// };
 
-interface SelectionEditViewProps {
-  selectionId: number;
-  onBack: () => void;
-}
+// interface SelectionEditViewProps {
+//   selectionId: number;
+//   onBack: () => void;
+// }
 
-const SelectionEditView: React.FC<SelectionEditViewProps> = ({
-  selectionId,
-  onBack,
-}) => {
+export const SelectionEditPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const selectionId = Number(id);
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({ name: '', description: '' });
   const [bookId, setBookId] = useState('');
@@ -215,10 +216,13 @@ const SelectionEditView: React.FC<SelectionEditViewProps> = ({
     }
   };
 
-  const handleDelete = () => {
-    deleteMutation.mutate(selectionId);
+  const handleDelete = async () => {
     setDeleteModalOpen(false);
-    onBack();
+    await deleteMutation.mutate(selectionId, {
+      onSuccess: () => {
+        navigate('/selections', { replace: true });
+      },
+    });
   };
 
   const handleAddBook = () => {
@@ -253,7 +257,7 @@ const SelectionEditView: React.FC<SelectionEditViewProps> = ({
 
   return (
     <div className={styles['container']}>
-      <button onClick={onBack}>
+      <button onClick={() => navigate('/selections')}>
         <ArrowLeft style={{ cursor: 'pointer' }} /> Назад
       </button>
 
@@ -332,8 +336,8 @@ const SelectionEditView: React.FC<SelectionEditViewProps> = ({
         description={`Это действие нельзя будет отменить`}
         open={deleteModalOpen}
         title={`Вы действительно хотите удалить эту подборку?`}
-        handleAccept={() => {
-          handleDelete();
+        handleAccept={async () => {
+          await handleDelete();
         }}
         handleReject={() => {
           setDeleteModalOpen(false);

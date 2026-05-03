@@ -30,6 +30,8 @@ import {
   LanguageManager,
   PersonManager,
   PublisherManager,
+  SelectionCreatePage,
+  SelectionEditPage,
   ThemeManager,
 } from '@/pages/AdminPanel';
 import { ContentUnit } from '@/pages/AdminPanel/Contents/SingleContent/ContentUnit';
@@ -214,7 +216,11 @@ export default function App() {
             <Route path="publisher" element={<PublisherManager />} />
             <Route path="person" element={<PersonManager />} />
 
+            {/* <Route path="selections" element={<SelectionsPage />} />
+             */}
             <Route path="selections" element={<SelectionsPage />} />
+            <Route path="selections/new" element={<SelectionCreatePage />} />
+            <Route path="selections/:id" element={<SelectionEditPage />} />
             <Route path="themes" element={<ThemeManager />} />
             <Route path="tags" element={<TagsPage />} />
 
