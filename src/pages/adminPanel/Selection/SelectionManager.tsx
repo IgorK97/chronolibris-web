@@ -22,6 +22,7 @@ import styles from './SelectionManager.module.css';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { AlertDialog } from '@/components/dialogs/AlertDialog';
+import { SelectionPickerModal } from '@/components/selections';
 
 interface SelectionManagerEditProps {
   mode: 'edit';
@@ -153,7 +154,9 @@ const SelectionEditView: React.FC<SelectionEditViewProps> = ({
   const [editData, setEditData] = useState({ name: '', description: '' });
   const [bookId, setBookId] = useState('');
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-
+  const [selectionModalBookId, setSelectionModalBookId] = useState<
+    number | null
+  >(null);
   const { data: selection, isLoading: selectionLoading } =
     useSelection(selectionId);
 
@@ -378,6 +381,9 @@ const SelectionEditView: React.FC<SelectionEditViewProps> = ({
                     onPress={() => {
                       navigate(`/book/${book.id}`);
                     }}
+                    onSelectionToggle={(bookId) =>
+                      setSelectionModalBookId(bookId)
+                    }
                   />
                   <button
                     className={`${styles['btn']} ${styles['btn-danger']}`}
@@ -402,6 +408,12 @@ const SelectionEditView: React.FC<SelectionEditViewProps> = ({
           </>
         )}
       </div>
+      {selectionModalBookId !== null && (
+        <SelectionPickerModal
+          bookId={selectionModalBookId}
+          onClose={() => setSelectionModalBookId(null)}
+        />
+      )}
     </div>
   );
 };

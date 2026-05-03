@@ -41,6 +41,7 @@ import {
   useRemoveBookFromShelf,
   useShelves,
 } from '@/api/collections';
+import { SelectionPickerModal } from '@/components/selections';
 // import { Circles } from 'react-loading-icons';
 
 interface SearchPageProps {
@@ -63,15 +64,17 @@ function toBookListItem(book: BookSearchResult): BookListItem {
 export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [showAdvanced, setShowAdvanced] = useState(false);
-
+  const [selectionModalBookId, setSelectionModalBookId] = useState<
+    number | null
+  >(null);
   const urlQuery = searchParams.get('q') ?? '';
   const filters: AdvancedFilters = useMemo(
     () => filtersFromParams(searchParams),
     [searchParams.toString()]
   );
   const filtersCurrent: AdvancedFilters = useMemo(() => {
-    console.log('SELECTION - PAGE', searchParams.get('selectionId'));
-    console.log('THEME - PAGE', searchParams.get('themeId'));
+    // console.log('SELECTION - PAGE', searchParams.get('selectionId'));
+    // console.log('THEME - PAGE', searchParams.get('themeId'));
     return filtersFromParams(searchParams);
   }, [
     searchParams.get('person'),
@@ -271,6 +274,11 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
                       setCurrentBook(toBookListItem(book));
                       onNavigateToBook(book.id);
                     }}
+                    onSelectionToggle={
+                      isAdmin
+                        ? (bookId) => setSelectionModalBookId(bookId)
+                        : undefined
+                    }
                     onFavoriteToggle={async () => {
                       if (!favoritesShelfId) return;
                       if (book.isFavorite)
@@ -305,6 +313,12 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
           </div>
         </div>
       </div>
+      {selectionModalBookId !== null && (
+        <SelectionPickerModal
+          bookId={selectionModalBookId}
+          onClose={() => setSelectionModalBookId(null)}
+        />
+      )}
     </div>
   );
 }

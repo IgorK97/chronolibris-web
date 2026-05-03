@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart } from 'lucide-react';
+import { Heart, PlusCircle } from 'lucide-react';
 import type { BookListItem } from '@/types';
 import {
   favColor,
@@ -17,21 +17,30 @@ interface BookCardProps {
   bookInfo: BookListItem;
   onPress: () => void;
   onFavoriteToggle?: (bookId: number, currentIsFavorite: boolean) => void;
+  onSelectionToggle?: (bookId: number) => void;
 }
 
 export const BookCard: React.FC<BookCardProps> = ({
   bookInfo,
   onPress,
   onFavoriteToggle,
+  onSelectionToggle,
 }) => {
   // const [isFavorite, setIsFavorite] = useState(bookInfo.isFavorite);
   // const { shelves } = useStore();
-  const { user } = useStore();
+  const { user, isAdmin, isReader } = useStore();
   const coverUrl = import.meta.env.VITE_STORAGE_URL;
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onFavoriteToggle) {
       onFavoriteToggle(bookInfo.id, bookInfo.isFavorite);
+    }
+  };
+
+  const handleSelectionClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onSelectionToggle) {
+      onSelectionToggle(bookInfo.id);
     }
   };
   return (
@@ -52,7 +61,7 @@ export const BookCard: React.FC<BookCardProps> = ({
           </div>
         )}
 
-        {user?.role == 'reader' && (
+        {isReader() && (
           <button
             type="button"
             className={styles['favorite-button']}
@@ -64,6 +73,16 @@ export const BookCard: React.FC<BookCardProps> = ({
               color={bookInfo.isFavorite ? favColor : unfavColor}
               fill={bookInfo.isFavorite ? fillFavColor : fillUnfavColor}
             />
+          </button>
+        )}
+        {isAdmin() && onSelectionToggle && (
+          <button
+            type="button"
+            className={styles['favorite-button']} // переиспользуем тот же класс позиционирования
+            onClick={handleSelectionClick}
+            aria-label="Добавить в подборку"
+          >
+            <PlusCircle size={16} />
           </button>
         )}
       </div>

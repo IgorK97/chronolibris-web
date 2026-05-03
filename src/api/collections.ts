@@ -17,7 +17,8 @@ import { queryClient } from './queryClient';
 
 export const collectionsApi = {
   getAllSelections: () => apiClient.get<SelectionDetails[]>('/Selections'),
-
+  seekBookInSelection: (bookId: number) =>
+    apiClient.get<number[]>(`/Selections/books/${bookId}`),
   getSelections: (
     lastId?: number | null,
     limit: number = 20,
@@ -119,7 +120,8 @@ export const useDeleteShelf = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: number) => collectionsApi.deleteShelf(id),
-    onSuccess: (_, id) => {
+    onSuccess: () => {
+      //_, id
       // queryClient.removeQueries({ queryKey: ['books', 'shelves', id] });
       queryClient.invalidateQueries({ queryKey: ['shelves'] });
       queryClient.invalidateQueries({ queryKey: ['books', 'shelves'] });
@@ -201,6 +203,14 @@ export const useSelectionsInfinite = (
       lastPage.hasNext ? lastPage.lastId : undefined,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: 'always',
+  });
+};
+
+export const useSeekedSelections = (bookId: number) => {
+  return useQuery({
+    queryKey: ['selections', 'book', bookId],
+    queryFn: () => collectionsApi.seekBookInSelection(bookId),
+    enabled: !!bookId,
   });
 };
 
@@ -293,9 +303,12 @@ export const useAddBookToSelection = () => {
       selectionId: number;
       bookId: number;
     }) => collectionsApi.addBookToSelection(selectionId, bookId),
-    onSuccess: (_, { selectionId }) => {
+    onSuccess: (_, { selectionId, bookId }) => {
       queryClient.invalidateQueries({ queryKey: ['selection', selectionId] });
       queryClient.invalidateQueries({ queryKey: ['selections'] });
+      queryClient.invalidateQueries({
+        queryKey: ['selections', 'book', bookId],
+      });
     },
   });
 };
@@ -310,9 +323,12 @@ export const useRemoveBookFromSelection = () => {
       selectionId: number;
       bookId: number;
     }) => collectionsApi.removeBookFromSelection(selectionId, bookId),
-    onSuccess: (_, { selectionId }) => {
+    onSuccess: (_, { selectionId, bookId }) => {
       queryClient.invalidateQueries({ queryKey: ['selection', selectionId] });
       queryClient.invalidateQueries({ queryKey: ['selections'] });
+      queryClient.invalidateQueries({
+        queryKey: ['selections', 'book', bookId],
+      });
     },
   });
 };
