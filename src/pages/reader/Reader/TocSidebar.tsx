@@ -88,18 +88,21 @@ export const TocSidebar: React.FC<TocSidebarProps> = ({
         )} */}
 
         <div className={styles['toc-list']}>
-          {tocData.Body && tocData.Body.length > 0
-            ? renderBodyItems(tocData.Body)
-            : tocData.Parts.map((part, idx) => (
-                <button
-                  key={idx}
-                  className={`${styles['toc-item']} ${idx === currentPartIndex ? styles['toc-item-active'] : ''}`}
-                  style={{ paddingLeft: 16 }}
-                  onClick={() => onSelectPart(idx)}
-                >
-                  {part.url || `Часть ${idx + 1}`}
-                </button>
-              ))}
+          {
+            tocData.Body &&
+              tocData.Body.length > 0 &&
+              renderBodyItems(tocData.Body)
+            // : tocData.Parts.map((part, idx) => (
+            //     <button
+            //       key={idx}
+            //       className={`${styles['toc-item']} ${idx === currentPartIndex ? styles['toc-item-active'] : ''}`}
+            //       style={{ paddingLeft: 16 }}
+            //       onClick={() => onSelectPart(idx)}
+            //     >
+            //       {part.url || `Часть ${idx + 1}`}
+            //     </button>
+            //   ))
+          }
         </div>
       </aside>
     </>,

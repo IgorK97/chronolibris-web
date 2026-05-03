@@ -451,7 +451,7 @@
 .lightbox-overlay {
   position: fixed;
   inset: 0;
-  background: rgb(0 0 0 / 85%);
+  background-color: rgb(30 30 30 / 65%);
   z-index: 2000;
   display: flex;
   align-items: center;
@@ -461,11 +461,12 @@
 }
 
 .lightbox-img {
+  background-color: #fff;
   max-width: 90vw;
   max-height: 90vh;
   object-fit: contain;
   border-radius: 4px;
-  box-shadow: 0 8px 40px rgb(0 0 0 / 60%);
+  box-shadow: 0 8px 40px rgb(110 110 110);
   animation: scale-in 0.15s ease;
 }
 

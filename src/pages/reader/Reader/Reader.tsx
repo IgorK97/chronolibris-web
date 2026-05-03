@@ -361,7 +361,7 @@ export const Reader: React.FC<ReaderProps> = ({
   useEffect(() => {
     window.addEventListener('resize', recalcCols);
     return () => window.removeEventListener('resize', recalcCols);
-  }, []);
+  }, [twoPageMode]);
 
   useEffect(() => {
     if (isLoading || totalCols === 0) return;
@@ -865,7 +865,7 @@ export const Reader: React.FC<ReaderProps> = ({
                 onClick={() => window.history.back()}
               >
                 <ChevronLeft size={20} />
-                <span>Назад</span>
+                <span>Назад к описанию</span>
               </button>
             )}
             {fetchedTocData && (
