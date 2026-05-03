@@ -66,6 +66,8 @@
 .download-file-size {
   font-size: 13px;
   color: #666;
+  display: flex;
+  flex-direction: column;
 }
 
 .download-error {

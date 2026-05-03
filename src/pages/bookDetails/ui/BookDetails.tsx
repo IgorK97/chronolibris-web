@@ -223,7 +223,8 @@ export const BookDetailsComponent = ({
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      const extension = FORMAT_EXTENSIONS[formatId];
+      let extension = FORMAT_EXTENSIONS[formatId];
+      if (extension === 'fb2') extension += '.zip';
       a.download = `${fullBookDetails.title}.${extension}`;
       document.body.appendChild(a);
       a.click();
@@ -361,8 +362,24 @@ export const BookDetailsComponent = ({
                                 file.formatId ?? 1
                               ]?.toUpperCase() ?? ''}
                             </span>
+                            {/* <span className={styles['download-file-size']}>
+                              {`${formatFileSize(file.storedSizeBytes)} ${
+                                file.formatId === 1
+                                  ? `(zip) 
+                                  ${formatFileSize(file.fileSizeBytes)} (оригинал)`
+                                  : ''
+                              }`}
+                            </span> */}
                             <span className={styles['download-file-size']}>
-                              {formatFileSize(file.fileSizeBytes)}
+                              <span style={{ whiteSpace: 'nowrap' }}>
+                                {formatFileSize(file.storedSizeBytes)} (zip)
+                              </span>
+                              {file.formatId === 1 && (
+                                <span style={{ whiteSpace: 'nowrap' }}>
+                                  {formatFileSize(file.fileSizeBytes)}{' '}
+                                  (оригинал)
+                                </span>
+                              )}
                             </span>
                           </li>
                         ))}

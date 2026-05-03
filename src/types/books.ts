@@ -16,7 +16,8 @@ export interface BookFileDto {
   formatName?: string | null;
   storageUrl: string;
   fileSizeBytes: number;
-  fileSizeDisplay: string;
+  storedSizeBytes: number;
+  // fileSizeDisplay: string;
   isReadable: boolean;
   createdAt: string;
   completedAt?: string | null;

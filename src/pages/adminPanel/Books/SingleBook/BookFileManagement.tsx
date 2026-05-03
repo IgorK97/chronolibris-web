@@ -17,6 +17,12 @@ import { t } from 'i18next';
 import { AlertDialog } from '@/components/dialogs/AlertDialog';
 import Circles from 'react-loading-icons/dist/esm/components/circles';
 
+const formatFileSize = (bytes: number): string => {
+  if (bytes < 1024) return `${bytes} Б`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} КБ`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} МБ`;
+};
+
 interface BookFileManagementProps {
   bookId: number;
   bookTitle: string;
@@ -114,7 +120,8 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      const extension = FORMAT_EXTENSIONS[formatId] || '';
+      let extension = FORMAT_EXTENSIONS[formatId] || '';
+      if (extension === 'fb2') extension += '.zip';
       a.download = `${bookTitle}.${extension}`;
       document.body.appendChild(a);
       a.click();
@@ -241,7 +248,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
             <tr>
               <th>ID</th>
               <th>Формат</th>
-              <th>Размер</th>
+              <th>Размер исходного файла</th>
               <th>Статус</th>
               <th>Тип</th>
               <th>Загружен</th>
@@ -253,7 +260,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
               <tr key={file.id}>
                 <td>{file.id}</td>
                 <td>{file.formatName}</td>
-                <td>{file.fileSizeDisplay}</td>
+                <td>{formatFileSize(file.fileSizeBytes)}</td>
                 <td>{getStatusBadge(file.bookFileStatusId)}</td>
                 <td>{file.isReadable ? 'Основной' : 'Для скачивания'}</td>
                 <td>{new Date(file.createdAt).toLocaleDateString('ru-RU')}</td>
