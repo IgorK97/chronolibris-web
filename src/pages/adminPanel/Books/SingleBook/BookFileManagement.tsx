@@ -41,7 +41,8 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
   const { data: bookFiles, isLoading, error, refetch } = useBookFiles(bookId);
   const { data: formats } = useFormats();
   const uploadMutation = useUploadBookFile();
-  const deleteMutation = useDeleteBookFile();
+  const { mutateAsync: deleteAsync, isPending: isDeleting } =
+    useDeleteBookFile();
   // const downloadMutation = useDownloadBookFile();
   // const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
@@ -105,7 +106,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
 
   const handleDelete = async () => {
     setDeleteModalOpen(false);
-    await deleteMutation.mutateAsync(deletingBookfile);
+    await deleteAsync(deletingBookfile);
     refetch();
   };
 
@@ -242,7 +243,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
       />
       <div className={styles['files-list']}>
         <h4>Существующие файлы ({bookFiles?.length || 0})</h4>
-        {isDownloading && <Circles width={50} fill="#d32f2f" />}
+        {(isDownloading || isDeleting) && <Circles width={50} fill="#d32f2f" />}
         <table className={styles['files-table']}>
           <thead>
             <tr>
@@ -278,7 +279,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
                       setDeletingBookfile(file.id);
                       setDeleteModalOpen(true);
                     }}
-                    disabled={deleteMutation.isPending}
+                    disabled={isDeleting}
                   >
                     <Trash2 style={{ cursor: 'pointer' }} />
                   </button>

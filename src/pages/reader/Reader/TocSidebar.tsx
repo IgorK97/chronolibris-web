@@ -83,9 +83,9 @@ export const TocSidebar: React.FC<TocSidebarProps> = ({
           </button>
         </div>
 
-        {tocData.Meta?.Title && (
+        {/* {tocData.Meta?.Title && (
           <div className={styles['toc-book-title']}>{tocData.Meta.Title}</div>
-        )}
+        )} */}
 
         <div className={styles['toc-list']}>
           {tocData.Body && tocData.Body.length > 0
