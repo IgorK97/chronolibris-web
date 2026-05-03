@@ -74,9 +74,9 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
     console.log('THEME - PAGE', searchParams.get('themeId'));
     return filtersFromParams(searchParams);
   }, [
-    searchParams.get('personFilters'),
-    searchParams.get('requiredTagIds'),
-    searchParams.get('excludedTagIds'),
+    searchParams.get('person'),
+    searchParams.get('tagIncl'),
+    searchParams.get('tagExcl'),
     searchParams.get('themeId'),
     searchParams.get('selectionId'),
   ]);
