@@ -870,11 +870,11 @@ export const Reader: React.FC<ReaderProps> = ({
             )}
             {fetchedTocData && (
               <button
-                className={styles['nav-button']}
+                className={styles['font-button']}
                 onClick={() => setTocOpen(true)}
               >
                 <TableOfContents size={20} />
-                <span>Содержание</span>
+                <span className={styles['toc']}>Содержание</span>
               </button>
             )}
             <button
