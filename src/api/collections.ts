@@ -119,7 +119,8 @@ export const useDeleteShelf = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: number) => collectionsApi.deleteShelf(id),
-    onSuccess: () => {
+    onSuccess: (_, id) => {
+      // queryClient.removeQueries({ queryKey: ['books', 'shelves', id] });
       queryClient.invalidateQueries({ queryKey: ['shelves'] });
       queryClient.invalidateQueries({ queryKey: ['books', 'shelves'] });
     },
@@ -227,20 +228,6 @@ export const useSelectionBooksDefault = (selectionId: number) =>
     queryFn: () => collectionsApi.getSelectionBooks(selectionId, 0, 10),
     enabled: !!selectionId,
   });
-
-// export const useSelectionBooks = (
-//   selectionId: number,
-//   lastId: number | null,
-//   limit: number = 10
-// ) => {
-//   return useQuery({
-//     queryKey: ['selections', selectionId, lastId, limit],
-//     queryFn: () => collectionsApi.getSelectionBooks(selectionId, lastId, limit),
-//     enabled: !!selectionId,
-//     //На всякий случай, пока идет рефетч после инвалидации, вернуть старые данные вместо undefined
-//     placeholderData: keepPreviousData,
-//   });
-// };
 
 export const useAllSelections = () => {
   return useQuery({

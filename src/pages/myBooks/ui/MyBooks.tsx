@@ -190,11 +190,11 @@ export const MyBooks = ({
         open={deleteModalOpen}
         title={`Вы действительно хотите удалить эту книжную полку?`}
         handleAccept={async () => {
+          setSelectedShelfId(null);
+          setShelfMenuId(null);
+          setDeleteModalOpen(false);
           await deleteShelf(deletingShelfId);
           setDeletingShelfId(0);
-          setSelectedShelfId(null);
-          setDeleteModalOpen(false);
-          setShelfMenuId(null);
         }}
         handleReject={() => {
           setDeleteModalOpen(false);
