@@ -199,6 +199,7 @@ export const useSelectionsInfinite = (
     getNextPageParam: (lastPage) =>
       lastPage.hasNext ? lastPage.lastId : undefined,
     staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: 'always',
   });
 };
 
@@ -246,6 +247,7 @@ export const useAllSelections = () => {
     queryKey: ['selections'],
     queryFn: () => collectionsApi.getAllSelections(),
     staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: 'always',
   });
 };
 
