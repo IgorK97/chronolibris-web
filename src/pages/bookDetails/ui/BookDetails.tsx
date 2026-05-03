@@ -50,6 +50,7 @@ import { TagChip } from '@/components';
 import { BookTabs } from './BookTabs';
 import { AlertDialog } from '@/components/dialogs/AlertDialog';
 import { StarRating } from './Components/StarRating';
+import { SelectionPickerModal } from '@/components/selections';
 interface BookDetailsProps {
   onNavigateToReviews: (id: number) => void;
   onNavigateToRead: (bookFileId?: number) => void;
@@ -84,7 +85,7 @@ export const BookDetailsComponent = ({
   onNavigateToBack,
   onReadClick,
 }: BookDetailsProps) => {
-  const { setCurrentBook, user, isReader } = useStore();
+  const { setCurrentBook, user, isReader, isAdmin } = useStore();
   const { data: roles } = useRoles();
   const [isReportOpen, setIsReportOpen] = useState(false);
   const { id: bookId } = useParams();
@@ -144,7 +145,9 @@ export const BookDetailsComponent = ({
     isAuth
   );
   const { data: userReview } = useMyReview(Number(bookId) || 0, isReader());
-
+  const [selectionModalBookId, setSelectionModalBookId] = useState<
+    number | null
+  >(null);
   const createReview = useCreateReview();
   const updateReview = useUpdateReview(Number(bookId) || 0);
   const deleteReview = useDeleteReview(Number(bookId) || 0);
@@ -306,6 +309,17 @@ export const BookDetailsComponent = ({
                   </span>
                 </button>
               </div>
+            )}
+            {isAdmin() && (
+              <button
+                className={styles['icon-button']}
+                onClick={() => setSelectionModalBookId(fullBookDetails.id)}
+              >
+                <ListPlus size={24} />
+                <span className={styles['button-label']}>
+                  {t('book.add_to_selection')}
+                </span>
+              </button>
             )}
             {bookFiles && bookFiles.length > 0 && (
               <button
@@ -614,6 +628,12 @@ export const BookDetailsComponent = ({
           setDeleteModalOpen(false);
         }}
       />
+      {selectionModalBookId !== null && (
+        <SelectionPickerModal
+          bookId={selectionModalBookId}
+          onClose={() => setSelectionModalBookId(null)}
+        />
+      )}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { SectionHeader } from './SectionHeader';
 import { BookCard } from '../../../components/Books';
 import { type BookListItem } from '../../../types';
@@ -15,6 +15,7 @@ import {
   // collectionsApi,
   useShelves,
 } from '@api/collections';
+import { SelectionPickerModal } from '@/components/selections';
 
 interface LibraryProps {
   onNavigateToBook: (id: number) => void;
@@ -35,8 +36,11 @@ const SelectionSection = ({
   onNavigateToList: (id: number, title: string) => void;
   onFavoriteToggle?: (bookId: number, currentIsFavorite: boolean) => void;
 }) => {
+  const { isAdmin } = useStore();
   const { data, isLoading } = useSelectionBooksDefault(id);
-
+  const [selectionModalBookId, setSelectionModalBookId] = useState<
+    number | null
+  >(null);
   const displayBooks = (data?.items ?? []).slice(0, 5);
 
   if (isLoading && !data) {
@@ -57,8 +61,19 @@ const SelectionSection = ({
             bookInfo={book}
             onPress={() => onNavigateToBook(book)}
             onFavoriteToggle={onFavoriteToggle}
+            onSelectionToggle={
+              isAdmin()
+                ? (bookId) => setSelectionModalBookId(bookId)
+                : undefined
+            }
           />
         ))}
+        {selectionModalBookId !== null && (
+          <SelectionPickerModal
+            bookId={selectionModalBookId}
+            onClose={() => setSelectionModalBookId(null)}
+          />
+        )}
       </div>
     </section>
   );

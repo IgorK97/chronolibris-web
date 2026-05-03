@@ -1,9 +1,9 @@
 import { SquareCheckBig, Square, X } from 'lucide-react';
 import {
   useAddBookToSelection,
+  useAllSelections,
   useRemoveBookFromSelection,
   useSeekedSelections,
-  useSelectionsInfinite,
 } from '@/api/collections';
 import styles from './index.module.css';
 import { createPortal } from 'react-dom';
@@ -15,8 +15,7 @@ interface Props {
 }
 
 export const SelectionPickerModal = ({ bookId, onClose, onRefresh }: Props) => {
-  const { data: infiniteData } = useSelectionsInfinite(50, false); // false = все, не только активные
-  const selections = infiniteData?.pages.flatMap((page) => page.items) ?? [];
+  const { data: selections } = useAllSelections();
 
   const { data: seekedSelections } = useSeekedSelections(bookId);
 
@@ -40,7 +39,7 @@ export const SelectionPickerModal = ({ bookId, onClose, onRefresh }: Props) => {
           <X />
         </button>
         <h3>Добавить в подборку</h3>
-        {selections.length === 0 ? (
+        {!selections || selections.length === 0 ? (
           <p className={styles['empty']}>Нет доступных подборок</p>
         ) : (
           <ul className={styles['list']}>

@@ -303,8 +303,8 @@ export const useAddBookToSelection = () => {
       selectionId: number;
       bookId: number;
     }) => collectionsApi.addBookToSelection(selectionId, bookId),
-    onSuccess: (_, { selectionId, bookId }) => {
-      queryClient.invalidateQueries({ queryKey: ['selection', selectionId] });
+    onSuccess: (_, { bookId }) => {
+      queryClient.invalidateQueries({ queryKey: ['selection'] });
       queryClient.invalidateQueries({ queryKey: ['selections'] });
       queryClient.invalidateQueries({
         queryKey: ['selections', 'book', bookId],
@@ -323,8 +323,8 @@ export const useRemoveBookFromSelection = () => {
       selectionId: number;
       bookId: number;
     }) => collectionsApi.removeBookFromSelection(selectionId, bookId),
-    onSuccess: (_, { selectionId, bookId }) => {
-      queryClient.invalidateQueries({ queryKey: ['selection', selectionId] });
+    onSuccess: (_, { bookId }) => {
+      queryClient.invalidateQueries({ queryKey: ['selection'] });
       queryClient.invalidateQueries({ queryKey: ['selections'] });
       queryClient.invalidateQueries({
         queryKey: ['selections', 'book', bookId],
