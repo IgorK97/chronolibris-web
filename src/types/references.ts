@@ -53,14 +53,14 @@ export interface FormatDto {
 export interface CreatePublisherRequest {
   name: string;
   description: string;
-  countryId: number;
+  // countryId: number;
 }
 
 export interface UpdatePublisherRequest {
   id: number;
   name: string;
   description: string;
-  countryId: number;
+  // countryId: number;
 }
 
 export interface CreateFormatRequest {
@@ -100,9 +100,9 @@ export interface PublisherDto {
   name: string;
   description: string;
   createdAt: string;
-  updatedAt?: string | null;
-  countryId: number;
-  countryName?: string | null;
+  // updatedAt?: string | null;
+  // countryId: number;
+  // countryName?: string | null;
 }
 
 export interface PersonDetails {

@@ -6,7 +6,6 @@ import {
   useUpdatePublisher,
   useDeletePublisher,
 } from '@/api/publishers';
-import { useCountries } from '@/api/references';
 import type {
   CreatePublisherRequest,
   PublisherDto,
@@ -17,7 +16,6 @@ import { AlertDialog } from '@/components/dialogs/AlertDialog';
 
 export const PublisherManager: React.FC = () => {
   const { data: publishers, isLoading, error } = usePublishers();
-  const { data: countries } = useCountries();
   const createMutation = useCreatePublisher();
   const updateMutation = useUpdatePublisher();
   const deleteMutation = useDeletePublisher();
@@ -28,7 +26,6 @@ export const PublisherManager: React.FC = () => {
   const [formData, setFormData] = useState<CreatePublisherRequest>({
     name: '',
     description: '',
-    countryId: 0,
   });
 
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -46,14 +43,9 @@ export const PublisherManager: React.FC = () => {
       return;
     }
 
-    if (formData.countryId <= 0) {
-      alert('Выберите страну');
-      return;
-    }
-
     try {
       await createMutation.mutateAsync(formData);
-      setFormData({ name: '', description: '', countryId: 0 });
+      setFormData({ name: '', description: '' });
     } catch (err: any) {
       console.error('Ошибка создания издательства:', err);
       alert(err.response?.data?.message || 'Ошибка создания издательства');
@@ -63,8 +55,7 @@ export const PublisherManager: React.FC = () => {
   const handleUpdate = async (
     id: number,
     name: string,
-    description: string,
-    countryId: number
+    description: string
   ) => {
     if (!name.trim()) {
       alert('Название издательства обязательно');
@@ -76,15 +67,10 @@ export const PublisherManager: React.FC = () => {
       return;
     }
 
-    if (countryId <= 0) {
-      alert('Выберите страну');
-      return;
-    }
-
     try {
       await updateMutation.mutateAsync({
         id,
-        data: { id, name, description, countryId } as UpdatePublisherRequest,
+        data: { id, name, description } as UpdatePublisherRequest,
       });
       setEditingId(null);
       setEditFormData(null);
@@ -105,7 +91,6 @@ export const PublisherManager: React.FC = () => {
       id: publisher.id,
       name: publisher.name,
       description: publisher.description,
-      countryId: publisher.countryId,
     });
   };
 
@@ -163,24 +148,6 @@ export const PublisherManager: React.FC = () => {
             />
           </div>
 
-          <div className="form-group">
-            <p>Страна</p>
-            <select
-              value={formData.countryId}
-              onChange={(e) =>
-                setFormData({ ...formData, countryId: Number(e.target.value) })
-              }
-              className={styles['input-field']}
-            >
-              <option value={0}>Выберите страну</option>
-              {countries?.map((country) => (
-                <option key={country.id} value={country.id}>
-                  {country.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
           <div className={styles['form-group']}>
             <label>Описание</label>
             <textarea
@@ -201,8 +168,7 @@ export const PublisherManager: React.FC = () => {
             disabled={
               createMutation.isPending ||
               !formData.name.trim() ||
-              formData.description.length < 20 ||
-              formData.countryId <= 0
+              formData.description.length < 20
             }
             className={styles['btn']}
           >
@@ -218,7 +184,6 @@ export const PublisherManager: React.FC = () => {
             <tr>
               <th>Название</th>
               <th>Описание</th>
-              <th>Страна</th>
               <th>Создано</th>
               <th>Действия</th>
             </tr>
@@ -257,25 +222,6 @@ export const PublisherManager: React.FC = () => {
                         maxLength={2000}
                       />
                     </td>
-                    <td>
-                      <select
-                        value={editFormData?.countryId || 0}
-                        onChange={(e) =>
-                          setEditFormData({
-                            ...editFormData!,
-                            countryId: Number(e.target.value),
-                          })
-                        }
-                        className={styles['input-field']}
-                      >
-                        <option value={0}>Выберите страну</option>
-                        {countries?.map((country) => (
-                          <option key={country.id} value={country.id}>
-                            {country.name}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
                     <td>{formatDate(publisher.createdAt)}</td>
                     <td>
                       <button
@@ -283,16 +229,14 @@ export const PublisherManager: React.FC = () => {
                           handleUpdate(
                             publisher.id,
                             editFormData?.name || '',
-                            editFormData?.description || '',
-                            editFormData?.countryId || 0
+                            editFormData?.description || ''
                           )
                         }
                         className={`${styles['btn']} ${styles['btn-update']}`}
                         disabled={
                           updateMutation.isPending ||
                           !editFormData?.name.trim() ||
-                          editFormData.description.length < 20 ||
-                          editFormData.countryId <= 0
+                          editFormData.description.length < 20
                         }
                       >
                         {updateMutation.isPending
@@ -314,7 +258,6 @@ export const PublisherManager: React.FC = () => {
                     <td className={styles['description-cell']}>
                       {publisher.description}
                     </td>
-                    <td>{publisher.countryName || '—'}</td>
                     <td>{formatDate(publisher.createdAt)}</td>
                     <td>
                       <button
