@@ -9,6 +9,9 @@ interface TocSidebarProps {
   tocData: TocData | null;
   currentPartIndex: number;
   onSelectPart: (idx: number, xpointer?: number[]) => void;
+  textColor?: string;
+  pageColor?: string;
+  bgColor?: string;
 }
 
 export const TocSidebar: React.FC<TocSidebarProps> = ({
@@ -17,6 +20,9 @@ export const TocSidebar: React.FC<TocSidebarProps> = ({
   tocData,
   currentPartIndex,
   onSelectPart,
+  textColor,
+  pageColor,
+  bgColor,
 }) => {
   if (!tocData) return null;
 
@@ -71,6 +77,11 @@ export const TocSidebar: React.FC<TocSidebarProps> = ({
         className={`${styles['toc-sidebar']} ${open ? styles['toc-sidebar-open'] : ''}`}
         aria-label="Содержание"
         role="navigation"
+        style={{
+          background: pageColor,
+          color: textColor,
+          borderColor: bgColor,
+        }}
       >
         <div className={styles['toc-header']}>
           <span className={styles['toc-title']}>Содержание</span>

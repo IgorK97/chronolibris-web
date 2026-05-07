@@ -12,6 +12,9 @@ interface BookmarkPanelProps {
   onEdit: (bm: BookmarkDetails) => void;
   onDelete: (id: number) => void;
   onNavigate: (bm: BookmarkDetails) => void;
+  textColor?: string;
+  pageColor?: string;
+  bgColor?: string;
 }
 
 //из "/1/3/7" в [1,3,7]  (для сортировки)
@@ -36,6 +39,9 @@ export const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
   onEdit,
   onDelete,
   onNavigate,
+  textColor,
+  pageColor,
+  bgColor,
 }) =>
   createPortal(
     <>
@@ -48,9 +54,17 @@ export const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
         className={`${styles['toc-sidebar']} ${styles['bm-sidebar']} ${open ? styles['toc-sidebar-open'] : ''}`}
         aria-label="Закладки"
         role="complementary"
+        style={{
+          background: pageColor,
+          color: textColor,
+          borderColor: bgColor,
+        }}
       >
         <div className={styles['toc-header']}>
-          <span className={styles['toc-title']}>
+          <span
+          // style={{ color: textColor }}
+          // className={styles['toc-title']}
+          >
             Закладки ({bookmarks.length})
           </span>
           <button

@@ -163,6 +163,11 @@ export const ColorModal: React.FC<ColorModalProps> = ({
         role="dialog"
         aria-modal="true"
         aria-label="Настройка оформления"
+        style={{
+          background: pageColor,
+          color: textColor,
+          borderColor: bgColor,
+        }}
       >
         <div className={styles['color-modal-header']}>
           <span className={styles['color-modal-title']}>Темы оформления</span>

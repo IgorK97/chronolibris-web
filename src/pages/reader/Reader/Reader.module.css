@@ -685,7 +685,6 @@
 .color-modal-title {
   font-size: 15px;
   font-weight: 600;
-  color: #333;
 }
 
 .color-modal-body {
@@ -761,7 +760,7 @@
 .toc-title {
   font-size: 16px;
   font-weight: 700;
-  color: #333;
+  color: #8b4513;
   letter-spacing: 0.02em;
 }
 
@@ -789,7 +788,8 @@
   border: none;
   padding: 10px 16px;
   font-size: 14px;
-  color: #333;
+
+  /* color: #333; */
   cursor: pointer;
   line-height: 1.4;
   transition:

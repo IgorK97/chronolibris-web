@@ -824,6 +824,9 @@ export const Reader: React.FC<ReaderProps> = ({
         open={tocOpen}
         onClose={() => setTocOpen(false)}
         tocData={fetchedTocData}
+        textColor={textColor}
+        pageColor={pageColor}
+        bgColor={bgColor}
         currentPartIndex={currentPartIndex}
         onSelectPart={(idx, xps) => {
           const xp = stringifyXpointer(xps ?? []);
@@ -1077,6 +1080,9 @@ export const Reader: React.FC<ReaderProps> = ({
         isLoading={bookmarksLoading}
         onDelete={(id: number) => deleteBookmark(id, bookFileId)}
         onNavigate={navigateToBookmark}
+        textColor={textColor}
+        pageColor={pageColor}
+        bgColor={bgColor}
       />
       {contextMenu && (
         <ContextMenu
