@@ -404,13 +404,13 @@ export const Reader: React.FC<ReaderProps> = ({
   const goToCol = (col: number) => {
     const vp = viewportRef.current;
     const ct = contentRef.current;
-    if (!vp || !ct) return;
+    if (!vp || !ct || !fetchedTocData) return;
 
     const pageWidth = twoPageMode
       ? (ct!.clientWidth - pageGap) / 2 + pageGap
       : vp.clientWidth;
     // console.log(pageWidth);
-    if (col >= totalCols && fetchedTocData) {
+    if (col >= totalCols) {
       const nextIdx = currentPartIndex + 1;
       if (nextIdx < fetchedTocData.Parts.length) {
         setCurrentCol(0);
@@ -420,23 +420,24 @@ export const Reader: React.FC<ReaderProps> = ({
       return; // -
     }
 
-    if (col < 0 && fetchedTocData) {
+    if (col < 0) {
       const prevIdx = currentPartIndex - 1;
       if (prevIdx >= 0) {
         pendingColRef.current = 9999;
         setCurrentPartIndex(prevIdx);
-        return;
+        // return;
       }
       return;
     }
 
-    let clamped = Math.max(0, Math.min(col, totalCols - 1));
+    // let targetCol = Math.max(0, Math.min(col, totalCols - 1));
+    let targetCol = col;
     // В режиме двух страниц всегда показываем левую страницу разворота
-    if (twoPageMode && clamped > 0) clamped = clamped - (clamped % 2);
-    const leftPos = clamped * pageWidth;
+    if (twoPageMode && targetCol > 0) targetCol = targetCol - (targetCol % 2);
+    const leftPos = targetCol * pageWidth;
 
     // console.log(col, totalCols, leftPos);
-    setCurrentCol(clamped);
+    setCurrentCol(targetCol);
     ct.scrollTo({ left: leftPos, behavior: 'smooth' });
   };
 
@@ -1059,9 +1060,14 @@ export const Reader: React.FC<ReaderProps> = ({
         textColor={textColor}
         pageColor={pageColor}
         bgColor={bgColor}
-        onTextColor={setTextColor}
-        onPageColor={setPageColor}
-        onBgColor={setBgColor}
+        onApplyTheme={(theme: { text: string; page: string; bg: string }) => {
+          if (theme.text) setTextColor(theme.text);
+          if (theme.page) setPageColor(theme.page);
+          if (theme.bg) setBgColor(theme.bg);
+        }}
+        // onTextColor={setTextColor}
+        // onPageColor={setPageColor}
+        // onBgColor={setBgColor}
       />
       <BookmarkPanel
         open={bookmarkPanelOpen}

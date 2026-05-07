@@ -1178,3 +1178,27 @@
 .bm-item-btn:hover {
   color: #8b4513;
 }
+
+.theme-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.theme-row:hover {
+  background: rgb(0 0 0 / 5%);
+}
+
+.active-row {
+  background: rgb(0 0 0 / 8%);
+  font-weight: bold;
+}
+
+.theme-swatches-group {
+  display: flex;
+  gap: 12px;
+}
