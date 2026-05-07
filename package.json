@@ -10,7 +10,8 @@
     "blind-build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "test:ui": "vitest --ui"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

@@ -10,7 +10,7 @@ describe('PhoneInputField', () => {
     onChange: vi.fn(),
   };
 
-  it('отображение маски телефона', () => {
+  it('Отображение маски телефона', () => {
     render(<PhoneInputField {...defaultProps} />);
 
     const input = screen.getByPlaceholderText(
@@ -19,7 +19,7 @@ describe('PhoneInputField', () => {
     expect(input.value).toBe('+7 ___ ___ __ __');
   });
 
-  it('отображение сообщения об ошибке', () => {
+  it('Отображение сообщения об ошибке', () => {
     const errorMessage = 'Ошибка';
     const { container: _ } = render(
       <PhoneInputField {...defaultProps} error={errorMessage} />
@@ -30,7 +30,7 @@ describe('PhoneInputField', () => {
     const input = screen.getByPlaceholderText('Номер телефона');
     expect(input.className).toContain('error-input');
   });
-  it('корректно обновляет значение поля при вводе', () => {
+  it('Корректное обновление значения поля при вводе', () => {
     const { rerender } = render(
       <PhoneInputField {...defaultProps} value="900" />
     );

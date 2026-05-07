@@ -28,23 +28,26 @@ describe('BookCard', () => {
   };
   beforeEach(() => {
     vi.clearAllMocks();
-    (useStore as any).mockReturnValue({ user: { role: 'reader' } });
+    (useStore as any).mockReturnValue({
+      isReader: () => true,
+      isAdmin: () => false,
+    });
   });
 
-  it('отображение заголока книги и списка авторов', () => {
+  it('Корректное отображение заголока книги и списка авторов', () => {
     render(<BookCard {...defaultProps} />);
 
     expect(screen.getByText('Книга')).toBeInTheDocument();
     expect(screen.getByText('Автор')).toBeInTheDocument();
   });
-  it('отображение картинки', () => {
+  it('Отображение картинки, когда она есть', () => {
     render(<BookCard {...defaultProps} />);
 
     const img = screen.getByAltText('Книга') as HTMLImageElement;
     expect(img.src).toBe('http://test-storage.com/covers/book.jpg');
   });
 
-  it('отображение заполнителя (placeholder) при отсутствии картинки', () => {
+  it('Отображение текста при отсутствии картинки', () => {
     const bookWithoutCover = {
       ...mockBook,
       coverUri: null,
@@ -60,13 +63,16 @@ describe('BookCard', () => {
   });
 
   describe('Логика избранного', () => {
-    it('отображение иконки для читателей', () => {
+    it('Отображение иконки для читателей', () => {
       render(<BookCard {...defaultProps} />);
       expect(screen.getByLabelText('Toggle favorite')).toBeInTheDocument();
     });
 
-    it('скрытие иконки для админов', () => {
-      (useStore as any).mockReturnValue({ user: { role: 'admin' } });
+    it('Скрытие иконки для админов', () => {
+      (useStore as any).mockReturnValue({
+        isReader: () => false,
+        isAdmin: () => true,
+      });
       render(<BookCard {...defaultProps} />);
 
       expect(
@@ -74,7 +80,7 @@ describe('BookCard', () => {
       ).not.toBeInTheDocument();
     });
 
-    it('корректный клик по иконке избранного', () => {
+    it('Корректный клик по иконке избранного', () => {
       render(<BookCard {...defaultProps} />);
 
       const favButton = screen.getByLabelText('Toggle favorite');
@@ -88,7 +94,7 @@ describe('BookCard', () => {
     });
   });
 
-  it('перечисление авторов', () => {
+  it('Корректное перечисление авторов', () => {
     const multiAuthorBook = {
       ...mockBook,
       authors: ['Первый автор', 'Второй автор'],

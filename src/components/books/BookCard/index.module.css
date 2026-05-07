@@ -124,6 +124,7 @@
   overflow: hidden;
   text-wrap: balance;
   text-align: left;
+  overflow-wrap: break-word;
 }
 
 .book-author {
@@ -144,6 +145,7 @@
   -webkit-box-orient: vertical;
   text-wrap: balance;
   text-align: left;
+  overflow-wrap: break-word;
 }
 
 .menu-container {

@@ -11,7 +11,7 @@ vi.mock('@/utils', () => ({
   pluralize: (_: number) => 'ratings',
 }));
 
-describe('StarRating Component', () => {
+describe('Компонент оценки книги', () => {
   const defaultProps = {
     averageRating: 4.5,
     ratingsCount: 10,
@@ -22,7 +22,7 @@ describe('StarRating Component', () => {
     onDeleteClick: vi.fn(),
   };
 
-  it('должен показывать всплывающее окно при наведении, если пользователь — читатель', async () => {
+  it('Корректное отображение всплывающего окна при наведении читателем', async () => {
     render(<StarRating {...defaultProps} />);
 
     const trigger = screen.getByTestId('rating-trigger');
@@ -32,7 +32,7 @@ describe('StarRating Component', () => {
     expect(screen.getByText('book.rate_book')).toBeInTheDocument();
   });
 
-  it('не должен показывать всплывающее окно при наведении, если пользователь — админ (не читатель)', () => {
+  it('Если администратор, то окно не всплывает', () => {
     render(<StarRating {...defaultProps} isReader={false} />);
 
     const trigger = screen.getByTestId('rating-trigger');
@@ -41,7 +41,7 @@ describe('StarRating Component', () => {
     expect(screen.queryByTestId('rating-popup')).not.toBeInTheDocument();
   });
 
-  it('должен вызывать onRate с правильным значением при клике на звезду', async () => {
+  it('Корректный вызов onRate с правильным значением при клике на звезду', async () => {
     render(<StarRating {...defaultProps} />);
 
     fireEvent.mouseEnter(screen.getByTestId('rating-trigger'));

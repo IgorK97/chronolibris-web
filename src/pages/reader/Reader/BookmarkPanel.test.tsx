@@ -7,7 +7,7 @@ vi.mock('@/utils', () => ({
   formatDate: (date: string) => `${date}`,
 }));
 
-describe('BookmarkPanel', () => {
+describe('Панель закладок', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -15,7 +15,7 @@ describe('BookmarkPanel', () => {
     {
       id: 101,
       xpointer: '5',
-      context: '',
+      context: 'Контекст',
       note: 'Заметка',
       createdAt: '2024-05-01',
       bookFileId: 1,
@@ -38,7 +38,7 @@ describe('BookmarkPanel', () => {
     onEdit: vi.fn(),
   };
 
-  it('отображение списка закладок с датами', () => {
+  it('Корректное отображение списка закладок', () => {
     render(<BookmarkPanel {...defaultProps} />);
 
     expect(screen.getByText('Заметка')).toBeInTheDocument();
@@ -46,17 +46,19 @@ describe('BookmarkPanel', () => {
     expect(screen.getByText('2024-05-02')).toBeInTheDocument();
   });
 
-  it('вызов onNavigate при клике по закладке', () => {
+  it('Корректный вызов onNavigate при клике по закладке', () => {
     render(<BookmarkPanel {...defaultProps} />);
 
     // const bookmarkItem = screen.getByText('Important quote');
-    const paragraphTitle = screen.getByText('Абзац №5');
+    const paragraphTitle = screen.getByText((content) =>
+      content.includes('Контекст')
+    );
     fireEvent.click(paragraphTitle);
     // fireEvent.click(bookmarkItem);
 
     expect(defaultProps.onNavigate).toHaveBeenCalledWith(mockBookmarks[0]);
   });
-  it('удаление закладки при клике на кнопку Удалить', () => {
+  it('Корректное удаление закладки при клике на кнопку Удалить', () => {
     render(<BookmarkPanel {...defaultProps} />);
 
     const deleteButtons = screen.getAllByText('Удалить');
@@ -65,7 +67,7 @@ describe('BookmarkPanel', () => {
     expect(defaultProps.onDelete).toHaveBeenCalledWith(101);
     expect(defaultProps.onNavigate).not.toHaveBeenCalled();
   });
-  it('скрытие панели при нажатии на кнопку Скрыть', () => {
+  it('Корректное скрытие панели при нажатии на кнопку Скрыть', () => {
     render(<BookmarkPanel {...defaultProps} />);
 
     const overlay = screen.getByTestId('panel-overlay');

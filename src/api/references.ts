@@ -86,8 +86,8 @@ export const useLanguages = () => {
   return useQuery({
     queryKey: ['references', 'languages'],
     queryFn: referencesApi.getLanguages,
-    staleTime: 24 * 60 * 60 * 1000,
-    refetchOnWindowFocus: false,
+    // staleTime: 24 * 60 * 60 * 1000,
+    // refetchOnWindowFocus: false,
   });
 };
 

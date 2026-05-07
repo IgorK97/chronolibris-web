@@ -11,14 +11,14 @@ vi.mock('@/components/dialogs/AlertDialog', () => ({
   AlertDialog: () => <div data-testid="alert-dialog" />,
 }));
 
-describe('SmartTextBox Formatting', () => {
+describe('Форматирование текста', () => {
   const defaultProps = {
     placeholder: 'Введите текст',
     type: 'comment' as const,
     onSubmit: vi.fn(),
   };
 
-  it('должен вставлять символы форматирования в пустой textarea при клике на кнопки', () => {
+  it('Корректная вставка символов форматирования при клике на кнопки', () => {
     render(<SmartTextBox {...defaultProps} />);
 
     const textarea = screen.getByPlaceholderText(
@@ -35,8 +35,8 @@ describe('SmartTextBox Formatting', () => {
     expect(textarea.value).toBe('>!!<');
   });
 
-  it('должен оборачивать выделенный текст в символы форматирования', () => {
-    const initialText = 'Мама мыла раму';
+  it('Корректное оборачивание выделенного текста в символы форматирования', () => {
+    const initialText = 'Текст выделенный текст текст';
     render(<SmartTextBox {...defaultProps} initialText={initialText} />);
 
     const textarea = screen.getByDisplayValue(
@@ -44,10 +44,10 @@ describe('SmartTextBox Formatting', () => {
     ) as HTMLTextAreaElement;
     const italicBtn = screen.getByTitle('Курсив');
 
-    textarea.setSelectionRange(5, 9);
+    textarea.setSelectionRange(6, 22);
 
     fireEvent.click(italicBtn);
 
-    expect(textarea.value).toBe('Мама _мыла_ раму');
+    expect(textarea.value).toBe('Текст __выделенный текст__ текст');
   });
 });
