@@ -37,7 +37,12 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
   bookId,
   bookTitle,
 }) => {
-  const { data: bookFiles, isLoading, error, refetch } = useBookFiles(bookId);
+  const {
+    data: bookFiles,
+    isLoading,
+    error,
+    refetch,
+  } = useBookFiles(bookId, true);
   const { data: formats } = useFormats();
   const uploadMutation = useUploadBookFile();
   const { mutateAsync: deleteAsync, isPending: isDeleting } =
@@ -136,25 +141,24 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
 
   const getStatusBadge = (statusId: number) => {
     const statusMap: Record<number, { label: string; color: string }> = {
-      [BookFileStatuses.PENDING]: { label: 'Ожидание', color: '#ffc107' },
-      [BookFileStatuses.UPLOADED]: { label: 'Загружен', color: '#28a745' },
-      [BookFileStatuses.PROCESSING]: { label: 'Обработка', color: '#17a2b8' },
+      [BookFileStatuses.PENDING]: { label: 'Ожидание', color: 'gray' },
+      [BookFileStatuses.UPLOADED]: { label: 'Загружен', color: 'orange' },
+      [BookFileStatuses.PROCESSING]: { label: 'Обработка', color: 'blue' },
       [BookFileStatuses.COMPLETED]: { label: 'Готов', color: '#28a745' },
       [BookFileStatuses.FAILED]: { label: 'Ошибка', color: '#dc3545' },
     };
 
-    const status = statusMap[statusId] || {
-      label: 'Неизвестно',
-      color: '#6c757d',
-    };
+    const status = statusMap[statusId] || null;
 
     return (
-      <span
-        className={styles['status-badge']}
-        style={{ backgroundColor: status.color }}
-      >
-        {status.label}
-      </span>
+      status && (
+        <span
+          className={styles['status-badge']}
+          style={{ backgroundColor: status.color }}
+        >
+          {status.label}
+        </span>
+      )
     );
   };
 

@@ -54,7 +54,9 @@ export const TocSidebar: React.FC<TocSidebarProps> = ({
               }
             }}
           >
-            <span className={styles['toc-item-text']}>{item.t.trim()}</span>
+            <span className={styles['toc-item-text']}>
+              {item?.t?.trim() || ''}
+            </span>
           </button>
 
           {children && children.length > 0 && (

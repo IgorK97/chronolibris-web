@@ -120,7 +120,7 @@ export const BookDetailsComponent = ({
     }
   }, [fullBookDetails]);
 
-  const { data: bookFiles } = useBookFiles(Number(bookId) || 0);
+  const { data: bookFiles } = useBookFiles(Number(bookId) || 0, false);
   const navigate = useNavigate();
 
   const [isDownloadPanelOpen, setIsDownloadPanelOpen] =

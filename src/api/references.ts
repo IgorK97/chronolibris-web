@@ -3,13 +3,13 @@ import { apiClient } from './apiClient';
 import type {
   CountryDto,
   CreateCountryRequest,
-  CreateFormatRequest,
+  // CreateFormatRequest,
   CreateLanguageRequest,
   FormatDto,
   LanguageDto,
   RoleDetails,
   UpdateCountryRequest,
-  UpdateFormatRequest,
+  // UpdateFormatRequest,
   UpdateLanguageRequest,
 } from '../types';
 
@@ -59,17 +59,17 @@ export const referencesApi = {
   getFormats: (): Promise<FormatDto[]> =>
     apiClient.get<FormatDto[]>('/References/formats'),
 
-  getFormatById: (id: number): Promise<FormatDto> =>
-    apiClient.get<FormatDto>(`/References/formats/${id}`),
+  // getFormatById: (id: number): Promise<FormatDto> =>
+  //   apiClient.get<FormatDto>(`/References/formats/${id}`),
 
-  createFormat: (data: CreateFormatRequest): Promise<number> =>
-    apiClient.post<number, CreateFormatRequest>('/References/formats', data),
+  // createFormat: (data: CreateFormatRequest): Promise<number> =>
+  //   apiClient.post<number, CreateFormatRequest>('/References/formats', data),
 
-  updateFormat: (id: number, data: UpdateFormatRequest): Promise<void> =>
-    apiClient.put<void, UpdateFormatRequest>(`/References/formats/${id}`, data),
+  // updateFormat: (id: number, data: UpdateFormatRequest): Promise<void> =>
+  //   apiClient.put<void, UpdateFormatRequest>(`/References/formats/${id}`, data),
 
-  deleteFormat: (id: number): Promise<void> =>
-    apiClient.delete(`/References/formats/${id}`),
+  // deleteFormat: (id: number): Promise<void> =>
+  //   apiClient.delete(`/References/formats/${id}`),
 };
 
 export const useRoles = () => {
@@ -201,48 +201,48 @@ export const useFormats = () => {
   });
 };
 
-export const useFormatById = (id: number | null) => {
-  return useQuery({
-    queryKey: ['references', 'formats', id],
-    queryFn: () => {
-      if (id === null) throw new Error('ID формата не указан');
-      return referencesApi.getFormatById(id);
-    },
-    enabled: id !== null,
-    staleTime: 24 * 60 * 60 * 1000,
-  });
-};
+// export const useFormatById = (id: number | null) => {
+//   return useQuery({
+//     queryKey: ['references', 'formats', id],
+//     queryFn: () => {
+//       if (id === null) throw new Error('ID формата не указан');
+//       return referencesApi.getFormatById(id);
+//     },
+//     enabled: id !== null,
+//     staleTime: 24 * 60 * 60 * 1000,
+//   });
+// };
 
-export const useCreateFormat = () => {
-  const queryClient = useQueryClient();
+// export const useCreateFormat = () => {
+//   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: referencesApi.createFormat,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['references', 'formats'] });
-    },
-  });
-};
+//   return useMutation({
+//     mutationFn: referencesApi.createFormat,
+//     onSuccess: () => {
+//       queryClient.invalidateQueries({ queryKey: ['references', 'formats'] });
+//     },
+//   });
+// };
 
-export const useUpdateFormat = () => {
-  const queryClient = useQueryClient();
+// export const useUpdateFormat = () => {
+//   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: UpdateFormatRequest }) =>
-      referencesApi.updateFormat(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['references', 'formats'] });
-    },
-  });
-};
+//   return useMutation({
+//     mutationFn: ({ id, data }: { id: number; data: UpdateFormatRequest }) =>
+//       referencesApi.updateFormat(id, data),
+//     onSuccess: () => {
+//       queryClient.invalidateQueries({ queryKey: ['references', 'formats'] });
+//     },
+//   });
+// };
 
-export const useDeleteFormat = () => {
-  const queryClient = useQueryClient();
+// export const useDeleteFormat = () => {
+//   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: referencesApi.deleteFormat,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['references', 'formats'] });
-    },
-  });
-};
+//   return useMutation({
+//     mutationFn: referencesApi.deleteFormat,
+//     onSuccess: () => {
+//       queryClient.invalidateQueries({ queryKey: ['references', 'formats'] });
+//     },
+//   });
+// };

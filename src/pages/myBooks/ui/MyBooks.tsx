@@ -126,7 +126,16 @@ export const MyBooks = ({
                         // setShelfMenuId(shelf.id);
                         e.stopPropagation();
                         setShelfMenuId((prev) =>
-                          prev === shelf.id ? null : shelf.id
+                          // prev === shelf.id ? null : shelf.id
+                          {
+                            if (
+                              prev === shelf.id ||
+                              shelf.shelfType == 1 ||
+                              shelf.shelfType == 2
+                            )
+                              return null;
+                            return shelf.id;
+                          }
                         );
                       }}
                     >

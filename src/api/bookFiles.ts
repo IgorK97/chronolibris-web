@@ -7,8 +7,8 @@ import type {
 } from '../types';
 
 export const bookFilesApi = {
-  getBookFiles: (bookId: number): Promise<BookFileDto[]> =>
-    apiClient.get<BookFileDto[]>(`/BookFiles/book/${bookId}`),
+  getBookFiles: (bookId: number, adminMode: boolean): Promise<BookFileDto[]> =>
+    apiClient.get<BookFileDto[]>(`/BookFiles/book/${bookId}?mode=${adminMode}`),
   // 1. application/json
   //    {"bookId": 5, "formatId": 2}
   //    только текст, бинарник не положить
@@ -71,12 +71,12 @@ export const useDownloadBookFile = () => {
   });
 };
 
-export const useBookFiles = (bookId: number | null) => {
+export const useBookFiles = (bookId: number | null, mode: boolean) => {
   return useQuery({
     queryKey: ['bookFiles', bookId],
     queryFn: () => {
       if (bookId === null) throw new Error('ID книги не указан');
-      return bookFilesApi.getBookFiles(bookId);
+      return bookFilesApi.getBookFiles(bookId, mode);
     },
     enabled: bookId !== null,
     staleTime: 2 * 60 * 1000,

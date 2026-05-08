@@ -114,6 +114,7 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
   const { user, setCurrentBook, isReader } = useStore();
 
   const isAdmin = user?.role === 'admin';
+  const isModerator = user?.role == 'moderator';
 
   const queryReady = urlQuery.trim().length > 0;
 
@@ -223,7 +224,7 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
               onChange={setFilters}
               onClose={() => setShowAdvanced(false)}
               mode={mode}
-              onModeChange={isAdmin ? setMode : undefined}
+              onModeChange={isAdmin || isModerator ? setMode : undefined}
             />
           )}
 

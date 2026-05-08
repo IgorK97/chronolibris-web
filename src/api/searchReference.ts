@@ -38,19 +38,19 @@ export const searchReferenceApi = {
     }),
 };
 
-export const useLanguages = () =>
-  useQuery({
-    queryKey: ['search-reference', 'languages'],
-    queryFn: searchReferenceApi.getLanguages,
-    staleTime: Infinity,
-  });
+// export const useLanguages = () =>
+//   useQuery({
+//     queryKey: ['search-reference', 'languages'],
+//     queryFn: searchReferenceApi.getLanguages,
+//     staleTime: Infinity,
+//   });
 
-export const useCountries = () =>
-  useQuery({
-    queryKey: ['search-reference', 'countries'],
-    queryFn: searchReferenceApi.getCountries,
-    staleTime: Infinity,
-  });
+// export const useCountries = () =>
+//   useQuery({
+//     queryKey: ['search-reference', 'countries'],
+//     queryFn: searchReferenceApi.getCountries,
+//     staleTime: Infinity,
+//   });
 
 export const usePersonRoles = () =>
   useQuery({
