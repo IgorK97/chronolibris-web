@@ -58,18 +58,6 @@ export const referencesApi = {
 
   getFormats: (): Promise<FormatDto[]> =>
     apiClient.get<FormatDto[]>('/References/formats'),
-
-  // getFormatById: (id: number): Promise<FormatDto> =>
-  //   apiClient.get<FormatDto>(`/References/formats/${id}`),
-
-  // createFormat: (data: CreateFormatRequest): Promise<number> =>
-  //   apiClient.post<number, CreateFormatRequest>('/References/formats', data),
-
-  // updateFormat: (id: number, data: UpdateFormatRequest): Promise<void> =>
-  //   apiClient.put<void, UpdateFormatRequest>(`/References/formats/${id}`, data),
-
-  // deleteFormat: (id: number): Promise<void> =>
-  //   apiClient.delete(`/References/formats/${id}`),
 };
 
 export const useRoles = () => {

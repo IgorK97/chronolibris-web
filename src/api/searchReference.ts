@@ -1,6 +1,4 @@
 import type {
-  CountryDto,
-  LanguageDto,
   PersonRoleDto,
   PersonSuggestionDto,
   TagSuggestionDto,
@@ -9,10 +7,6 @@ import { apiClient } from './apiClient';
 import { useQuery } from '@tanstack/react-query';
 
 export const searchReferenceApi = {
-  getLanguages: () => apiClient.get<LanguageDto[]>('/search/languages'),
-
-  getCountries: () => apiClient.get<CountryDto[]>('/search/countries'),
-
   getPersonRoles: () => apiClient.get<PersonRoleDto[]>('/search/person-roles'),
 
   searchPersons: (name: string, limit = 10) =>
@@ -37,20 +31,6 @@ export const searchReferenceApi = {
       ids: ids.join(','),
     }),
 };
-
-// export const useLanguages = () =>
-//   useQuery({
-//     queryKey: ['search-reference', 'languages'],
-//     queryFn: searchReferenceApi.getLanguages,
-//     staleTime: Infinity,
-//   });
-
-// export const useCountries = () =>
-//   useQuery({
-//     queryKey: ['search-reference', 'countries'],
-//     queryFn: searchReferenceApi.getCountries,
-//     staleTime: Infinity,
-//   });
 
 export const usePersonRoles = () =>
   useQuery({
