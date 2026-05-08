@@ -2,15 +2,6 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { SmartTextBox } from './SmartTextBox';
 import { vi, describe, it, expect } from 'vitest';
 
-vi.mock('lucide-react', () => ({
-  CornerDownRight: () => <div data-testid="icon-reply" />,
-  X: () => <div data-testid="icon-x" />,
-}));
-
-vi.mock('@/components/dialogs/AlertDialog', () => ({
-  AlertDialog: () => <div data-testid="alert-dialog" />,
-}));
-
 describe('Форматирование текста', () => {
   const defaultProps = {
     placeholder: 'Введите текст',

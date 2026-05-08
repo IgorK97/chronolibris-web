@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useEffect, useState } from 'react';
+// import { ChevronDown, ChevronUp } from 'lucide-react';
 import { formatDate } from '@/utils';
 import {
   Avatar,
