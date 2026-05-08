@@ -404,7 +404,9 @@ export const Reader: React.FC<ReaderProps> = ({
   const goToCol = (col: number) => {
     const vp = viewportRef.current;
     const ct = contentRef.current;
+    console.log('PUM');
     if (!vp || !ct || !fetchedTocData) return;
+    console.log('I AM HERE');
 
     const pageWidth = twoPageMode
       ? (ct!.clientWidth - pageGap) / 2 + pageGap
@@ -419,7 +421,7 @@ export const Reader: React.FC<ReaderProps> = ({
       }
       return; // -
     }
-
+    console.log('I AM TUTA', col);
     if (col < 0) {
       const prevIdx = currentPartIndex - 1;
       if (prevIdx >= 0) {
@@ -432,11 +434,11 @@ export const Reader: React.FC<ReaderProps> = ({
 
     // let targetCol = Math.max(0, Math.min(col, totalCols - 1));
     let targetCol = col;
-    // В режиме двух страниц всегда показываем левую страницу разворота
+    // В режиме двух страниц всегда отображается левая страница разворота (округление вниз до четного числа)
     if (twoPageMode && targetCol > 0) targetCol = targetCol - (targetCol % 2);
     const leftPos = targetCol * pageWidth;
 
-    // console.log(col, totalCols, leftPos);
+    console.log(col, totalCols, leftPos);
     setCurrentCol(targetCol);
     ct.scrollTo({ left: leftPos, behavior: 'smooth' });
   };

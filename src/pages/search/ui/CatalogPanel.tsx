@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { ChevronRight, X } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { useThemes } from '@/api/themes';
 import { useAllSelections } from '@/api/collections';
 import styles from './CatalogPanel.module.css';
-
+import { useNavigate, useLocation } from 'react-router-dom';
 interface CatalogPanelProps {
   isOpen: boolean;
   onClose: () => void;
@@ -99,15 +98,23 @@ function ThemesView({
 }) {
   const { data: themes, isLoading } = useThemes();
   const [selectedId, setSelectedId] = useState<number | null>(null);
-
+  const location = useLocation();
   const handleGoToTheme = (themeId: number) => {
-    navigate(`/search?themeId=${themeId}`);
+    const params = new URLSearchParams(location.search);
+    params.set('themeId', String(themeId));
+    navigate(`/search?${params.toString()}`);
     onClose();
+    // navigate(`/search?themeId=${themeId}`);
+    // onClose();
   };
 
   const handleGoToAll = () => {
-    navigate('/search');
+    const params = new URLSearchParams(location.search);
+    params.delete('themeId');
+    navigate(`/search?${params.toString()}`);
     onClose();
+    // navigate('/search');
+    // onClose();
   };
 
   return (
@@ -148,15 +155,23 @@ function SelectionsView({
 }) {
   const { data: selections, isLoading } = useAllSelections();
   const [selectedId, setSelectedId] = useState<number | null>(null);
-
+  const location = useLocation();
   const handleGoToSelection = (selectionId: number) => {
-    navigate(`/search?selectionId=${selectionId}`);
+    const params = new URLSearchParams(location.search);
+    params.set('selectionId', String(selectionId));
+    navigate(`/search?${params.toString()}`);
     onClose();
+    // navigate(`/search?selectionId=${selectionId}`);
+    // onClose();
   };
 
   const handleGoToAll = () => {
-    navigate('/search');
+    const params = new URLSearchParams(location.search);
+    params.delete('selectionId');
+    navigate(`/search?${params.toString()}`);
     onClose();
+    // navigate('/search');
+    // onClose();
   };
 
   return (

@@ -13,7 +13,7 @@ import {
 // import { useStore } from '@stores/globalStore';
 import {
   useInfiniteAdvancedSearch,
-  useInfiniteSimpleSearch,
+  // useInfiniteSimpleSearch,
 } from '@/api/search';
 import type { BookSearchResult } from '@/types';
 import { BookCard } from '@/components';
@@ -86,13 +86,16 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
 
   const [mode, setMode] = useState(false);
 
-  const setFilters = useCallback((next: AdvancedFilters) => {
-    setSearchParams((prev) => {
-      const updated = new URLSearchParams(prev);
-      filtersToParams(next, updated);
-      return updated;
-    });
-  }, []);
+  const setFilters = useCallback(
+    (next: AdvancedFilters) => {
+      setSearchParams((prev) => {
+        const updated = new URLSearchParams(prev);
+        filtersToParams(next, updated);
+        return updated;
+      });
+    },
+    [searchParams] //иначе замыкание URLSearchParams не будет корректно работать, и всегда будут только старые значения
+  );
 
   const { isResolving } = useResolveFilterNames({
     filters: filtersCurrent,
@@ -110,24 +113,25 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
     filters.excludedTagIds.length > 0 ||
     themeId > 0 ||
     selectionId > 0;
-  console.log('HAS FILTERS', hasFilters);
+  // console.log('HAS FILTERS', hasFilters);
   const { user, setCurrentBook, isReader } = useStore();
 
   const isAdmin = user?.role === 'admin';
   const isModerator = user?.role == 'moderator';
 
   const queryReady = urlQuery.trim().length > 0;
+  const searchEnabled = queryReady || hasFilters;
 
   const { data: shelves } = useShelves(user?.userName || '', isReader());
   const favoritesShelfId = shelves?.find((s) => s.shelfType === 1)?.id;
   const { mutateAsync: addBookToShelf } = useAddBookToShelf();
   const { mutateAsync: removeBookFromShelf } = useRemoveBookFromShelf();
-  const simpleSearch = useInfiniteSimpleSearch(
-    urlQuery,
-    20,
-    !hasFilters && queryReady,
-    mode
-  );
+  // const simpleSearch = useInfiniteSimpleSearch(
+  //   urlQuery,
+  //   20,
+  //   !hasFilters && queryReady,
+  //   mode
+  // );
 
   const advancedSearch = useInfiniteAdvancedSearch(
     urlQuery,
@@ -139,11 +143,13 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
       selectionId,
     },
     20,
-    hasFilters,
+    // hasFilters,
+    searchEnabled,
     mode
   );
 
-  const active = hasFilters ? advancedSearch : simpleSearch;
+  // const active = hasFilters ? advancedSearch : simpleSearch;
+  const active = advancedSearch;
   const allBooks = active.data?.pages.flatMap((p) => p.items) ?? [];
   const isLoading = active.isLoading;
   const isError = active.isError;
@@ -178,14 +184,26 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
             selectedThemeId={themeId || null}
             // onSelect={(id) => setThemeId(id)}
             onSelect={(id) =>
-              setFilters({ ...filtersCurrent, themeId: id ?? 0 })
+              // setFilters({ ...filtersCurrent, themeId: id ?? 0 })
+              setSearchParams((prev) => {
+                const current = filtersFromParams(prev);
+                const updated = new URLSearchParams(prev);
+                filtersToParams({ ...current, themeId: id ?? 0 }, updated);
+                return updated;
+              })
             }
           />
           <SelectionPanel
             selectedSelectionId={selectionId || null}
             // onSelect={(id) => setSelectionId(id)}
             onSelect={(id) =>
-              setFilters({ ...filtersCurrent, selectionId: id ?? 0 })
+              // setFilters({ ...filtersCurrent, selectionId: id ?? 0 })
+              setSearchParams((prev) => {
+                const current = filtersFromParams(prev);
+                const updated = new URLSearchParams(prev);
+                filtersToParams({ ...current, selectionId: id ?? 0 }, updated);
+                return updated;
+              })
             }
           />
         </div>
@@ -281,12 +299,11 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
                 )}
               </div>
             )}
-            {!allBooks ||
-              (allBooks.length == 0 && (
-                <div className={styles['results']}>
-                  По вашему запросу ничего не найдено
-                </div>
-              ))}
+            {(!allBooks || allBooks.length == 0) && !isLoading && (
+              <div className={styles['results']}>
+                По вашему запросу ничего не найдено
+              </div>
+            )}
           </div>
         </div>
       </div>
