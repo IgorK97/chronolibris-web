@@ -466,6 +466,7 @@ interface FormState {
   coverFile: File | null;
   personFilters: PersonRoleFilterRequest[];
   deleteCoverCommand: boolean;
+  hasHistoricalVersions: boolean;
 }
 
 const emptyForm = (): FormState => ({
@@ -487,6 +488,7 @@ const emptyForm = (): FormState => ({
   coverFile: null,
   personFilters: [],
   deleteCoverCommand: false,
+  hasHistoricalVersions: true,
 });
 
 const VALIDATION_RULES = {
@@ -665,6 +667,7 @@ export const BookUnit: React.FC = () => {
           roleId: group.role,
           personIds: group.persons.map((p) => p.id),
         })),
+        hasHistoricalVersions: book.hasHistoricalVersions,
       });
       const persons: SelectedPerson[] = (book?.participants ?? []).flatMap(
         (group) =>
@@ -712,6 +715,7 @@ export const BookUnit: React.FC = () => {
           coverBase64,
           coverContentType: form.coverFile?.type ?? null,
           personFilters: clearPersonFilters,
+          hasHistoricalVersions: form.hasHistoricalVersions,
         };
 
         const newId = await createMutation.mutateAsync(payload);
@@ -748,6 +752,7 @@ export const BookUnit: React.FC = () => {
           coverContentType: form.coverFile?.type ?? null,
           personFilters: clearPersonFilters,
           deleteCoverCommand: form.deleteCoverCommand,
+          hasHistoricalVersions: form.hasHistoricalVersions,
         };
 
         await updateMutation.mutateAsync({ id: id!, data: payload });
@@ -786,6 +791,7 @@ export const BookUnit: React.FC = () => {
             roleId: group.role,
             personIds: group.persons.map((p) => p.id),
           })),
+          hasHistoricalVersions: book.hasHistoricalVersions,
         });
       }
       setMode('view');
@@ -1037,6 +1043,16 @@ export const BookUnit: React.FC = () => {
                   />
                   Можно оценивать
                 </label>
+                <label className={styles['checkbox-label']}>
+                  <input
+                    type="checkbox"
+                    checked={form.isReviewable}
+                    onChange={(e) =>
+                      set('hasHistoricalVersions', e.target.checked)
+                    }
+                  />
+                  С разными версиями текста
+                </label>
               </div>
 
               <PersonFilter
@@ -1074,7 +1090,7 @@ export const BookUnit: React.FC = () => {
               )}
 
               <div className={styles['field-group']}>
-                <label className={styles['field-label']}>Название *</label>
+                <label className={styles['field-label']}>Название</label>
                 <input
                   className={styles['field-input']}
                   value={form.title}
@@ -1194,6 +1210,15 @@ export const BookUnit: React.FC = () => {
                     onChange={() => {}}
                   />
                   Можно оценивать
+                </label>
+                <label className={styles['checkbox-label']}>
+                  <input
+                    type="checkbox"
+                    checked={form.hasHistoricalVersions}
+                    readOnly
+                    onChange={() => {}}
+                  />
+                  С разными версиями текста
                 </label>
               </div>
 

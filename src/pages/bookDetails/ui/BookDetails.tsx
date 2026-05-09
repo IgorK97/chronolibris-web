@@ -355,27 +355,39 @@ export const BookDetailsComponent = ({
                         {bookFiles.map((file) => (
                           <li
                             key={file.id}
+                            style={{ display: 'flex', flexDirection: 'column' }}
                             className={styles['download-file-item']}
                             onClick={() =>
                               handleDownload(file.id, file.formatId)
                             }
                           >
-                            <span className={styles['download-file-format']}>
-                              {FORMAT_EXTENSIONS[
-                                file.formatId ?? 1
-                              ]?.toUpperCase() ?? ''}
-                            </span>
-                            <span className={styles['download-file-size']}>
-                              <span style={{ whiteSpace: 'nowrap' }}>
-                                {formatFileSize(file.storedSizeBytes)} (zip)
+                            <div
+                              style={{ display: 'flex', flexDirection: 'row' }}
+                            >
+                              <span className={styles['download-file-format']}>
+                                {FORMAT_EXTENSIONS[
+                                  file.formatId ?? 1
+                                ]?.toUpperCase() ?? ''}
                               </span>
-                              {file.formatId === 1 && (
+                              <span className={styles['download-file-size']}>
                                 <span style={{ whiteSpace: 'nowrap' }}>
-                                  {formatFileSize(file.fileSizeBytes)}{' '}
-                                  (оригинал)
+                                  {formatFileSize(file.storedSizeBytes)} (zip)
                                 </span>
-                              )}
-                            </span>
+                                {file.formatId === 1 && (
+                                  <span style={{ whiteSpace: 'nowrap' }}>
+                                    {formatFileSize(file.fileSizeBytes)}{' '}
+                                    (оригинал)
+                                  </span>
+                                )}
+                              </span>
+                            </div>
+                            {file.historicalText != null && (
+                              <span className={styles['download-file-size']}>
+                                {file.historicalText == true
+                                  ? 'Исходная орфография'
+                                  : 'Современная орфография'}
+                              </span>
+                            )}
                           </li>
                         ))}
                       </ul>

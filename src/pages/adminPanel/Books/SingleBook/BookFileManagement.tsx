@@ -33,6 +33,20 @@ const FORMAT_EXTENSIONS: Record<number, string> = {
   2: 'epub',
 };
 
+interface TextType {
+  id: number;
+  name: string;
+}
+
+const TextTypes: TextType[] = [
+  {
+    id: 1,
+    name: 'Исходный исторический текст',
+  },
+  { id: 2, name: 'Обработанный исторический текст' },
+  { id: 3, name: 'Обычный текст' },
+];
+
 export const BookFileManagement: React.FC<BookFileManagementProps> = ({
   bookId,
   bookTitle,
@@ -54,6 +68,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [hasFile, setHasFile] = useState<boolean>(false);
   const [selectedFormat, setSelectedFormat] = useState<number>(0);
+  const [selectedTextType, setSelectedTextType] = useState<number>(0);
   const [isReadable, setIsReadable] = useState<boolean>(false);
   const [editingFile, setEditingFile] = useState<BookFileDto | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -69,6 +84,11 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
 
     if (selectedFormat <= 0) {
       alert('Выберите формат файла');
+      return;
+    }
+
+    if (selectedTextType <= 0) {
+      alert('Выберите тип текста');
       return;
     }
 
@@ -88,12 +108,18 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
       return;
     }
 
+    let resultTextType;
+    if (selectedTextType == 1) resultTextType = true;
+    else if (selectedTextType == 2) resultTextType = false;
+    else resultTextType = null;
+
     try {
       await uploadMutation.mutateAsync({
         bookId,
         formatId: selectedFormat,
         isReadable,
         file,
+        historicalText: resultTextType,
       });
 
       setSelectedFormat(0);
@@ -209,6 +235,25 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
           <span className={styles['hint']}>Макс. 100 MB</span>
         </div>
 
+        <div className={styles['form-group']}>
+          <label>Тип текста</label>
+          <select
+            value={selectedFormat}
+            onChange={(e) => {
+              const formatId = Number(e.target.value);
+              setSelectedTextType(formatId);
+            }}
+            className={styles['input-field']}
+          >
+            <option value={0}>Укажите тип</option>
+            {TextTypes?.map((format) => (
+              <option key={format.id} value={format.id}>
+                {format.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div>
           <button
             onClick={handleUpload}
@@ -244,6 +289,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
               <th>Размер исходного файла</th>
               <th>Статус</th>
               <th>Тип</th>
+              <th>Тип текста</th>
               <th>Загружен</th>
               <th>Действия</th>
             </tr>
@@ -256,6 +302,13 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
                 <td>{formatFileSize(file.fileSizeBytes)}</td>
                 <td>{getStatusBadge(file.bookFileStatusId)}</td>
                 <td>{file.isReadable ? 'Основной' : 'Для скачивания'}</td>
+                <td>
+                  {file.historicalText === true
+                    ? 'Текст в исходном историческом виде'
+                    : file.historicalText === false
+                      ? 'Обработанный текст (современная офрография)'
+                      : 'Обычный'}
+                </td>
                 <td>{new Date(file.createdAt).toLocaleDateString('ru-RU')}</td>
                 <td style={{ gap: '20px' }}>
                   <button
