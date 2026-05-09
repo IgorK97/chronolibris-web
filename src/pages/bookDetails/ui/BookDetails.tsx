@@ -377,14 +377,24 @@ export const BookDetailsComponent = ({
                         {bookFiles.map((file) => (
                           <li
                             key={file.id}
-                            style={{ display: 'flex', flexDirection: 'column' }}
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'flex-start',
+                            }}
                             className={styles['download-file-item']}
                             onClick={() =>
                               handleDownload(file.id, file.formatId)
                             }
                           >
                             <div
-                              style={{ display: 'flex', flexDirection: 'row' }}
+                              style={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                // justifyContent: 'space-between',
+                                width: '100%',
+                                alignItems: 'center',
+                              }}
                             >
                               <span className={styles['download-file-format']}>
                                 {FORMAT_EXTENSIONS[
@@ -581,7 +591,7 @@ export const BookDetailsComponent = ({
             </section>
           </div>
           {user && (
-            <div style={{ alignItems: 'center' }}>
+            <div style={{ width: '200px' }}>
               <button
                 className={styles['read-button']}
                 disabled={!defaultBookFileId}
