@@ -126,8 +126,30 @@ export const BookDetailsComponent = ({
   const [isDownloadPanelOpen, setIsDownloadPanelOpen] =
     useState<boolean>(false);
 
-  const defaultBookFileId =
-    bookFiles?.find((f) => f.isReadable)?.id ?? bookFiles?.[0]?.id;
+  const readableFiles = bookFiles?.filter((f) => f.isReadable) ?? [];
+  const historicalFile = readableFiles.find(
+    (f) => f.historicalText === true && f.isReadable
+  );
+  const modernFile = readableFiles.find(
+    (f) => f.historicalText === false && f.isReadable
+  );
+  const defaultReadableFile = historicalFile ?? readableFiles[0];
+
+  const [useHistoricalSpelling, setUseHistoricalSpelling] =
+    useState<boolean>(true);
+
+  const selectedReadableFile =
+    readableFiles.length > 1
+      ? useHistoricalSpelling
+        ? (historicalFile ?? defaultReadableFile)
+        : (modernFile ?? defaultReadableFile)
+      : defaultReadableFile;
+
+  const defaultBookFileId = selectedReadableFile?.id ?? bookFiles?.[0]?.id;
+  const hasSpellingChoice = !!historicalFile && !!modernFile;
+
+  // const defaultBookFileId =
+  //   bookFiles?.find((f) => f.isReadable)?.id ?? bookFiles?.[0]?.id;
 
   const { refetch: refetchReviews } = useInfiniteReviews(
     Number(bookId) || 0,
@@ -559,13 +581,42 @@ export const BookDetailsComponent = ({
             </section>
           </div>
           {user && (
-            <button
-              className={styles['read-button']}
-              disabled={!defaultBookFileId}
-              onClick={() => onReadClick(defaultBookFileId)}
-            >
-              {defaultBookFileId ? t('book.read') : t('book.no_read_available')}
-            </button>
+            <div style={{ alignItems: 'center' }}>
+              <button
+                className={styles['read-button']}
+                disabled={!defaultBookFileId}
+                onClick={() => onReadClick(defaultBookFileId)}
+              >
+                {defaultBookFileId
+                  ? t('book.read')
+                  : t('book.no_read_available')}
+              </button>
+              {hasSpellingChoice && (
+                <div
+                  style={{
+                    marginTop: '6px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '2px',
+                  }}
+                >
+                  <span className={styles['download-file-size']}>
+                    {useHistoricalSpelling
+                      ? 'Читать в исходной орфографии'
+                      : 'Читать в современной орфографии'}
+                  </span>
+                  <span
+                    className={styles['download-file-size']}
+                    style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                    onClick={() => setUseHistoricalSpelling((prev) => !prev)}
+                  >
+                    {useHistoricalSpelling
+                      ? 'Переключить на современную'
+                      : 'Переключить на исходную'}
+                  </span>
+                </div>
+              )}
+            </div>
           )}
         </div>
         <BookTabs

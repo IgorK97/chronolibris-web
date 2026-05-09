@@ -49,6 +49,8 @@ export const bookFilesApi = {
     formData.append('formatId', data.formatId.toString());
     formData.append('isReadable', data.isReadable.toString());
     formData.append('file', data.file);
+    if (data.historicalText != null)
+      formData.append('historical', data.historicalText.toString());
 
     const response = await axiosInstance.post<number>('/BookFiles', formData, {
       headers: {

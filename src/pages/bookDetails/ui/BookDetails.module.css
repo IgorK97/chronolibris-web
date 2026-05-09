@@ -555,7 +555,8 @@
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  margin: 20px 20px 0;
+
+  /* margin: 20px 20px 0; */
 }
 
 @media (width <= 768px) {

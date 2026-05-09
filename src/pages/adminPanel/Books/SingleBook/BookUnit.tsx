@@ -610,6 +610,7 @@ export const BookUnit: React.FC = () => {
       form.publisherId !== (book.publisher?.id ?? null) ||
       form.isAvailable !== book.isAvailable ||
       form.isReviewable !== book.isReviewable ||
+      form.hasHistoricalVersions !== book.hasHistoricalVersions ||
       form.bbk !== (book.bbk ?? '') ||
       form.udk !== (book.udk ?? '') ||
       form.coverFile !== null ||
@@ -795,6 +796,7 @@ export const BookUnit: React.FC = () => {
         });
       }
       setMode('view');
+      setGlobalError('');
     }
   };
 
@@ -1046,7 +1048,7 @@ export const BookUnit: React.FC = () => {
                 <label className={styles['checkbox-label']}>
                   <input
                     type="checkbox"
-                    checked={form.isReviewable}
+                    checked={form.hasHistoricalVersions}
                     onChange={(e) =>
                       set('hasHistoricalVersions', e.target.checked)
                     }

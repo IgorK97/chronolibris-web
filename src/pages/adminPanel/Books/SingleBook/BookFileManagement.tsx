@@ -238,7 +238,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
         <div className={styles['form-group']}>
           <label>Тип текста</label>
           <select
-            value={selectedFormat}
+            value={selectedTextType}
             onChange={(e) => {
               const formatId = Number(e.target.value);
               setSelectedTextType(formatId);
