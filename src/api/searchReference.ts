@@ -23,12 +23,12 @@ export const searchReferenceApi = {
 
   getPersonsByIds: (ids: number[]) =>
     apiClient.get<PersonSuggestionDto[]>('/search/persons-batch', {
-      ids: ids.join(','),
+      ids,
     }),
 
   getTagsByIds: (ids: number[]) =>
     apiClient.get<TagSuggestionDto[]>('/search/tags-batch', {
-      ids: ids.join(','),
+      ids,
     }),
 };
 

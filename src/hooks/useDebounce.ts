@@ -7,9 +7,6 @@ export function useDebounce<T>(value: T, delay: number): T {
     const handler = setTimeout(() => {
       setDebouncedValue(value);
     }, delay);
-
-    //Если значение изменилось до истечения задержки, то нужно
-    //очистить прошлый таймер - это сделает функция очистки
     return () => clearTimeout(handler);
   }, [value, delay]);
 

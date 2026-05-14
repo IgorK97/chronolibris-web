@@ -54,30 +54,6 @@ export interface BookDto {
   // contentsCount: number;
 }
 
-// export interface BookDto {
-//   id: number;
-//   title: string;
-//   description: string;
-//   countryId: number;
-//   countryName?: string | null;
-//   languageId: number;
-//   languageName?: string | null;
-//   year?: number | null;
-//   isbn?: string | null;
-//   coverPath?: string | null;
-//   isAvailable: boolean;
-//   isReviewable: boolean;
-//   isFragment: boolean;
-//   publisherId?: number | null;
-//   publisherName?: string | null;
-//   seriesId?: number | null;
-//   seriesName?: string | null;
-//   createdAt: string;
-//   updatedAt?: string | null;
-//   authors: string[];
-//   themes: ThemeDto[];
-// }
-
 export interface BookListResponse {
   items: BookDto[];
   nextCursor?: string | null;
@@ -85,21 +61,6 @@ export interface BookListResponse {
   totalCount: number;
   hasMore: boolean;
 }
-
-// export interface BookFilterRequest {
-//   searchQuery?: string | null;
-//   authorName?: string | null;
-//   includeThemeIds?: number[] | null;
-//   excludeThemeIds?: number[] | null;
-//   publisherId?: number | null;
-//   seriesId?: number | null;
-//   languageId?: number | null;
-//   yearFrom?: number | null;
-//   yearTo?: number | null;
-//   isAvailable?: boolean | null;
-//   cursor?: string | null;
-//   limit?: number;
-// }
 
 export interface BookListItem {
   id: number;
@@ -218,21 +179,6 @@ export interface BookListResponse {
   totalCount: number;
   hasMore: boolean;
 }
-//ошибки почему-то при экспорте двух разных типов с разной структурой не вывело
-// export interface BookFilterRequest {
-//   searchQuery?: string | null;
-//   authorName?: string | null;
-//   includeThemeIds?: number[] | null;
-//   excludeThemeIds?: number[] | null;
-//   publisherId?: number | null;
-//   seriesId?: number | null;
-//   languageId?: number | null;
-//   yearFrom?: number | null;
-//   yearTo?: number | null;
-//   isAvailable?: boolean | null;
-//   cursor?: string | null;
-//   limit?: number;
-// }
 
 export interface UploadBookFileRequest {
   bookId: number;
@@ -241,13 +187,6 @@ export interface UploadBookFileRequest {
   file: File;
   historicalText: boolean | null;
 }
-
-// export interface UpdateBookFileRequest {
-//   bookId: number;
-//   formatId: number;
-//   isReadable: boolean;
-//   file: File;
-// }
 
 export interface SearchParams {
   query: string;

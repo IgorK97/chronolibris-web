@@ -37,10 +37,9 @@ export const usePublisherById = (id: number | null) => {
   return useQuery({
     queryKey: ['publishers', id],
     queryFn: () => {
-      if (id === null) throw new Error('ID издательства не указан');
-      return publishersApi.getPublisherById(id);
+      return publishersApi.getPublisherById(id!);
     },
-    enabled: id !== null,
+    enabled: !!id,
     staleTime: 5 * 60 * 1000,
   });
 };

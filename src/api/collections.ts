@@ -20,7 +20,7 @@ export const collectionsApi = {
   seekBookInSelection: (bookId: number) =>
     apiClient.get<number[]>(`/Selections/books/${bookId}`),
   getSelections: (
-    lastId?: number | null,
+    lastId: number | null,
     limit: number = 20,
     onlyActive?: boolean
   ) => {
@@ -43,7 +43,7 @@ export const collectionsApi = {
     limit: number = 10
   ) =>
     apiClient.get<PagedResult<BookListItem>>(
-      `/Selections/${selectionId}/books?lastId=${lastId || ''}&limit=${limit}`
+      `/Selections/${selectionId}/books?${lastId ? `lastId=${lastId}` : ''}&limit=${limit}`
     ),
 
   createSelection: (data: { name: string; description: string }) =>
@@ -70,7 +70,7 @@ export const collectionsApi = {
 
   getShelfBooks: (shelfId: number, lastId: number | null, limit: number = 10) =>
     apiClient.get<PagedResult<BookListItem>>(
-      `/Shelves/${shelfId}/books?lastId=${lastId || ''}&limit=${limit}`
+      `/Shelves/${shelfId}/books?${lastId ? `lastId=${lastId}` : ''}&limit=${limit}`
     ),
 
   removeBookFromShelf: (shelfId: number, bookId: number) =>
@@ -193,12 +193,8 @@ export const useSelectionsInfinite = (
   return useInfiniteQuery({
     queryKey: ['selections', 'infinite', limit, onlyActive],
     queryFn: ({ pageParam }) =>
-      collectionsApi.getSelections(
-        pageParam as number | null,
-        limit,
-        onlyActive
-      ),
-    initialPageParam: null as number | null,
+      collectionsApi.getSelections(pageParam, limit, onlyActive),
+    initialPageParam: 0,
     getNextPageParam: (lastPage) =>
       lastPage.hasNext ? lastPage.lastId : undefined,
     staleTime: 5 * 60 * 1000,

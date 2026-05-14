@@ -29,7 +29,6 @@ export const usersApi = {
 
   getProfile: async () => {
     const profile = await apiClient.get<UserProfile>('/users/me');
-    // localStorage.setItem("profile", JSON.stringify(profile));
     return profile;
   },
 

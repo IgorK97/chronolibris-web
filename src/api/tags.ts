@@ -10,18 +10,18 @@ import {
 export const tagsApi = {
   getTagTypes: () => apiClient.get<TagType[]>('/Tags/types'),
 
-  //Потом проверить
   getRootTags: (
     tagTypeId?: number | null,
     searchTerm?: string | null,
     lastId?: number | null,
     pageSize: number = 20
   ) => {
-    const params: Record<string, string> = { pageSize: pageSize.toString() };
-    if (tagTypeId) params.tagTypeId = tagTypeId.toString();
-    if (searchTerm) params.searchTerm = searchTerm;
-    if (lastId) params.lastId = lastId.toString();
-    return apiClient.get<PagedResult<TagDetails>>('/Tags', params);
+    return apiClient.get<PagedResult<TagDetails>>('/Tags', {
+      pageSize,
+      tagTypeId: tagTypeId ?? undefined,
+      searchTerm: searchTerm ?? undefined,
+      lastId: lastId ?? undefined,
+    });
   },
 
   getChildTags: (
@@ -29,11 +29,12 @@ export const tagsApi = {
     lastId?: number | null,
     pageSize: number = 20
   ) => {
-    const params: Record<string, string> = { pageSize: pageSize.toString() };
-    if (lastId) params.lastId = lastId.toString();
     return apiClient.get<PagedResult<TagDetails>>(
       `/Tags/${parentId}/children`,
-      params
+      {
+        pageSize,
+        lastId: lastId ?? undefined,
+      }
     );
   },
 
@@ -62,12 +63,7 @@ export const useInfiniteRootTags = (
   useInfiniteQuery({
     queryKey: ['tags', 'root', tagTypeId, searchTerm, pageSize],
     queryFn: ({ pageParam }) =>
-      tagsApi.getRootTags(
-        tagTypeId,
-        searchTerm,
-        pageParam,
-        pageSize
-      ),
+      tagsApi.getRootTags(tagTypeId, searchTerm, pageParam, pageSize),
     getNextPageParam: (lastPage) =>
       lastPage.hasNext ? lastPage.lastId : undefined,
     initialPageParam: null as number | null,

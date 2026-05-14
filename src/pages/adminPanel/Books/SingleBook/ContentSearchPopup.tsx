@@ -21,12 +21,6 @@ export const ContentSearchPopup: React.FC<ContentSearchPopupProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearch = useDebounce(searchQuery, 500);
 
-  // const [filter, setFilter] = useState<ContentFilterRequest>({
-  //   searchQuery: debouncedSearch,
-  //   limit: 20,
-  //   lastId: null,
-  // });
-
   const filter: ContentFilterRequest = {
     searchQuery: debouncedSearch,
     limit: 20,

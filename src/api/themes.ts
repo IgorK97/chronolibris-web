@@ -25,7 +25,6 @@ export const themesApi = {
   updateTheme: (id: number, data: UpdateThemeRequest): Promise<void> =>
     apiClient.put<void, UpdateThemeRequest>(`/Themes/${id}`, data),
 
-  //Почему воид можно не указывать?
   deleteTheme: (id: number): Promise<void> => apiClient.delete(`/Themes/${id}`),
 };
 
@@ -43,10 +42,9 @@ export const useThemesByParentId = (parentThemeId: number | null) => {
     queryKey: ['themes', 'parent', parentThemeId],
     queryFn: () => {
       if (parentThemeId === null)
-        throw new Error('ID родительской темы не указан');
-      return themesApi.getThemesByParentId(parentThemeId);
+        return themesApi.getThemesByParentId(parentThemeId!);
     },
-    enabled: parentThemeId !== null,
+    enabled: !!parentThemeId,
     staleTime: 5 * 60 * 1000,
   });
 };
@@ -55,10 +53,9 @@ export const useThemeById = (id: number | null) => {
   return useQuery({
     queryKey: ['themes', id],
     queryFn: () => {
-      if (id === null) throw new Error('ID темы не указан');
-      return themesApi.getThemeById(id);
+      return themesApi.getThemeById(id!);
     },
-    enabled: id !== null,
+    enabled: !!id,
     staleTime: 5 * 60 * 1000,
   });
 };

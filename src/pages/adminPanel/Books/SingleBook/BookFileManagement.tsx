@@ -102,7 +102,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
       );
       return;
     }
-    const MAX_SIZE = 100 * 1024 * 1024;
+    const MAX_SIZE = 50 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
       alert('Размер файла не должен превышать 50 MB');
       return;
@@ -232,7 +232,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
             className={styles['file-input']}
             disabled={selectedFormat < 1}
           />
-          <span className={styles['hint']}>Макс. 100 MB</span>
+          <span className={styles['hint']}>Макс. 50 MB</span>
         </div>
 
         <div className={styles['form-group']}>

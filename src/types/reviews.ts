@@ -13,6 +13,7 @@ export interface CreateReviewRequest {
 export interface UpdateReviewRequest {
   reviewText?: string;
   score: number;
+  reviewId: number;
 }
 
 export interface ReviewDetails {

@@ -8,15 +8,17 @@ import {
 import { queryClient } from './queryClient';
 
 export const commentsApi = {
-  getByBookId: (bookId: number, lastId?: number, limit = 20) =>
-    apiClient.get<CommentDto[]>(
-      `/Comments/book/${bookId}?limit=${limit}&lastId=${lastId || ''}`
-    ),
+  getByBookId: (bookId: number, lastId: number | null, limit = 20) =>
+    apiClient.get<CommentDto[]>(`/Comments/book/${bookId}`, {
+      limit,
+      lastId: lastId ?? undefined,
+    }),
 
-  getReplies: (parentId: number, lastId?: number, limit = 50) =>
-    apiClient.get<CommentDto[]>(
-      `/Comments/${parentId}/replies?limit=${limit}&lastId=${lastId || ''}`
-    ),
+  getReplies: (parentId: number, lastId: number | null, limit = 50) =>
+    apiClient.get<CommentDto[]>(`/Comments/${parentId}/replies`, {
+      limit,
+      lastId: lastId ?? undefined,
+    }),
 
   create: (req: CreateCommentRequest) =>
     apiClient.post<number>('/Comments', req),
@@ -24,7 +26,7 @@ export const commentsApi = {
   delete: (id: number) => apiClient.delete<void>(`/Comments/${id}`),
 
   rateComment: (command: { commentId: number; score: number }) =>
-    apiClient.post('/Comments/rate', command), //потом посмотреть, стоит ли менять и получать с сервера сам комментарий
+    apiClient.post('/Comments/rate', command),
 };
 
 export const useDeleteComment = () => {
@@ -55,7 +57,7 @@ export const useGetCommentsByBook = (bookId: number) => {
   return useInfiniteQuery({
     queryKey: ['comments', bookId],
     queryFn: ({ pageParam }) => commentsApi.getByBookId(bookId, pageParam),
-    initialPageParam: undefined as number | undefined,
+    initialPageParam: null as number | null,
     getNextPageParam: (lastPage) =>
       lastPage.length > 0 ? lastPage[lastPage.length - 1].id : undefined,
   });
@@ -65,7 +67,7 @@ export const useGetRepliesByComment = (parentId: number, showMore: boolean) => {
   return useInfiniteQuery({
     queryKey: ['comments', 'replies', parentId],
     queryFn: ({ pageParam }) => commentsApi.getReplies(parentId, pageParam),
-    initialPageParam: undefined as number | undefined,
+    initialPageParam: null as number | null,
     getNextPageParam: (lastPage) =>
       lastPage.length > 0 ? lastPage[lastPage.length - 1].id : undefined,
     enabled: showMore,
@@ -77,19 +79,14 @@ export const useCreateComment = () => {
   return useMutation({
     mutationFn: (req: CreateCommentRequest) => commentsApi.create(req),
     onSuccess: (_, { parentCommentId, bookId }) => {
-      // Можно оптимизировать, добавляя новый комментарий в кэш вместо полной инвалидизации
-      // Но для простоты сейчас просто инвалидируем
+      queryClient.invalidateQueries({
+        queryKey: ['comments', bookId],
+      });
       if (parentCommentId) {
-        queryClient.invalidateQueries({
-          queryKey: ['comments', bookId],
-        });
         queryClient.invalidateQueries({
           queryKey: ['comments', 'replies', parentCommentId],
         });
-      } else
-        queryClient.invalidateQueries({
-          queryKey: ['comments', bookId],
-        });
+      }
     },
   });
 };

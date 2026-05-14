@@ -38,7 +38,6 @@ export const PersonFilter: React.FC<PersonFilterProps> = ({
 
   useEffect(() => {
     if (value.length === 0 && selected.some((p) => p.roleId !== null)) {
-      //И как их избегать?
       setSelected([]);
     }
   }, [value]);

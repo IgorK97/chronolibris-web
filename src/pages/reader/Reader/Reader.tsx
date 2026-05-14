@@ -692,7 +692,7 @@ export const Reader: React.FC<ReaderProps> = ({
         (n) => typeof n !== 'string' && (n as ImgNode).t === 'img'
       ) as ImgNode | undefined;
       if (!firstImg) return null;
-      const fullUrl = `${import.meta.env.VITE_STORAGE_URL}/images/${bookFileId}/${firstImg.src}`;
+      const fullUrl = `${import.meta.env.VITE_API_URL}/books/images/${bookFileId}/${firstImg.src}`;
       return (
         <div key={index} className={styles['img-block']}>
           <img

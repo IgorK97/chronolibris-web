@@ -17,9 +17,7 @@ import {
 
 export const reportsApi = {
   createReport: (data: CreateReportRequest) =>
-    apiClient.post<void, CreateReportRequest>('/reports', data), //Так-то хотел результат получать,
-  //но по факту это делается через исключение. Потом исправить
-
+    apiClient.post<void, CreateReportRequest>('/reports', data),
   getReports: (params: GetReportsRequest) =>
     apiClient.get<GetReportsResponse, GetReportsRequest>(
       '/reports/reports',
@@ -62,9 +60,7 @@ export const reportsApi = {
 
 const PAGE_SIZE = 20;
 
-export const useInfiniteReports = (
-  filters: Omit<GetReportsRequest, 'lastDate' | 'count'>
-) => {
+export const useInfiniteReports = (filters: GetReportsRequest) => {
   return useInfiniteQuery({
     queryKey: [
       'moderation',

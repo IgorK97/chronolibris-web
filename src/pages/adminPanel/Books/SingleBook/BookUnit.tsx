@@ -96,22 +96,11 @@ function PersonFilter({
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // console.log('USEEFFECT - INITIAL PERSONS', initialPersons);
-    // console.log('USEEFFECT - ROLES', roles);
-
     if (initialPersons && initialPersons.length > 0 && roles.length > 0) {
       const filtered = initialPersons
         .filter((p) => {
           const role = roles.find((r) => r.id == p.roleId);
           if (!role) return false;
-          // console.log(
-          //   'FILTERING PERSON',
-          //   p.name,
-          //   'WITH ROLE',
-          //   role.name,
-          //   'AND KIND',
-          //   role.kind
-          // );
           if (itemType === 'book')
             return Number(role.kind) === 2 || Number(role.kind) === 3;
           if (itemType === 'content')
@@ -119,7 +108,6 @@ function PersonFilter({
           return true;
         })
         .map((p) => ({ ...p, uid: `${p.id}-${p.roleId}` }));
-      // console.log('USEEFFECT - FILTERED PERSONS', filtered);
       setSelected(filtered);
     }
   }, [initialPersons, roles, itemType]);
@@ -722,7 +710,7 @@ export const BookUnit: React.FC = () => {
         const newId = await createMutation.mutateAsync(payload);
         setForm(emptyForm());
         setMode('view');
-        navigate(`/books/${newId}`); //почему то в итоге сразу в состояние редактирования перехожу
+        navigate(`/books/${newId}`);
         setGlobalError('');
       } else {
         const coverBase64 = form.coverFile

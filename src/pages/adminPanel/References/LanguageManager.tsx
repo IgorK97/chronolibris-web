@@ -21,8 +21,7 @@ export const LanguageManager = () => {
       isLoading={isLoading}
       error={error}
       onCreate={async (name) => {
-        const res = () => create.mutateAsync({ name });
-        res();
+        create.mutateAsync({ name });
       }}
       onUpdate={(id, name) => update.mutateAsync({ id, data: { id, name } })}
       onDelete={(id) => del.mutateAsync(id)}

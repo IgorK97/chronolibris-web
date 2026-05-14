@@ -16,16 +16,13 @@ export const searchApi = {
     apiClient.post<SearchPagedResult, AdvancedSearchBody>(
       `/search/advanced${mode ? '?hiddenIsAvailableMode=true' : ''}`,
       body
-    ), //Почему в одном случае гет, а в дргуом пост?
+    ),
 };
 
-type SearchCursor =
-  | {
-      //Зачем здесь вертикальный слеш?
-      lastBestSimilarity: number;
-      lastId: number;
-    }
-  | undefined;
+type SearchCursor = {
+  lastBestSimilarity: number;
+  lastId: number;
+} | null;
 
 export const useInfiniteSimpleSearch = (
   query: string,
@@ -33,7 +30,6 @@ export const useInfiniteSimpleSearch = (
   enabled = true,
   mode: boolean = false
 ) => {
-  //Внутри каждого компонента будет свой инстанс функции или общий?
   return useInfiniteQuery({
     queryKey: ['search', 'simple', query, pageSize, mode],
     queryFn: ({ pageParam }) =>
@@ -46,8 +42,8 @@ export const useInfiniteSimpleSearch = (
         },
         mode
       ),
-    initialPageParam: undefined as SearchCursor,
-    getNextPageParam: (lastPage): SearchCursor => {
+    initialPageParam: null as SearchCursor | null,
+    getNextPageParam: (lastPage) => {
       if (
         !lastPage.hasNext ||
         lastPage.lastBestSimilarity === null ||
@@ -86,8 +82,8 @@ export const useInfiniteAdvancedSearch = (
         },
         mode
       ),
-    initialPageParam: undefined as SearchCursor,
-    getNextPageParam: (lastPage): SearchCursor => {
+    initialPageParam: null as SearchCursor | null,
+    getNextPageParam: (lastPage) => {
       if (
         !lastPage.hasNext ||
         lastPage.lastBestSimilarity === null ||

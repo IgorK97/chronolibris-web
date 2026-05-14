@@ -61,15 +61,10 @@ export const contentsApi = {
     apiClient.delete(`/Contents/${contentId}/books/${bookId}`),
 };
 
-interface UseOptions {
-  enabled?: boolean;
-}
-
 export const useInfiniteContents = (
   filter: ContentFilterRequest,
-  options?: UseOptions
+  enabled: boolean
 ) => {
-  const enabled = options?.enabled !== undefined ? options.enabled : !!filter;
   return useInfiniteQuery({
     queryKey: ['contents', 'infinite', filter],
 
@@ -92,10 +87,9 @@ export const useContentById = (id: number | null) => {
   return useQuery({
     queryKey: ['contents', id],
     queryFn: () => {
-      if (id === null) throw new Error('ID контента не указан');
-      return contentsApi.getContentById(id);
+      return contentsApi.getContentById(id!);
     },
-    enabled: id !== null,
+    enabled: !!id,
     staleTime: 5 * 60 * 1000,
   });
 };
@@ -104,10 +98,9 @@ export const useContentBooks = (contentId: number | null) => {
   return useQuery({
     queryKey: ['contents', contentId, 'books'],
     queryFn: () => {
-      if (contentId === null) throw new Error('ID контента не указан');
-      return contentsApi.getContentBooks(contentId);
+      return contentsApi.getContentBooks(contentId!);
     },
-    enabled: contentId !== null,
+    enabled: !!contentId,
     staleTime: 2 * 60 * 1000,
   });
 };
@@ -181,10 +174,9 @@ export const useContentTags = (contentId: number | null) => {
   return useQuery({
     queryKey: ['contentTags', contentId],
     queryFn: () => {
-      if (contentId === null) throw new Error('ID контента не указан');
-      return contentsApi.getContentTags(contentId);
+      return contentsApi.getContentTags(contentId!);
     },
-    enabled: contentId !== null,
+    enabled: !!contentId,
     staleTime: 2 * 60 * 1000,
   });
 };

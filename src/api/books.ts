@@ -41,36 +41,18 @@ export const prefetchBookChunk = (
   fetchedTocData: TocData | undefined
 ) => {
   queryClient.prefetchQuery({
-    //уникальный ключ кэша, учитывается при рендере,
-    //если хотя бы одно из значений изменилось, считается новым запросом это и
-    // ищется в кэшэ. Если там нет, новый запрос к серверу
     queryKey: ['chunk', bookFileId, nextIdx],
     queryFn: () => {
       const url = fetchedTocData?.Parts[nextIdx]?.url;
       if (!url) {
-        // Если URL нет, отклонить промис с ошибкой
-        return Promise.reject(new Error('URL не доступен для следующей части'));
+        throw new Error('URL нет для следующей части');
       }
       return booksApi.fetchChunk(bookFileId, fetchedTocData.Parts[nextIdx].url);
     },
-    staleTime: Infinity, //повторный запрос к серверу,
-    //если данные есть в кэшэ, делаться не будет никогда
-    gcTime: 60 * 60 * 1000, //когда данные в кэшэ будут удалены,
-    //если нет ни одного компонента, который бы их использовал
-    //таким образом, при чтении книги в читалке самые старые не используемые фрагменты
-    //будут удалены из кэшэ через час после последнего использования
+    staleTime: Infinity,
+    gcTime: 60 * 60 * 1000,
   });
 };
-//триггеры фетча: монтирование, фокус, интернет соединение, изменение ключа
-//повторный запрос при тех же ключах фетч не триггерит, поэтому время устаревания даже не учитывается
-//при триггере фетча - смотрит на кэш. Тогда, если данные в нем,
-//определяет то, был ли запрос и каково время сборки мусора
-//если запрос был и данные кем-то до сих пор используются или
-//если данные уже не используются, но время сборки мусора не прошло,
-//то выдает эти данные и смотрит на время устаревания. Если время устаревания прошло,
-//то новый запрос, иначе пока отдает эти данные и ничего не делает
-//если запроса и не было никогда, то в любом случае новый запрос
-//еще раз - ререндер не триггерит рефетч, а вот изменение ключа - триггерит
 
 export const useBookToc = (bookFileId: number) => {
   return useQuery({
@@ -94,13 +76,10 @@ export const useBookChunk = (
   return useQuery({
     queryKey: ['chunk', bookFileId, currentPartIndex],
     queryFn: () => {
-      //URL существует (fetchedTocData гарантирован enabled, но url может отсутствовать)
       const url = fetchedTocData?.Parts[currentPartIndex]?.url;
       if (!url) {
-        // Если URL нет, отклонить промис с ошибкой
-        return Promise.reject(new Error('URL не доступен для текущей части'));
+        throw new Error('URL нет для текущей части');
       }
-      // console.log('fetching chunk with url:', url);
       return booksApi.fetchChunk(bookFileId, url);
     },
     enabled: !!fetchedTocData && currentPartIndex < fetchedTocData.Parts.length,
@@ -144,9 +123,8 @@ export const useBookContents = (bookId: number | null) =>
   useQuery({
     queryKey: ['books', bookId, 'contents'],
     queryFn: () => {
-      if (bookId === null) throw new Error('ID книги не указан');
-      return booksApi.getBookContents(bookId);
+      return booksApi.getBookContents(bookId!);
     },
-    enabled: bookId !== null,
+    enabled: !!bookId,
     staleTime: 2 * 60 * 1000,
   });

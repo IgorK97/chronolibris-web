@@ -36,10 +36,9 @@ export const usePersonById = (id: number | null) => {
   return useQuery({
     queryKey: ['persons', id],
     queryFn: () => {
-      if (id === null) throw new Error('ID персоны не указан');
-      return personsApi.getPersonById(id);
+      return personsApi.getPersonById(id!);
     },
-    enabled: id !== null,
+    enabled: !!id,
     staleTime: 5 * 60 * 1000,
   });
 };

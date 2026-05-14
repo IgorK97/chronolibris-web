@@ -11,7 +11,7 @@ export const bookmarksApi = {
     apiClient.get<Bookmark[]>(`/Bookmarks/${bookFileId}`),
 
   createBookmark: (data: CreateBookmarkRequest): Promise<Bookmark> =>
-    apiClient.post<Bookmark>('/Bookmarks', data), //По факту возвращает id и createdAt, потом перепишу
+    apiClient.post<Bookmark>('/Bookmarks', data), //id и createdAt
 
   updateBookmark: (id: number, data: UpdateBookmarkRequest): Promise<void> =>
     apiClient.put<void>(`/Bookmarks/${id}`, data),
@@ -27,12 +27,9 @@ export const useBookmarks = (
   return useQuery({
     queryKey: ['bookmarks', bookFileId, userName],
     queryFn: () => {
-      if (bookFileId === null || userName === null) {
-        throw new Error('bookFileId и userName обязательны');
-      }
-      return bookmarksApi.getBookmarks(bookFileId);
+      return bookmarksApi.getBookmarks(bookFileId!);
     },
-    enabled: bookFileId !== null && userName !== null,
+    enabled: !!bookFileId && !!userName,
     staleTime: 5 * 60 * 1000,
   });
 };
@@ -54,7 +51,6 @@ export const useCreateBookmark = (userName: string) => {
         id: bookmarkDataFromServer.id,
         createdAt: bookmarkDataFromServer.createdAt,
       };
-      // console.log('Bookmark created:', newBookmark);
       queryClient.setQueryData<Bookmark[]>(
         ['bookmarks', variables.bookFileId, userName],
         (oldBookmarks) => {
@@ -72,8 +68,6 @@ export const useUpdateBookmark = () => {
     mutationFn: ({
       id,
       data,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      bookFileId,
     }: {
       id: number;
       data: UpdateBookmarkRequest;
@@ -91,8 +85,7 @@ export const useDeleteBookmark = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    mutationFn: ({ id, bookFileId }: { id: number; bookFileId: number }) =>
+    mutationFn: ({ id }: { id: number; bookFileId: number }) =>
       bookmarksApi.deleteBookmark(id),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({

@@ -26,7 +26,7 @@ export interface GetReportsRequest {
   lastTargetId?: number;
   lastTargetTypeId?: number;
   // lastReportTypeId?: number;
-  count: number;
+  count?: number;
   targetTypeFilter: boolean;
   // reportTypeFilter: boolean;
   reportStatusFilter: boolean;

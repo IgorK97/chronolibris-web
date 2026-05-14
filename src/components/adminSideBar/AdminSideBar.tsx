@@ -39,7 +39,6 @@ const SECTIONS = [
     items: [
       { label: 'Языки', path: '/lang', icon: Globe },
       { label: 'Страны', path: '/country', icon: Globe },
-      // { label: 'Форматы', path: '/format', icon: List },
       { label: 'Издатели', path: '/publisher', icon: Building2 },
       { label: 'Персоны', path: '/person', icon: User },
       { label: 'Темы', path: '/themes', icon: FerrisWheel },

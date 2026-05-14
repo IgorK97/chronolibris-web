@@ -212,12 +212,9 @@ export default function App() {
           <Route element={<ProtectedRoute allowedRoles={[USER_ROLES.ADMIN]} />}>
             <Route path="lang" element={<LanguageManager />} />
             <Route path="country" element={<CountryManager />} />
-            {/* <Route path="format" element={<FormatManager />} /> */}
             <Route path="publisher" element={<PublisherManager />} />
             <Route path="person" element={<PersonManager />} />
 
-            {/* <Route path="selections" element={<SelectionsPage />} />
-             */}
             <Route path="selections" element={<SelectionsPage />} />
             <Route path="selections/new" element={<SelectionCreatePage />} />
             <Route path="selections/:id" element={<SelectionEditPage />} />
@@ -228,10 +225,7 @@ export default function App() {
             <Route path="/contents/new" element={<ContentUnit />} />
             <Route path="/contents/:contentId" element={<ContentUnit />} />
             <Route path="/contents/:contentId/edit" element={<ContentUnit />} />
-
-            {/* <Route path="books" element={<BookManagement />} /> */}
             <Route path="books/:bookId" element={<BookUnit />} />
-
             <Route path="register-staff" element={<RegisterStaffPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/library" />} />
