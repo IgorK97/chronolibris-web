@@ -241,8 +241,7 @@ function TargetInfoPanel({ targetId, targetTypeId }: TargetInfoPanelProps) {
           )}
           <a
             href={`/book/${data.targetId}`}
-            target="_blank"
-            rel="noopener noreferrer"
+            target="_blank" //в новой вкладке
             className={styles.bookLink}
           >
             Перейти к книге <ArrowBigRight />
@@ -277,7 +276,6 @@ function TargetInfoPanel({ targetId, targetTypeId }: TargetInfoPanelProps) {
           <a
             href={`/book/${data.bookId}`}
             target="_blank"
-            rel="noopener noreferrer"
             className={styles.bookLink}
           >
             Перейти к книге <ArrowBigRight />

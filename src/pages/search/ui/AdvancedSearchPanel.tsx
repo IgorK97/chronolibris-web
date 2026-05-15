@@ -82,7 +82,7 @@ function PersonFilter({
     }
   }, [suggestions, cachePersons]);
 
-  const emitChange = (next: SelectedPerson[]) => {
+  const changePersons = (next: SelectedPerson[]) => {
     // setSelected(next);
     const grouped = new Map<number | null, number[]>();
     for (const p of next) {
@@ -110,7 +110,7 @@ function PersonFilter({
     if (!selected.some((p) => p.id === person.id)) {
       cachePersons([{ id: person.id, name: person.name }]);
     }
-    emitChange([
+    changePersons([
       ...selected,
       {
         id: person.id,
@@ -123,20 +123,17 @@ function PersonFilter({
     setShowDropDown(false);
   };
   const handleRoleChange = (uid: string, personId: number, roleId: number) => {
-    // emitChange(selected.map((p) => (p.id === personId ? { ...p, roleId } : p)));
     const duplicate = selected.find(
       (p) => p.id === personId && p.roleId === roleId
     );
     if (duplicate) {
       return;
     }
-    emitChange(selected.map((p) => (p.uid === uid ? { ...p, roleId } : p)));
+    changePersons(selected.map((p) => (p.uid === uid ? { ...p, roleId } : p)));
   };
-  // const handleRemove = (personId: number) => {
-  //   emitChange(selected.filter((p) => p.id !== personId));
-  // };
+
   const handleRemove = (uid: string) => {
-    emitChange(selected.filter((p) => p.uid !== uid));
+    changePersons(selected.filter((p) => p.uid !== uid));
   };
 
   return (
@@ -276,7 +273,7 @@ function TagFilter({
     }
   }, [suggestions, cacheTags]);
 
-  const emitChange = (next: SelectedTag[]) => {
+  const changeTags = (next: SelectedTag[]) => {
     // setSelected(next);
     onChange(
       next.filter((t) => t.mode === 'include').map((t) => t.id),
@@ -293,7 +290,7 @@ function TagFilter({
 
     cacheTags([{ id: tag.id, name: tag.name, matchedName: tag.matchedName }]);
 
-    emitChange([
+    changeTags([
       ...selected,
       {
         id: tag.id,
@@ -307,7 +304,7 @@ function TagFilter({
   };
 
   const toggleMode = (tagId: number) => {
-    emitChange(
+    changeTags(
       selected.map((t) =>
         t.id === tagId
           ? { ...t, mode: t.mode === 'include' ? 'exclude' : 'include' }
@@ -317,7 +314,7 @@ function TagFilter({
   };
 
   const handleRemove = (tagId: number) => {
-    emitChange(selected.filter((t) => t.id !== tagId));
+    changeTags(selected.filter((t) => t.id !== tagId));
   };
 
   return (
@@ -408,8 +405,8 @@ export function AdvancedSearchPanel({
 }: Props) {
   const { data: roles = [] } = usePersonRoles();
   const [draft, setDraft] = useState<AdvancedFilters>(filters);
-  console.log('SELECTION', filters.selectionId);
-  console.log('THEME', filters.themeId);
+  // console.log('SELECTION', filters.selectionId);
+  // console.log('THEME', filters.themeId);
   const handleApply = () => {
     const resDraft: AdvancedFilters = {
       personFilters: draft.personFilters.filter((pf) => pf.roleId),

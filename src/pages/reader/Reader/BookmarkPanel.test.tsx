@@ -49,12 +49,10 @@ describe('Панель закладок', () => {
   it('Корректный вызов onNavigate при клике по закладке', () => {
     render(<BookmarkPanel {...defaultProps} />);
 
-    // const bookmarkItem = screen.getByText('Important quote');
     const paragraphTitle = screen.getByText((content) =>
       content.includes('Контекст')
     );
     fireEvent.click(paragraphTitle);
-    // fireEvent.click(bookmarkItem);
 
     expect(defaultProps.onNavigate).toHaveBeenCalledWith(mockBookmarks[0]);
   });

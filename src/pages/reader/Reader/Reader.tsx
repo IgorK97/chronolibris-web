@@ -404,9 +404,9 @@ export const Reader: React.FC<ReaderProps> = ({
   const goToCol = (col: number) => {
     const vp = viewportRef.current;
     const ct = contentRef.current;
-    console.log('PUM');
+    // console.log('PUM');
     if (!vp || !ct || !fetchedTocData) return;
-    console.log('I AM HERE');
+    // console.log('I AM HERE');
 
     const pageWidth = twoPageMode
       ? (ct!.clientWidth - pageGap) / 2 + pageGap
@@ -421,7 +421,7 @@ export const Reader: React.FC<ReaderProps> = ({
       }
       return; // -
     }
-    console.log('I AM TUTA', col);
+    // console.log('I AM TUTA', col);
     if (col < 0) {
       const prevIdx = currentPartIndex - 1;
       if (prevIdx >= 0) {
@@ -434,7 +434,7 @@ export const Reader: React.FC<ReaderProps> = ({
 
     // let targetCol = Math.max(0, Math.min(col, totalCols - 1));
     let targetCol = col;
-    // В режиме двух страниц всегда отображается левая страница разворота (округление вниз до четного числа)
+    //В режиме двух страниц всегда отображается левая страница разворота (округление вниз до четного числа)
     if (twoPageMode && targetCol > 0) targetCol = targetCol - (targetCol % 2);
     const leftPos = targetCol * pageWidth;
 
@@ -446,7 +446,7 @@ export const Reader: React.FC<ReaderProps> = ({
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       recalcCols();
-    }, 0); // микро-задержка для гарантии отрисовки
+    }, 0); //задержка для гарантии отрисовки
 
     return () => clearTimeout(timeoutId);
   }, [twoPageMode]);
@@ -502,7 +502,7 @@ export const Reader: React.FC<ReaderProps> = ({
       if (twoPageMode && targetCol > 0) targetCol = targetCol - (targetCol % 2);
       goToCol(targetCol);
     } else {
-      // Другой фрагмент: сохраняем ratio, меняем фрагмент
+      //если другой фрагмент: сохранить ratio, сменить фрагмент
       pendingColRef.current = -withinRatio;
       setCurrentPartIndex(partIdx);
     }
@@ -835,14 +835,14 @@ export const Reader: React.FC<ReaderProps> = ({
           setTocOpen(false);
 
           if (idx === currentPartIndex) {
-            // Тот же фрагмент — сразу скроллим
+            //тот же фрагмент — сразу скролл
             if (xp) setTimeout(() => scrollToXpInDOM(xp), 50);
           } else {
-            // Другой фрагмент — ставим pending и меняем фрагмент
+            //другой фрагмент - сменить фрагмент
             if (xp) {
               pendingBookmarkXpRef.current = xp;
             } else {
-              pendingColRef.current = 0; // без xp — просто на начало
+              pendingColRef.current = 0; //без xp — просто на начало
             }
             setCurrentPartIndex(idx);
           }
@@ -1016,7 +1016,7 @@ export const Reader: React.FC<ReaderProps> = ({
                   </button>
                 </div>
               ) : (
-                // Рендерим сегменты, если всё ок
+                //если все хорошо, то рендер сегментов
                 segments?.map((seg, idx) => renderSegment(seg, idx))
               )}
               {/* {segments.map((seg, idx) => renderSegment(seg, idx))} */}

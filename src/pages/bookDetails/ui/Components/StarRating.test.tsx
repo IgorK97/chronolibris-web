@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { render, screen, fireEvent } from '@testing-library/react';
 import { StarRating } from './StarRating';
 import { vi, describe, it, expect } from 'vitest';
