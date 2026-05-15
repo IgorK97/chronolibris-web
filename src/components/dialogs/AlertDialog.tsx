@@ -5,19 +5,21 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
+interface AlertDialogProps {
+  open: boolean;
+  title: string;
+  description: string;
+  handleAccept: () => void;
+  handleReject: () => void;
+}
+
 export const AlertDialog = ({
   open,
   title,
   description,
   handleAccept,
   handleReject,
-}: {
-  open: boolean;
-  title: string;
-  description: string;
-  handleAccept: () => void;
-  handleReject: () => void;
-}) => {
+}: AlertDialogProps) => {
   return (
     <Dialog open={open} onClose={handleReject} role="alertdialog">
       <DialogTitle id="alert-dialog-title">{title}</DialogTitle>

@@ -88,16 +88,6 @@ export const TagsTable: React.FC<TagsTableProps> = ({ onParentTagSelect }) => {
         </div>
       </div>
 
-      {isSearchMode && (
-        <div className={styles['search-mode-notice']}>
-          Поиск по всем уровням: «{debouncedSearch}»
-          <span className={styles['search-mode-sub']}>
-            {' '}
-            — для тегов с родителем указан путь к родителю
-          </span>
-        </div>
-      )}
-
       {isLoading ? (
         <div className={styles['loading']}>Загрузка...</div>
       ) : (

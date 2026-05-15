@@ -212,11 +212,11 @@
 }
 
 .delete-option {
-  color: #dc2626 !important;
+  color: #dc2626;
 }
 
 .delete-option:hover {
-  background-color: #fef2f2 !important;
+  background-color: #fef2f2;
 }
 
 .info {

@@ -178,7 +178,7 @@ export const Auth = ({ onNavigate }: AuthProps) => {
     const valid = isRegister ? validateRegister() : validateLogin();
     if (!valid) return;
     // const phoneNumber = parsePhoneNumber(regForm.phone, 'RU');
-    console.log('I AM HERE');
+    // console.log('I AM HERE');
     try {
       if (isRegister) {
         await usersApi.register({

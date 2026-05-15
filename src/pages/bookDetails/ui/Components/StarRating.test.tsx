@@ -7,9 +7,6 @@ import '@testing-library/jest-dom/vitest';
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
-vi.mock('@/utils', () => ({
-  pluralize: (_: number) => 'ratings',
-}));
 
 describe('Компонент оценки книги', () => {
   const defaultProps = {

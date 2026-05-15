@@ -83,9 +83,6 @@ export const MyBooks = ({
       <aside
         style={{
           maxHeight: '100%',
-          // overflowY: `${isCollapsed ? 'hidden' : 'auto'}`,
-          // overflowY: 'auto',
-          // overflowX: 'hidden',
         }}
       >
         <div

@@ -11,7 +11,7 @@ import {
   // X,
 } from 'lucide-react';
 import styles from './BookTabs.module.css';
-import { getInitials, getAvatarColor } from './BookTabsData';
+import { getInitials, getAvatarColor } from './BookTabsUtils';
 import { ReportModal } from '@/components/reports/ReportModal';
 import { useStore } from '@stores/globalStore';
 import { AlertDialog } from '@/components/dialogs/AlertDialog';
@@ -86,20 +86,22 @@ export function ScoreDisplay({
   );
 }
 
-export function ThreeDotsMenu({
-  canDelete,
-  onDelete,
-  canReport = true,
-  targetId,
-  targetTypeId,
-}: {
+interface ThreeDotsMenu {
   type?: 'comment' | 'review';
   canDelete: boolean;
   canReport?: boolean;
   onDelete: () => Promise<void>;
   targetId: number;
   targetTypeId: number;
-}) {
+}
+
+export function ThreeDotsMenu({
+  canDelete,
+  onDelete,
+  canReport = true,
+  targetId,
+  targetTypeId,
+}: ThreeDotsMenu) {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const { user, isReader } = useStore();
@@ -163,22 +165,21 @@ export function ThreeDotsMenu({
           />,
           document.body
         )}
-      {
-        <AlertDialog
-          description={`Это действие нельзя будет отменить, но его можно написать заново`}
-          open={deleteModalOpen}
-          title={`Вы действительно хотите удалить ${targetTypeId === TARGET_TYPE.REVIEW ? 'отзыв' : 'комментарий'}?`}
-          handleAccept={() => {
-            if (onDelete) onDelete();
-            setDeleteModalOpen(false);
-            setMenuOpen(false);
-          }}
-          handleReject={() => {
-            setDeleteModalOpen(false);
-            setMenuOpen(false);
-          }}
-        />
-      }
+
+      <AlertDialog
+        description={`Это действие нельзя будет отменить, но его можно написать заново`}
+        open={deleteModalOpen}
+        title={`Вы действительно хотите удалить ${targetTypeId === TARGET_TYPE.REVIEW ? 'отзыв' : 'комментарий'}?`}
+        handleAccept={() => {
+          if (onDelete) onDelete();
+          setDeleteModalOpen(false);
+          setMenuOpen(false);
+        }}
+        handleReject={() => {
+          setDeleteModalOpen(false);
+          setMenuOpen(false);
+        }}
+      />
     </>
   );
 }

@@ -87,7 +87,7 @@ export function ThemePanel({ selectedThemeId, onSelect }: ThemePanelProps) {
   };
 
   const handleBack = () => {
-    setStack((prev) => prev.slice(0, -1));
+    setStack((prev) => prev.slice(0, -1)); //не включая последний
     setPendingId(currentParentId);
   };
 

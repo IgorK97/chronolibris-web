@@ -3,6 +3,18 @@ import { CornerDownRight, X } from 'lucide-react';
 import styles from './BookTabs.module.css';
 // import { AlertDialog } from '@/components/dialogs/AlertDialog';
 
+interface SmartTextBoxProps {
+  placeholder: string;
+  replyingTo?: { parentId: number; authorName: string } | null;
+  onCancelReply?: () => void;
+  onSubmit: (text: string) => void;
+  children?: React.ReactNode;
+  type: 'review' | 'comment';
+  onDelete?: () => void;
+  initialText?: string;
+  isReadOnly?: boolean;
+}
+
 export function SmartTextBox({
   placeholder,
   replyingTo,
@@ -13,17 +25,7 @@ export function SmartTextBox({
   children,
   type,
   isReadOnly = false,
-}: {
-  placeholder: string;
-  replyingTo?: { parentId: number; authorName: string } | null;
-  onCancelReply?: () => void;
-  onSubmit: (text: string) => void;
-  children?: React.ReactNode;
-  type: 'review' | 'comment';
-  onDelete?: () => void;
-  initialText?: string;
-  isReadOnly?: boolean;
-}) {
+}: SmartTextBoxProps) {
   const [text, setText] = useState(initialText);
   // const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);

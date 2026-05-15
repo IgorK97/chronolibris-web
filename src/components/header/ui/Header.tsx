@@ -20,8 +20,6 @@ export default function Header() {
     setInputValue(currentQuery);
   }, [currentQuery]);
 
-  // const hasActiveFilters = FILTER_PARAMS.some((key) => searchParams.has(key));
-
   const handleSearch = () => {
     const trimmed = inputValue.trim();
 

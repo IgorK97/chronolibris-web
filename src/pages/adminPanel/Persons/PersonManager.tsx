@@ -77,7 +77,7 @@ export const PersonManager: React.FC = () => {
           id,
           name,
           description,
-        } as UpdatePersonRequest,
+        },
       });
       setEditingId(null);
       setEditFormData(null);

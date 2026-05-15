@@ -57,18 +57,17 @@ export function useResolveFilterNames({
         if (missingPersonIds.length > 0) {
           const batch =
             await searchReferenceApi.getPersonsByIds(missingPersonIds);
-          // console.log('Resolved persons:', batch);
           for (const p of batch) resolvedPersons.push(p);
           const foundIds = new Set(batch.map((p) => p.id));
           for (const id of missingPersonIds) {
             if (!foundIds.has(id)) notFoundPersonIds.push(id);
           }
         }
-        const resolvedTags: Array<{
+        const resolvedTags: {
           id: number;
           name: string;
           matchedName: string | null;
-        }> = [];
+        }[] = [];
         const notFoundTagIds: number[] = [];
 
         if (missingTagIds.length > 0) {

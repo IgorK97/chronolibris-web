@@ -8,6 +8,7 @@ interface Props {
 
 interface State {
   hasError: boolean;
+  error?: Error;
 }
 
 export default class ErrorBoundary extends React.Component<Props, State> {
@@ -16,13 +17,12 @@ export default class ErrorBoundary extends React.Component<Props, State> {
     this.state = { hasError: false };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   static getDerivedStateFromError(e: Error) {
-    return { hasError: true };
+    return { hasError: true, error: e };
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    console.error('Caught error:', error, info.componentStack);
+    console.error('Ошибка:', error, info.componentStack);
   }
 
   render() {

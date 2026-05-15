@@ -238,7 +238,7 @@ export function RegisterStaffPage() {
   );
 }
 
-function Field({
+export function Field({
   label,
   value,
   maxLength = 256,

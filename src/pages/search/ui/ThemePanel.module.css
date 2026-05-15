@@ -134,11 +134,11 @@
 }
 
 .theme-item-pending {
-  background: #ebebeb !important;
+  background: #ebebeb;
 }
 
 .theme-item-selected {
-  background: #e0e8f5 !important;
+  background: #e0e8f5;
 }
 
 .theme-name {

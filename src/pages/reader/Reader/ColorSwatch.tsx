@@ -23,8 +23,8 @@ export const ColorSwatch: React.FC<{
       transition: 'transform 0.1s',
       transform: selected ? 'scale(1.18)' : 'scale(1)',
       boxShadow: selected
-        ? '0 0 0 2px rgba(0,0,0,0.18)'
-        : '0 1px 3px rgba(0,0,0,0.12)',
+        ? '0 0 0 2px rgb(0 0 0 / 18%)'
+        : '0 1px 3px rgb(0 0 0 / 12%)',
     }}
   />
 );

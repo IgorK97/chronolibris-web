@@ -16,9 +16,7 @@ interface Props {
 
 export const SelectionPickerModal = ({ bookId, onClose, onRefresh }: Props) => {
   const { data: selections } = useAllSelections();
-
   const { data: seekedSelections } = useSeekedSelections(bookId);
-
   const { mutateAsync: addBookToSelection } = useAddBookToSelection();
   const { mutateAsync: removeBookFromSelection } = useRemoveBookFromSelection();
 

@@ -58,7 +58,7 @@ import { ContextMenu } from './ContextMenu';
 import { ImageLightbox } from './ImageLightbox';
 import { BookmarkEditModal } from './BookmarkEditModal';
 
-// первые слова из текста абзаца
+//первые слова из текста абзаца
 const extractContext = (seg: TextSegment): string => {
   let raw = '';
   if (typeof seg.c === 'string') {

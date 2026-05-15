@@ -4,17 +4,19 @@ import { BookShelfConstructing } from './BookShelfConstructing';
 // import { collectionsApi, useShelves } from '../../../api/collections';
 // import { useStore } from '@/stores/globalStore';
 
+interface ShelfRefiningModalProps {
+  onClose: () => void;
+  onSubmit: (name: string) => Promise<void>;
+  initialName?: string;
+  title?: string;
+}
+
 export const ShelfRefiningModal = ({
   onClose,
   onSubmit,
   initialName = '',
   title = '',
-}: {
-  onClose: () => void;
-  onSubmit: (name: string) => Promise<void>;
-  initialName?: string;
-  title?: string;
-}) => {
+}: ShelfRefiningModalProps) => {
   return (
     <div className={styles['modal-overlay']}>
       <div className={styles['modal-content']}>

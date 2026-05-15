@@ -48,8 +48,8 @@ export function getAvatarColor(name: string): string {
     '#8b5cf6',
   ];
   let hash = 0;
-  if (name === undefined) name = 'N';
+  if (!name) name = 'N';
   for (let i = 0; i < name.length; i++)
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    hash = name.charCodeAt(i) + ((hash << 5) + hash);
   return colors[Math.abs(hash) % colors.length];
 }

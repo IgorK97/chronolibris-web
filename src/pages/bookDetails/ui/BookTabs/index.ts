@@ -1,6 +1,6 @@
 export * from './BookTabs';
 export * from './BookTabsAtoms';
-export * from './BookTabsData';
+export * from './BookTabsUtils';
 export * from './CommentItem';
 export * from './CommentsSection';
 export * from './ParticipantsInfo';

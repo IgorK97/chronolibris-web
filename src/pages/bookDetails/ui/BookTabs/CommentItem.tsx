@@ -29,7 +29,13 @@ import { SmartTextBox } from './SmartTextBox';
 // import ReactMarkdown from 'react-markdown';
 // import remarkGfm from 'remark-gfm';
 
-const MAX_INDENT_DEPTH = 3; // После 3 уровня вправо больше не сдвигается
+const MAX_INDENT_DEPTH = 3; //После 3 уровня вправо больше не сдвигается
+
+interface VoteState {
+  likes: number;
+  dislikes: number;
+  userVote: 'like' | 'dislike' | null;
+}
 
 export function SmartCommentItem({
   comment,
@@ -83,7 +89,7 @@ export function SmartCommentItem({
   const userName = user?.userName;
 
   // console.log(userName, 'Kukusiki');
-  const [votes, setVotes] = useState({
+  const [votes, setVotes] = useState<VoteState>({
     likes: comment.likesCount,
     dislikes: comment.dislikesCount,
 
@@ -93,10 +99,6 @@ export function SmartCommentItem({
         : comment.userVote === false
           ? 'dislike'
           : null,
-  } as {
-    likes: number;
-    dislikes: number;
-    userVote: 'like' | 'dislike' | null;
   });
   const { mutateAsync: rateComment } = useRateComment(bookId, comment.id);
   const { mutateAsync: deleteComment } = useDeleteComment();
@@ -106,7 +108,6 @@ export function SmartCommentItem({
 
     const score = type === 'like' ? 1 : -1;
 
-    //Оптимистичное обновление
     setVotes((prev) => {
       if (prev.userVote === type) {
         return {

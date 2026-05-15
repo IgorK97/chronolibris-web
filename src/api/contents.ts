@@ -11,9 +11,10 @@ import type {
   ContentFilterRequest,
   TagDetails,
   CreateContentRequest,
-  PatchContentRequest,
+  // PatchContentRequest,
   BookContentLinkRequest,
   PagedResult,
+  UpdateContentRequest,
 } from '../types';
 import type { BookDto } from '../types';
 
@@ -41,8 +42,8 @@ export const contentsApi = {
   createContent: (data: CreateContentRequest): Promise<number> =>
     apiClient.post<number, CreateContentRequest>('/Contents', data),
 
-  putContent: (data: PatchContentRequest): Promise<void> =>
-    apiClient.put<void, PatchContentRequest>(`/Contents/${data.id}`, data),
+  putContent: (data: UpdateContentRequest): Promise<void> =>
+    apiClient.put<void, UpdateContentRequest>(`/Contents/${data.id}`, data),
 
   deleteContent: (id: number): Promise<void> =>
     apiClient.delete(`/Contents/${id}`),
@@ -77,7 +78,7 @@ export const useInfiniteContents = (
 
     getNextPageParam: (lastPage) =>
       lastPage.hasNext ? lastPage.lastId : undefined,
-
+    refetchOnWindowFocus: true,
     staleTime: 0,
     enabled: enabled && !!filter,
   });

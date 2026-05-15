@@ -2,7 +2,7 @@ import { Reader } from './Reader';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 
 export const ReaderPage: React.FC = () => {
-  const { bookFileId } = useParams<{ bookFileId: string }>();
+  const { bookFileId } = useParams();
   const navigate = useNavigate();
   const id = Number(bookFileId);
   if (!bookFileId || isNaN(id)) return <Navigate to="/" replace />;

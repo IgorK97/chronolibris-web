@@ -26,7 +26,7 @@ export interface ImgNode {
 export interface TextSegment {
   t: string;
   xp?: number[];
-  c: string | TextSegment[] | (string | InlineNode)[] | ImgNode[]; //широкий юнион
+  c: string | TextSegment[] | (string | InlineNode)[] | ImgNode[];
 }
 
 export interface TocPart {

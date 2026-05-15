@@ -47,7 +47,7 @@ export const ThemeManager: React.FC = () => {
     try {
       await createMutation.mutateAsync(formData);
       setFormData({ name: '', parentThemeId: null });
-      setSelectedParentName(null); // Сброс после создания
+      setSelectedParentName(null);
       refetch();
     } catch (err: any) {
       console.error('Ошибка создания темы:', err);
@@ -74,7 +74,6 @@ export const ThemeManager: React.FC = () => {
       setEditFormData(null);
       refetch();
     } catch (err: any) {
-      console.error('Ошибка обновления темы:', err);
       alert(err.response?.data?.message || 'Ошибка обновления темы');
     }
   };

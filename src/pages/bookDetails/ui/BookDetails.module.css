@@ -50,7 +50,7 @@
   padding: 12px;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.15s ease; /* why is red? */
+  transition: background 0.15s ease;
 }
 
 .download-file-item:hover {

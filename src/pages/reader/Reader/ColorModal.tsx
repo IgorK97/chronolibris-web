@@ -3,7 +3,6 @@ import styles from './Reader.module.css';
 import { ColorSwatch } from './ColorSwatch';
 import { X } from 'lucide-react';
 
-// Определяем структуру темы
 interface ThemePreset {
   id: string;
   label: string;
@@ -12,7 +11,6 @@ interface ThemePreset {
   bgColor: string;
 }
 
-// Выносим пресеты (можно в отдельный файл readerOpts.ts)
 const THEMES: ThemePreset[] = [
   {
     id: 'light',
@@ -53,11 +51,9 @@ const THEMES: ThemePreset[] = [
 interface ColorModalProps {
   open: boolean;
   onClose: () => void;
-  // Текущие значения (состояние хранится в родителе)
   textColor: string;
   pageColor: string;
   bgColor: string;
-  // Функция для смены всего набора сразу
   onApplyTheme: (theme: { text: string; page: string; bg: string }) => void;
 }
 
@@ -93,7 +89,6 @@ export const ColorModal: React.FC<ColorModalProps> = ({
         </div>
 
         <div className={styles['color-modal-body']}>
-          {/* Шапка таблицы для наглядности */}
           <div
             style={{
               display: 'flex',
@@ -108,7 +103,6 @@ export const ColorModal: React.FC<ColorModalProps> = ({
           </div>
 
           {THEMES.map((theme) => {
-            // Проверяем, выбрана ли эта тема сейчас (сравнение по всем цветам)
             const isSelected =
               theme.textColor === textColor &&
               theme.pageColor === pageColor &&

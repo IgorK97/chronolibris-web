@@ -71,7 +71,3 @@ export interface UpdateContentRequest {
   personFilters?: PersonRoleFilter[];
   themeIds?: number[];
 }
-
-export type PatchContentRequest = Partial<UpdateContentRequest> & {
-  id: number;
-};

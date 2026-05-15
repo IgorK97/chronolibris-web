@@ -211,10 +211,7 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
           </h3>
           <div className={styles['form']}>
             <div className={styles['input-group']}>
-              <label className={styles['label']}>
-                {/* {t('profile.label_name')} */}
-                Имя
-              </label>
+              <label className={styles['label']}>Имя</label>
               <input
                 className={styles['text-input']}
                 value={profileForm.firstName}
@@ -230,10 +227,7 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
             </div>
 
             <div className={styles['input-group']}>
-              <label className={styles['label']}>
-                {/* {t('profile.label_name')} */}
-                Фамилия
-              </label>
+              <label className={styles['label']}>Фамилия</label>
               <input
                 className={styles['text-input']}
                 value={profileForm.lastName}
@@ -249,10 +243,7 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
             </div>
 
             <div className={styles['input-group']}>
-              <label className={styles['label']}>
-                {/* {t('profile.label_name')} */}
-                Имя пользователя
-              </label>
+              <label className={styles['label']}>Имя пользователя</label>
               <input
                 className={styles['text-input']}
                 value={profileForm.userName}

@@ -277,7 +277,7 @@
 }
 
 .danger:hover {
-  background-color: #fef2f2 !important;
+  background-color: #fef2f2;
   color: #b91c1c;
 }
 

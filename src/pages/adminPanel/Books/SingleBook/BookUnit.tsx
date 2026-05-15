@@ -121,7 +121,7 @@ function PersonFilter({
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const emitChange = (next: SelectedPerson[]) => {
+  const changePersons = (next: SelectedPerson[]) => {
     setSelected(next);
     const grouped = new Map<number, number[]>();
     for (const p of next) {
@@ -143,7 +143,7 @@ function PersonFilter({
       setShowDropDown(false);
       return;
     }
-    emitChange([
+    changePersons([
       ...selected,
       {
         id: person.id,
@@ -163,11 +163,11 @@ function PersonFilter({
     if (duplicate) {
       return;
     }
-    emitChange(selected.map((p) => (p.uid === uid ? { ...p, roleId } : p)));
+    changePersons(selected.map((p) => (p.uid === uid ? { ...p, roleId } : p)));
   };
 
   const handleRemove = (uid: string) => {
-    emitChange(selected.filter((p) => p.uid !== uid));
+    changePersons(selected.filter((p) => p.uid !== uid));
   };
   // console.log('PERSON FILTER - RENDER', selected.length);
   return (
@@ -332,7 +332,7 @@ function AutocompleteField({
                 key={item.id}
                 className={`${styles['autocomplete-item']} ${
                   item.id === selectedId
-                    ? styles['autocomplete-item--selected']
+                    ? styles['autocomplete-item-selected']
                     : ''
                 }`}
                 onMouseDown={() => {
@@ -497,13 +497,12 @@ export const BookUnit: React.FC = () => {
   const id = bookId && !isNew ? parseInt(bookId, 10) : null;
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState('');
-  const { data: publishersData = [] } = usePublishers(); //
+  const { data: publishersData = [] } = usePublishers();
 
-  // Преобразуем данные в формат AutocompleteItem
   const publishers = useMemo(
     () => publishersData.map((p) => ({ id: p.id, name: p.name })),
     [publishersData]
-  ); //
+  );
   const {
     data: book,
     isLoading,
@@ -513,8 +512,6 @@ export const BookUnit: React.FC = () => {
     if (book) {
       document.title = `${book.title} — Редактирование`;
     }
-
-    // return () => { document.title = 'Chronolibris'; };
   }, [book]);
   const { data: contents, refetch: refetchContents } = useBookContents(id);
   // console.log(contents);
@@ -617,12 +614,9 @@ export const BookUnit: React.FC = () => {
     // console.log('useEffect: TUTA-1');
 
     if (mode === 'edit') {
-      // console.log('useEffect: TUTA-2');
-
       validate(form);
     }
-    // console.log('useEffect: TUTA-3');
-  }, [form, mode, validate]); //??? может, здесь? При изменении атрибутов изменится сам объект?
+  }, [form, mode, validate]);
 
   useEffect(() => {
     if (isNew) {
@@ -762,9 +756,9 @@ export const BookUnit: React.FC = () => {
           title: book.title ?? '',
           description: book.description ?? '',
           isbn: book.isbn ?? '',
-          bbk: (book as any).bbk ?? '',
-          udk: (book as any).udk ?? '',
-          source: (book as any).source ?? '',
+          bbk: book.bbk ?? '',
+          udk: book.udk ?? '',
+          source: book.source ?? '',
           year: book.year != null ? String(book.year) : '',
           isAvailable: book.isAvailable,
           isReviewable: book.isReviewable,

@@ -44,7 +44,6 @@ export const USER_ROLES = {
   ADMIN: 'admin',
 } as const;
 
-export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];
 const EMPTY_CACHE: FilterNamesCache = { persons: {}, tags: {} };
 
 export const useStore = create<AppState>()(

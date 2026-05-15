@@ -367,13 +367,6 @@
   object-fit: cover;
 }
 
-.cover-placeholder {
-  text-align: center;
-  color: #aaa;
-  font-size: 13px;
-  padding: 12px;
-}
-
 .person-list {
   display: flex;
   flex-direction: column;

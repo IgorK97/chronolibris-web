@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styles from './AdminSidebar.module.css';
 import {
@@ -60,7 +60,7 @@ const SECTIONS = [
 
 export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const location = useLocation();
-  const sidebarRef = useRef<HTMLDivElement>(null);
+  // const sidebarRef = useRef<HTMLDivElement>(null);
 
   //Чтобы по нажатии на esc скрылась панель
   useEffect(() => {
@@ -84,8 +84,8 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         aria-hidden="true"
       />
 
-      <aside
-        ref={sidebarRef}
+      <div
+        // ref={sidebarRef}
         className={`${styles.sidebar} ${isOpen ? styles['sidebar-open'] : ''}`}
         aria-label="Панель администратора"
         role="navigation"
@@ -104,7 +104,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
           </button>
         </div>
 
-        <nav className={styles.nav}>
+        <div className={styles.nav}>
           {SECTIONS.map((section) => (
             <div key={section.title} className={styles.section}>
               <p className={styles['section-title']}>{section.title}</p>
@@ -127,8 +127,8 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
               </ul>
             </div>
           ))}
-        </nav>
-      </aside>
+        </div>
+      </div>
     </>
   );
 }

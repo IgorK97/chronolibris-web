@@ -231,8 +231,6 @@ export const RELATION_TYPES = [
   },
 ] as const;
 
-export type RelationType = (typeof RELATION_TYPES)[number];
-
 export interface CreateThemeRequest {
   name: string;
   parentThemeId?: number | null;

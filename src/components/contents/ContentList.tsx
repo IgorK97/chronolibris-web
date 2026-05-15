@@ -8,10 +8,10 @@ interface ContentListProps {
   filter?: ContentFilterRequest;
   renderActions: (content: ContentDto) => React.ReactNode;
   onTitleClick?: (content: ContentDto) => void;
-  additionalColumns?: Array<{
+  additionalColumns?: {
     header: string;
     render: (content: ContentDto) => React.ReactNode;
-  }>;
+  }[];
 }
 
 export const ContentList: React.FC<ContentListProps> = ({

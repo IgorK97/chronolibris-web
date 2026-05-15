@@ -1,7 +1,7 @@
 import { Spoiler } from './Spoiler';
 
 export const renderFormattedText = (text: string) => {
-  const regex = /(\*\*.*?\*\*|~~.*?~~|_.*?_|>!.*?!<)/g;
+  const regex = /(\*\*.*?\*\*|~~.*?~~|__.*?__|>!.*?!<)/g;
   const parts = text.split(regex);
 
   return parts.map((part, index) => {

@@ -20,6 +20,13 @@ interface BookTabsProps {
   onRatingChanged: () => void;
 }
 
+interface TabType {
+  id: TabId;
+  label: string;
+  count?: number;
+  disabled?: boolean;
+}
+
 export function BookTabs({
   infoContent,
   canReview,
@@ -36,12 +43,7 @@ export function BookTabs({
 }: BookTabsProps) {
   const [activeTab, setActiveTab] = useState<TabId>('discussion');
 
-  const tabs: {
-    id: TabId;
-    label: string;
-    count?: number;
-    disabled?: boolean;
-  }[] = [
+  const tabs: TabType[] = [
     { id: 'info', label: 'Информация' },
     { id: 'discussion', label: 'Обсуждение', count: discussionCount },
     {
