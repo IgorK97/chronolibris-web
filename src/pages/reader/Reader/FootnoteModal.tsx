@@ -29,13 +29,12 @@ export const FootnoteModal: React.FC<FootnoteModalProps> = ({
         className={styles['footnote-modal']}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
-        aria-modal="true"
         style={{ background: pageColor, color: textColor, fontFamily }}
       >
         <button
           className={styles['footnote-close']}
           onClick={onClose}
-          aria-label="Закрыть"
+          title="Закрыть"
           style={{ color: textColor }}
         >
           <X />
