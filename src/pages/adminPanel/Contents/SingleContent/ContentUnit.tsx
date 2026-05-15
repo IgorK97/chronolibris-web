@@ -318,6 +318,8 @@ export const ContentUnit: React.FC = () => {
       const y = parseInt(data.yearFrom, 10);
       if (
         isNaN(y) ||
+        !Number.isInteger(y) ||
+        String(y) !== data.yearFrom.trim() ||
         y < VALIDATION_RULES.year.min ||
         y > VALIDATION_RULES.year.max
       ) {
@@ -329,6 +331,8 @@ export const ContentUnit: React.FC = () => {
       const y = parseInt(data.yearTo, 10);
       if (
         isNaN(y) ||
+        !Number.isInteger(y) ||
+        String(y) !== data.yearTo.trim() ||
         y < VALIDATION_RULES.year.min ||
         y > VALIDATION_RULES.year.max
       ) {

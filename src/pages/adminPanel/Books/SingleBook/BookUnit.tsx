@@ -555,6 +555,8 @@ export const BookUnit: React.FC = () => {
         const y = parseInt(data.year, 10);
         if (
           isNaN(y) ||
+          !Number.isInteger(y) ||
+          String(y) !== data.year.trim() ||
           y < VALIDATION_RULES.year.min ||
           y > VALIDATION_RULES.year.max
         ) {

@@ -12,7 +12,7 @@ export const renderFormattedText = (text: string) => {
       return <del key={index}>{part.slice(2, -2)}</del>;
     }
     if (part.startsWith('__') && part.endsWith('__')) {
-      return <em key={index}>{part.slice(1, -1)}</em>;
+      return <em key={index}>{part.slice(2, -2)}</em>;
     }
     if (part.startsWith('>!') && part.endsWith('!<')) {
       return <Spoiler key={index}>{part.slice(2, -2)}</Spoiler>;

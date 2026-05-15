@@ -144,24 +144,27 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
     if (!bookFileId) return;
     // setIsDownloading(true);
     setDownloadError(null);
-
+    let a;
+    let url;
     try {
       const { blob } = await download(bookFileId);
-
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      url = window.URL.createObjectURL(blob);
+      a = document.createElement('a');
       a.href = url;
       let extension = FORMAT_EXTENSIONS[formatId] || '';
       if (extension === 'fb2') extension += '.zip';
       a.download = `${bookTitle}.${extension}`;
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
     } catch (error) {
       setDownloadError(t('book.download_error'));
     } finally {
-      // setIsDownloading(false);
+      if (a) {
+        document.body.removeChild(a);
+      }
+      if (url) {
+        window.URL.revokeObjectURL(url);
+      }
     }
   };
 
