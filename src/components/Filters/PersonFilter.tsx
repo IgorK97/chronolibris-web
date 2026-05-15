@@ -52,7 +52,7 @@ export const PersonFilter: React.FC<PersonFilterProps> = ({
       }
     });
 
-    const result = Array.from(grouped.entries()).map(([roleId, personIds]) => ({
+    const result = [...grouped].map(([roleId, personIds]) => ({
       roleId,
       personIds,
     }));

@@ -17,18 +17,19 @@ interface BookmarkPanelProps {
   bgColor?: string;
 }
 
-//из "/1/3/7" в [1,3,7]  (для сортировки)
+//из "/1/3/7" в [1,3,7]
 const parseXpointer = (xp: string): number[] =>
-  xp.split('/').filter(Boolean).map(Number);
+  xp
+    .split('/')
+    .filter((s) => !!s)
+    .map((s) => Number(s));
 
 const compareXp = (a: number[], b: number[]): number => {
-  const len = Math.max(a.length, b.length);
+  const len = Math.min(a.length, b.length);
   for (let i = 0; i < len; i++) {
-    const av = a[i] ?? -Infinity;
-    const bv = b[i] ?? -Infinity;
-    if (av !== bv) return av < bv ? -1 : 1;
+    if (a[i] !== b[i]) return a[i] < b[i] ? -1 : 1; //по возрастанию, первым идет а, потом б
   }
-  return 0;
+  return a.length - b.length;
 };
 
 export const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
@@ -50,10 +51,9 @@ export const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
         onClick={onClose}
         data-testid="panel-overlay"
       />
-      <aside
+      <div
         className={`${styles['toc-sidebar']} ${styles['bm-sidebar']} ${open ? styles['toc-sidebar-open'] : ''}`}
         aria-label="Закладки"
-        role="complementary"
         style={{
           background: pageColor,
           color: textColor,
@@ -130,7 +130,7 @@ export const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
               ))}
           </div>
         )}
-      </aside>
+      </div>
     </>,
     document.body
   );

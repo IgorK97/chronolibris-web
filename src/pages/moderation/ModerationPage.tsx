@@ -254,7 +254,7 @@ function TargetInfoPanel({ targetId, targetTypeId }: TargetInfoPanelProps) {
             <span className={styles['field-label']}>Автор:</span>
             <span>
               {data.readerName
-                ? `@${data.readerName}`
+                ? `${data.readerName}`
                 : `Пользователь ${data.readerId ?? '—'}`}
             </span>
           </div>
@@ -301,7 +301,6 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
   const [error, setError] = useState(
     report.comment.length < 20 ? 'Напишите комментарий к решению' : ''
   );
-  // Метки типов жалоб через запятую для отображения в заголовке строки
   const reasonLabels = (report.reasonTypeIds ?? [])
     .map((id) => REASON_TYPES.find((r) => r.id === id)?.label ?? `Тип ${id}`)
     .join(', ');
@@ -324,7 +323,6 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
     await createTask.mutateAsync({
       targetId: report.targetId,
       targetTypeId: report.targetTypeId,
-      // reportTypeId убран
     });
     onUpdated();
   };
@@ -553,8 +551,6 @@ export function ModerationPage() {
           </select>
         </div>
 
-        {/* Фильтр по типу жалобы убран */}
-
         <button
           className={`${styles['action-btn']} ${styles['primary-btn']}`}
           onClick={applyFilters}
@@ -576,7 +572,6 @@ export function ModerationPage() {
 
         {allReports.map((report) => (
           <ReportRow
-            // ключ теперь только по контенту, без reasonTypeId
             key={`${report.targetId}-${report.targetTypeId}`}
             report={report}
             onUpdated={refetch}

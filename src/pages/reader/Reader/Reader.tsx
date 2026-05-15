@@ -191,8 +191,8 @@ export const Reader: React.FC<ReaderProps> = ({
         return p.getAttribute('data-xpointer') || '/1';
       }
     }
-    // Если полностью видимых нет, нужен тот, чье начало ближе всего к началу вьюпорта
-    const firstVisible = Array.from(paragraphs).find(
+    //Если полностью видимых нет, нужен тот, чье начало ближе всего к началу вьюпорта
+    const firstVisible = [...paragraphs].find(
       (p) => p.offsetLeft + p.offsetWidth > contentLeft
     );
     return firstVisible

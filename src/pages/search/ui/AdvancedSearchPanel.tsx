@@ -92,7 +92,7 @@ function PersonFilter({
       grouped.get(rId)!.push(p.id);
     }
     onChange(
-      Array.from(grouped.entries())
+      [...grouped]
         // .filter(([roleId]) => roleId !== null)
         .map(([roleId, personIds]) => ({
           roleId: roleId as number,

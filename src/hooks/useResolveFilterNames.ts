@@ -50,7 +50,7 @@ export function useResolveFilterNames({
     // console.log('TUTA');
     const func = async () => {
       try {
-        const resolvedPersons: Array<{ id: number; name: string }> = [];
+        const resolvedPersons: { id: number; name: string }[] = [];
         const notFoundPersonIds: number[] = [];
         // console.log('ZDESYA', missingTagIds);
 
@@ -84,7 +84,6 @@ export function useResolveFilterNames({
 
         if (cancelled) return;
         if (resolvedPersons.length > 0) cachePersons(resolvedPersons);
-        // console.log('Resolved tags:', resolvedTags);
         if (resolvedTags.length > 0) cacheTags(resolvedTags);
 
         if (notFoundPersonIds.length > 0) removePersons(notFoundPersonIds);

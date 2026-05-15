@@ -130,7 +130,8 @@ function PersonFilter({
       grouped.get(p.roleId)!.push(p.id);
     }
     onChange(
-      Array.from(grouped.entries()).map(([roleId, personIds]) => ({
+      [...grouped].map(([roleId, personIds]) => ({
+        //распыление и деструктуризация, возвращает объект
         roleId,
         personIds,
       }))
@@ -361,11 +362,11 @@ const validateRealFileType = async (file: File): Promise<boolean> => {
     const reader = new FileReader();
     reader.onloadend = () => {
       const arr = new Uint8Array(reader.result as ArrayBuffer).subarray(0, 4);
-      let header = '';
+      let headerValue = '';
       for (let i = 0; i < arr.length; i++) {
-        header += arr[i].toString(16);
+        headerValue += arr[i].toString(16);
       }
-      resolve(header);
+      resolve(headerValue);
     };
     reader.readAsArrayBuffer(file.slice(0, 4));
   });

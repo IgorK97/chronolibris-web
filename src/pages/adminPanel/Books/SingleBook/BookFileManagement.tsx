@@ -261,7 +261,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
             disabled={
               uploadMutation.isPending || selectedFormat <= 0 || !hasFile
             }
-            className={`${styles['btn']}`}
+            className={styles['btn']}
           >
             {uploadMutation.isPending ? 'Загрузка...' : 'Загрузить'}
           </button>

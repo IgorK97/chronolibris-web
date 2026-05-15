@@ -4,6 +4,7 @@ import { useCreateReport } from '@/api/reports';
 import { TARGET_TYPE } from '@/types';
 import styles from './ReportModal.module.css';
 import { useStore } from '@stores/globalStore';
+import axios from 'axios';
 
 export interface ReportModalProps {
   targetId: number;
@@ -54,12 +55,8 @@ export function ReportModal({
         description: description.trim() || undefined,
       });
       setResult('success');
-    } catch (err: unknown) {
-      const status =
-        err &&
-        typeof err === 'object' &&
-        'response' in err &&
-        (err as { response?: { status?: number } }).response?.status;
+    } catch (err) {
+      const status = axios.isAxiosError(err) ? err.response?.status : '';
       setResult(status === 409 ? 'cooldown' : 'error');
     }
   };

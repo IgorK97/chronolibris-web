@@ -147,7 +147,7 @@ function PersonFilter({
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const emitChange = (next: SelectedPerson[]) => {
+  const changePersons = (next: SelectedPerson[]) => {
     setSelected(next);
     const grouped = new Map<number, number[]>();
     for (const p of next) {
@@ -156,7 +156,7 @@ function PersonFilter({
       grouped.get(p.roleId)!.push(p.id);
     }
     onChange(
-      Array.from(grouped.entries()).map(([roleId, personIds]) => ({
+      [...grouped].map(([roleId, personIds]) => ({
         roleId,
         personIds,
       }))
@@ -169,7 +169,7 @@ function PersonFilter({
       setShowDropDown(false);
       return;
     }
-    emitChange([
+    changePersons([
       ...selected,
       {
         id: person.id,
@@ -189,13 +189,11 @@ function PersonFilter({
     if (duplicate) {
       return;
     }
-    emitChange(selected.map((p) => (p.uid === uid ? { ...p, roleId } : p)));
-
-    // emitChange(selected.map((p) => (p.id === personId ? { ...p, roleId } : p)));
+    changePersons(selected.map((p) => (p.uid === uid ? { ...p, roleId } : p)));
   };
 
   const handleRemove = (uid: string) => {
-    emitChange(selected.filter((p) => p.uid !== uid));
+    changePersons(selected.filter((p) => p.uid !== uid));
   };
 
   return (
@@ -501,12 +499,11 @@ export const ContentUnit: React.FC = () => {
   const isEditing = mode === 'edit';
   const isValid = Object.keys(errors).length === 0;
 
-  const langName =
-    languages.find((l: any) => l.id === form.languageId)?.name ?? '';
+  const langName = languages.find((l) => l.id === form.languageId)?.name ?? '';
   const countryName =
-    countries.find((c: any) => c.id === form.countryId)?.name ?? '';
+    countries.find((c) => c.id === form.countryId)?.name ?? '';
   const typeName =
-    contentTypes.find((t: any) => t.id === form.contentTypeId)?.name ?? '';
+    contentTypes.find((t) => t.id === form.contentTypeId)?.name ?? '';
 
   if (isLoading) return <div className={styles['loading']}>Загрузка...</div>;
   if (error || (!content && !isNew))
