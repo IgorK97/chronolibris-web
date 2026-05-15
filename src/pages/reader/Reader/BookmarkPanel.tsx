@@ -53,7 +53,7 @@ export const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
       />
       <div
         className={`${styles['toc-sidebar']} ${styles['bm-sidebar']} ${open ? styles['toc-sidebar-open'] : ''}`}
-        aria-label="Закладки"
+        title="Закладки"
         style={{
           background: pageColor,
           color: textColor,
@@ -70,7 +70,7 @@ export const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
           <button
             className={styles['footnote-close']}
             onClick={onClose}
-            aria-label="Закрыть"
+            title="Закрыть"
           >
             <X style={{ cursor: 'pointer' }} />
           </button>

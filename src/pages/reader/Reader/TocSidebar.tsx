@@ -77,7 +77,7 @@ export const TocSidebar: React.FC<TocSidebarProps> = ({
       />
       <aside
         className={`${styles['toc-sidebar']} ${open ? styles['toc-sidebar-open'] : ''}`}
-        aria-label="Содержание"
+        title="Содержание"
         role="navigation"
         style={{
           background: pageColor,
@@ -90,7 +90,7 @@ export const TocSidebar: React.FC<TocSidebarProps> = ({
           <button
             className={styles['footnote-close']}
             onClick={onClose}
-            aria-label="Закрыть"
+            title="Закрыть"
           >
             <X size={24} />
           </button>

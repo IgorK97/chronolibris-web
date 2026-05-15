@@ -27,7 +27,7 @@ export function SelectionPanel({
         <span className={styles.title}>ПОДБОРКИ</span>
         <button
           className={styles['toggle-btn']}
-          aria-label={collapsed ? 'Развернуть' : 'Свернуть'}
+          title={collapsed ? 'Развернуть' : 'Свернуть'}
           onClick={(e) => {
             e.stopPropagation();
             setCollapsed((v) => !v);

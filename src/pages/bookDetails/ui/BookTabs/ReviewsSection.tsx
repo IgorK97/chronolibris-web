@@ -25,10 +25,7 @@ import { SmartTextBox } from './SmartTextBox';
 
 function StarRating({ rating }: { rating: number }) {
   return (
-    <div
-      className={styles['review-stars']}
-      aria-label={`Оценка: ${rating} из 5`}
-    >
+    <div className={styles['review-stars']} title={`Оценка: ${rating} из 5`}>
       {[1, 2, 3, 4, 5].map((s) => (
         <span
           key={s}
@@ -64,7 +61,7 @@ function StarPicker({
             onClick={() => !disabled && onChange(s)}
             type="button"
             disabled={disabled}
-            aria-label={`${s} звезд`}
+            title={`${s} звезд`}
           >
             ★
           </button>

@@ -13,7 +13,7 @@ export const ExpandChildButton = ({
     <button
       className={styles['expand-button']}
       onClick={handleExpandClick}
-      aria-label={isExpanded ? 'Свернуть' : 'Развернуть'}
+      title={isExpanded ? 'Свернуть' : 'Развернуть'}
     >
       {isExpanded ? '▾' : '▸'}
     </button>

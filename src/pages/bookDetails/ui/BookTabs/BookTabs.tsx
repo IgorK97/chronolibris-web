@@ -62,8 +62,6 @@ export function BookTabs({
             return (
               <button
                 key={tab.id}
-                role="tab"
-                aria-selected={activeTab === tab.id}
                 disabled={tab.disabled}
                 className={`${styles['tab-btn']} ${activeTab === tab.id ? styles['tab-btn-active'] : ''} ${tab.disabled ? styles['tab-btn-disabled'] : ''}`}
                 onClick={() => !tab.disabled && setActiveTab(tab.id)}

@@ -15,10 +15,10 @@ export const ImageLightbox: React.FC<ImageLightboxProps> = ({
     <div
       className={styles['lightbox-overlay']}
       onClick={onClose}
-      role="button"
-      aria-label="Закрыть изображение"
-      tabIndex={0}
-      onKeyDown={(e) => e.key === 'Escape' && onClose()}
+      title="Закрыть изображение"
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') onClose();
+      }}
     >
       <img
         src={src}

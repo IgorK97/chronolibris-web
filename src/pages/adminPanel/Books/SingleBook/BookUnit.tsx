@@ -212,7 +212,7 @@ function PersonFilter({
                   type="button"
                   className={styles['remove-btn']}
                   onClick={() => handleRemove(p.uid)}
-                  aria-label="Удалить"
+                  title="Удалить"
                 >
                   <X />
                 </button>

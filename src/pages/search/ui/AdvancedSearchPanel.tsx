@@ -163,7 +163,7 @@ function PersonFilter({
               <button
                 className={styles['remove-btn']}
                 onClick={() => handleRemove(p.uid)}
-                aria-label="Удалить"
+                title="Удалить"
               >
                 <X style={{ cursor: 'pointer' }} />
               </button>
@@ -355,7 +355,7 @@ function TagFilter({
               <button
                 className={styles['remove-btn']}
                 onClick={() => handleRemove(t.id)}
-                aria-label="Удалить"
+                title="Удалить"
               >
                 <X style={{ cursor: 'pointer' }} />
               </button>

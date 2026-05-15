@@ -28,7 +28,6 @@ export const BookmarkEditModal: React.FC<BookmarkEditModalProps> = ({
         className={styles['bm-edit-modal']}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
-        aria-modal="true"
       >
         <div className={styles['bm-edit-header']}>
           <span className={styles['bm-edit-title']}>

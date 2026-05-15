@@ -50,6 +50,6 @@ export function getAvatarColor(name: string): string {
   let hash = 0;
   if (!name) name = 'N';
   for (let i = 0; i < name.length; i++)
-    hash = name.charCodeAt(i) + ((hash << 5) + hash);
+    hash = name.charCodeAt(i) + ((hash << 5) + hash); //djb2
   return colors[Math.abs(hash) % colors.length];
 }

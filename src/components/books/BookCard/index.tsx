@@ -66,7 +66,7 @@ export const BookCard: React.FC<BookCardProps> = ({
             type="button"
             className={styles['favorite-button']}
             onClick={handleFavoriteClick}
-            aria-label="Toggle favorite"
+            title="Кнопка Избранного"
           >
             <Heart
               size={16}
@@ -80,7 +80,7 @@ export const BookCard: React.FC<BookCardProps> = ({
             type="button"
             className={styles['favorite-button']}
             onClick={handleSelectionClick}
-            aria-label="Добавить в подборку"
+            title="Добавить в подборку"
           >
             <PlusCircle size={16} />
           </button>

@@ -51,7 +51,6 @@ function ThemeLevel({
                 onDrillDown(theme.id);
               }}
               title="Показать подтемы"
-              aria-label="Показать подтемы"
             >
               <ChevronDown size={14} />
             </button>
@@ -103,7 +102,7 @@ export function ThemePanel({ selectedThemeId, onSelect }: ThemePanelProps) {
         <span className={styles.title}>ТЕМЫ</span>
         <button
           className={styles['toggle-btn']}
-          aria-label={collapsed ? 'Развернуть' : 'Свернуть'}
+          title={collapsed ? 'Развернуть' : 'Свернуть'}
           onClick={(e) => {
             e.stopPropagation();
             setCollapsed((v) => !v);

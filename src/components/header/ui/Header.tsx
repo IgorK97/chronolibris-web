@@ -89,7 +89,6 @@ export default function Header() {
                   <UserStar
                     style={{ cursor: 'pointer' }}
                     onClick={() => setAdminOpen(true)}
-                    aria-label="Открыть панель администратора"
                   />
                 )}
                 {user.role == 'moderator' ||

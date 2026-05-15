@@ -73,8 +73,7 @@ export const ColorModal: React.FC<ColorModalProps> = ({
         className={styles['color-modal']}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
-        aria-modal="true"
-        aria-label="Настройка оформления"
+        title="Настройка оформления"
         style={{
           background: pageColor,
           color: textColor,

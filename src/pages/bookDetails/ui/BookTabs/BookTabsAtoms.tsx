@@ -59,7 +59,7 @@ export function VoteButton({
         onClick={onClick}
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
-        aria-label={type === 'like' ? 'Нравится' : 'Не нравится'}
+        title={type === 'like' ? 'Нравится' : 'Не нравится'}
         disabled={disabled}
       >
         <Icon size={14} />
@@ -125,7 +125,7 @@ export function ThreeDotsMenu({
         <button
           className={styles['comment-menu-btn']}
           onClick={() => setMenuOpen((v) => !v)}
-          aria-label="Действия"
+          title="Действия"
         >
           <MoreHorizontal size={15} />
         </button>

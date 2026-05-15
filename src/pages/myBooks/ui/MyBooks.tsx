@@ -96,7 +96,7 @@ export const MyBooks = ({
         >
           {/* <div> */}
           {/* {isCollapsed && <p>Развернуть</p>} */}
-          <div className={styles['sidebar-header']} aria-label="Книжные полки">
+          <div className={styles['sidebar-header']} title="Книжные полки">
             <LibraryBig size={20} /> {!isCollapsed ? t('mybooks.my_books') : ''}
           </div>
           {/* </div> */}

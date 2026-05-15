@@ -40,7 +40,6 @@ describe('Панель закладок', () => {
 
   it('Корректное отображение списка закладок', () => {
     render(<BookmarkPanel {...defaultProps} />);
-
     expect(screen.getByText('Заметка')).toBeInTheDocument();
     expect(screen.getByText('2024-05-01')).toBeInTheDocument();
     expect(screen.getByText('2024-05-02')).toBeInTheDocument();

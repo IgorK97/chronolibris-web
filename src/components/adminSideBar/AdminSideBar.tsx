@@ -81,14 +81,12 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       <div
         className={`${styles.backdrop} ${isOpen ? styles['backdrop-visible'] : ''}`}
         onClick={onClose}
-        aria-hidden="true"
       />
 
       <div
         // ref={sidebarRef}
         className={`${styles.sidebar} ${isOpen ? styles['sidebar-open'] : ''}`}
-        aria-label="Панель администратора"
-        role="navigation"
+        title="Панель администратора"
       >
         <div className={styles.header}>
           <div className={styles['header-title']}>
@@ -98,7 +96,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
           <button
             className={styles['close-btn']}
             onClick={onClose}
-            aria-label="Закрыть панель"
+            title="Закрыть панель"
           >
             <X size={18} />
           </button>

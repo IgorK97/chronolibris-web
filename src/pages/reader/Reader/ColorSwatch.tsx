@@ -6,7 +6,7 @@ export const ColorSwatch: React.FC<{
 }> = ({ color, selected, onSelect, dark }) => (
   <button
     onClick={onSelect}
-    aria-label={color}
+    title={color}
     style={{
       width: 28,
       height: 28,

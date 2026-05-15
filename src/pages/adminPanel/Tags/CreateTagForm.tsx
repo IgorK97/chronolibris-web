@@ -103,7 +103,7 @@ export const CreateTagForm: React.FC<CreateTagFormProps> = ({
               type="button"
               onClick={onParentTagClear}
               className={styles['clear-parent-button']}
-              aria-label="Убрать родительский тег"
+              title="Убрать родительский тег"
             >
               <X
                 style={{

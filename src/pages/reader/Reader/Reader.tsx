@@ -856,9 +856,6 @@ export const Reader: React.FC<ReaderProps> = ({
         <button
           className={styles['toolbar-toggle']}
           onClick={() => setToolbarCollapsed((v) => !v)}
-          aria-label={
-            toolbarCollapsed ? 'Развернуть панель' : 'Свернуть панель'
-          }
           title={toolbarCollapsed ? 'Развернуть панель' : 'Свернуть панель'}
         >
           {toolbarCollapsed ? <ChevronDown /> : <ChevronUp />}
@@ -928,7 +925,7 @@ export const Reader: React.FC<ReaderProps> = ({
               className={styles['font-select']}
               value={fontFamily}
               onChange={(e) => changeFontFamily(e.target.value)}
-              aria-label="Выбор шрифта"
+              title="Выбор шрифта"
             >
               {FONT_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -939,7 +936,6 @@ export const Reader: React.FC<ReaderProps> = ({
             <button
               onClick={() => setColorModalOpen(true)}
               className={styles['color-button']}
-              aria-label="Настройка цветов"
               title="Цвета"
             >
               <Palette color="red" />
@@ -948,7 +944,6 @@ export const Reader: React.FC<ReaderProps> = ({
               <button
                 onClick={() => setBookmarkPanelOpen((v) => !v)}
                 className={`${styles['color-button']} ${bookmarkPanelOpen ? styles['nav-button-active'] : ''}`}
-                aria-label="Закладки"
                 title={`Закладки (${(bookmarks || []).filter((b) => b.bookFileId === bookFileId).length})`}
               >
                 <Bookmark color="red" />{' '}
@@ -1039,10 +1034,6 @@ export const Reader: React.FC<ReaderProps> = ({
         className={styles['progress-bar']}
         onClick={handleProgressClick}
         role="slider"
-        aria-valuenow={Math.round(readPercent)}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label="Прогресс чтения"
         title={`${readPercent.toFixed(0)}% прочитано`}
       >
         <div
