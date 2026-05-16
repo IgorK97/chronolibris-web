@@ -230,26 +230,31 @@ export const BookDetailsComponent = ({
     if (!bookFileId) return;
     // setIsDownloading(true);
     setDownloadError(null);
-
+    let a;
+    let url;
     try {
       const { blob } = await download(bookFileId);
-
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      if (!blob) throw new Error('Файл не найден');
+      url = window.URL.createObjectURL(blob);
+      a = document.createElement('a');
       a.href = url;
       let extension = FORMAT_EXTENSIONS[formatId];
       if (extension === 'fb2') extension += '.zip';
       a.download = `${fullBookDetails.title}.${extension}`;
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-
-      setIsDownloadPanelOpen(false);
     } catch (error) {
-      setDownloadError(t('book.download_error'));
+      let errorMessage = t('book.download_error');
+      if (error instanceof Error) errorMessage += error.message;
+      setDownloadError(errorMessage);
     } finally {
-      // setIsDownloading(false);
+      if (a) {
+        document.body.removeChild(a);
+      }
+      if (url) {
+        window.URL.revokeObjectURL(url);
+      }
+      setIsDownloadPanelOpen(false);
     }
   };
 

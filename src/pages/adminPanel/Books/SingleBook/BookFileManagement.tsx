@@ -148,6 +148,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
     let url;
     try {
       const { blob } = await download(bookFileId);
+      if (!blob) throw new Error('Файл не найден');
       url = window.URL.createObjectURL(blob);
       a = document.createElement('a');
       a.href = url;
@@ -157,7 +158,9 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
       document.body.appendChild(a);
       a.click();
     } catch (error) {
-      setDownloadError(t('book.download_error'));
+      let errorMessage = t('book.download_error');
+      if (error instanceof Error) errorMessage += error.message;
+      setDownloadError(errorMessage);
     } finally {
       if (a) {
         document.body.removeChild(a);
