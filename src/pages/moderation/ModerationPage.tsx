@@ -17,6 +17,7 @@ import {
   TASK_STATUS_LABEL,
   type ReportShortDto,
 } from '@/types';
+import { createPortal } from 'react-dom';
 
 type StatusFilter = 'free' | 'inProgress' | 'accepted' | 'rejected';
 
@@ -133,7 +134,7 @@ function ReportsModal({
   const [activeTab, setActiveTab] = useState(reasonTypeIds[0] ?? 1);
   const tabs = reasonTypeIds.length > 0 ? reasonTypeIds : [1];
 
-  return (
+  return createPortal(
     <div className={styles['modal-overlay']} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles['modal-header']}>
@@ -175,7 +176,8 @@ function ReportsModal({
           />
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

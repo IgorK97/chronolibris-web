@@ -298,7 +298,7 @@ const ThemeTreeNode: React.FC<ThemeTreeNodeProps> = ({
             className={styles['input-field']}
             maxLength={500}
           />
-          <select
+          {/* <select
             value={editFormData?.parentThemeId || ''}
             onChange={(e) =>
               setEditFormData({
@@ -316,7 +316,7 @@ const ThemeTreeNode: React.FC<ThemeTreeNodeProps> = ({
                   {t.name}
                 </option>
               ))}
-          </select>
+          </select> */}
           <button
             onClick={() =>
               onUpdate(

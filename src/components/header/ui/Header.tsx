@@ -91,13 +91,12 @@ export default function Header() {
                     onClick={() => setAdminOpen(true)}
                   />
                 )}
-                {user.role == 'moderator' ||
-                  (user.role == 'admin' && (
-                    <ShieldCheck
-                      style={{ cursor: 'pointer' }}
-                      onClick={() => navigate('/moderation')}
-                    />
-                  ))}
+                {(user.role == 'moderator' || user.role == 'admin') && (
+                  <ShieldCheck
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => navigate('/moderation')}
+                  />
+                )}
                 {user.role == 'reader' && (
                   <Link to="/mybooks" className={styles['catalog-btn']}>
                     <span className={styles['catalog-btn-label']}>
