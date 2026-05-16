@@ -38,9 +38,9 @@ const REASON_TYPES: { id: number; label: string }[] = [
   { id: 5, label: 'Иное' },
 ];
 
-function formatDate(iso: string | null): string {
-  if (!iso) return '—';
-  return new Date(iso).toLocaleString('ru-RU', {
+function formatDate(stringData: string | null): string {
+  if (!stringData) return '—';
+  return new Date(stringData).toLocaleString('ru-RU', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
@@ -200,7 +200,7 @@ function TargetInfoPanel({ targetId, targetTypeId }: TargetInfoPanelProps) {
 
   const isBook = targetTypeId === TARGET_TYPE.BOOK;
 
-  const contentStatusLabel = data.isActive ? 'Активен' : 'Скрыт / удалён';
+  const contentStatusLabel = data.isActive ? 'Активен' : 'Скрыт';
   const contentStatusClass = data.isActive
     ? styles['status-active']
     : styles['status-hidden'];
@@ -213,7 +213,6 @@ function TargetInfoPanel({ targetId, targetTypeId }: TargetInfoPanelProps) {
 
   return (
     <div className={styles['target-panel']}>
-      {/* Блок статуса контента */}
       <div className={styles['target-field']}>
         <span className={styles['field-label']}>Статус контента:</span>
         <span className={`${styles['status-chip']} ${contentStatusClass}`}>

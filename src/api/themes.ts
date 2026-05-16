@@ -41,8 +41,7 @@ export const useThemesByParentId = (parentThemeId: number | null) => {
   return useQuery({
     queryKey: ['themes', 'parent', parentThemeId],
     queryFn: () => {
-      if (parentThemeId === null)
-        return themesApi.getThemesByParentId(parentThemeId!);
+      return themesApi.getThemesByParentId(parentThemeId!);
     },
     enabled: !!parentThemeId,
     staleTime: 5 * 60 * 1000,

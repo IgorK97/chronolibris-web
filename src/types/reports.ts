@@ -89,8 +89,8 @@ export const TASK_STATUS = {
 
 export const TARGET_TYPE = {
   BOOK: 1,
-  COMMENT: 2,
-  REVIEW: 3,
+  REVIEW: 2,
+  COMMENT: 3,
 } as const;
 
 export const TARGET_TYPE_LABEL: Record<number, string> = {

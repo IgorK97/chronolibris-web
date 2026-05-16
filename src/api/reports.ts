@@ -91,7 +91,6 @@ export const useTargetInfo = (
     queryKey: ['moderation', 'target', targetTypeId, targetId],
     queryFn: () => reportsApi.getTargetInfo(targetTypeId, targetId),
     enabled,
-    staleTime: 5 * 60 * 1000,
   });
 };
 
