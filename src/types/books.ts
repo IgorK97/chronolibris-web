@@ -118,6 +118,7 @@ export interface UpdateBookRequest {
   personFilters?: PersonRoleFilter[];
   deleteCoverCommand: boolean;
   hasHistoricalVersions: boolean;
+  oldUpdatedAt: string;
 }
 
 export interface BookDetails {
@@ -146,6 +147,7 @@ export interface BookDetails {
   udk?: string;
   source?: string;
   hasHistoricalVersions: boolean;
+  oldUpdatedAt: string;
 }
 
 export interface SelectionDetails {

@@ -42,7 +42,7 @@ export const contentsApi = {
   createContent: (data: CreateContentRequest): Promise<number> =>
     apiClient.post<number, CreateContentRequest>('/Contents', data),
 
-  putContent: (data: UpdateContentRequest): Promise<void> =>
+  updateContent: (data: UpdateContentRequest): Promise<void> =>
     apiClient.put<void, UpdateContentRequest>(`/Contents/${data.id}`, data),
 
   deleteContent: (id: number): Promise<void> =>
@@ -116,10 +116,10 @@ export const useCreateContent = () => {
   });
 };
 
-export const usePatchContent = () => {
+export const useUpdateContent = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: contentsApi.putContent,
+    mutationFn: contentsApi.updateContent,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['contents', variables.id] });
       queryClient.invalidateQueries({ queryKey: ['contents'] });

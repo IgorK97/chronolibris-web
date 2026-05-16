@@ -709,7 +709,7 @@ export const BookUnit: React.FC = () => {
         setMode('view');
         navigate(`/books/${newId}`);
         setGlobalError('');
-      } else {
+      } else if (book) {
         const coverBase64 = form.coverFile
           ? await fileToBase64(form.coverFile)
           : null;
@@ -739,6 +739,7 @@ export const BookUnit: React.FC = () => {
           personFilters: clearPersonFilters,
           deleteCoverCommand: form.deleteCoverCommand,
           hasHistoricalVersions: form.hasHistoricalVersions,
+          oldUpdatedAt: book?.oldUpdatedAt,
         };
 
         await updateMutation.mutateAsync({ id: id!, data: payload });

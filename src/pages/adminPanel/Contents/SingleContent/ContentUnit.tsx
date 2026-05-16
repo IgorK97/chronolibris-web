@@ -11,7 +11,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import {
   useContentById,
   useCreateContent,
-  usePatchContent,
+  useUpdateContent,
   useContentBooks,
 } from '@/api/contents';
 import { useLanguages, useCountries } from '@/api/references';
@@ -296,7 +296,7 @@ export const ContentUnit: React.FC = () => {
   const [globalError, setGlobalError] = useState('');
 
   const createMutation = useCreateContent();
-  const patchMutation = usePatchContent();
+  const updateMutation = useUpdateContent();
 
   const [mode, setMode] = useState<'view' | 'edit'>('view');
   const [form, setForm] = useState<FormState>(emptyForm);
@@ -340,6 +340,20 @@ export const ContentUnit: React.FC = () => {
       }
     }
 
+    if (
+      data.yearFrom &&
+      data.yearTo &&
+      !newErrors.yearFrom &&
+      !newErrors.yearTo
+    ) {
+      const from = parseInt(data.yearFrom, 10);
+      const to = parseInt(data.yearTo, 10);
+
+      if (from > to) {
+        newErrors.yearFrom =
+          'Самый ранний год год не может быть позже конечного';
+      }
+    }
     if (!data.languageId) newErrors.language = 'Выберите язык';
     if (!data.countryId) newErrors.country = 'Выберите страну';
     if (!data.contentTypeId) newErrors.contentTypeId = 'Выберите тип документа';
@@ -451,9 +465,9 @@ export const ContentUnit: React.FC = () => {
     const requestData = {
       title: form.title,
       description: form.description,
-      contentTypeId: form.contentTypeId || null,
-      languageId: form.languageId || null,
-      countryId: form.countryId || null,
+      contentTypeId: form.contentTypeId!,
+      languageId: form.languageId!,
+      countryId: form.countryId!,
       yearFrom: form.yearFrom ? parseInt(form.yearFrom) : null,
       yearTo: form.yearTo ? parseInt(form.yearTo) : null,
       themeIds: selectedThemes.map((t) => t.id),
@@ -462,12 +476,17 @@ export const ContentUnit: React.FC = () => {
 
     try {
       if (isNew) {
-        const newId = await createMutation.mutateAsync(requestData as any);
+        const newId = await createMutation.mutateAsync(requestData);
         setMode('view');
         setForm(emptyForm());
         navigate(`/contents/${newId}`);
-      } else {
-        await patchMutation.mutateAsync({ id: id!, ...requestData } as any);
+      } else if (content) {
+        await updateMutation.mutateAsync({
+          id: id!,
+          yearToProvided: content.yearTo != Number(form.yearTo),
+          yearFromProvided: content.yearFrom != Number(form.yearFrom),
+          ...requestData,
+        });
         setMode('view');
       }
     } catch (err: any) {
@@ -499,7 +518,7 @@ export const ContentUnit: React.FC = () => {
     }
   };
 
-  const isSaving = createMutation.isPending || patchMutation.isPending;
+  const isSaving = createMutation.isPending || updateMutation.isPending;
   const isEditing = mode === 'edit';
   const isValid = Object.keys(errors).length === 0;
 

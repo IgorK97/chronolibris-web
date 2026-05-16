@@ -65,7 +65,8 @@ export interface UpdateContentRequest {
   languageId: number;
   yearFrom?: number | null;
   yearTo?: number | null;
-  yearProvided: boolean;
+  yearFromProvided: boolean;
+  yearToProvided: boolean;
   parentContentId?: number | null;
   position?: number | null;
   personFilters?: PersonRoleFilter[];
