@@ -108,6 +108,11 @@ export function SmartCommentItem({
 
     const score = type === 'like' ? 1 : -1;
 
+    await rateComment({
+      commentId: comment.id,
+      score,
+    });
+
     setVotes((prev) => {
       if (prev.userVote === type) {
         return {
@@ -131,11 +136,6 @@ export function SmartCommentItem({
               : prev.dislikes,
         userVote: type,
       };
-    });
-
-    await rateComment({
-      commentId: comment.id,
-      score,
     });
   };
 

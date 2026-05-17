@@ -67,6 +67,11 @@ function StarPicker({
           </button>
         ))}
       </div>
+      {value == 0 && (
+        <span className={styles['star-picker-hint']}>
+          Чтобы написать отзыв, нужно поставить оценку
+        </span>
+      )}
       {value > 0 && (
         <span className={styles['star-picker-hint']}>
           Вы выбрали {value} из 5
@@ -75,8 +80,6 @@ function StarPicker({
     </div>
   );
 }
-
-const TRUNCATE_LINES = 5;
 
 function ReviewItem({
   review,
@@ -113,7 +116,11 @@ function ReviewItem({
     if (!isAuth) return;
     const score = type === 'like' ? 1 : -1;
 
-    //Оптимистичное обновление
+    await rateReview({
+      reviewId: review.id,
+      score,
+    });
+
     setVotes((prev) => {
       if (prev.userVote === type) {
         return {
@@ -138,11 +145,6 @@ function ReviewItem({
         userVote: type,
       };
     });
-
-    await rateReview({
-      reviewId: review.id,
-      score,
-    });
   };
 
   return (
@@ -166,10 +168,7 @@ function ReviewItem({
             )}
           </div>
 
-          <div
-            className={styles['review-text-wrap']}
-            style={{ ['--lines' as string]: TRUNCATE_LINES }}
-          >
+          <div className={styles['review-text-wrap']}>
             {/* <p className={styles['comment-text']}>{review.text}</p> */}
             {renderFormattedText(review.text!)}
           </div>
@@ -300,6 +299,7 @@ export function ReviewsSection({
           onDelete={() => setDeleteModalOpen(true)}
           initialText={userReviewText || ''}
           isReadOnly={!!userReviewText}
+          pickedRating={pickedRating}
         >
           <StarPicker
             value={pickedRating}
@@ -328,7 +328,8 @@ export function ReviewsSection({
             review={r}
             isAuth={isAuth}
             canDelete={isAuth && r.userName === user?.userName}
-            onDelete={async () => setDeleteModalOpen(true)}
+            // onDelete={async () => setDeleteModalOpen(true)}
+            onDelete={async () => handleDeleteReview()}
           />
         ))}
       </div>

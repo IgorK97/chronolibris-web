@@ -13,6 +13,7 @@ interface SmartTextBoxProps {
   onDelete?: () => void;
   initialText?: string;
   isReadOnly?: boolean;
+  pickedRating?: number;
 }
 
 export function SmartTextBox({
@@ -25,6 +26,7 @@ export function SmartTextBox({
   children,
   type,
   isReadOnly = false,
+  pickedRating = 0,
 }: SmartTextBoxProps) {
   const [text, setText] = useState(initialText);
   // const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -151,7 +153,9 @@ export function SmartTextBox({
             <button
               className={styles['compose-submit']}
               disabled={
-                !text.trim() || text.length < (type === 'review' ? MIN : 1)
+                !text.trim() ||
+                text.length < (type === 'review' ? MIN : 1) ||
+                (type === 'review' && pickedRating == 0)
               }
               title={`${type === 'review' && text.length < MIN ? `Минимальное количество символов - ${MIN}` : ''}`}
               onClick={handleSubmit}

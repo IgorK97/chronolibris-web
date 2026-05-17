@@ -492,6 +492,12 @@
 }
 
 .review-text-wrap {
+  white-space: pre-wrap;
+  line-height: 1.6;
+  word-break: break-all;
+  font-size: 14px;
+  color: #374151;
+  margin: 0 0 10px;
 }
 
 .review-text-wrap-expanded {

@@ -288,14 +288,14 @@ export const SelectionEditPage: React.FC = () => {
               >
                 {selection.isActive ? 'Скрыть' : 'Показать'}
               </button>
-              <button
+              {/* <button
                 onClick={() => {
                   setDeleteModalOpen(true);
                 }}
                 className={`${styles['btn']} ${styles['btn-danger']}`}
               >
                 Удалить
-              </button>
+              </button> */}
             </div>
           </>
         )}
