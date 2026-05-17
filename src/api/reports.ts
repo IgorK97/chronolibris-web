@@ -66,13 +66,13 @@ export const useInfiniteReports = (filters: GetReportsRequest) => {
       'moderation',
       'reports',
       filters.reportStatusId,
-      filters.targetTypeFilter,
+      filters.lastTargetTypeId,
     ],
     queryFn: ({ pageParam }) =>
       reportsApi.getReports({
         ...filters,
         count: PAGE_SIZE,
-        lastDate: pageParam as string | undefined,
+        lastDate: pageParam,
       }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) =>
