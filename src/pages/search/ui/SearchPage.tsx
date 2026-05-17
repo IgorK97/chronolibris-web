@@ -88,13 +88,16 @@ export default function SearchPage({ onNavigateToBook }: SearchPageProps) {
 
   const setFilters = useCallback(
     (next: AdvancedFilters) => {
+      // const updated = searchParams;
+      // filtersToParams(next, updated);
+      // setSearchParams(updated);
       setSearchParams((prev) => {
         const updated = new URLSearchParams(prev);
         filtersToParams(next, updated);
         return updated;
       });
     },
-    [searchParams] //иначе замыкание URLSearchParams не будет корректно работать, и всегда будут только старые значения
+    [searchParams]
   );
 
   const { isResolving } = useResolveFilterNames({

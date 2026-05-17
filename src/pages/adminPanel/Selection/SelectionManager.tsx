@@ -63,14 +63,14 @@ export const SelectionCreatePage: React.FC = () => {
             className={styles['input']}
             placeholder="Название"
           />
-          <textarea
+          {/* <textarea
             value={formData.description}
             onChange={(e) =>
               setFormData({ ...formData, description: e.target.value })
             }
             className={styles['textarea']}
             placeholder="Описание"
-          />
+          /> */}
 
           <div className={styles['visibility-row']}>
             <label className={styles['checkbox-label']}>
@@ -242,14 +242,14 @@ export const SelectionEditPage: React.FC = () => {
               className={styles['input']}
               placeholder="Название"
             />
-            <textarea
+            {/* <textarea
               value={editData.description}
               onChange={(e) =>
                 setEditData({ ...editData, description: e.target.value })
               }
               className={styles['textarea']}
               placeholder="Описание"
-            />
+            /> */}
             <div className={styles['buttons']}>
               <button onClick={handleSave} className={styles['btn']}>
                 Сохранить

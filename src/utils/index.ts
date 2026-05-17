@@ -42,14 +42,14 @@ export const getImageUrl = (path: string | null | undefined) => {
   return `${baseUrl}${cleanPath}`;
 };
 
-export function formatDate(iso: string): string {
+export function formatDate(dateString: string): string {
   // console.log('DATE: ', iso);
-  if (iso === undefined) {
+  if (dateString === undefined) {
     // console.log('UNDEFINED');
     return '';
   }
 
-  return new Date(iso).toLocaleDateString('ru-RU', {
+  return new Date(dateString).toLocaleDateString('ru-RU', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
