@@ -419,16 +419,12 @@
 
 .vote-tooltip {
   position: absolute;
-  bottom: calc(100% + 4px);
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 100%;
   background: #1f2937;
   color: #fff;
   font-size: 11px;
   padding: 3px 7px;
   border-radius: 5px;
-  white-space: nowrap;
-  pointer-events: none;
   z-index: 20;
 }
 

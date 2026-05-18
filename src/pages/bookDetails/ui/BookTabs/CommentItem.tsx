@@ -204,22 +204,28 @@ export function SmartCommentItem({
               </button>
             )}
             <VoteButton
-              disabled={!!comment.deletedAt || comment.userLogin === userName}
+              // disabled={!!comment.deletedAt || comment.userLogin === userName}
               type="like"
               count={votes.likes}
               active={votes.userVote === 'like'}
               onClick={() => {
                 // console.log(!!comment.deletedAt);
+                if (!!comment.deletedAt || comment.userLogin === userName)
+                  return;
                 handleVote('like');
               }}
             />
             <ScoreDisplay likes={votes.likes} dislikes={votes.dislikes} />
             <VoteButton
-              disabled={!!comment.deletedAt || comment.userLogin === userName}
+              // disabled={!!comment.deletedAt || comment.userLogin === userName}
               type="dislike"
               count={votes.dislikes}
               active={votes.userVote === 'dislike'}
-              onClick={() => handleVote('dislike')}
+              onClick={() => {
+                if (!!comment.deletedAt || comment.userLogin === userName)
+                  return;
+                handleVote('dislike');
+              }}
             />
           </div>
           {user?.role == 'reader' && !comment.deletedAt && (

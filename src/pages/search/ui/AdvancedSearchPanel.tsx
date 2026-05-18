@@ -219,13 +219,13 @@ function buildSelectedTags(
     id,
     name: cache[id]?.name ?? `#${id}`,
     matchedName: cache[id]?.matchedName ?? null,
-    mode: 'include' as const,
+    mode: 'include',
   }));
   const exc: SelectedTag[] = excludedTagIds.map((id) => ({
     id,
     name: cache[id]?.name ?? `#${id}`,
     matchedName: cache[id]?.matchedName ?? null,
-    mode: 'exclude' as const,
+    mode: 'exclude',
   }));
   return [...req, ...exc];
 }

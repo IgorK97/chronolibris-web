@@ -27,7 +27,7 @@ export const ContentManagement = () => {
 
   return (
     <div className={styles['content-management']}>
-      <h2>Управление контентом</h2>
+      <h2>Управление контентами</h2>
 
       <div className={styles['top-actions']}>
         <button

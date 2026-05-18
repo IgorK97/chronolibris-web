@@ -39,14 +39,14 @@ export function Avatar({ userName }: { userName: string }) {
 export function VoteButton({
   type,
   count,
-  disabled,
+  disabled = false,
   active,
   onClick,
 }: {
   type: 'like' | 'dislike';
   count: number;
   active: boolean;
-  disabled: boolean;
+  disabled?: boolean;
   onClick: () => void;
 }) {
   const [showTooltip, setShowTooltip] = useState(false);

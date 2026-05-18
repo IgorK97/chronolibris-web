@@ -257,6 +257,7 @@
   resize: vertical;
   outline: none;
   transition: border-color 0.15s;
+  min-height: 200px;
 }
 
 .field-textarea:focus {

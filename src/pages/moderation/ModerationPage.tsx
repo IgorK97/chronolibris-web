@@ -410,12 +410,14 @@ function ReportRow({ report, onUpdated }: ReportRowProps) {
                   value={reportText}
                   onChange={(e) => setReportText(e.target.value)}
                   minLength={50}
+                  style={{ minWidth: '400px' }}
                 />
                 {error && (
                   <p style={{ marginTop: '5px', color: 'red' }}>{error}</p>
                 )}
               </div>
               <button
+                style={{ marginLeft: 'auto' }}
                 className={`${styles['action-btn']} ${styles['accept-btn']}`}
                 onClick={() => handleResolve(true)}
                 disabled={isActionLoading}
