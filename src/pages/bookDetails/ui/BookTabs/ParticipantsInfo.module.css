@@ -123,7 +123,6 @@
   gap: 0.125rem;
 }
 
-/* чтобы отступ был */
 .info-row + .info-row {
   margin-top: 0.5rem;
 }

@@ -3,6 +3,11 @@ import { CornerDownRight, X } from 'lucide-react';
 import styles from './BookTabs.module.css';
 // import { AlertDialog } from '@/components/dialogs/AlertDialog';
 
+const hasRealContent = (content: string): boolean => {
+  const cleanText = content.replace(/\*\*|__|~~|>!|!</g, '').trim();
+  return cleanText.length > 0;
+};
+
 interface SmartTextBoxProps {
   placeholder: string;
   replyingTo?: { parentId: number; authorName: string } | null;
@@ -155,7 +160,8 @@ export function SmartTextBox({
               disabled={
                 !text.trim() ||
                 text.length < (type === 'review' ? MIN : 1) ||
-                (type === 'review' && pickedRating == 0)
+                (type === 'review' && pickedRating == 0) ||
+                !hasRealContent(text)
               }
               title={`${type === 'review' && text.length < MIN ? `Минимальное количество символов - ${MIN}` : ''}`}
               onClick={handleSubmit}

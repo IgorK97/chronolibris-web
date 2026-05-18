@@ -13,7 +13,7 @@ export const TagsTable: React.FC<TagsTableProps> = ({ onParentTagSelect }) => {
   const [selectedType, setSelectedType] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedParentId, setSelectedParentId] = useState<number | null>(null);
-  const [resetKey, setResetKey] = useState('initial');
+  // const [resetKey, setResetKey] = useState('initial');
 
   const pageSize = 20;
   const debouncedSearch = useDebounce(searchTerm, 500);
@@ -25,10 +25,10 @@ export const TagsTable: React.FC<TagsTableProps> = ({ onParentTagSelect }) => {
 
   const allRootTags = data?.pages.flatMap((page) => page.items) ?? [];
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setResetKey(`${selectedType ?? 'all'}-${debouncedSearch}`);
-  }, [debouncedSearch, selectedType]);
+  // useEffect(() => {
+  //   // eslint-disable-next-line react-hooks/set-state-in-effect
+  //   setResetKey(`${selectedType ?? 'all'}-${debouncedSearch}`);
+  // }, [debouncedSearch, selectedType]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -109,7 +109,7 @@ export const TagsTable: React.FC<TagsTableProps> = ({ onParentTagSelect }) => {
                   depth={0}
                   isSelected={selectedParentId === tag.id}
                   onSelectParent={handleSelectParent}
-                  resetKey={resetKey}
+                  // resetKey={resetKey}
                 />
               ))}
             </tbody>

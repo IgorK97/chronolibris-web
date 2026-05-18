@@ -169,7 +169,7 @@ export const Reader: React.FC<ReaderProps> = ({
   //   console.log('TOC DATA: ', fetchedTocData);
   // }, [fetchedTocData]);
 
-  // Находит индекс первого параграфа, который полностью виден в текущей вьюпорте
+  //Находит индекс первого параграфа, который полностью виден в текущей вьюпорте
   const captureVisibleParaIndex = useCallback(() => {
     const vp = viewportRef.current;
     const ct = contentRef.current;
@@ -242,29 +242,27 @@ export const Reader: React.FC<ReaderProps> = ({
     return () => window.removeEventListener('beforeunload', handleUnload);
   }, [user, bookFileId, captureVisibleParaIndex]);
 
-  // Сравнение xpointer-массивов лексикографически:
-  //   compareXp([1,1,3], [1,1,5]) значит -1 (меньше)
-  //   compareXp([1,1,5], [1,1,5])  -  0 (равно)
-  //   compareXp([1,1,6], [1,1,5])  -  1 (больше)
-  // Более короткий массив «меньше» при равном префиксе: [1,1] < [1,1,1]
+  //Сравнение xpointer-массивов лексикографически:
+  //compareXp([1,1,3], [1,1,5]) значит -1 (меньше)
+  //compareXp([1,1,5], [1,1,5])  -  0 (равно)
+  //compareXp([1,1,6], [1,1,5])  -  1 (больше)
+  //Более короткий массив меньше при равном префиксе: [1,1] < [1,1,1]
   const compareXp = (a: number[], b: number[]): number => {
-    const len = Math.max(a.length, b.length);
+    const len = Math.min(a.length, b.length);
     for (let i = 0; i < len; i++) {
-      const av = a[i] ?? -Infinity;
-      const bv = b[i] ?? -Infinity;
-      if (av !== bv) return av < bv ? -1 : 1;
+      if (a[i] !== b[i]) return a[i] < b[i] ? -1 : 1; //по возрастанию, первым идет а, потом б
     }
-    return 0;
+    return a.length - b.length;
   };
 
-  // "/1/3/1" - [1, 3, 1]
+  //"/1/3/1" - [1, 3, 1]
   const parseXpointer = (xp: string): number[] =>
     xp.split('/').filter(Boolean).map(Number);
 
   const stringifyXpointer = (path: number[]): string =>
     path.length > 0 ? `/${path.join('/')}` : '/';
 
-  // Индекс Part, в диапазон [xps..xpe] которого попадает xpointer закладки
+  //Индекс Part, в диапазон [xps..xpe] которого попадает xpointer закладки
   const findPartByXpointer = useCallback(
     (xpointer: string): number => {
       if (!fetchedTocData) return -1;
@@ -487,7 +485,7 @@ export const Reader: React.FC<ReaderProps> = ({
       0,
       Math.min(1, (e.clientX - rect.left) / rect.width)
     );
-    const targetGlobal = Math.round(ratio * fetchedTocData.Body[0].e); // 0-based
+    const targetGlobal = Math.round(ratio * fetchedTocData.Body[0].e);
 
     const partIdx = fetchedTocData.Parts.findIndex(
       (p) => targetGlobal >= p.s && targetGlobal <= p.e
@@ -502,8 +500,7 @@ export const Reader: React.FC<ReaderProps> = ({
       if (twoPageMode && targetCol > 0) targetCol = targetCol - (targetCol % 2);
       goToCol(targetCol);
     } else {
-      //если другой фрагмент: сохранить ratio, сменить фрагмент
-      pendingColRef.current = -withinRatio;
+      pendingColRef.current = -withinRatio; //вместо индекса страницы процент
       setCurrentPartIndex(partIdx);
     }
   };
@@ -605,7 +602,7 @@ export const Reader: React.FC<ReaderProps> = ({
     if (isLoading || totalCols === 0) return;
     const paraIdx = pendingBookmarkParaRef.current;
     pendingBookmarkParaRef.current = null;
-    // На всякий случай задержку поставил, устал уже от всего
+    //На всякий случай задержку поставил, устал уже от всего
     setTimeout(() => {
       const el = contentRef.current?.querySelector(
         `[data-xpointer="${paraIdx}"]` //data-para-index

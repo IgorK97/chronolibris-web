@@ -5,7 +5,6 @@ import type {
 } from '@/types';
 import { apiClient } from './apiClient';
 import { useQuery } from '@tanstack/react-query';
-import qs from 'qs';
 
 export const searchReferenceApi = {
   getPersonRoles: () => apiClient.get<PersonRoleDto[]>('/search/person-roles'),

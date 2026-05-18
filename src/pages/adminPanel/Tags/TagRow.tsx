@@ -4,13 +4,13 @@ import { TAG_TYPES, type TagDetails } from '@/types';
 import styles from './TagsTable.module.css';
 import { ExpandChildButton } from '@/components/buttons/ExpandChildButton';
 import { AlertDialog } from '@/components/dialogs/AlertDialog';
+import { ArrowLeft } from 'lucide-react';
 
 interface TagRowProps {
   tag: TagDetails;
   depth: number;
   isSelected: boolean;
   onSelectParent: (tag: TagDetails) => void;
-  resetKey?: string;
 }
 
 export const TagRow: React.FC<TagRowProps> = ({
@@ -18,17 +18,11 @@ export const TagRow: React.FC<TagRowProps> = ({
   depth,
   isSelected,
   onSelectParent,
-  resetKey,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const deleteMutation = useDeleteTag();
   const loaderRef = useRef<HTMLTableRowElement | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIsExpanded(false);
-  }, [resetKey]);
 
   const {
     data: childData,
@@ -102,7 +96,7 @@ export const TagRow: React.FC<TagRowProps> = ({
             )}
             {tag.parentTagName && (
               <span className={styles['parent-breadcrumb']}>
-                ← {tag.parentTagName}
+                <ArrowLeft /> {tag.parentTagName}
               </span>
             )}
           </span>
@@ -173,10 +167,8 @@ export const TagRow: React.FC<TagRowProps> = ({
                   key={child.id}
                   tag={child}
                   depth={depth + 1}
-                  // isSelected={isSelected && false}
                   isSelected={false}
                   onSelectParent={onSelectParent}
-                  resetKey={resetKey}
                 />
               ))}
               {hasNextPage && (

@@ -242,14 +242,6 @@ export const SelectionEditPage: React.FC = () => {
               className={styles['input']}
               placeholder="Название"
             />
-            {/* <textarea
-              value={editData.description}
-              onChange={(e) =>
-                setEditData({ ...editData, description: e.target.value })
-              }
-              className={styles['textarea']}
-              placeholder="Описание"
-            /> */}
             <div className={styles['buttons']}>
               <button onClick={handleSave} className={styles['btn']}>
                 Сохранить
@@ -288,14 +280,6 @@ export const SelectionEditPage: React.FC = () => {
               >
                 {selection.isActive ? 'Скрыть' : 'Показать'}
               </button>
-              {/* <button
-                onClick={() => {
-                  setDeleteModalOpen(true);
-                }}
-                className={`${styles['btn']} ${styles['btn-danger']}`}
-              >
-                Удалить
-              </button> */}
             </div>
           </>
         )}

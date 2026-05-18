@@ -82,7 +82,6 @@ export const PersonManager: React.FC = () => {
       setEditingId(null);
       setEditFormData(null);
     } catch (err: any) {
-      console.error('Ошибка обновления персоны:', err);
       alert(err.response?.data?.message || 'Ошибка обновления персоны');
     }
   };

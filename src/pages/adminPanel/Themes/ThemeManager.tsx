@@ -298,25 +298,6 @@ const ThemeTreeNode: React.FC<ThemeTreeNodeProps> = ({
             className={styles['input-field']}
             maxLength={500}
           />
-          {/* <select
-            value={editFormData?.parentThemeId || ''}
-            onChange={(e) =>
-              setEditFormData({
-                ...editFormData!,
-                parentThemeId: e.target.value ? Number(e.target.value) : null,
-              })
-            }
-            className={styles['input-field']}
-          >
-            <option value="">Без родительской темы</option>
-            {allThemes
-              .filter((t) => t.id !== theme.id)
-              .map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name}
-                </option>
-              ))}
-          </select> */}
           <button
             onClick={() =>
               onUpdate(

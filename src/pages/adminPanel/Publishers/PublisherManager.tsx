@@ -47,7 +47,6 @@ export const PublisherManager: React.FC = () => {
       await createMutation.mutateAsync(formData);
       setFormData({ name: '', description: '' });
     } catch (err: any) {
-      console.error('Ошибка создания издательства:', err);
       alert(err.response?.data?.message || 'Ошибка создания издательства');
     }
   };
@@ -75,7 +74,6 @@ export const PublisherManager: React.FC = () => {
       setEditingId(null);
       setEditFormData(null);
     } catch (err: any) {
-      console.error('Ошибка обновления издательства:', err);
       alert(err.response?.data?.message || 'Ошибка обновления издательства');
     }
   };

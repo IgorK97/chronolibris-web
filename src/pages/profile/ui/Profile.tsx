@@ -68,7 +68,6 @@ export const Profile = ({ onNavigate }: ProfileProps) => {
       newErrors.email = 'Некорректный формат почты';
     }
 
-    // const phoneNumber = parsePhoneNumber(profileForm.phoneNumber, 'RU');
     if (!VALIDATION_RULES.phone.test(`+7` + data.phoneNumber)) {
       newErrors.phone = 'Некорректный формат телефона';
     }

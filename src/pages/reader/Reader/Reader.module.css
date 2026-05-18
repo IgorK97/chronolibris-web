@@ -819,9 +819,9 @@
   transition: height 0.15s;
 }
 
-.progress-bar:hover {
+/* .progress-bar:hover {
   height: 10px;
-}
+} */
 
 .progress-fill {
   height: 100%;

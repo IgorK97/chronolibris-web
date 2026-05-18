@@ -571,7 +571,6 @@ export const BookUnit: React.FC = () => {
 
       if (!data.languageId) newErrors.language = 'Выберите язык';
       if (!data.countryId) newErrors.country = 'Выберите страну';
-      // if (isNew && !data.coverFile) newErrors.cover = 'Обложка обязательна';
 
       setErrors(newErrors);
       return Object.keys(newErrors).length === 0;
