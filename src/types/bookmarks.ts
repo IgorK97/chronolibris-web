@@ -26,14 +26,8 @@ export interface BookmarkWithBookDetails {
   createdAt: string;
   bookFileId: number;
   bookFileFormatName: string;
+  bookFileFormatId: number;
   bookFileStatusId: number;
   bookId: number;
   bookTitle: string;
-}
-
-export interface BookmarksPagedResult {
-  items: BookmarkWithBookDetails[];
-  totalCount: number;
-  page: number;
-  pageSize: number;
 }

@@ -168,7 +168,7 @@ export const Reader: React.FC<ReaderProps> = ({
       setPendingBookmarkNav(null);
 
       if (partIdx === currentPartIndex) {
-        setTimeout(() => scrollToXpInDOM(targetXp), 200);
+        setTimeout(() => scrollToXpInDOM(targetXp), 400);
       } else {
         pendingBookmarkXpRef.current = targetXp;
         setCurrentPartIndex(partIdx);

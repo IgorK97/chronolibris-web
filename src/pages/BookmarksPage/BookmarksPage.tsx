@@ -1,13 +1,25 @@
-import React, { useState } from 'react';
-import { Bookmark, Search, BookOpen, Hash, FileType } from 'lucide-react';
-import { useMyBookmarksPaged } from '@/api/bookmarks';
-import styles from './index.module.css';
+import React, { useCallback, useState } from 'react';
+import {
+  Bookmark,
+  Search,
+  BookOpen,
+  FileType,
+  Download,
+  Trash2,
+} from 'lucide-react';
+import { useDeleteBookmark, useMyBookmarksPaged } from '@/api/bookmarks';
+import styles from './BookmarksPage.module.css';
 import { useDebounce } from '@/hooks';
 import { BookFileStatuses, type BookmarkWithBookDetails } from '@/types';
 import { useStore } from '@/stores/globalStore';
 import { useNavigate } from 'react-router-dom';
+import { useDownloadBookFile } from '@/api/bookFiles';
 
 const PAGE_SIZE = 20;
+const FORMAT_EXTENSIONS: Record<number, string> = {
+  1: 'fb2',
+  2: 'epub',
+};
 
 const getStatusBadge = (statusId: number) => {
   const statusMap: Record<number, { label: string; color: string }> = {
@@ -50,6 +62,16 @@ export default function BookmarksPage() {
       month: '2-digit',
       year: 'numeric',
     });
+  const deleteBookmarkMutation = useDeleteBookmark();
+
+  const deleteBookmark = useCallback(
+    async (id: number, bookFileId: number) => {
+      if (!bookFileId) return;
+
+      await deleteBookmarkMutation.mutateAsync({ id, bookFileId });
+    },
+    [deleteBookmarkMutation]
+  );
 
   const handleBookmarkClick = (bm: BookmarkWithBookDetails) => {
     setPendingBookmarkNav({
@@ -57,6 +79,41 @@ export default function BookmarksPage() {
       xpointer: bm.xpointer,
     });
     navigate(`/reader/${bm.bookFileId}`);
+  };
+
+  const { mutateAsync: download, isPending: isDownloading } =
+    useDownloadBookFile();
+
+  const handleDownload = async (
+    bookFileId: number,
+    formatId: number,
+    bookTitle: string
+  ) => {
+    if (!bookFileId) return;
+    // setIsDownloading(true);
+    let a;
+    let url;
+    try {
+      const { blob } = await download(bookFileId);
+      if (!blob) throw new Error('Файл не найден');
+      url = window.URL.createObjectURL(blob);
+      a = document.createElement('a');
+      a.href = url;
+      let extension = FORMAT_EXTENSIONS[formatId] || '';
+      if (extension === 'fb2') extension += '.zip';
+      a.download = `${bookTitle}.${extension}`;
+      document.body.appendChild(a);
+      a.click();
+    } catch {
+      //
+    } finally {
+      if (a) {
+        document.body.removeChild(a);
+      }
+      if (url) {
+        window.URL.revokeObjectURL(url);
+      }
+    }
   };
 
   return (
@@ -73,7 +130,7 @@ export default function BookmarksPage() {
           <input
             className={styles['search-input']}
             type="text"
-            placeholder="Поиск по названию или заметке…"
+            placeholder="Поиск по закладкам…"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
           />
@@ -113,6 +170,28 @@ export default function BookmarksPage() {
                       <span className={styles['row-note']}>{bm.note}</span>
                     )}
                   </span>
+
+                  {bm.bookFileStatusId == BookFileStatuses.ARCHIVE && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDownload(
+                          bm.bookFileId,
+                          bm.bookFileFormatId,
+                          bm.bookTitle
+                        );
+                      }}
+                      disabled={isDownloading}
+                    >
+                      <Download style={{ cursor: 'pointer' }} />
+                    </button>
+                  )}
+                  <button
+                    className={styles['bm-item-btn']}
+                    onClick={() => deleteBookmark(bm.id, bm.bookFileId)}
+                  >
+                    <Trash2 />
+                  </button>
                   <span className={styles['row-date']}>
                     {formatDate(bm.createdAt)}
                   </span>

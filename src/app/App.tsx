@@ -46,7 +46,7 @@ import { RegisterStaffPage } from '@/pages/AdminPanel/RegisterStaffPage/Register
 import { PublicOnlyRoute } from './routes/PublicOnlyRoute';
 import { queryClient } from '@/api/queryClient';
 import { Toaster } from 'react-hot-toast';
-import BookmarksPage from '@/pages/BookmarksPage';
+import BookmarksPage from '@/pages/BookmarksPage/BookmarksPage';
 
 export default function App() {
   const { setUser, isInitialized, setInitialized } = useStore();
