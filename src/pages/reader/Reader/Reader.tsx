@@ -103,7 +103,7 @@ export const Reader: React.FC<ReaderProps> = ({
   const [currentCol, setCurrentCol] = useState(0);
   const [totalCols, setTotalCols] = useState(0);
 
-  const { user } = useStore();
+  const { user, pendingBookmarkNav, setPendingBookmarkNav } = useStore();
 
   const { data: bookmarks = [], isLoading: bookmarksLoading } = useBookmarks(
     bookFileId ?? null,
@@ -139,6 +139,49 @@ export const Reader: React.FC<ReaderProps> = ({
     isError: isTocError,
     refetch: refetchToc,
   } = useBookToc(bookFileId);
+  //Индекс Part, в диапазон которого попадает xpointer закладки
+  const findPartByXpointer = useCallback(
+    (xpointer: string): number => {
+      if (!fetchedTocData) return -1;
+      const xp = parseXpointer(xpointer);
+      return fetchedTocData.Parts.findIndex(
+        (p) => compareXp(xp, p.xps) >= 0 && compareXp(xp, p.xpe) <= 0
+      );
+    },
+    [fetchedTocData]
+  );
+
+  useEffect(() => {
+    if (
+      !pendingBookmarkNav ||
+      !fetchedTocData ||
+      pendingBookmarkNav.bookFileId !== bookFileId
+    ) {
+      return;
+    }
+
+    const targetXp = pendingBookmarkNav.xpointer;
+
+    const partIdx = findPartByXpointer(targetXp);
+
+    if (partIdx !== -1) {
+      setPendingBookmarkNav(null);
+
+      if (partIdx === currentPartIndex) {
+        setTimeout(() => scrollToXpInDOM(targetXp), 200);
+      } else {
+        pendingBookmarkXpRef.current = targetXp;
+        setCurrentPartIndex(partIdx);
+      }
+    }
+  }, [
+    pendingBookmarkNav,
+    fetchedTocData,
+    bookFileId,
+    currentPartIndex,
+    findPartByXpointer,
+    setPendingBookmarkNav,
+  ]);
 
   // useEffect(() => {
   //   console.log('TOC DATA: ', fetchedTocData);
@@ -205,18 +248,6 @@ export const Reader: React.FC<ReaderProps> = ({
 
   const stringifyXpointer = (path: number[]): string =>
     path.length > 0 ? `/${path.join('/')}` : '/';
-
-  //Индекс Part, в диапазон которого попадает xpointer закладки
-  const findPartByXpointer = useCallback(
-    (xpointer: string): number => {
-      if (!fetchedTocData) return -1;
-      const xp = parseXpointer(xpointer);
-      return fetchedTocData.Parts.findIndex(
-        (p) => compareXp(xp, p.xps) >= 0 && compareXp(xp, p.xpe) <= 0
-      );
-    },
-    [fetchedTocData]
-  );
 
   const pendingBookmarkXpRef = useRef<string | null>(null);
   // const pendingBookmarkParaRef = useRef<string | null>(null);

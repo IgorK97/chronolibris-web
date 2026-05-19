@@ -17,3 +17,23 @@ export interface CreateBookmarkRequest {
 export interface UpdateBookmarkRequest {
   note?: string;
 }
+
+export interface BookmarkWithBookDetails {
+  id: number;
+  xpointer: string;
+  context: string;
+  note: string | null;
+  createdAt: string;
+  bookFileId: number;
+  bookFileFormatName: string;
+  bookFileStatusId: number;
+  bookId: number;
+  bookTitle: string;
+}
+
+export interface BookmarksPagedResult {
+  items: BookmarkWithBookDetails[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}

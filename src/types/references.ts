@@ -15,6 +15,7 @@ export const BookFileStatuses = {
   PROCESSING: 3,
   COMPLETED: 4,
   FAILED: 5,
+  ARCHIVE: 6,
 } as const;
 
 export interface CreateLanguageRequest {

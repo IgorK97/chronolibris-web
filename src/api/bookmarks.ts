@@ -1,8 +1,15 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { apiClient } from './apiClient';
 import type {
   Bookmark,
+  BookmarkWithBookDetails,
   CreateBookmarkRequest,
+  PagedResult,
   UpdateBookmarkRequest,
 } from '@/types';
 
@@ -18,6 +25,35 @@ export const bookmarksApi = {
 
   deleteBookmark: (id: number): Promise<void> =>
     apiClient.delete<void>(`/Bookmarks/${id}`),
+
+  getMyBookmarksPaged: (
+    number: number,
+    pageSize: number,
+    search?: string
+  ): Promise<PagedResult<BookmarkWithBookDetails>> => {
+    return apiClient.get<PagedResult<BookmarkWithBookDetails>>(
+      `/Bookmarks/my`,
+      {
+        number,
+        pageSize,
+        search,
+      }
+    );
+  },
+};
+
+export const useMyBookmarksPaged = (pageSize: number, search: string) => {
+  return useInfiniteQuery({
+    queryKey: ['my-bookmarks', pageSize, search],
+    queryFn: ({ pageParam }) =>
+      bookmarksApi.getMyBookmarksPaged(pageParam, pageSize, search),
+    staleTime: 2 * 60 * 1000,
+    placeholderData: (prev) => prev,
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => {
+      return lastPage.hasNext ? lastPage.lastId : undefined;
+    },
+  });
 };
 
 export const useBookmarks = (
@@ -57,6 +93,7 @@ export const useCreateBookmark = (userName: string) => {
           return oldBookmarks ? [...oldBookmarks, newBookmark] : [newBookmark];
         }
       );
+      queryClient.invalidateQueries({ queryKey: ['my-bookmarks'] });
     },
   });
 };

@@ -2,7 +2,7 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useStore } from '@/stores/globalStore';
 import styles from './Header.module.css';
 import { useEffect, useRef, useState } from 'react';
-import { Library, Search, ShieldCheck, UserStar } from 'lucide-react';
+import { Bookmark, Library, Search, ShieldCheck, UserStar } from 'lucide-react';
 import { CatalogPanel } from '@/pages/Search/';
 import { AdminSidebar } from '@/components/AdminSideBar/AdminSideBar';
 
@@ -98,12 +98,24 @@ export default function Header() {
                   />
                 )}
                 {user.role == 'reader' && (
-                  <Link to="/mybooks" className={styles['catalog-btn']}>
-                    <span className={styles['catalog-btn-label']}>
-                      Мои книги
-                    </span>
-                    {<Library className={styles['catalog-btn-icon']} />}
-                  </Link>
+                  <div style={{ display: 'flex', flexDirection: 'row' }}>
+                    <Link to="/mybooks" className={styles['catalog-btn']}>
+                      <span className={styles['catalog-btn-label']}>
+                        Мои книги
+                      </span>
+                      {<Library className={styles['catalog-btn-icon']} />}
+                    </Link>
+                    <Link
+                      style={{ marginLeft: '10px' }}
+                      to="/bookmarks"
+                      className={styles['catalog-btn']}
+                    >
+                      <span className={styles['catalog-btn-label']}>
+                        Закладки
+                      </span>
+                      {<Bookmark className={styles['catalog-btn-icon']} />}
+                    </Link>
+                  </div>
                 )}
                 <Link to="/profile" className={styles['profile-icon']}>
                   {user.userName?.charAt(0).toUpperCase() || 'U'}

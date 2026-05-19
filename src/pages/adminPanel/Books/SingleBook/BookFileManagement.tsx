@@ -173,11 +173,16 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
 
   const getStatusBadge = (statusId: number) => {
     const statusMap: Record<number, { label: string; color: string }> = {
-      [BookFileStatuses.PENDING]: { label: 'Ожидание', color: 'gray' },
-      [BookFileStatuses.UPLOADED]: { label: 'Загружен', color: 'orange' },
-      [BookFileStatuses.PROCESSING]: { label: 'Обработка', color: 'blue' },
-      [BookFileStatuses.COMPLETED]: { label: 'Готов', color: '#28a745' },
+      [BookFileStatuses.PENDING]: { label: 'Ожидание', color: '#32384B' },
+      [BookFileStatuses.UPLOADED]: { label: 'Загружен', color: '#946D4B' },
+      [BookFileStatuses.PROCESSING]: { label: 'Обработка', color: '#394264' },
+
       [BookFileStatuses.FAILED]: { label: 'Ошибка', color: '#dc3545' },
+      [BookFileStatuses.COMPLETED]: {
+        label: 'Готов к чтению',
+        color: '#2F5C57',
+      },
+      [BookFileStatuses.ARCHIVE]: { label: 'Архив', color: '#6F4F46' },
     };
 
     const status = statusMap[statusId] || null;
@@ -275,7 +280,8 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
         </div>
       </div>
       <AlertDialog
-        description={`Это действие нельзя будет отменить, все сопутствующие фрагменты и данные будут также удалены`}
+        description={`Это действие нельзя будет отменить. Если файл не находится в архивном состоянии, он будет переведен в архивное состояние и доступен только администраторам, модераторам и тем читателям, что
+          имеют закладки для данного файла. Если файл в архивном состоянии, все сопутствующие фрагменты и данные будут окончательно удалены вместе с самим файлом`}
         open={deleteModalOpen}
         title={`Вы действительно хотите удалить этот файл книги?`}
         handleAccept={handleDelete}
@@ -312,7 +318,7 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
                   {file.historicalText === true
                     ? 'Текст в исходном историческом виде'
                     : file.historicalText === false
-                      ? 'Обработанный текст (современная офрография)'
+                      ? 'Обработанный текст (современная орфография)'
                       : 'Обычный'}
                 </td>
                 <td>{new Date(file.createdAt).toLocaleDateString('ru-RU')}</td>

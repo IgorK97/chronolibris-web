@@ -46,6 +46,7 @@ import { RegisterStaffPage } from '@/pages/AdminPanel/RegisterStaffPage/Register
 import { PublicOnlyRoute } from './routes/PublicOnlyRoute';
 import { queryClient } from '@/api/queryClient';
 import { Toaster } from 'react-hot-toast';
+import BookmarksPage from '@/pages/BookmarksPage';
 
 export default function App() {
   const { setUser, isInitialized, setInitialized } = useStore();
@@ -88,6 +89,7 @@ export default function App() {
       '/tags': 'Управление тегами | Chronolibris',
       '/contents': 'Управление содержимым | Chronolibris',
       '/register-staff': 'Регистрация сотрудников | Chronolibris',
+      '/bookmarks': 'Закладки',
     };
 
     const matchedKey = Object.keys(titles).find((path) =>
@@ -206,6 +208,7 @@ export default function App() {
               path="mybooks"
               element={<MyBooks onNavigateToBook={handleBookSelection} />}
             />
+            <Route path="bookmarks" element={<BookmarksPage />} />
           </Route>
 
           {/* Только администраторы */}

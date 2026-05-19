@@ -18,6 +18,11 @@ export interface FilterNamesCache {
   tags: Record<number, CachedTag>;
 }
 
+export interface PendingBookmarkNavigation {
+  bookFileId: number;
+  xpointer: string;
+}
+
 interface AppState {
   user: UserProfile | null;
   currentBook: BookListItem | null;
@@ -28,6 +33,9 @@ interface AppState {
   cacheTags: (tags: CachedTag[]) => void;
   removePersons: (ids: number[]) => void;
   removeTags: (ids: number[]) => void;
+
+  pendingBookmarkNav: PendingBookmarkNavigation | null;
+  setPendingBookmarkNav: (nav: PendingBookmarkNavigation | null) => void;
 
   setUser: (user: UserProfile | null) => void;
   setCurrentBook: (book: BookListItem | null) => void;
@@ -53,7 +61,7 @@ export const useStore = create<AppState>()(
       currentBook: null,
       isInitialized: false,
       filterNamesCache: EMPTY_CACHE,
-
+      pendingBookmarkNav: null,
       setUser: (user) => set({ user }),
       setCurrentBook: (book) => set({ currentBook: book }),
       setInitialized: (val) => set({ isInitialized: val }),
@@ -61,6 +69,7 @@ export const useStore = create<AppState>()(
         set({ currentBook: null, user: null, isInitialized: true });
         localStorage.removeItem('elibrary-app-storage');
       },
+      setPendingBookmarkNav: (nav) => set({ pendingBookmarkNav: nav }),
       isReader: () => get().user?.role === USER_ROLES.READER,
       isModerator: () => get().user?.role === USER_ROLES.MODERATOR,
       isAdmin: () => get().user?.role === USER_ROLES.ADMIN,
@@ -100,6 +109,14 @@ export const useStore = create<AppState>()(
           };
         }),
     }),
-    { name: 'elibrary-app-storage' }
+    {
+      name: 'elibrary-app-storage',
+      partialize: (state) => ({
+        user: state.user,
+        currentBook: state.currentBook,
+        isInitialized: state.isInitialized,
+        filterNamesCache: state.filterNamesCache,
+      }),
+    }
   )
 );
