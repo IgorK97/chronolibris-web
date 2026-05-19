@@ -161,7 +161,6 @@ export const Reader: React.FC<ReaderProps> = ({
       // const pRight = pLeft + p.offsetWidth;
 
       //параграф полностью внутри видимой области
-      // (можно ослабить условие до pLeft >= viewportLeft, если нужно начало параграфа)
       if (pLeft >= contentLeft) {
         return p.getAttribute('data-xpointer') || '/1';
       }
