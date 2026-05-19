@@ -336,7 +336,7 @@
   z-index: 100;
   white-space: nowrap;
   padding-top: 14px;
-  top: calc(100% + 4px);
+  top: 100%;
 
   &::before {
     content: '';
@@ -344,9 +344,11 @@
     top: -6px;
     left: 50%;
     transform: translateX(-50%) rotate(45deg);
-    width: 10px;
-    height: 10px;
     background: #fff;
+    height: 10px;
+    width: 10px;
+
+    /* border: 1px solid transparent; */
     border-left: 1px solid #e5e7eb;
     border-top: 1px solid #e5e7eb;
   }

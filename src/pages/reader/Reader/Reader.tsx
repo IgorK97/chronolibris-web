@@ -57,29 +57,7 @@ import { ColorModal } from './ColorModal';
 import { ContextMenu } from './ContextMenu';
 import { ImageLightbox } from './ImageLightbox';
 import { BookmarkEditModal } from './BookmarkEditModal';
-
-//первые слова из текста абзаца
-const extractContext = (seg: TextSegment): string => {
-  let raw = '';
-  if (typeof seg.c === 'string') {
-    raw = seg.c;
-  } else if (Array.isArray(seg.c)) {
-    raw = seg.c
-      .map((item) =>
-        typeof item === 'string' ? item : ((item as { c?: string }).c ?? '')
-      )
-      .join('');
-  }
-
-  const words = raw.trim().split(/\s+/);
-  let result = '';
-  for (const word of words) {
-    const next = result ? result + ' ' + word : word;
-    if (next.length > 30) break;
-    result = next;
-  }
-  return result;
-};
+import { extractContext } from './utils';
 
 interface ReaderProps {
   bookFileId: number;
@@ -121,7 +99,6 @@ export const Reader: React.FC<ReaderProps> = ({
 
   const [activeNote, setActiveNote] = useState<Note | null>(null);
   const [activeImage, setActiveImage] = useState<string | null>(null);
-  const [xpointer, setXpointer] = useState('');
 
   const [currentCol, setCurrentCol] = useState(0);
   const [totalCols, setTotalCols] = useState(0);
@@ -132,9 +109,7 @@ export const Reader: React.FC<ReaderProps> = ({
     bookFileId ?? null,
     user?.userName ?? null
   );
-  const progressLoaded = useRef(false);
   // console.log(bookmarks);
-  const savedPercentRef = useRef<number>(0);
 
   const createBookmarkMutation = useCreateBookmark(user?.userName ?? '');
   const updateBookmarkMutation = useUpdateBookmark();
@@ -147,7 +122,7 @@ export const Reader: React.FC<ReaderProps> = ({
 
   //Индекс первого видимого на странице параграфа до изменений
   const visibleParaIndexRef = useRef<string | null>(null);
-  //Флаг того, что после изменения нужно восстановить позицию по элементу
+  //восстановление по элементу или нет
   const restoreByElementRef = useRef<boolean>(false);
 
   const [editingBookmark, setEditingBookmark] =
@@ -169,7 +144,7 @@ export const Reader: React.FC<ReaderProps> = ({
   //   console.log('TOC DATA: ', fetchedTocData);
   // }, [fetchedTocData]);
 
-  //Находит индекс первого параграфа, который полностью виден в текущей вьюпорте
+  //функция для определения индекса первого параграфа, который полностью виден на странице
   const captureVisibleParaIndex = useCallback(() => {
     const vp = viewportRef.current;
     const ct = contentRef.current;
@@ -211,42 +186,12 @@ export const Reader: React.FC<ReaderProps> = ({
     return Math.min(100, (globalPos / fetchedTocData.Body[0].e) * 100);
   }, [fetchedTocData, currentPartIndex, currentCol, totalCols]);
 
-  const readPercentRef = useRef(readPercent);
+  // const readPercentRef = useRef(readPercent);
 
-  useEffect(() => {
-    readPercentRef.current = readPercent;
-  }, [readPercent]);
+  // useEffect(() => {
+  //   readPercentRef.current = readPercent;
+  // }, [readPercent]);
 
-  useEffect(() => {
-    if (!user) return;
-
-    const handleUnload = () => {
-      if (!progressLoaded.current) return;
-
-      const paraIndex = captureVisibleParaIndex() ?? 0;
-      if (readPercentRef.current > savedPercentRef.current) {
-        fetch('/api/ReadingProgress', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            bookFileId,
-            percentage: readPercentRef,
-            paraIndex,
-          }),
-          keepalive: true,
-        });
-      }
-    };
-
-    window.addEventListener('beforeunload', handleUnload);
-    return () => window.removeEventListener('beforeunload', handleUnload);
-  }, [user, bookFileId, captureVisibleParaIndex]);
-
-  //Сравнение xpointer-массивов лексикографически:
-  //compareXp([1,1,3], [1,1,5]) значит -1 (меньше)
-  //compareXp([1,1,5], [1,1,5])  -  0 (равно)
-  //compareXp([1,1,6], [1,1,5])  -  1 (больше)
-  //Более короткий массив меньше при равном префиксе: [1,1] < [1,1,1]
   const compareXp = (a: number[], b: number[]): number => {
     const len = Math.min(a.length, b.length);
     for (let i = 0; i < len; i++) {
@@ -262,7 +207,7 @@ export const Reader: React.FC<ReaderProps> = ({
   const stringifyXpointer = (path: number[]): string =>
     path.length > 0 ? `/${path.join('/')}` : '/';
 
-  //Индекс Part, в диапазон [xps..xpe] которого попадает xpointer закладки
+  //Индекс Part, в диапазон которого попадает xpointer закладки
   const findPartByXpointer = useCallback(
     (xpointer: string): number => {
       if (!fetchedTocData) return -1;
@@ -275,11 +220,9 @@ export const Reader: React.FC<ReaderProps> = ({
   );
 
   const pendingBookmarkXpRef = useRef<string | null>(null);
-  const pendingXpointerRef = useRef<string | null>(null);
+  // const pendingBookmarkParaRef = useRef<string | null>(null);
 
-  const pendingBookmarkParaRef = useRef<string | null>(null);
-
-  const pendingColRef = useRef<number | null>(null);
+  const pendingColRef = useRef<number | null>(null); //null,9999,+0,-
 
   const viewportRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -326,7 +269,7 @@ export const Reader: React.FC<ReaderProps> = ({
 
       restoreByElementRef.current = false;
       visibleParaIndexRef.current = null;
-      return; //позиция восстановлена
+      return;
     }
 
     if (pendingColRef.current !== null) {
@@ -383,7 +326,7 @@ export const Reader: React.FC<ReaderProps> = ({
 
     if (totalCols === 0) return;
 
-    const remaining = totalCols - 1 - currentCol;
+    const remaining = totalCols - currentCol;
     if (remaining > PREFETCH_THRESHOLD) return;
 
     const nextIdx = currentPartIndex + 1;
@@ -419,7 +362,6 @@ export const Reader: React.FC<ReaderProps> = ({
       }
       return; // -
     }
-    // console.log('I AM TUTA', col);
     if (col < 0) {
       const prevIdx = currentPartIndex - 1;
       if (prevIdx >= 0) {
@@ -444,8 +386,7 @@ export const Reader: React.FC<ReaderProps> = ({
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       recalcCols();
-    }, 0); //задержка для гарантии отрисовки
-
+    }, 0);
     return () => clearTimeout(timeoutId);
   }, [twoPageMode]);
 
@@ -454,7 +395,6 @@ export const Reader: React.FC<ReaderProps> = ({
 
   const changeFontSize = useCallback(
     (delta: number) => {
-      //какой элемент сейчас видит пользователь
       const visiblePara = captureVisibleParaIndex();
       if (visiblePara !== null) {
         visibleParaIndexRef.current = visiblePara;
@@ -468,7 +408,6 @@ export const Reader: React.FC<ReaderProps> = ({
   );
 
   const changeFontFamily = useCallback((value: string) => {
-    //какой элемент сейчас видит пользователь
     const visiblePara = captureVisibleParaIndex();
     if (visiblePara !== null) {
       visibleParaIndexRef.current = visiblePara;
@@ -517,7 +456,7 @@ export const Reader: React.FC<ReaderProps> = ({
   }, [contextMenu]);
 
   const createBookmark = useCallback(
-    (xpointer: string, context: string, note: string) => {
+    async (xpointer: string, context: string, note: string) => {
       if (!bookFileId || !user) return;
 
       const request: CreateBookmarkRequest = {
@@ -527,15 +466,17 @@ export const Reader: React.FC<ReaderProps> = ({
         noteText: note.trim() || undefined,
       };
 
-      createBookmarkMutation.mutate(request);
+      await createBookmarkMutation.mutateAsync(request);
       setContextMenu(null);
     },
     [bookFileId, user, createBookmarkMutation]
   );
 
   const updateBookmark = useCallback(
-    (id: number, bookFileId: number, note?: string) => {
-      updateBookmarkMutation.mutate({
+    async (id: number, bookFileId: number, note?: string) => {
+      if (!bookFileId || !user) return;
+
+      await updateBookmarkMutation.mutateAsync({
         id,
         data: { note: note?.trim() || undefined },
         bookFileId,
@@ -546,8 +487,10 @@ export const Reader: React.FC<ReaderProps> = ({
   );
 
   const deleteBookmark = useCallback(
-    (id: number, bookFileId: number) => {
-      deleteBookmarkMutation.mutate({ id, bookFileId });
+    async (id: number, bookFileId: number) => {
+      if (!bookFileId || !user) return;
+
+      await deleteBookmarkMutation.mutateAsync({ id, bookFileId });
       setEditingBookmark(null);
     },
     [deleteBookmarkMutation]
@@ -555,22 +498,24 @@ export const Reader: React.FC<ReaderProps> = ({
 
   const scrollToXpInDOM = useCallback(
     (xpointer: string): boolean => {
-      const el = contentRef.current?.querySelector(
-        `[data-xpointer="${CSS.escape(xpointer)}"]`
+      if (!contentRef.current || !viewportRef.current) return false;
+
+      const el = contentRef.current.querySelector(
+        `[data-xpointer="${xpointer}"]`
       ) as HTMLElement | null;
       if (!el || !viewportRef.current) return false;
 
-      const ctRect = contentRef.current!.getBoundingClientRect();
+      const ctRect = contentRef.current.getBoundingClientRect();
       const elRect = el.getBoundingClientRect();
-      const elLeft = elRect.left - ctRect.left + contentRef.current!.scrollLeft;
+      const elLeft = elRect.left - ctRect.left + contentRef.current.scrollLeft;
       const colWidth = twoPageMode
-        ? (contentRef.current!.clientWidth - pageGap) / 2 + pageGap
+        ? (contentRef.current.clientWidth - pageGap) / 2 + pageGap
         : viewportRef.current.clientWidth;
       const targetCol = Math.max(0, Math.floor(elLeft / colWidth));
 
       if (targetCol !== currentCol) {
         setCurrentCol(targetCol);
-        contentRef.current!.scrollTo({
+        contentRef.current.scrollTo({
           left: targetCol * colWidth,
           behavior: 'smooth',
         });
@@ -597,57 +542,19 @@ export const Reader: React.FC<ReaderProps> = ({
     [fetchedTocData, findPartByXpointer, currentPartIndex, scrollToXpInDOM]
   );
 
-  useEffect(() => {
-    if (pendingBookmarkParaRef.current === null) return;
-    if (isLoading || totalCols === 0) return;
-    const paraIdx = pendingBookmarkParaRef.current;
-    pendingBookmarkParaRef.current = null;
-    //На всякий случай задержку поставил, устал уже от всего
-    setTimeout(() => {
-      const el = contentRef.current?.querySelector(
-        `[data-xpointer="${paraIdx}"]` //data-para-index
-      ) as HTMLElement | null;
-      if (!el || !viewportRef.current) return;
-      const vpRect = viewportRef.current.getBoundingClientRect();
-      const elRect = el.getBoundingClientRect();
-      const elLeft = elRect.left - vpRect.left + viewportRef.current.scrollLeft;
-      // const colWidth = viewportRef.current.clientWidth - pageGap;
-      const colWidth = twoPageMode
-        ? (contentRef.current!.clientWidth - pageGap) / 2 + pageGap
-        : viewportRef.current.clientWidth;
-      const targetCol = Math.max(0, Math.floor(elLeft / colWidth));
-      setCurrentCol(targetCol);
-      contentRef.current!.scrollTo({
-        // left: targetCol * (contentRef.current!.clientWidth - pageGap),
-        left: targetCol * colWidth,
-        behavior: 'smooth',
-      });
-    }, 80);
-  }, [isLoading, totalCols, segments, twoPageMode]);
-
   const renderInlineContent = useCallback(
     (content: (string | InlineNode)[]): React.ReactNode => {
       return content.map((item, idx) => {
-        if (typeof item === 'string')
-          return <React.Fragment key={idx}>{item}</React.Fragment>;
-        if (typeof item === 'object' && 'pn' in item) {
+        if (typeof item === 'string') return <span key={idx}>{item}</span>;
+        if ('pn' in item) {
           return (
-            // <span key={idx} className={styles['page-num']}>
-            //   {(item as PageNumberNode).pn}
-            // </span>
             <Badge key={idx} variant="outline" className={styles['page-num']}>
-              {(item as PageNumberNode).pn}
+              {item.pn}
             </Badge>
           );
         }
-        //Почему-то пока не добавил обработку сверху, выдавал ошибку,
-        //что такого свойства нет в InlineNode (PageNumberNode)
-        if (item.t === 'em')
-          return <em key={idx}>{(item as { t: string; c: string }).c}</em>;
-        if (item.t === 'st')
-          return (
-            <strong key={idx}>{(item as { t: string; c: string }).c}</strong>
-          );
+        if (item.t === 'em') return <em key={idx}>{item.c}</em>;
+        if (item.t === 'st') return <strong key={idx}>{item.c}</strong>;
         if (item.t === 'note') {
           const note = item as Note;
           return (
@@ -658,9 +565,9 @@ export const Reader: React.FC<ReaderProps> = ({
                 e.stopPropagation();
                 setActiveNote(note);
               }}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && setActiveNote(note)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') setActiveNote(note);
+              }}
             >
               {note.c}
             </span>
@@ -674,11 +581,11 @@ export const Reader: React.FC<ReaderProps> = ({
 
   const renderSegment = (seg: TextSegment, index: number): React.ReactNode => {
     if (seg.t === 'br') return <br key={index} />;
-    if (seg.t === 'pn') {
+    if ('pn' in seg) {
       return (
         <div key={index} className={styles['page-num-block']}>
           <Badge variant="outline" className={styles['page-num']}>
-            {seg.c as unknown as number}
+            {seg.pn as number}
           </Badge>
         </div>
       );
@@ -694,18 +601,16 @@ export const Reader: React.FC<ReaderProps> = ({
         <div key={index} className={styles['img-block']}>
           <img
             src={fullUrl}
-            alt=""
             className={styles['img-inline']}
             onClick={() => setActiveImage(fullUrl)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => e.key === 'Enter' && setActiveImage(fullUrl)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') setActiveImage(fullUrl);
+            }}
           />
         </div>
       );
     }
 
-    // const paraIndex = seg.xp?.[2] ?? 0;
     const segXpointer = seg.xp ? '/' + seg.xp.join('/') : '';
     // console.log(paraIndex, bookFileId);
     // console.log(bookmarks[0]);
@@ -1011,7 +916,6 @@ export const Reader: React.FC<ReaderProps> = ({
                 //если все хорошо, то рендер сегментов
                 segments?.map((seg, idx) => renderSegment(seg, idx))
               )}
-              {/* {segments.map((seg, idx) => renderSegment(seg, idx))} */}
             </div>
           </div>
           <div

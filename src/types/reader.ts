@@ -47,9 +47,6 @@ export interface TocBodyItem {
 
 export interface TocMeta {
   Title: string;
-  Authors: { Role: string; First?: string; Last?: string }[];
-  Annotation: string;
-  Lang: string;
 }
 
 export interface TocData {
