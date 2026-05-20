@@ -281,7 +281,8 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
       </div>
       <AlertDialog
         description={`Это действие нельзя будет отменить. Если файл не находится в архивном состоянии, он будет переведен в архивное состояние и доступен только администраторам, модераторам и тем читателям, что
-          имеют закладки для данного файла. Если файл в архивном состоянии, все сопутствующие фрагменты и данные будут окончательно удалены вместе с самим файлом`}
+          имеют закладки для данного файла. Если файл в архивном состоянии, все сопутствующие фрагменты и данные в файловом хранилище будут окончательно удалены вместе с самим файлом, 
+          а состояние файла будет изменено на удаленное.`}
         open={deleteModalOpen}
         title={`Вы действительно хотите удалить этот файл книги?`}
         handleAccept={handleDelete}
@@ -303,6 +304,8 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
               <th>Тип</th>
               <th>Тип текста</th>
               <th>Загружен</th>
+              <th>Скрыт</th>
+              <th>Удален</th>
               <th>Действия</th>
             </tr>
           </thead>
@@ -322,23 +325,54 @@ export const BookFileManagement: React.FC<BookFileManagementProps> = ({
                       : 'Обычный'}
                 </td>
                 <td>{new Date(file.createdAt).toLocaleDateString('ru-RU')}</td>
+                <td>
+                  {file.hiddenAt
+                    ? new Date(file.hiddenAt).toLocaleDateString('ru-RU')
+                    : '-'}
+                </td>
+                <td>
+                  {file.deletedAt
+                    ? new Date(file.createdAt).toLocaleDateString('ru-RU')
+                    : '-'}
+                </td>
                 <td style={{ gap: '20px' }}>
                   <button
                     onClick={() => handleDownload(file.id, file.formatId)}
                     disabled={
-                      file.bookFileStatusId !== BookFileStatuses.COMPLETED
+                      file.bookFileStatusId != BookFileStatuses.ARCHIVE &&
+                      file.bookFileStatusId != BookFileStatuses.COMPLETED
                     }
                   >
-                    <Download style={{ cursor: 'pointer' }} />
+                    <Download
+                      style={{
+                        cursor: 'pointer',
+                        opacity:
+                          file.bookFileStatusId == BookFileStatuses.ARCHIVE ||
+                          file.bookFileStatusId == BookFileStatuses.COMPLETED
+                            ? 1.0
+                            : 0.4,
+                      }}
+                    />
                   </button>
                   <button
                     onClick={() => {
                       setDeletingBookfile(file.id);
                       setDeleteModalOpen(true);
                     }}
-                    disabled={isDeleting}
+                    disabled={
+                      isDeleting ||
+                      file.bookFileStatusId == BookFileStatuses.DELETED
+                    }
                   >
-                    <Trash2 style={{ cursor: 'pointer' }} />
+                    <Trash2
+                      style={{
+                        cursor: 'pointer',
+                        opacity:
+                          file.bookFileStatusId != BookFileStatuses.DELETED
+                            ? 1.0
+                            : 0.4,
+                      }}
+                    />
                   </button>
                 </td>
               </tr>

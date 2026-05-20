@@ -21,6 +21,8 @@ export interface BookFileDto {
   isReadable: boolean;
   createdAt: string;
   completedAt?: string | null;
+  hiddenAt?: string | null;
+  deletedAt?: string | null;
   createdBy: number;
   createdByName?: string | null;
   version: number;
